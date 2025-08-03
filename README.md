@@ -23,32 +23,32 @@ https://dailyjamm.com
 
 - 🔒 Single play per day tracked with localStorage
 
-🧮 Stats tracking:
+- 🧮 Stats tracking:
 
-Current streak
+-- Current streak
 
-Best streak
+-- Best streak
 
-Total games played
+-- Total games played
 
-⏱️ Countdown timer after game ends
+- ⏱️ Countdown timer after game ends
 
-📱 Responsive UI built with Tailwind CSS
+- 📱 Responsive UI built with Tailwind CSS
 
-🖼️ Custom favicon & clean UI modals
+- 🖼️ Custom favicon & clean UI modals
 
-🛠️ Tech Stack
-HTML / JavaScript
+## 🛠️ Tech Stack
+- HTML / JavaScript
 
-Tailwind CSS (via CDN for quick dev)
+- Tailwind CSS (via CDN for quick dev)
 
-SoundCloud Player Widget API
+- SoundCloud Player Widget API
 
-LocalStorage for session state & statistics
+- LocalStorage for session state & statistics
 
-📂 Project Structure
-bash
-Copy code
+## 📂 Project Structure
+- bash
+- Copy code
 📁 project-root
 ├── index.html        # Main game logic + UI
 ├── favicon.png       # Tab icon/logo for the site
