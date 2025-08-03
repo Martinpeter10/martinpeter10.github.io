@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cartoondle</title>
+  <link rel="icon" type="image/png" href="/mnt/data/A_logo_for_a_daily_game_website_named_\"DailyJamm\"_.png">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://w.soundcloud.com/player/api.js"></script>
   <style>
@@ -105,10 +106,10 @@
       document.getElementById("listenTime").textContent = maxListenTime[Math.min(currentListenTimeIndex, maxListenTime.length - 1)] + " second" + (maxListenTime[currentListenTimeIndex] > 1 ? "s" : "");
     }
 
-    function addGuessToHistory(guess, correct) {
+    function addGuessToHistory(guess, correct, timeLength) {
       const history = document.getElementById("guessHistory");
       const div = document.createElement("div");
-      div.textContent = guess;
+      div.innerHTML = `<strong>${guess || '(Skipped)'}</strong> <span class="text-xs opacity-60">@ ${timeLength} sec</span>`;
       div.className = correct ? "text-green-400 font-bold" : "text-red-400";
       history.appendChild(div);
     }
@@ -123,10 +124,15 @@
     });
 
     document.getElementById("skipBtn").addEventListener("click", () => {
-      if (currentGuess < maxGuesses - 1) {
+      if (currentGuess < maxGuesses) {
+        const time = maxListenTime[Math.min(currentListenTimeIndex, maxListenTime.length - 1)];
+        addGuessToHistory("", false, time);
         currentGuess++;
         currentListenTimeIndex++;
         updateStatus();
+        if (currentGuess >= maxGuesses) {
+          alert(`Out of guesses! The answer was: ${todayTrack.title}`);
+        }
       }
     });
 
@@ -136,12 +142,13 @@
 
       if (!userGuess || currentGuess >= maxGuesses) return;
 
+      const time = maxListenTime[Math.min(currentListenTimeIndex, maxListenTime.length - 1)];
+
       if (userGuess.toLowerCase() === correctAnswer.toLowerCase()) {
-        addGuessToHistory(userGuess, true);
+        addGuessToHistory(userGuess, true, time);
         alert("Correct!");
-        // Add modal or final state here
       } else {
-        addGuessToHistory(userGuess, false);
+        addGuessToHistory(userGuess, false, time);
         currentGuess++;
         currentListenTimeIndex++;
         updateStatus();
