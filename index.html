@@ -5,13 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cartoondle</title>
   <link rel="icon" type="image/png" href="favicon.png">
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://w.soundcloud.com/player/api.js"></script>
   <style>
     #resultModal, #alreadyPlayedModal { display: none; }
   </style>
 </head>
 <body class="bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-800 min-h-screen text-white">
+  <noscript>
+    <div class="text-center mt-40 text-red-400 text-xl">Please enable JavaScript to play Cartoondle.</div>
+  </noscript>
+
+  <!-- Already Played Modal -->
   <div id="alreadyPlayedModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden">
     <div class="bg-white text-black rounded-xl p-6 w-full max-w-md text-center">
       <h2 class="text-2xl font-bold mb-2">🎧 You've already played today!</h2>
@@ -20,50 +25,106 @@
     </div>
   </div>
 
-  <div id="countdownToMidnight" class="text-center text-white mt-6 text-lg hidden"></div>
+  <div class="container mx-auto px-4 py-8 max-w-4xl">
+    <div class="text-center mb-8">
+      <h1 class="text-4xl font-bold mb-2">🎵 Cartoondle 🎵</h1>
+      <p class="text-lg opacity-90">Guess the cartoon theme song in 6 tries or less!</p>
+      <div class="mt-4 bg-white/10 rounded-lg p-4">
+        <div class="flex justify-center space-x-8 text-sm">
+          <div><span class="font-semibold">Current Streak:</span> <span id="currentStreak" class="ml-1 text-yellow-300">0</span></div>
+          <div><span class="font-semibold">Best Streak:</span> <span id="bestStreak" class="ml-1 text-green-300">0</span></div>
+          <div><span class="font-semibold">Games Played:</span> <span id="gamesPlayed" class="ml-1 text-blue-300">0</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 mb-6">
+      <div class="text-center mb-6">
+        <h2 class="text-xl font-semibold mb-2">Listen to the theme song:</h2>
+        <iframe id="sc-player" width="0" height="0" style="visibility:hidden;" scrolling="no" frameborder="no" allow="autoplay"></iframe>
+        <div class="text-center mt-4 mb-4">
+          <button id="playSnippet" class="bg-green-500 hover:bg-green-600 px-6 py-2 rounded-lg font-semibold">▶️ Play Snippet</button>
+          <button id="skipBtn" class="bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold">⏭️ Skip</button>
+        </div>
+        <div class="text-sm opacity-75">
+          Guess <span id="currentGuess">1</span> of 6 • Listen time: <span id="listenTime">1 second</span>
+        </div>
+      </div>
+
+      <div class="mb-6">
+        <input type="text" id="guessInput" placeholder="Enter your guess for the cartoon name..."
+          class="w-full p-4 rounded-lg text-black text-lg border-2 border-transparent focus:border-yellow-400 focus:outline-none">
+        <button id="submitBtn" class="w-full mt-3 bg-blue-500 hover:bg-blue-600 py-3 rounded-lg font-semibold text-lg">Submit Guess</button>
+      </div>
+      <div id="guessHistory" class="space-y-2"></div>
+      <div id="correctAnswerReveal" class="text-center text-xl text-green-300 font-semibold mt-6 hidden"></div>
+    </div>
+
+    <div id="countdownToMidnight" class="text-center text-white mt-6 text-lg hidden"></div>
+  </div>
+
+  <div id="resultModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+    <div class="bg-white text-black rounded-xl p-6 w-full max-w-md text-center">
+      <h2 class="text-2xl font-bold mb-2" id="modalTitle"></h2>
+      <p id="modalMessage" class="text-lg mb-4"></p>
+      <button id="modalCloseBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">OK</button>
+    </div>
+  </div>
 
   <script>
-    function getCSTMidnight() {
-      const now = new Date();
-      const nowUtc = now.getTime() + now.getTimezoneOffset() * 60000;
-      const offset = -6 * 60 * 60000;
-      const cstNow = new Date(nowUtc + offset);
-      const cstMidnight = new Date(cstNow);
-      cstMidnight.setHours(24, 0, 0, 0);
-      return cstMidnight;
-    }
-
-    function getCSTDayKey() {
-      const midnight = getCSTMidnight();
-      midnight.setHours(0, 0, 0, 0);
-      return `day-${midnight.getTime()}`;
-    }
-
     function showCountdownToMidnight() {
       const countdown = document.getElementById("countdownToMidnight");
       countdown.classList.remove("hidden");
+
       function updateCountdown() {
         const now = new Date();
-        const nextMidnight = getCSTMidnight();
+        const nextMidnight = new Date(now);
+        nextMidnight.setUTCHours(30, 0, 0, 0);
         const diff = nextMidnight - now;
         const hrs = Math.floor(diff / (1000 * 60 * 60));
         const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         const secs = Math.floor((diff % (1000 * 60)) / 1000);
         countdown.textContent = `⏳ New song in ${hrs}h ${mins}m ${secs}s`;
       }
+
       updateCountdown();
       setInterval(updateCountdown, 1000);
     }
 
     window.addEventListener("DOMContentLoaded", () => {
-      const todayKey = getCSTDayKey();
-      const storedState = JSON.parse(localStorage.getItem("gameState") || "{}");
-      if (storedState[todayKey]?.completed) {
-        document.getElementById("alreadyPlayedModal").classList.remove("hidden");
-        document.getElementById("alreadyPlayedOkBtn").addEventListener("click", () => {
-          document.getElementById("alreadyPlayedModal").classList.add("hidden");
-          showCountdownToMidnight();
-        });
+      try {
+        const playlist = [
+          { id: "123456789", title: "DuckTales", url: "https://api.soundcloud.com/tracks/123456789" },
+          { id: "234567890", title: "SpongeBob SquarePants", url: "https://api.soundcloud.com/tracks/234567890" },
+          { id: "345678901", title: "Animaniacs", url: "https://api.soundcloud.com/tracks/345678901" }
+        ];
+
+        const maxListenTime = [1, 2, 3, 5, 10, 15];
+        let currentGuess = 0;
+        const maxGuesses = 6;
+        let currentListenTimeIndex = 0;
+
+        const getCSTDayKey = () => {
+          const now = new Date();
+          const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+          const cstOffset = -6 * 60 * 60000;
+          const cstMidnight = new Date(utc + cstOffset);
+          cstMidnight.setHours(0, 0, 0, 0);
+          return `day-${cstMidnight.getTime()}`;
+        };
+
+        const todayKey = getCSTDayKey();
+        const storedState = JSON.parse(localStorage.getItem("gameState") || "{}");
+
+        if (storedState[todayKey]?.completed) {
+          document.getElementById("alreadyPlayedModal").classList.remove("hidden");
+          document.getElementById("alreadyPlayedOkBtn").addEventListener("click", () => {
+            document.getElementById("alreadyPlayedModal").classList.add("hidden");
+            showCountdownToMidnight();
+          });
+        }
+      } catch (err) {
+        console.error("Cartoondle error:", err);
       }
     });
   </script>
