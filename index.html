@@ -11,6 +11,16 @@
 </head>
 <body class="bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-800 min-h-screen text-white">
 
+  <!-- Already Played Modal -->
+  <div id="alreadyPlayedModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+    <div class="bg-white text-black rounded-xl p-6 w-full max-w-md text-center">
+      <h2 class="text-2xl font-bold mb-2">🎧 You've already played today!</h2>
+      <p class="text-lg mb-4">Come back tomorrow for a new challenge.</p>
+      <div id="countdownModal" class="text-center text-sm mb-4"></div>
+      <button id="alreadyPlayedOkBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">OK</button>
+    </div>
+  </div>
+
   <!-- Game Over Modal -->
   <div id="resultModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden transition-opacity duration-300">
     <div class="bg-white text-black rounded-xl p-6 w-full max-w-md text-center transform scale-95 transition-transform duration-300">
@@ -20,28 +30,23 @@
     </div>
   </div>
 
-  <!-- Stats & Share -->
-    <div class="text-center mb-6">
-      <h1 class="text-4xl font-bold mb-2">🎵 Cartoondle 🎵</h1>
-      <div class="bg-white/10 rounded-xl py-4 px-6 mt-4 mb-2 inline-block text-white text-lg sm:text-xl font-semibold">
-        <span class="mr-4">📊 Games: <span id="gamesPlayed" class="font-bold">0</span></span>
-        <span class="mr-4">🔥 Streak: <span id="currentStreak" class="font-bold">0</span></span>
-        <span>🏆 Best: <span id="bestStreak" class="font-bold">0</span></span>
-      </div>
-      <div class="mt-2">
-        <button id="shareBtn" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded font-semibold text-white text-sm sm:text-base">
-          Share Result
-        </button>
-      </div>
+  <!-- Header and Stats -->
+  <div class="container mx-auto px-4 pt-6 pb-2 max-w-4xl text-center">
+    <h1 class="text-4xl font-bold mb-2">🎵 Cartoondle 🎵</h1>
+    <div class="bg-white/10 rounded-xl py-4 px-6 mt-4 mb-2 inline-block text-white text-lg sm:text-xl font-semibold">
+      <span class="mr-4">📊 Games: <span id="gamesPlayed" class="font-bold">0</span></span>
+      <span class="mr-4">🔥 Streak: <span id="currentStreak" class="font-bold">0</span></span>
+      <span>🏆 Best: <span id="bestStreak" class="font-bold">0</span></span>
     </div>
+    <div class="mt-2">
+      <button id="shareBtn" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded font-semibold text-white text-sm sm:text-base">
+        Share Result
+      </button>
+    </div>
+  </div>
 
   <!-- Main Game Area -->
   <div class="container mx-auto px-4 py-2 max-w-4xl">
-    <div class="text-center mb-6">
-      <h1 class="text-4xl font-bold mb-2">🎵 Cartoondle 🎵</h1>
-      <p class="text-lg opacity-90 mt-2">Guess the cartoon theme song in 6 tries or less!</p>
-    </div>
-
     <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 mb-6 relative">
       <div class="text-center mb-6">
         <h2 class="text-xl font-semibold mb-2">Listen to the theme song:</h2>
