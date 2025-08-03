@@ -52,28 +52,28 @@ https://dailyjamm.com
 📁 project-root
 ├── index.html        # Main game logic + UI
 ├── favicon.png       # Tab icon/logo for the site
-🧪 Development Notes
-✅ To Do (or Future Ideas):
-Add a Share button with result emojis like Wordle
+## 🧪 Development Notes
+- ✅ To Do (or Future Ideas):
+- - Add a Share button with result emojis like Wordle
 
-Store historical guesses per day
+- - Store historical guesses per day
 
-Create a leaderboard (requires backend or Firebase)
+- - Create a leaderboard (requires backend or Firebase)
 
-Allow players to submit their own cartoon themes
+- - Allow players to submit their own cartoon themes
 
-Add a mobile app shortcut (PWA support)
+- - Add a mobile app shortcut (PWA support)
 
-⚠️ Known Limitations:
-Songs must be manually managed in the playlist array.
+- ⚠️ Known Limitations:
+- - Songs must be manually managed in the playlist array.
 
-CDN Tailwind usage is not recommended for production — consider switching to Tailwind CLI for build optimization.
+- - CDN Tailwind usage is not recommended for production — consider switching to Tailwind CLI for build optimization.
 
-localStorage is device-specific — users switching devices won’t carry over their stats.
+- - localStorage is device-specific — users switching devices won’t carry over their stats.
 
-🧰 How to Customize
-🔊 Add More Songs
-In the <script> block of index.html, update this array:
+## 🧰 How to Customize
+- 🔊 Add More Songs
+I- n the <script> block of index.html, update this array:
 
 js
 Copy code
@@ -91,14 +91,14 @@ A SoundCloud track URL
 
 You can get the URL using SoundCloud's API or direct upload links.
 
-🚀 Deployment
+## 🚀 Deployment
 Upload to any static host (e.g., GitHub Pages, Vercel, Netlify).
 
 Make sure favicon.png is available at the root directory.
 
 Visit your site and test!
 
-🙏 Credits
+## 🙏 Credits
 Inspired by Heardle and Wordle
 
 Uses SoundCloud's Player Widget API
