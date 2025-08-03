@@ -44,16 +44,16 @@
   <div class="container mx-auto px-4 py-8 max-w-4xl">
     <div class="text-center mb-8">
       <h1 class="text-4xl font-bold mb-2">🎵 Cartoondle 🎵</h1>
-      <div class="flex justify-center items-center gap-6 text-white mt-4">
-        <p>Games Played: <span id="gamesPlayed">0</span></p>
-        <p>Current Streak: <span id="currentStreak">0</span></p>
-        <p>Best Streak: <span id="bestStreak">0</span></p>
-      </div>
       <p class="text-lg opacity-90 mt-4">Guess the cartoon theme song in 6 tries or less!</p>
     </div>
 
     <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 mb-6 relative">
       <div class="text-center mb-6">
+        <div class="flex justify-center items-center gap-6 text-white mb-4">
+          <p>Games Played: <span id="gamesPlayed">0</span></p>
+          <p>Current Streak: <span id="currentStreak">0</span></p>
+          <p>Best Streak: <span id="bestStreak">0</span></p>
+        </div>
         <h2 class="text-xl font-semibold mb-2">Listen to the theme song:</h2>
         <iframe id="sc-player" width="100%" height="120" scrolling="no" frameborder="no" allow="autoplay"></iframe>
         <div class="flex justify-center gap-4 mt-4 mb-4">
@@ -76,5 +76,175 @@
     </div>
     <div id="countdownBottom" class="text-center text-white text-sm mt-4">⏳ New theme song in ...</div>
   </div>
+
+  <script>
+    const playlist = [
+      { id: "1641348812", title: "The Simpsons" },
+      { id: "1641348482", title: "SpongeBob SquarePants" },
+      { id: "1641347950", title: "Animaniacs" },
+      { id: "1641347648", title: "Avatar: The Last Airbender" },
+      { id: "1641347005", title: "Teen Titans" },
+      { id: "1641346529", title: "The Fairly OddParents" },
+      { id: "1641346035", title: "Futurama" }
+    ];
+
+    const guessInput = document.getElementById("guessInput");
+    const autocompleteList = document.getElementById("autocomplete-list");
+    const submitBtn = document.getElementById("submitBtn");
+    const playBtn = document.getElementById("playSnippet");
+    const skipBtn = document.getElementById("skipBtn");
+    const guessHistory = document.getElementById("guessHistory");
+    const correctAnswerReveal = document.getElementById("correctAnswerReveal");
+    const currentGuessSpan = document.getElementById("currentGuess");
+    const listenTimeSpan = document.getElementById("listenTime");
+    const resultModal = document.getElementById("resultModal");
+    const resultAnswer = document.getElementById("resultAnswer");
+    const resultCloseBtn = document.getElementById("resultCloseBtn");
+    const alreadyPlayedModal = document.getElementById("alreadyPlayedModal");
+    const alreadyPlayedOkBtn = document.getElementById("alreadyPlayedOkBtn");
+
+    let currentGuessCount = 0;
+    let widget;
+    const maxGuesses = 6;
+
+    function getTodayIndex() {
+      const date = new Date().toLocaleDateString('en-US', { timeZone: 'America/Chicago' });
+      return date.split('/').reduce((a, b) => a + parseInt(b), 0) % playlist.length;
+    }
+
+    const todayIndex = getTodayIndex();
+    const todayTrack = playlist[todayIndex];
+    const todayKey = `played-${todayIndex}`;
+
+    function disableButtons() {
+      playBtn.disabled = true;
+      skipBtn.disabled = true;
+      submitBtn.disabled = true;
+      guessInput.disabled = true;
+    }
+
+    function updateCountdown() {
+      const now = new Date();
+      const midnight = new Date();
+      midnight.setHours(24, 0, 0, 0);
+      const diff = midnight - now;
+      const hrs = Math.floor(diff / (1000 * 60 * 60));
+      const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const secs = Math.floor((diff % (1000 * 60)) / 1000);
+      const msg = `⏳ New theme song in ${hrs}h ${mins}m ${secs}s`;
+      document.getElementById("countdownBottom").textContent = msg;
+      document.getElementById("countdownModal").textContent = msg;
+    }
+    setInterval(updateCountdown, 1000);
+
+    function launchConfetti() {
+      confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+    }
+
+    function updateStatsDisplay() {
+      document.getElementById("gamesPlayed").textContent = localStorage.getItem("gamesPlayed") || 0;
+      document.getElementById("currentStreak").textContent = localStorage.getItem("currentStreak") || 0;
+      document.getElementById("bestStreak").textContent = localStorage.getItem("bestStreak") || 0;
+    }
+
+    function endGame(correct) {
+      localStorage.setItem(todayKey, 'done');
+      correctAnswerReveal.textContent = `🎯 The correct answer was: ${todayTrack.title}`;
+      correctAnswerReveal.classList.remove("hidden");
+      resultAnswer.textContent = `🎯 The correct answer was: ${todayTrack.title}`;
+      resultModal.classList.remove("hidden");
+      disableButtons();
+
+      let gamesPlayed = parseInt(localStorage.getItem("gamesPlayed") || "0") + 1;
+      let currentStreak = parseInt(localStorage.getItem("currentStreak") || "0");
+      let bestStreak = parseInt(localStorage.getItem("bestStreak") || "0");
+
+      if (correct) {
+        currentStreak++;
+        if (currentStreak > bestStreak) bestStreak = currentStreak;
+      } else {
+        currentStreak = 0;
+      }
+
+      localStorage.setItem("gamesPlayed", gamesPlayed);
+      localStorage.setItem("currentStreak", currentStreak);
+      localStorage.setItem("bestStreak", bestStreak);
+      updateStatsDisplay();
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      updateStatsDisplay();
+
+      const iframe = document.getElementById("sc-player");
+      iframe.src = `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${todayTrack.id}&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=false`;
+      widget = SC.Widget(iframe);
+
+      if (localStorage.getItem(todayKey) === 'done') {
+        correctAnswerReveal.textContent = `🎯 The correct answer was: ${todayTrack.title}`;
+        correctAnswerReveal.classList.remove("hidden");
+        alreadyPlayedModal.classList.remove("hidden");
+        disableButtons();
+      }
+
+      alreadyPlayedOkBtn.onclick = () => alreadyPlayedModal.classList.add("hidden");
+      resultCloseBtn.onclick = () => resultModal.classList.add("hidden");
+
+      submitBtn.onclick = () => {
+        if (currentGuessCount >= maxGuesses) return;
+        const guess = guessInput.value.trim();
+        if (!guess) return;
+        const time = [1, 2, 3, 5, 10, 15][Math.min(currentGuessCount, 5)];
+        const entry = document.createElement("div");
+        entry.textContent = `Guess: ${guess} @ ${time}s`;
+        guessHistory.appendChild(entry);
+        guessInput.value = "";
+        currentGuessCount++;
+        currentGuessSpan.textContent = Math.min(currentGuessCount + 1, maxGuesses);
+        listenTimeSpan.textContent = `${time} second`;
+        if (guess.toLowerCase() === todayTrack.title.toLowerCase()) {
+          launchConfetti();
+          endGame(true);
+        } else if (currentGuessCount >= maxGuesses) {
+          endGame(false);
+        }
+      };
+
+      skipBtn.onclick = () => {
+        if (currentGuessCount >= maxGuesses) return;
+        const time = [1, 2, 3, 5, 10, 15][Math.min(currentGuessCount, 5)];
+        const entry = document.createElement("div");
+        entry.textContent = `(Skipped) @ ${time}s`;
+        guessHistory.appendChild(entry);
+        currentGuessCount++;
+        currentGuessSpan.textContent = Math.min(currentGuessCount + 1, maxGuesses);
+        listenTimeSpan.textContent = `${time} second`;
+        if (currentGuessCount >= maxGuesses) endGame(false);
+      };
+
+      playBtn.onclick = () => {
+        const time = [1, 2, 3, 5, 10, 15][Math.min(currentGuessCount, 5)];
+        widget.seekTo(0);
+        widget.play();
+        setTimeout(() => widget.pause(), time * 1000);
+      };
+
+      guessInput.addEventListener("input", () => {
+        const val = guessInput.value.toLowerCase();
+        autocompleteList.innerHTML = '';
+        if (!val) return autocompleteList.classList.add("hidden");
+        playlist.filter(track => track.title.toLowerCase().includes(val)).forEach(track => {
+          const div = document.createElement("div");
+          div.textContent = track.title;
+          div.className = "cursor-pointer px-3 py-1 hover:bg-gray-200";
+          div.onclick = () => {
+            guessInput.value = track.title;
+            autocompleteList.classList.add("hidden");
+          };
+          autocompleteList.appendChild(div);
+        });
+        autocompleteList.classList.remove("hidden");
+      });
+    });
+  </script>
 </body>
 </html>
