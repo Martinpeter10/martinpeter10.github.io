@@ -8,11 +8,6 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <script src="https://w.soundcloud.com/player/api.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-  <script>
-    function launchConfetti() {
-      confetti({ particleCount: 200, spread: 70, origin: { y: 0.6 } });
-    }
-  </script>
 </head>
 <body class="bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-800 min-h-screen text-white">
   <div id="alreadyPlayedModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden">
@@ -67,5 +62,100 @@
 
     <div id="countdownToMidnight" class="text-center text-white mt-6 text-lg hidden"></div>
   </div>
+
+  <script>
+    const cartoonList = [
+      "DuckTales",
+      "SpongeBob SquarePants",
+      "Animaniacs",
+      "Teen Titans",
+      "Batman: The Animated Series",
+      "The Fairly OddParents",
+      "The Simpsons",
+      "Futurama",
+      "Avatar: The Last Airbender"
+    ];
+
+    const guessInput = document.getElementById('guessInput');
+    const submitBtn = document.getElementById('submitBtn');
+    const playSnippet = document.getElementById('playSnippet');
+    const skipBtn = document.getElementById('skipBtn');
+    let gameOver = false;
+
+    function getCSTMidnight() {
+      const now = new Date();
+      const nowUtc = now.getTime() + now.getTimezoneOffset() * 60000;
+      const offset = -6 * 60 * 60000;
+      const cstNow = new Date(nowUtc + offset);
+      const cstMidnight = new Date(cstNow);
+      cstMidnight.setHours(24, 0, 0, 0);
+      return cstMidnight;
+    }
+
+    function getCSTDayKey() {
+      const midnight = getCSTMidnight();
+      midnight.setHours(0, 0, 0, 0);
+      return `day-${midnight.getTime()}`;
+    }
+
+    function showCountdownToMidnight() {
+      const countdown = document.getElementById("countdownToMidnight");
+      countdown.classList.remove("hidden");
+      function updateCountdown() {
+        const now = new Date();
+        const nextMidnight = getCSTMidnight();
+        const diff = nextMidnight - now;
+        const hrs = Math.floor(diff / (1000 * 60 * 60));
+        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const secs = Math.floor((diff % (1000 * 60)) / 1000);
+        countdown.textContent = `⏳ New song in ${hrs}h ${mins}m ${secs}s`;
+      }
+      updateCountdown();
+      setInterval(updateCountdown, 1000);
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const todayKey = getCSTDayKey();
+      const storedState = JSON.parse(localStorage.getItem("gameState") || "{}");
+      if (storedState[todayKey]?.completed) {
+        gameOver = true;
+        document.getElementById("alreadyPlayedModal").classList.remove("hidden");
+        document.getElementById("alreadyPlayedOkBtn").addEventListener("click", () => {
+          document.getElementById("alreadyPlayedModal").classList.add("hidden");
+          showCountdownToMidnight();
+        });
+        return;
+      }
+
+      submitBtn.addEventListener("click", () => {
+        if (gameOver) return;
+        const guess = guessInput.value.trim();
+        if (!guess) return;
+        const guessEl = document.createElement("div");
+        guessEl.textContent = `Guess: ${guess}`;
+        document.getElementById("guessHistory").appendChild(guessEl);
+        if (cartoonList.includes(guess)) {
+          gameOver = true;
+          launchConfetti();
+          document.getElementById("correctAnswerReveal").textContent = `🎯 The correct answer was: ${guess}`;
+          document.getElementById("correctAnswerReveal").classList.remove("hidden");
+        }
+      });
+
+      playSnippet.addEventListener("click", () => {
+        if (gameOver) return;
+        console.log("Play snippet");
+      });
+
+      skipBtn.addEventListener("click", () => {
+        if (gameOver) return;
+        const guessEl = document.createElement("div");
+        guessEl.textContent = `(Skipped)`;
+        document.getElementById("guessHistory").appendChild(guessEl);
+      });
+
+      showCountdownToMidnight();
+    });
+  </script>
 </body>
 </html>
