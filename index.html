@@ -8,14 +8,14 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://w.soundcloud.com/player/api.js"></script>
   <style>
-    #resultModal { display: none; }
+    #resultModal, #alreadyPlayedModal { display: none; }
   </style>
 </head>
 <body class="bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-800 min-h-screen text-white">
   <noscript>
     <div class="text-center mt-40 text-red-400 text-xl">Please enable JavaScript to play Cartoondle.</div>
   </noscript>
-  <div class="container mx-auto px-4 py-8 max-w-4xl">
+  <div id="gameContainer" class="container mx-auto px-4 py-8 max-w-4xl">
     <div class="text-center mb-8">
       <h1 class="text-4xl font-bold mb-2">🎵 Cartoondle 🎵</h1>
       <p class="text-lg opacity-90">Guess the cartoon theme song in 6 tries or less!</p>
@@ -48,14 +48,25 @@
       </div>
       <div id="guessHistory" class="space-y-2"></div>
       <div id="correctAnswerReveal" class="text-center text-xl text-green-300 font-semibold mt-6 hidden"></div>
+      <div id="countdownToMidnight" class="text-center text-lg text-white mt-6 hidden"></div>
     </div>
   </div>
 
+  <!-- Game Over Modal -->
   <div id="resultModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
     <div class="bg-white text-black rounded-xl p-6 w-full max-w-md text-center">
       <h2 class="text-2xl font-bold mb-2" id="modalTitle"></h2>
       <p id="modalMessage" class="text-lg mb-4"></p>
       <button id="modalCloseBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">OK</button>
+    </div>
+  </div>
+
+  <!-- Already Played Modal -->
+  <div id="alreadyPlayedModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+    <div class="bg-white text-black rounded-xl p-6 w-full max-w-md text-center">
+      <h2 class="text-2xl font-bold mb-2">🎧 You've already played today!</h2>
+      <p class="text-lg mb-4">Come back at midnight CST for a new theme song.</p>
+      <button id="alreadyPlayedOkBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">OK</button>
     </div>
   </div>
 
@@ -89,14 +100,10 @@
         const playerIframe = document.getElementById("sc-player");
         playerIframe.src = `https://w.soundcloud.com/player/?url=${encodeURIComponent(todayTrack.url)}&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=false`;
 
-        if (storedState[todayKey]?.completed) {
-          document.body.innerHTML = '<div class="text-center mt-40 text-white text-2xl">🎧 You\'ve already played today. Come back at midnight CST!</div>';
-          return;
-        }
-
+        const widgetReady = () => SC.Widget(playerIframe);
         let widget;
-        let currentListenTimeIndex = 0;
-        let stats = JSON.parse(localStorage.getItem("stats") || '{"current":0,"best":0,"games":0}');
+
+        const stats = JSON.parse(localStorage.getItem("stats") || '{"current":0,"best":0,"games":0}');
 
         const updateStatsDisplay = () => {
           document.getElementById("currentStreak").textContent = stats.current;
@@ -133,22 +140,38 @@
         const endGame = (won) => {
           storedState[todayKey] = { completed: true };
           localStorage.setItem("gameState", JSON.stringify(storedState));
-
           stats.games++;
-          if (won) {
-            stats.current++;
-            if (stats.current > stats.best) stats.best = stats.current;
-          } else {
-            stats.current = 0;
-          }
+          stats.current = won ? stats.current + 1 : 0;
+          if (won && stats.current > stats.best) stats.best = stats.current;
           localStorage.setItem("stats", JSON.stringify(stats));
           updateStatsDisplay();
-
           showModal(won ? "You got it!" : "Out of Guesses", `The answer was: ${todayTrack.title}`);
+        };
+
+        const showCountdown = () => {
+          const el = document.getElementById("countdownToMidnight");
+          const now = new Date();
+          const midnight = new Date(now);
+          midnight.setHours(24, 0, 0, 0);
+          const update = () => {
+            const diff = Math.max(midnight - new Date(), 0);
+            const hrs = Math.floor(diff / (1000 * 60 * 60));
+            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const secs = Math.floor((diff % (1000 * 60)) / 1000);
+            el.textContent = `⏳ New song in ${hrs}h ${mins}m ${secs}s`;
+          };
+          el.classList.remove("hidden");
+          update();
+          setInterval(update, 1000);
         };
 
         document.getElementById("modalCloseBtn").addEventListener("click", () => {
           document.getElementById("resultModal").style.display = "none";
+        });
+
+        document.getElementById("alreadyPlayedOkBtn").addEventListener("click", () => {
+          document.getElementById("alreadyPlayedModal").style.display = "none";
+          showCountdown();
         });
 
         document.getElementById("playSnippet").addEventListener("click", () => {
@@ -171,11 +194,9 @@
         document.getElementById("submitBtn").addEventListener("click", () => {
           const userGuess = document.getElementById("guessInput").value.trim();
           if (!userGuess || currentGuess >= maxGuesses) return;
-
           const time = maxListenTime[Math.min(currentListenTimeIndex, maxListenTime.length - 1)];
           const isCorrect = userGuess.toLowerCase() === todayTrack.title.toLowerCase();
           addGuessToHistory(userGuess, isCorrect, time);
-
           if (isCorrect) {
             endGame(true);
           } else {
@@ -184,16 +205,17 @@
             updateStatus();
             if (currentGuess >= maxGuesses) endGame(false);
           }
-
           document.getElementById("guessInput").value = "";
         });
 
+        widget = widgetReady();
         updateStatus();
         updateStatsDisplay();
 
-        playerIframe.onload = () => {
-          widget = SC.Widget(playerIframe);
-        };
+        if (storedState[todayKey]?.completed) {
+          document.getElementById("alreadyPlayedModal").style.display = "flex";
+        }
+
       } catch (err) {
         console.error("Cartoondle error:", err);
       }
