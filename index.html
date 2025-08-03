@@ -22,6 +22,24 @@
   </style>
 </head>
 <body class="bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-800 min-h-screen text-white">
+  <!-- Modals -->
+  <div id="alreadyPlayedModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+    <div class="bg-white text-black rounded-xl p-6 w-full max-w-md text-center">
+      <h2 class="text-2xl font-bold mb-2">🎧 You've already played today!</h2>
+      <p class="text-lg mb-4">Come back at midnight CST for a new challenge.</p>
+      <button id="alreadyPlayedOkBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">OK</button>
+    </div>
+  </div>
+
+  <div id="resultModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+    <div class="bg-white text-black rounded-xl p-6 w-full max-w-md text-center">
+      <h2 class="text-2xl font-bold mb-2">Game Over</h2>
+      <p id="resultAnswer" class="text-lg mb-4"></p>
+      <button id="resultCloseBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Close</button>
+    </div>
+  </div>
+
+  <!-- Game Container -->
   <div class="container mx-auto px-4 py-8 max-w-4xl">
     <div class="text-center mb-8">
       <h1 class="text-4xl font-bold mb-2">🎵 Cartoondle 🎵</h1>
@@ -72,6 +90,9 @@
     const correctAnswerReveal = document.getElementById("correctAnswerReveal");
     const currentGuessSpan = document.getElementById("currentGuess");
     const listenTimeSpan = document.getElementById("listenTime");
+    const resultModal = document.getElementById("resultModal");
+    const resultAnswer = document.getElementById("resultAnswer");
+    const resultCloseBtn = document.getElementById("resultCloseBtn");
 
     const maxGuesses = 6;
     let currentGuessCount = 0;
@@ -89,6 +110,10 @@
       if (localStorage.getItem(todayKey) === 'done') {
         correctAnswerReveal.textContent = `🎯 The correct answer was: ${todayTrack.title}`;
         correctAnswerReveal.classList.remove("hidden");
+        document.getElementById("alreadyPlayedModal").classList.remove("hidden");
+        document.getElementById("alreadyPlayedOkBtn").onclick = () => {
+          document.getElementById("alreadyPlayedModal").classList.add("hidden");
+        };
         disableButtons();
         return;
       }
@@ -131,6 +156,10 @@
         widget.play();
         setTimeout(() => widget.pause(), time * 1000);
       });
+
+      resultCloseBtn.onclick = () => {
+        resultModal.classList.add("hidden");
+      };
     });
 
     guessInput.addEventListener("input", () => {
@@ -165,6 +194,8 @@
       localStorage.setItem(todayKey, 'done');
       correctAnswerReveal.textContent = `🎯 The correct answer was: ${todayTrack.title}`;
       correctAnswerReveal.classList.remove("hidden");
+      resultAnswer.textContent = `🎯 The correct answer was: ${todayTrack.title}`;
+      resultModal.classList.remove("hidden");
       disableButtons();
     }
   </script>
