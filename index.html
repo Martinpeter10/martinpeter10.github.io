@@ -22,6 +22,32 @@
   </style>
 </head>
 <body class="bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-800 min-h-screen text-white">
+  <!-- Modals -->
+  <div id="alreadyPlayedModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+    <div class="bg-white text-black rounded-xl p-6 w-full max-w-md text-center">
+      <h2 class="text-2xl font-bold mb-2">🎧 You've already played today!</h2>
+      <p class="text-lg mb-4">Come back tomorrow for a new challenge.</p>
+      <div id="countdownModal" class="text-center text-sm mb-4"></div>
+      <button id="alreadyPlayedOkBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">OK</button>
+    </div>
+  </div>
+
+  <div id="resultModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+    <div class="bg-white text-black rounded-xl p-6 w-full max-w-md text-center">
+      <h2 class="text-2xl font-bold mb-2">Game Over</h2>
+      <p id="resultAnswer" class="text-lg mb-4"></p>
+      <button id="resultCloseBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Close</button>
+    </div>
+  </div>
+
+  <!-- Stats Display -->
+  <div class="text-center text-white mb-6">
+    <p>Games Played: <span id="gamesPlayed">0</span></p>
+    <p>Current Streak: <span id="currentStreak">0</span></p>
+    <p>Best Streak: <span id="bestStreak">0</span></p>
+  </div>
+
+  <!-- Game Container -->
   <div class="container mx-auto px-4 py-8 max-w-4xl">
     <div class="text-center mb-8">
       <h1 class="text-4xl font-bold mb-2">🎵 Cartoondle 🎵</h1>
@@ -55,11 +81,12 @@
 
   <script>
     function launchConfetti() {
-      confetti({
-        particleCount: 150,
-        spread: 70,
-        origin: { y: 0.6 }
-      });
+      confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+    }
+    function updateStatsDisplay() {
+      document.getElementById("gamesPlayed").textContent = localStorage.getItem("gamesPlayed") || 0;
+      document.getElementById("currentStreak").textContent = localStorage.getItem("currentStreak") || 0;
+      document.getElementById("bestStreak").textContent = localStorage.getItem("bestStreak") || 0;
     }
 
     const playlist = [
@@ -81,6 +108,14 @@
     const correctAnswerReveal = document.getElementById("correctAnswerReveal");
     const currentGuessSpan = document.getElementById("currentGuess");
     const listenTimeSpan = document.getElementById("listenTime");
+    const alreadyPlayedModal = document.getElementById("alreadyPlayedModal");
+    const alreadyPlayedOkBtn = document.getElementById("alreadyPlayedOkBtn");
+    const resultModal = document.getElementById("resultModal");
+    const resultAnswer = document.getElementById("resultAnswer");
+    const resultCloseBtn = document.getElementById("resultCloseBtn");
+    const countdownBottom = document.getElementById("countdownBottom");
+    const countdownModal = document.getElementById("countdownModal");
+
     const maxGuesses = 6;
     let currentGuessCount = 0;
     let widget;
@@ -94,15 +129,19 @@
       iframe.src = `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${todayTrack.id}&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=false`;
       widget = SC.Widget(iframe);
 
-      const played = localStorage.getItem(todayKey) === 'done';
-      if (played) {
+      updateStatsDisplay();
+
+      if (localStorage.getItem(todayKey) === 'done') {
         correctAnswerReveal.textContent = `🎯 The correct answer was: ${todayTrack.title}`;
         correctAnswerReveal.classList.remove("hidden");
+        alreadyPlayedModal.classList.remove("hidden");
         disableButtons();
-        return;
       }
 
-      submitBtn.addEventListener("click", () => {
+      alreadyPlayedOkBtn.onclick = () => alreadyPlayedModal.classList.add("hidden");
+      resultCloseBtn.onclick = () => resultModal.classList.add("hidden");
+
+      submitBtn.onclick = () => {
         if (currentGuessCount >= maxGuesses) return;
         const guess = guessInput.value.trim();
         if (!guess) return;
@@ -116,13 +155,13 @@
         listenTimeSpan.textContent = `${time} second`;
         if (guess.toLowerCase() === todayTrack.title.toLowerCase()) {
           launchConfetti();
-          endGame();
+          endGame(true);
         } else if (currentGuessCount >= maxGuesses) {
-          endGame();
+          endGame(false);
         }
-      });
+      };
 
-      skipBtn.addEventListener("click", () => {
+      skipBtn.onclick = () => {
         if (currentGuessCount >= maxGuesses) return;
         const time = [1, 2, 3, 5, 10, 15][Math.min(currentGuessCount, 5)];
         const entry = document.createElement("div");
@@ -131,50 +170,78 @@
         currentGuessCount++;
         currentGuessSpan.textContent = Math.min(currentGuessCount + 1, maxGuesses);
         listenTimeSpan.textContent = `${time} second`;
-        if (currentGuessCount >= maxGuesses) endGame();
-      });
+        if (currentGuessCount >= maxGuesses) endGame(false);
+      };
 
-      playBtn.addEventListener("click", () => {
+      playBtn.onclick = () => {
         const time = [1, 2, 3, 5, 10, 15][Math.min(currentGuessCount, 5)];
         widget.seekTo(0);
         widget.play();
         setTimeout(() => widget.pause(), time * 1000);
-      });
-    });
+      };
 
-    guessInput.addEventListener("input", () => {
-      const val = guessInput.value.toLowerCase();
-      autocompleteList.innerHTML = '';
-      if (!val) {
-        autocompleteList.classList.add("hidden");
-        return;
-      }
-      const matches = playlist.filter(track => track.title.toLowerCase().includes(val));
-      matches.forEach(track => {
-        const div = document.createElement("div");
-        div.textContent = track.title;
-        div.className = "cursor-pointer px-3 py-1 hover:bg-gray-200";
-        div.addEventListener("click", () => {
-          guessInput.value = track.title;
-          autocompleteList.classList.add("hidden");
+      guessInput.addEventListener("input", () => {
+        const val = guessInput.value.toLowerCase();
+        autocompleteList.innerHTML = '';
+        if (!val) return autocompleteList.classList.add("hidden");
+        playlist.filter(track => track.title.toLowerCase().includes(val)).forEach(track => {
+          const div = document.createElement("div");
+          div.textContent = track.title;
+          div.className = "cursor-pointer px-3 py-1 hover:bg-gray-200";
+          div.onclick = () => {
+            guessInput.value = track.title;
+            autocompleteList.classList.add("hidden");
+          };
+          autocompleteList.appendChild(div);
         });
-        autocompleteList.appendChild(div);
+        autocompleteList.classList.remove("hidden");
       });
-      autocompleteList.classList.remove("hidden");
+
+      function updateCountdown() {
+        const now = new Date();
+        const midnight = new Date();
+        midnight.setHours(24, 0, 0, 0);
+        const diff = midnight - now;
+        const hrs = Math.floor(diff / (1000 * 60 * 60));
+        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const secs = Math.floor((diff % (1000 * 60)) / 1000);
+        const msg = `⏳ New song in ${hrs}h ${mins}m ${secs}s`;
+        countdownBottom.textContent = msg;
+        countdownModal.textContent = msg;
+      }
+      setInterval(updateCountdown, 1000);
     });
 
     function disableButtons() {
-      document.getElementById("playSnippet").disabled = true;
-      document.getElementById("skipBtn").disabled = true;
-      document.getElementById("submitBtn").disabled = true;
-      document.getElementById("guessInput").disabled = true;
+      playBtn.disabled = true;
+      skipBtn.disabled = true;
+      submitBtn.disabled = true;
+      guessInput.disabled = true;
     }
 
-    function endGame() {
+    function endGame(correct) {
       localStorage.setItem(todayKey, 'done');
       correctAnswerReveal.textContent = `🎯 The correct answer was: ${todayTrack.title}`;
       correctAnswerReveal.classList.remove("hidden");
+      resultAnswer.textContent = `🎯 The correct answer was: ${todayTrack.title}`;
+      resultModal.classList.remove("hidden");
       disableButtons();
+
+      let gamesPlayed = parseInt(localStorage.getItem("gamesPlayed") || "0") + 1;
+      let currentStreak = parseInt(localStorage.getItem("currentStreak") || "0");
+      let bestStreak = parseInt(localStorage.getItem("bestStreak") || "0");
+
+      if (correct) {
+        currentStreak++;
+        if (currentStreak > bestStreak) bestStreak = currentStreak;
+      } else {
+        currentStreak = 0;
+      }
+
+      localStorage.setItem("gamesPlayed", gamesPlayed);
+      localStorage.setItem("currentStreak", currentStreak);
+      localStorage.setItem("bestStreak", bestStreak);
+      updateStatsDisplay();
     }
   </script>
 </body>
