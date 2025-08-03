@@ -28,6 +28,15 @@
   </style>
 </head>
 <body class="bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-800 min-h-screen text-white">
+  <div class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden" id="alreadyPlayedModal">
+    <div class="bg-white text-black rounded-xl p-6 w-full max-w-md text-center">
+      <h2 class="text-2xl font-bold mb-2">🎧 You've already played today!</h2>
+      <p class="text-lg mb-4">Come back tomorrow for a new theme song.</p>
+      <div id="countdownModal" class="text-center text-sm mb-4"></div>
+      <button id="alreadyPlayedOkBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">OK</button>
+    </div>
+  </div>
+
   <div class="container mx-auto px-4 py-8 max-w-4xl">
     <div class="text-center mb-8">
       <h1 class="text-4xl font-bold mb-2">🎵 Cartoondle 🎵</h1>
@@ -69,16 +78,6 @@
   </div>
 
   <script>
-    const playlist = [
-      { id: "1641348812", title: "The Simpsons" },
-      { id: "1641348482", title: "SpongeBob SquarePants" },
-      { id: "1641347950", title: "Animaniacs" },
-      { id: "1641347648", title: "Avatar: The Last Airbender" },
-      { id: "1641347005", title: "Teen Titans" },
-      { id: "1641346529", title: "The Fairly OddParents" },
-      { id: "1641346035", title: "Futurama" }
-    ];
-
     const guessInput = document.getElementById("guessInput");
     const autocompleteList = document.getElementById("autocomplete-list");
     const submitBtn = document.getElementById("submitBtn");
@@ -89,27 +88,27 @@
     const currentGuessSpan = document.getElementById("currentGuess");
     const listenTimeSpan = document.getElementById("listenTime");
     const volumeSlider = document.getElementById("volumeControl");
+    const alreadyPlayedModal = document.getElementById("alreadyPlayedModal");
+    const alreadyPlayedOkBtn = document.getElementById("alreadyPlayedOkBtn");
+    const countdownModal = document.getElementById("countdownModal");
 
-    let currentGuessCount = 0;
-    let widget;
-    const maxGuesses = 6;
+    const playlist = [
+      { id: "1641348812", title: "The Simpsons" },
+      { id: "1641348482", title: "SpongeBob SquarePants" },
+      { id: "1641347950", title: "Animaniacs" },
+      { id: "1641347648", title: "Avatar: The Last Airbender" },
+      { id: "1641347005", title: "Teen Titans" },
+      { id: "1641346529", title: "The Fairly OddParents" },
+      { id: "1641346035", title: "Futurama" }
+    ];
 
-    function getTodayIndex() {
-      const date = new Date().toLocaleDateString('en-US', { timeZone: 'America/Chicago' });
-      return date.split('/').reduce((a, b) => a + parseInt(b), 0) % playlist.length;
-    }
-
-    const todayIndex = getTodayIndex();
+    const todayIndex = new Date().toLocaleDateString('en-US', { timeZone: 'America/Chicago' }).split('/').reduce((a, b) => a + parseInt(b), 0) % playlist.length;
     const todayTrack = playlist[todayIndex];
     const todayKey = `played-${todayIndex}`;
     const guessKey = `guesses-${todayIndex}`;
-
-    function disableButtons() {
-      playBtn.disabled = true;
-      skipBtn.disabled = true;
-      submitBtn.disabled = true;
-      guessInput.disabled = true;
-    }
+    let currentGuessCount = 0;
+    let widget;
+    const maxGuesses = 6;
 
     function updateCountdown() {
       const now = new Date();
@@ -121,11 +120,19 @@
       const secs = Math.floor((diff % (1000 * 60)) / 1000);
       const msg = `⏳ New theme song in ${hrs}h ${mins}m ${secs}s`;
       document.getElementById("countdownBottom").textContent = msg;
+      countdownModal.textContent = msg;
     }
-    setInterval(updateCountdown, 1000);
 
-    function launchConfetti() {
-      confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+    function disableButtons() {
+      playBtn.disabled = true;
+      skipBtn.disabled = true;
+      submitBtn.disabled = true;
+      guessInput.disabled = true;
+    }
+
+    function showAlreadyPlayedModal() {
+      updateCountdown();
+      alreadyPlayedModal.classList.remove("hidden");
     }
 
     function storeGuess(text) {
@@ -143,16 +150,30 @@
       });
     }
 
+    function launchConfetti() {
+      confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+    }
+
     window.addEventListener("DOMContentLoaded", () => {
-      loadStoredGuesses();
+      updateCountdown();
+      setInterval(updateCountdown, 1000);
 
       const iframe = document.getElementById("sc-player");
       iframe.src = `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${todayTrack.id}&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=false`;
       widget = SC.Widget(iframe);
+      loadStoredGuesses();
+
+      if (localStorage.getItem(todayKey) === 'done') {
+        showAlreadyPlayedModal();
+        disableButtons();
+      }
+
+      alreadyPlayedOkBtn.onclick = () => {
+        alreadyPlayedModal.classList.add("hidden");
+      };
 
       volumeSlider.addEventListener("input", () => {
-        const volume = volumeSlider.value / 100;
-        widget.setVolume(volume);
+        widget.setVolume(volumeSlider.value / 100);
       });
 
       submitBtn.onclick = () => {
@@ -173,13 +194,13 @@
           launchConfetti();
           correctAnswerReveal.textContent = `🎯 The correct answer was: ${todayTrack.title}`;
           correctAnswerReveal.classList.remove("hidden");
-          disableButtons();
           localStorage.setItem(todayKey, 'done');
+          disableButtons();
         } else if (currentGuessCount >= maxGuesses) {
           correctAnswerReveal.textContent = `🎯 The correct answer was: ${todayTrack.title}`;
           correctAnswerReveal.classList.remove("hidden");
-          disableButtons();
           localStorage.setItem(todayKey, 'done');
+          disableButtons();
         }
       };
 
@@ -197,8 +218,8 @@
         if (currentGuessCount >= maxGuesses) {
           correctAnswerReveal.textContent = `🎯 The correct answer was: ${todayTrack.title}`;
           correctAnswerReveal.classList.remove("hidden");
-          disableButtons();
           localStorage.setItem(todayKey, 'done');
+          disableButtons();
         }
       };
 
