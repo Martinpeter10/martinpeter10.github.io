@@ -4,32 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cartoondle</title>
-  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="icon" type="image/png" href="A_logo_for_a_daily_game_website_named_\"DailyJamm\"_.png">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://w.soundcloud.com/player/api.js"></script>
   <style>
-    .slider::-webkit-slider-thumb {
-      appearance: none;
-      height: 16px;
-      width: 16px;
-      border-radius: 50%;
-      background: #fbbf24;
-      cursor: pointer;
-      border: 2px solid #ffffff;
-    }
-
-    .slider::-moz-range-thumb {
-      height: 16px;
-      width: 16px;
-      border-radius: 50%;
-      background: #fbbf24;
-      cursor: pointer;
-      border: 2px solid #ffffff;
-    }
-
-    #resultModal {
-      display: none;
-    }
+    #resultModal { display: none; }
   </style>
 </head>
 <body class="bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-800 min-h-screen text-white">
@@ -67,16 +46,6 @@
       <div id="guessHistory" class="space-y-2"></div>
       <div id="correctAnswerReveal" class="text-center text-xl text-green-300 font-semibold mt-6 hidden"></div>
     </div>
-
-    <div class="bg-white/5 rounded-lg p-4 text-sm">
-      <h3 class="font-semibold mb-2">How to Play:</h3>
-      <ul class="space-y-1 opacity-90">
-        <li>• Listen to the theme song clip and guess the cartoon</li>
-        <li>• Each wrong guess gives you more of the song (1s → 2s → 3s → 5s → 10s → 15s)</li>
-        <li>• <span class="text-red-400">Red</span> = Wrong, <span class="text-yellow-400">Yellow</span> = Same network, <span class="text-green-400">Green</span> = Correct!</li>
-        <li>• Use Skip to hear more of the song without using a guess</li>
-      </ul>
-    </div>
   </div>
 
   <div id="resultModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
@@ -98,17 +67,37 @@
     let currentGuess = 0;
     const maxGuesses = 6;
 
-    function getTodayTrack() {
-      const day = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
-      return playlist[day % playlist.length];
+    function getCSTDayKey() {
+      const now = new Date();
+      const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+      const cstOffset = -6 * 60 * 60000; // CST = UTC-6
+      const cstMidnight = new Date(utc + cstOffset);
+      cstMidnight.setHours(0, 0, 0, 0);
+      return `day-${cstMidnight.getTime()}`;
     }
 
-    const todayTrack = getTodayTrack();
-    const playerIframe = document.getElementById('sc-player');
+    const todayKey = getCSTDayKey();
+    const storedState = JSON.parse(localStorage.getItem("gameState") || "{}");
+
+    const todayIndex = parseInt(todayKey.replace("day-", "")) % playlist.length;
+    const todayTrack = playlist[todayIndex];
+    const playerIframe = document.getElementById("sc-player");
     playerIframe.src = `https://w.soundcloud.com/player/?url=${encodeURIComponent(todayTrack.url)}&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=false`;
+
+    if (storedState[todayKey]?.completed) {
+      document.body.innerHTML = '<div class="text-center mt-40 text-white text-2xl">🎧 You've already played today. Come back at midnight CST!</div>';
+      throw new Error("Already played today");
+    }
 
     let widget;
     let currentListenTimeIndex = 0;
+    let stats = JSON.parse(localStorage.getItem("stats") || "{\"current\":0,\"best\":0,\"games\":0}");
+
+    function updateStatsDisplay() {
+      document.getElementById("currentStreak").textContent = stats.current;
+      document.getElementById("bestStreak").textContent = stats.best;
+      document.getElementById("gamesPlayed").textContent = stats.games;
+    }
 
     playerIframe.onload = () => {
       widget = SC.Widget(playerIframe);
@@ -116,7 +105,7 @@
 
     function updateStatus() {
       document.getElementById("currentGuess").textContent = Math.min(currentGuess + 1, maxGuesses);
-      document.getElementById("listenTime").textContent = maxListenTime[Math.min(currentListenTimeIndex, maxListenTime.length - 1)] + " second" + (maxListenTime[currentListenTimeIndex] > 1 ? "s" : "");
+      document.getElementById("listenTime").textContent = `${maxListenTime[Math.min(currentListenTimeIndex, maxListenTime.length - 1)]} second${maxListenTime[currentListenTimeIndex] > 1 ? "s" : ""}`;
     }
 
     function addGuessToHistory(guess, correct, timeLength) {
@@ -154,16 +143,13 @@
     });
 
     document.getElementById("skipBtn").addEventListener("click", () => {
-      if (currentGuess < maxGuesses) {
-        const time = maxListenTime[Math.min(currentListenTimeIndex, maxListenTime.length - 1)];
-        addGuessToHistory("", false, time);
-        currentGuess++;
-        currentListenTimeIndex++;
-        updateStatus();
-        if (currentGuess >= maxGuesses) {
-          showModal("Out of Guesses", `The answer was: ${todayTrack.title}`);
-        }
-      }
+      if (currentGuess >= maxGuesses) return;
+      const time = maxListenTime[Math.min(currentListenTimeIndex, maxListenTime.length - 1)];
+      addGuessToHistory("", false, time);
+      currentGuess++;
+      currentListenTimeIndex++;
+      updateStatus();
+      if (currentGuess >= maxGuesses) endGame(false);
     });
 
     document.getElementById("submitBtn").addEventListener("click", () => {
@@ -174,21 +160,37 @@
 
       if (userGuess.toLowerCase() === correctAnswer.toLowerCase()) {
         addGuessToHistory(userGuess, true, time);
-        showModal("You got it!", `The answer was: ${correctAnswer}`);
+        endGame(true);
       } else {
         addGuessToHistory(userGuess, false, time);
         currentGuess++;
         currentListenTimeIndex++;
         updateStatus();
-        if (currentGuess >= maxGuesses) {
-          showModal("Out of Guesses", `The answer was: ${correctAnswer}`);
-        }
+        if (currentGuess >= maxGuesses) endGame(false);
       }
 
       document.getElementById("guessInput").value = "";
     });
 
+    function endGame(won) {
+      storedState[todayKey] = { completed: true };
+      localStorage.setItem("gameState", JSON.stringify(storedState));
+
+      stats.games++;
+      if (won) {
+        stats.current++;
+        if (stats.current > stats.best) stats.best = stats.current;
+      } else {
+        stats.current = 0;
+      }
+      localStorage.setItem("stats", JSON.stringify(stats));
+      updateStatsDisplay();
+
+      showModal(won ? "You got it!" : "Out of Guesses", `The answer was: ${todayTrack.title}`);
+    }
+
     updateStatus();
+    updateStatsDisplay();
   </script>
 </body>
 </html>
