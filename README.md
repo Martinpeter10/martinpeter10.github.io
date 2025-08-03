@@ -6,22 +6,22 @@ https://dailyjamm.com
 ## 🧩 Gameplay Overview
 - A new song is featured each day at midnight CST.
 
-Players can listen to increasingly longer snippets on each guess (1s → 15s max).
+- Players can listen to increasingly longer snippets on each guess (1s → 15s max).
 
-Players get up to 6 guesses to identify the theme song.
+- Players get up to 6 guesses to identify the theme song.
 
-If they guess correctly, their streak continues!
+- If they guess correctly, their streak continues!
 
-If they fail or skip 6 times, the game ends, revealing the correct answer.
+- If they fail or skip 6 times, the game ends, revealing the correct answer.
 
-One play per day — refreshing will not reset your play.
+- One play per day — refreshing will not reset your play.
 
-🧠 Features
-🎧 Embedded SoundCloud player (invisible to prevent cheating)
+## 🧠 Features
+- 🎧 Embedded SoundCloud player (invisible to prevent cheating)
 
-📅 Daily song rotation based on CST midnight
+- 📅 Daily song rotation based on CST midnight
 
-🔒 Single play per day tracked with localStorage
+- 🔒 Single play per day tracked with localStorage
 
 🧮 Stats tracking:
 
