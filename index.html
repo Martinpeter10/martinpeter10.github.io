@@ -7,6 +7,12 @@
   <link rel="icon" type="image/png" href="favicon.png">
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <script src="https://w.soundcloud.com/player/api.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  <script>
+    function launchConfetti() {
+      confetti({ particleCount: 200, spread: 70, origin: { y: 0.6 } });
+    }
+  </script>
 </head>
 <body class="bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-800 min-h-screen text-white">
   <div id="alreadyPlayedModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden">
@@ -107,15 +113,22 @@
 
       document.getElementById("playSnippet").addEventListener("click", () => {
         if (!widget) return;
+        const timeLimit = maxListenTime[Math.min(currentListenTimeIndex, maxListenTime.length - 1)];
         widget.seekTo(0);
         widget.play();
-        setTimeout(() => widget.pause(), maxListenTime[Math.min(currentListenTimeIndex, maxListenTime.length - 1)] * 1000);
+        setTimeout(() => widget.pause(), timeLimit * 1000);
       });
 
       document.getElementById("skipBtn").addEventListener("click", () => {
         if (currentGuess >= maxGuesses) return;
+        const index = Math.min(currentListenTimeIndex, maxListenTime.length - 1);
+        const time = maxListenTime[index];
+        const guessEl = document.createElement("div");
+        guessEl.textContent = `(Skipped) @ ${time}s`;
+        guessEl.className = "text-red-400";
+        document.getElementById("guessHistory").appendChild(guessEl);
         currentGuess++;
-        currentListenTimeIndex++;
+        if (currentListenTimeIndex < maxListenTime.length - 1) currentListenTimeIndex++;
         document.getElementById("currentGuess").textContent = currentGuess + 1;
         document.getElementById("listenTime").textContent = `${maxListenTime[Math.min(currentListenTimeIndex, maxListenTime.length - 1)]} second`;
       });
@@ -125,12 +138,15 @@
         if (!guess) return;
         const correctAnswer = todayTrack.title.toLowerCase();
         const isCorrect = guess.toLowerCase() === correctAnswer;
+        if (isCorrect) launchConfetti();
+        const index = Math.min(currentListenTimeIndex, maxListenTime.length - 1);
+        const time = maxListenTime[index];
         const guessEl = document.createElement("div");
-        guessEl.textContent = `${guess} @ ${maxListenTime[Math.min(currentListenTimeIndex, maxListenTime.length - 1)]}s`;
+        guessEl.textContent = `${guess} @ ${time}s`;
         guessEl.className = isCorrect ? "text-green-400" : "text-red-400";
         document.getElementById("guessHistory").appendChild(guessEl);
         currentGuess++;
-        currentListenTimeIndex++;
+        if (currentListenTimeIndex < maxListenTime.length - 1) currentListenTimeIndex++;
         document.getElementById("currentGuess").textContent = currentGuess + 1;
         document.getElementById("listenTime").textContent = `${maxListenTime[Math.min(currentListenTimeIndex, maxListenTime.length - 1)]} second`;
       });
