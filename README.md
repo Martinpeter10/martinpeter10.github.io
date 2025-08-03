@@ -3,7 +3,7 @@ Cartoondle is a daily guessing game inspired by Heardle, but focused on classic 
 
 https://dailyjamm.com
 
-🧩 Gameplay Overview
+## 🧩 Gameplay Overview
 - A new song is featured each day at midnight CST.
 
 Players can listen to increasingly longer snippets on each guess (1s → 15s max).
