@@ -105,7 +105,3 @@ Uses SoundCloud's Player Widget API
 
 UI powered by Tailwind CSS
 
-📬 Contact
-Built by Peter Martin
-Got feature ideas or theme requests? Drop me a message or open an issue.
-
