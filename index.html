@@ -40,8 +40,8 @@
     </div>
   </div>
 
-  <!-- Stats Display -->
-  <div class="text-center text-white mb-6">
+  <!-- Stats and Countdown Display -->
+  <div class="flex justify-center items-center gap-6 text-white mb-4">
     <p>Games Played: <span id="gamesPlayed">0</span></p>
     <p>Current Streak: <span id="currentStreak">0</span></p>
     <p>Best Streak: <span id="bestStreak">0</span></p>
@@ -75,20 +75,11 @@
       </div>
       <div id="guessHistory" class="space-y-2"></div>
       <div id="correctAnswerReveal" class="text-center text-green-300 font-bold text-lg mt-4 hidden"></div>
-      <div id="countdownBottom" class="text-center text-white mt-6 text-sm hidden"></div>
     </div>
+    <div id="countdownBottom" class="text-center text-white text-sm mt-4">⏳ New theme song in ...</div>
   </div>
 
   <script>
-    function launchConfetti() {
-      confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-    }
-    function updateStatsDisplay() {
-      document.getElementById("gamesPlayed").textContent = localStorage.getItem("gamesPlayed") || 0;
-      document.getElementById("currentStreak").textContent = localStorage.getItem("currentStreak") || 0;
-      document.getElementById("bestStreak").textContent = localStorage.getItem("bestStreak") || 0;
-    }
-
     const playlist = [
       { id: "1641348812", title: "The Simpsons" },
       { id: "1641348482", title: "SpongeBob SquarePants" },
@@ -108,28 +99,87 @@
     const correctAnswerReveal = document.getElementById("correctAnswerReveal");
     const currentGuessSpan = document.getElementById("currentGuess");
     const listenTimeSpan = document.getElementById("listenTime");
-    const alreadyPlayedModal = document.getElementById("alreadyPlayedModal");
-    const alreadyPlayedOkBtn = document.getElementById("alreadyPlayedOkBtn");
     const resultModal = document.getElementById("resultModal");
     const resultAnswer = document.getElementById("resultAnswer");
     const resultCloseBtn = document.getElementById("resultCloseBtn");
-    const countdownBottom = document.getElementById("countdownBottom");
-    const countdownModal = document.getElementById("countdownModal");
+    const alreadyPlayedModal = document.getElementById("alreadyPlayedModal");
+    const alreadyPlayedOkBtn = document.getElementById("alreadyPlayedOkBtn");
 
-    const maxGuesses = 6;
     let currentGuessCount = 0;
     let widget;
+    const maxGuesses = 6;
 
-    const todayIndex = new Date().toLocaleDateString('en-US', { timeZone: 'America/Chicago' }).split('/').reduce((a, b) => a + parseInt(b), 0) % playlist.length;
+    function getTodayIndex() {
+      const date = new Date().toLocaleDateString('en-US', { timeZone: 'America/Chicago' });
+      return date.split('/').reduce((a, b) => a + parseInt(b), 0) % playlist.length;
+    }
+
+    const todayIndex = getTodayIndex();
     const todayTrack = playlist[todayIndex];
     const todayKey = `played-${todayIndex}`;
 
+    function disableButtons() {
+      playBtn.disabled = true;
+      skipBtn.disabled = true;
+      submitBtn.disabled = true;
+      guessInput.disabled = true;
+    }
+
+    function updateCountdown() {
+      const now = new Date();
+      const midnight = new Date();
+      midnight.setHours(24, 0, 0, 0);
+      const diff = midnight - now;
+      const hrs = Math.floor(diff / (1000 * 60 * 60));
+      const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const secs = Math.floor((diff % (1000 * 60)) / 1000);
+      const msg = `⏳ New theme song in ${hrs}h ${mins}m ${secs}s`;
+      document.getElementById("countdownBottom").textContent = msg;
+      document.getElementById("countdownModal").textContent = msg;
+    }
+    setInterval(updateCountdown, 1000);
+
+    function launchConfetti() {
+      confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+    }
+
+    function updateStatsDisplay() {
+      document.getElementById("gamesPlayed").textContent = localStorage.getItem("gamesPlayed") || 0;
+      document.getElementById("currentStreak").textContent = localStorage.getItem("currentStreak") || 0;
+      document.getElementById("bestStreak").textContent = localStorage.getItem("bestStreak") || 0;
+    }
+
+    function endGame(correct) {
+      localStorage.setItem(todayKey, 'done');
+      correctAnswerReveal.textContent = `🎯 The correct answer was: ${todayTrack.title}`;
+      correctAnswerReveal.classList.remove("hidden");
+      resultAnswer.textContent = `🎯 The correct answer was: ${todayTrack.title}`;
+      resultModal.classList.remove("hidden");
+      disableButtons();
+
+      let gamesPlayed = parseInt(localStorage.getItem("gamesPlayed") || "0") + 1;
+      let currentStreak = parseInt(localStorage.getItem("currentStreak") || "0");
+      let bestStreak = parseInt(localStorage.getItem("bestStreak") || "0");
+
+      if (correct) {
+        currentStreak++;
+        if (currentStreak > bestStreak) bestStreak = currentStreak;
+      } else {
+        currentStreak = 0;
+      }
+
+      localStorage.setItem("gamesPlayed", gamesPlayed);
+      localStorage.setItem("currentStreak", currentStreak);
+      localStorage.setItem("bestStreak", bestStreak);
+      updateStatsDisplay();
+    }
+
     window.addEventListener("DOMContentLoaded", () => {
+      updateStatsDisplay();
+
       const iframe = document.getElementById("sc-player");
       iframe.src = `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${todayTrack.id}&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=false`;
       widget = SC.Widget(iframe);
-
-      updateStatsDisplay();
 
       if (localStorage.getItem(todayKey) === 'done') {
         correctAnswerReveal.textContent = `🎯 The correct answer was: ${todayTrack.title}`;
@@ -196,53 +246,7 @@
         });
         autocompleteList.classList.remove("hidden");
       });
-
-      function updateCountdown() {
-        const now = new Date();
-        const midnight = new Date();
-        midnight.setHours(24, 0, 0, 0);
-        const diff = midnight - now;
-        const hrs = Math.floor(diff / (1000 * 60 * 60));
-        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const secs = Math.floor((diff % (1000 * 60)) / 1000);
-        const msg = `⏳ New song in ${hrs}h ${mins}m ${secs}s`;
-        countdownBottom.textContent = msg;
-        countdownModal.textContent = msg;
-      }
-      setInterval(updateCountdown, 1000);
     });
-
-    function disableButtons() {
-      playBtn.disabled = true;
-      skipBtn.disabled = true;
-      submitBtn.disabled = true;
-      guessInput.disabled = true;
-    }
-
-    function endGame(correct) {
-      localStorage.setItem(todayKey, 'done');
-      correctAnswerReveal.textContent = `🎯 The correct answer was: ${todayTrack.title}`;
-      correctAnswerReveal.classList.remove("hidden");
-      resultAnswer.textContent = `🎯 The correct answer was: ${todayTrack.title}`;
-      resultModal.classList.remove("hidden");
-      disableButtons();
-
-      let gamesPlayed = parseInt(localStorage.getItem("gamesPlayed") || "0") + 1;
-      let currentStreak = parseInt(localStorage.getItem("currentStreak") || "0");
-      let bestStreak = parseInt(localStorage.getItem("bestStreak") || "0");
-
-      if (correct) {
-        currentStreak++;
-        if (currentStreak > bestStreak) bestStreak = currentStreak;
-      } else {
-        currentStreak = 0;
-      }
-
-      localStorage.setItem("gamesPlayed", gamesPlayed);
-      localStorage.setItem("currentStreak", currentStreak);
-      localStorage.setItem("bestStreak", bestStreak);
-      updateStatsDisplay();
-    }
   </script>
 </body>
 </html>
