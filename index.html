@@ -20,203 +20,51 @@
     </div>
   </div>
 
-  <div class="container mx-auto px-4 py-8 max-w-4xl">
-    <div class="text-center mb-8">
-      <h1 class="text-4xl font-bold mb-2">🎵 Cartoondle 🎵</h1>
-      <p class="text-lg opacity-90">Guess the cartoon theme song in 6 tries or less!</p>
-      <div class="mt-4 bg-white/10 rounded-lg p-4">
-        <div class="flex justify-center space-x-8 text-sm">
-          <div><span class="font-semibold">Current Streak:</span> <span id="currentStreak" class="ml-1 text-yellow-300">0</span></div>
-          <div><span class="font-semibold">Best Streak:</span> <span id="bestStreak" class="ml-1 text-green-300">0</span></div>
-          <div><span class="font-semibold">Games Played:</span> <span id="gamesPlayed" class="ml-1 text-blue-300">0</span></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 mb-6">
-      <div class="text-center mb-6">
-        <h2 class="text-xl font-semibold mb-2">Listen to the theme song:</h2>
-        <iframe id="sc-player" width="0" height="0" style="visibility:hidden;" scrolling="no" frameborder="no" allow="autoplay"></iframe>
-        <div class="text-center mt-4 mb-4">
-          <button id="playSnippet" class="bg-green-500 hover:bg-green-600 px-6 py-2 rounded-lg font-semibold">▶️ Play Snippet</button>
-          <button id="skipBtn" class="bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold">⏭️ Skip</button>
-        </div>
-        <div class="text-sm opacity-75">
-          Guess <span id="currentGuess">1</span> of 6 • Listen time: <span id="listenTime">1 second</span>
-        </div>
-      </div>
-
-      <div class="mb-6">
-        <input type="text" id="guessInput" placeholder="Enter your guess for the cartoon name..."
-          class="w-full p-4 rounded-lg text-black text-lg border-2 border-transparent focus:border-yellow-400 focus:outline-none">
-        <button id="submitBtn" class="w-full mt-3 bg-blue-500 hover:bg-blue-600 py-3 rounded-lg font-semibold text-lg">Submit Guess</button>
-      </div>
-      <div id="guessHistory" class="space-y-2"></div>
-      <div id="correctAnswerReveal" class="text-center text-xl text-green-300 font-semibold mt-6 hidden"></div>
-    </div>
-
-    <div id="countdownToMidnight" class="text-center text-white mt-6 text-lg hidden"></div>
-  </div>
-
-  <div id="resultModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden">
-    <div class="bg-white text-black rounded-xl p-6 w-full max-w-md text-center">
-      <h2 class="text-2xl font-bold mb-2" id="modalTitle"></h2>
-      <p id="modalMessage" class="text-lg mb-4"></p>
-      <button id="modalCloseBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">OK</button>
-    </div>
-  </div>
+  <div id="countdownToMidnight" class="text-center text-white mt-6 text-lg hidden"></div>
 
   <script>
-    window.addEventListener("DOMContentLoaded", () => {
-      const playlist = [
-        { id: "123456789", title: "DuckTales", url: "https://api.soundcloud.com/tracks/123456789" },
-        { id: "234567890", title: "SpongeBob SquarePants", url: "https://api.soundcloud.com/tracks/234567890" },
-        { id: "345678901", title: "Animaniacs", url: "https://api.soundcloud.com/tracks/345678901" }
-      ];
+    function getCSTMidnight() {
+      const now = new Date();
+      const nowUtc = now.getTime() + now.getTimezoneOffset() * 60000;
+      const offset = -6 * 60 * 60000;
+      const cstNow = new Date(nowUtc + offset);
+      const cstMidnight = new Date(cstNow);
+      cstMidnight.setHours(24, 0, 0, 0);
+      return cstMidnight;
+    }
 
-      const maxListenTime = [1, 2, 3, 5, 10, 15];
-      let currentGuess = 0;
-      let currentListenTimeIndex = 0;
-      const maxGuesses = 6;
+    function getCSTDayKey() {
+      const midnight = getCSTMidnight();
+      midnight.setHours(0, 0, 0, 0);
+      return `day-${midnight.getTime()}`;
+    }
 
-      const getCSTDayKey = () => {
+    function showCountdownToMidnight() {
+      const countdown = document.getElementById("countdownToMidnight");
+      countdown.classList.remove("hidden");
+      function updateCountdown() {
         const now = new Date();
-        const utc = now.getTime() + now.getTimezoneOffset() * 60000;
-        const cstOffset = -6 * 60 * 60000;
-        const cstMidnight = new Date(utc + cstOffset);
-        cstMidnight.setHours(0, 0, 0, 0);
-        return `day-${cstMidnight.getTime()}`;
-      };
+        const nextMidnight = getCSTMidnight();
+        const diff = nextMidnight - now;
+        const hrs = Math.floor(diff / (1000 * 60 * 60));
+        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const secs = Math.floor((diff % (1000 * 60)) / 1000);
+        countdown.textContent = `⏳ New song in ${hrs}h ${mins}m ${secs}s`;
+      }
+      updateCountdown();
+      setInterval(updateCountdown, 1000);
+    }
 
+    window.addEventListener("DOMContentLoaded", () => {
       const todayKey = getCSTDayKey();
       const storedState = JSON.parse(localStorage.getItem("gameState") || "{}");
-      const stats = JSON.parse(localStorage.getItem("stats") || '{"current":0,"best":0,"games":0}');
-      const todayIndex = parseInt(todayKey.replace("day-", "")) % playlist.length;
-      const todayTrack = playlist[todayIndex];
-
-      const playerIframe = document.getElementById("sc-player");
-      playerIframe.src = `https://w.soundcloud.com/player/?url=${encodeURIComponent(todayTrack.url)}&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=false`;
-
-      let widget;
-      playerIframe.onload = () => {
-        widget = SC.Widget(playerIframe);
-      };
-
-      function updateStatsDisplay() {
-        document.getElementById("currentStreak").textContent = stats.current;
-        document.getElementById("bestStreak").textContent = stats.best;
-        document.getElementById("gamesPlayed").textContent = stats.games;
-      }
-
-      function updateStatus() {
-        document.getElementById("currentGuess").textContent = Math.min(currentGuess + 1, maxGuesses);
-        document.getElementById("listenTime").textContent = `${maxListenTime[Math.min(currentListenTimeIndex, maxListenTime.length - 1)]} second${maxListenTime[currentListenTimeIndex] > 1 ? "s" : ""}`;
-      }
-
-      function addGuessToHistory(guess, correct, timeLength) {
-        const history = document.getElementById("guessHistory");
-        const div = document.createElement("div");
-        div.innerHTML = `<strong>${guess || '(Skipped)'}</strong> <span class="text-xs opacity-60">@ ${timeLength} sec</span>`;
-        div.className = correct ? "text-green-400 font-bold" : "text-red-400";
-        history.appendChild(div);
-      }
-
-      function revealCorrectAnswer() {
-        const el = document.getElementById("correctAnswerReveal");
-        el.textContent = `🎯 The correct answer was: ${todayTrack.title}`;
-        el.classList.remove("hidden");
-      }
-
-      function showModal(title, message) {
-        document.getElementById("modalTitle").textContent = title;
-        document.getElementById("modalMessage").textContent = message;
-        document.getElementById("resultModal").style.display = "flex";
-        revealCorrectAnswer();
-        showCountdownToMidnight();
-      }
-
-      function showCountdownToMidnight() {
-        const countdown = document.getElementById("countdownToMidnight");
-        countdown.classList.remove("hidden");
-        function updateCountdown() {
-          const now = new Date();
-          const nextMidnight = new Date(now);
-          nextMidnight.setUTCHours(30, 0, 0, 0);
-          const diff = nextMidnight - now;
-          const hrs = Math.floor(diff / (1000 * 60 * 60));
-          const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-          const secs = Math.floor((diff % (1000 * 60)) / 1000);
-          countdown.textContent = `⏳ New song in ${hrs}h ${mins}m ${secs}s`;
-        }
-        updateCountdown();
-        setInterval(updateCountdown, 1000);
-      }
-
-      function endGame(won) {
-        storedState[todayKey] = { completed: true };
-        localStorage.setItem("gameState", JSON.stringify(storedState));
-        stats.games++;
-        if (won) {
-          stats.current++;
-          if (stats.current > stats.best) stats.best = stats.current;
-        } else {
-          stats.current = 0;
-        }
-        localStorage.setItem("stats", JSON.stringify(stats));
-        updateStatsDisplay();
-        showModal(won ? "You got it!" : "Out of Guesses", `The answer was: ${todayTrack.title}`);
-      }
-
-      document.getElementById("playSnippet").addEventListener("click", () => {
-        if (!widget) return;
-        widget.seekTo(0);
-        widget.play();
-        setTimeout(() => widget.pause(), maxListenTime[Math.min(currentListenTimeIndex, maxListenTime.length - 1)] * 1000);
-      });
-
-      document.getElementById("skipBtn").addEventListener("click", () => {
-        if (currentGuess >= maxGuesses) return;
-        const time = maxListenTime[Math.min(currentListenTimeIndex, maxListenTime.length - 1)];
-        addGuessToHistory("", false, time);
-        currentGuess++;
-        currentListenTimeIndex++;
-        updateStatus();
-        if (currentGuess >= maxGuesses) endGame(false);
-      });
-
-      document.getElementById("submitBtn").addEventListener("click", () => {
-        const input = document.getElementById("guessInput");
-        const guess = input.value.trim();
-        if (!guess || currentGuess >= maxGuesses) return;
-        const correct = guess.toLowerCase() === todayTrack.title.toLowerCase();
-        const time = maxListenTime[Math.min(currentListenTimeIndex, maxListenTime.length - 1)];
-        addGuessToHistory(guess, correct, time);
-        input.value = "";
-        if (correct) {
-          endGame(true);
-        } else {
-          currentGuess++;
-          currentListenTimeIndex++;
-          updateStatus();
-          if (currentGuess >= maxGuesses) endGame(false);
-        }
-      });
-
-      document.getElementById("modalCloseBtn").addEventListener("click", () => {
-        document.getElementById("resultModal").style.display = "none";
-      });
-
-      document.getElementById("alreadyPlayedOkBtn").addEventListener("click", () => {
-        document.getElementById("alreadyPlayedModal").classList.add("hidden");
-        showCountdownToMidnight();
-      });
-
       if (storedState[todayKey]?.completed) {
         document.getElementById("alreadyPlayedModal").classList.remove("hidden");
+        document.getElementById("alreadyPlayedOkBtn").addEventListener("click", () => {
+          document.getElementById("alreadyPlayedModal").classList.add("hidden");
+          showCountdownToMidnight();
+        });
       }
-
-      updateStatus();
-      updateStatsDisplay();
     });
   </script>
 </body>
