@@ -177,11 +177,15 @@
       iframe.src = `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${todayTrack.id}&auto_play=false&hide_related=true`;
       widget = SC.Widget(iframe);
 
-      if (localStorage.getItem(todayKey)==='done') {
-        elements.correctAnswerReveal.textContent = `🎯 The correct answer was: ${todayTrack.title}`;
-        elements.correctAnswerReveal.classList.remove("hidden");
-        disableInputs();
-      }
+      if (localStorage.getItem(todayKey) === 'done') {
+      elements.correctAnswerReveal.textContent = `🎯 The correct answer was: ${todayTrack.title}`;
+      elements.correctAnswerReveal.classList.remove("hidden");
+      document.getElementById("alreadyPlayedModal").classList.remove("hidden");
+      document.getElementById("alreadyPlayedOkBtn").onclick = () => {
+      document.getElementById("alreadyPlayedModal").classList.add("hidden");
+      };
+      disableInputs();
+}
 
       elements.resultCloseBtn.onclick = () => elements.resultModal.classList.add("hidden");
       elements.shareBtn.onclick = shareResults;
