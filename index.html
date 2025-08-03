@@ -52,13 +52,8 @@
         <h2 class="text-xl font-semibold mb-2">Listen to the theme song:</h2>
         <iframe id="sc-player" width="100%" height="120" scrolling="no" frameborder="no" allow="autoplay"></iframe>
         <div class="flex justify-center gap-4 mt-4 mb-4">
-          <button id="playSnippet" class="bg-green-500 hover:bg-green-600 px-6 py-2 rounded-lg font-semibold">
-            ▶️ Play Snippet
-          </button>
-          <button id="skipBtn"
-            class="bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 disabled:cursor-not-allowed px-6 py-2 rounded-lg font-semibold">
-            ⏭️ Skip
-          </button>
+          <button id="playSnippet" class="bg-green-500 hover:bg-green-600 px-6 py-2 rounded-lg font-semibold">▶️ Play Snippet</button>
+          <button id="skipBtn" class="bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 disabled:cursor-not-allowed px-6 py-2 rounded-lg font-semibold">⏭️ Skip</button>
         </div>
         <div class="text-sm opacity-75">
           Guess <span id="currentGuess">1</span> of 6 • Listen time: <span id="listenTime">1 second</span>
@@ -66,8 +61,7 @@
       </div>
 
       <div class="mb-6 relative">
-        <input id="guessInput" placeholder="Enter your guess..."
-               class="w-full p-4 rounded-lg text-black text-base sm:text-lg border-2 border-transparent focus:border-yellow-400 focus:outline-none">
+        <input id="guessInput" placeholder="Enter your guess..." class="w-full p-4 rounded-lg text-black text-base sm:text-lg border-2 border-transparent focus:border-yellow-400 focus:outline-none">
         <div id="autocomplete-list" class="hidden absolute bg-white text-black border mt-1 rounded w-full z-50"></div>
         <button id="submitBtn" class="w-full mt-3 bg-blue-500 hover:bg-blue-600 py-3 rounded-lg font-semibold text-lg">Submit Guess</button>
       </div>
@@ -79,8 +73,7 @@
     <div id="countdownBottom" class="text-center text-sm text-white mt-4">⏳ New theme song in ...</div>
   </div>
 
-  
-    <!-- Your external JavaScript file -->
-<script type="module" src="js/main.js"></script>
+  <!-- External JavaScript -->
+  <script type="module" src="js/main.js"></script>
 </body>
 </html>
