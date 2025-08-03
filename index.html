@@ -8,6 +8,25 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <script src="https://w.soundcloud.com/player/api.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  <style>
+    #autocomplete-list {
+      position: absolute;
+      background-color: white;
+      color: black;
+      border: 1px solid #ccc;
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 999;
+      width: 100%;
+    }
+    #autocomplete-list div {
+      padding: 8px;
+      cursor: pointer;
+    }
+    #autocomplete-list div:hover {
+      background-color: #f0f0f0;
+    }
+  </style>
 </head>
 <body class="bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-800 min-h-screen text-white">
   <div id="alreadyPlayedModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden">
@@ -24,7 +43,7 @@
       <p class="text-lg opacity-90">Guess the cartoon theme song in 6 tries or less!</p>
     </div>
 
-    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 mb-6">
+    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 mb-6 relative">
       <div class="text-center mb-4">
         <p class="text-sm text-white">Games Played: <span id="gamesPlayed">0</span> • Current Streak: <span id="currentStreak">0</span> • Best Streak: <span id="bestStreak">0</span></p>
       </div>
@@ -33,27 +52,17 @@
         <iframe id="sc-player" width="0" height="0" style="visibility:hidden;" scrolling="no" frameborder="no" allow="autoplay"></iframe>
         <div class="flex justify-center gap-4 mt-4 mb-4">
           <button id="playSnippet" class="bg-green-500 hover:bg-green-600 px-6 py-2 rounded-lg font-semibold">▶️ Play Snippet</button>
-          <button id="skipBtn" class="bg-green-500 hover:bg-green-600 px-6 py-2 rounded-lg font-semibold">⏭️ Skip</button>
+          <button id="skipBtn" class="bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold">⏭️ Skip</button>
         </div>
         <div class="text-sm opacity-75">
           Guess <span id="currentGuess">1</span> of 6 • Listen time: <span id="listenTime">1 second</span>
         </div>
       </div>
 
-      <div class="mb-6">
-        <input list="cartoonList" id="guessInput" placeholder="Enter your guess for the cartoon name..."
+      <div class="mb-6 relative">
+        <input id="guessInput" placeholder="Enter your guess for the cartoon name..."
           class="w-full p-4 rounded-lg text-black text-lg border-2 border-transparent focus:border-yellow-400 focus:outline-none">
-        <datalist id="cartoonList">
-          <option value="DuckTales">
-          <option value="SpongeBob SquarePants">
-          <option value="Animaniacs">
-          <option value="Teen Titans">
-          <option value="Batman: The Animated Series">
-          <option value="The Fairly OddParents">
-          <option value="The Simpsons">
-          <option value="Futurama">
-          <option value="Avatar: The Last Airbender">
-        </datalist>
+        <div id="autocomplete-list" class="hidden"></div>
         <button id="submitBtn" class="w-full mt-3 bg-blue-500 hover:bg-blue-600 py-3 rounded-lg font-semibold text-lg">Submit Guess</button>
       </div>
       <div id="guessHistory" class="space-y-2"></div>
@@ -76,11 +85,42 @@
       "Avatar: The Last Airbender"
     ];
 
+    let currentGuessCount = 0;
+    const maxGuesses = 6;
+    let gameOver = false;
+
     const guessInput = document.getElementById('guessInput');
     const submitBtn = document.getElementById('submitBtn');
     const playSnippet = document.getElementById('playSnippet');
     const skipBtn = document.getElementById('skipBtn');
-    let gameOver = false;
+    const autocompleteList = document.getElementById('autocomplete-list');
+
+    guessInput.addEventListener("input", () => {
+      const val = guessInput.value.toLowerCase();
+      autocompleteList.innerHTML = '';
+      if (!val) {
+        autocompleteList.classList.add("hidden");
+        return;
+      }
+      const matches = cartoonList.filter(name => name.toLowerCase().includes(val));
+      matches.forEach(name => {
+        const div = document.createElement("div");
+        div.textContent = name;
+        div.addEventListener("click", () => {
+          guessInput.value = name;
+          autocompleteList.classList.add("hidden");
+        });
+        autocompleteList.appendChild(div);
+      });
+      autocompleteList.classList.remove("hidden");
+    });
+
+    function endGame(message) {
+      gameOver = true;
+      const answerDisplay = document.getElementById("correctAnswerReveal");
+      answerDisplay.textContent = message;
+      answerDisplay.classList.remove("hidden");
+    }
 
     function getCSTMidnight() {
       const now = new Date();
@@ -128,30 +168,36 @@
       }
 
       submitBtn.addEventListener("click", () => {
-        if (gameOver) return;
+        if (gameOver || currentGuessCount >= maxGuesses) return;
         const guess = guessInput.value.trim();
         if (!guess) return;
+        const time = [1,2,3,5,10,15][Math.min(currentGuessCount, 5)];
         const guessEl = document.createElement("div");
-        guessEl.textContent = `Guess: ${guess}`;
+        guessEl.textContent = `Guess: ${guess} @ ${time}s`;
         document.getElementById("guessHistory").appendChild(guessEl);
+        currentGuessCount++;
         if (cartoonList.includes(guess)) {
-          gameOver = true;
           launchConfetti();
-          document.getElementById("correctAnswerReveal").textContent = `🎯 The correct answer was: ${guess}`;
-          document.getElementById("correctAnswerReveal").classList.remove("hidden");
+          endGame(`🎯 The correct answer was: ${guess}`);
+        } else if (currentGuessCount >= maxGuesses) {
+          endGame(`🎯 The correct answer was: [insert correct answer here]`);
         }
-      });
-
-      playSnippet.addEventListener("click", () => {
-        if (gameOver) return;
-        console.log("Play snippet");
+        document.getElementById("currentGuess").textContent = Math.min(currentGuessCount + 1, maxGuesses);
+        document.getElementById("listenTime").textContent = `${time} second`;
       });
 
       skipBtn.addEventListener("click", () => {
-        if (gameOver) return;
+        if (gameOver || currentGuessCount >= maxGuesses) return;
+        const time = [1,2,3,5,10,15][Math.min(currentGuessCount, 5)];
         const guessEl = document.createElement("div");
-        guessEl.textContent = `(Skipped)`;
+        guessEl.textContent = `(Skipped) @ ${time}s`;
         document.getElementById("guessHistory").appendChild(guessEl);
+        currentGuessCount++;
+        if (currentGuessCount >= maxGuesses) {
+          endGame(`🎯 The correct answer was: [insert correct answer here]`);
+        }
+        document.getElementById("currentGuess").textContent = Math.min(currentGuessCount + 1, maxGuesses);
+        document.getElementById("listenTime").textContent = `${time} second`;
       });
 
       showCountdownToMidnight();
