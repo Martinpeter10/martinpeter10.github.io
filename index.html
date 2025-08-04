@@ -30,7 +30,7 @@
     </div>
   </div>
 
-  <!-- Header and Stats -->
+  <!-- Header & Prominent Stats -->
   <div class="container mx-auto px-4 pt-6 pb-2 max-w-4xl text-center">
     <h1 class="text-4xl font-bold mb-2">🎵 Cartoondle 🎵</h1>
     <div class="bg-white/10 rounded-xl py-4 px-6 mt-4 mb-2 inline-block text-white text-lg sm:text-xl font-semibold">
@@ -45,7 +45,7 @@
     </div>
   </div>
 
-  <!-- Main Game Area -->
+  <!-- Main Gameplay Area -->
   <div class="container mx-auto px-4 py-2 max-w-4xl">
     <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 mb-6 relative">
       <div class="text-center mb-6">
@@ -56,14 +56,16 @@
           <button id="skipBtn" class="bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 disabled:cursor-not-allowed px-6 py-2 rounded-lg font-semibold">⏭️ Skip</button>
         </div>
         <div class="text-sm opacity-75">
-          Guess <span id="currentGuess">1</span> of 6 • Listen time: <span id="listenTime">1 second</span>
+          Guess <span id="currentGuess">1</span> of 6 &bull; Listen time: <span id="listenTime">1 second</span>
         </div>
       </div>
 
       <div class="mb-6 relative">
         <input id="guessInput" placeholder="Enter your guess..." class="w-full p-4 rounded-lg text-black text-base sm:text-lg border-2 border-transparent focus:border-yellow-400 focus:outline-none">
         <div id="autocomplete-list" class="hidden absolute bg-white text-black border mt-1 rounded w-full z-50"></div>
-        <button id="submitBtn" class="w-full mt-3 bg-blue-500 hover:bg-blue-600 py-3 rounded-lg font-semibold text-lg">Submit Guess</button>
+        <button id="submitBtn" class="w-full mt-3 bg-blue-500 hover:bg-blue-600 py-3 rounded-lg font-semibold text-lg">
+          Submit Guess
+        </button>
       </div>
 
       <div id="guessHistory" class="space-y-2 text-base sm:text-lg"></div>
@@ -73,7 +75,7 @@
     <div id="countdownBottom" class="text-center text-sm text-white mt-4">⏳ New theme song in ...</div>
   </div>
 
-  <!-- External JavaScript -->
+  <!-- External JS Module -->
   <script type="module" src="js/main.js"></script>
 </body>
 </html>
