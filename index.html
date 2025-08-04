@@ -6,11 +6,9 @@
   <title>Cartoondle</title>
   <link rel="icon" href="favicon.png" type="image/png">
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <script src="https://w.soundcloud.com/player/api.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 </head>
 <body class="bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-800 min-h-screen text-white">
-
   <!-- Already Played Modal -->
   <div id="alreadyPlayedModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden">
     <div class="bg-white text-black rounded-xl p-6 w-full max-w-md text-center">
@@ -30,7 +28,7 @@
     </div>
   </div>
 
-  <!-- Header & Prominent Stats -->
+  <!-- Header & Stats -->
   <div class="container mx-auto px-4 pt-6 pb-2 max-w-4xl text-center">
     <h1 class="text-4xl font-bold mb-2">🎵 Cartoondle 🎵</h1>
     <div class="bg-white/10 rounded-xl py-4 px-6 mt-4 mb-2 inline-block text-white text-lg sm:text-xl font-semibold">
@@ -45,37 +43,33 @@
     </div>
   </div>
 
-  <!-- Main Gameplay Area -->
+  <!-- Gameplay -->
   <div class="container mx-auto px-4 py-2 max-w-4xl">
     <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 mb-6 relative">
       <div class="text-center mb-6">
         <h2 class="text-xl font-semibold mb-2">Listen to the theme song:</h2>
-        <iframe id="sc-player" width="100%" height="120" scrolling="no" frameborder="no" allow="autoplay"></iframe>
+        <audio id="audioPlayer" preload="auto"></audio>
         <div class="flex justify-center gap-4 mt-4 mb-4">
           <button id="playSnippet" class="bg-green-500 hover:bg-green-600 px-6 py-2 rounded-lg font-semibold">▶️ Play Snippet</button>
           <button id="skipBtn" class="bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 disabled:cursor-not-allowed px-6 py-2 rounded-lg font-semibold">⏭️ Skip</button>
         </div>
         <div class="text-sm opacity-75">
-          Guess <span id="currentGuess">1</span> of 6 &bull; Listen time: <span id="listenTime">1 second</span>
+          Guess <span id="currentGuess">1</span> of 6 • Listen time: <span id="listenTime">1 second</span>
         </div>
       </div>
 
       <div class="mb-6 relative">
         <input id="guessInput" placeholder="Enter your guess..." class="w-full p-4 rounded-lg text-black text-base sm:text-lg border-2 border-transparent focus:border-yellow-400 focus:outline-none">
         <div id="autocomplete-list" class="hidden absolute bg-white text-black border mt-1 rounded w-full z-50"></div>
-        <button id="submitBtn" class="w-full mt-3 bg-blue-500 hover:bg-blue-600 py-3 rounded-lg font-semibold text-lg">
-          Submit Guess
-        </button>
+        <button id="submitBtn" class="w-full mt-3 bg-blue-500 hover:bg-blue-600 py-3 rounded-lg font-semibold text-lg">Submit Guess</button>
       </div>
 
       <div id="guessHistory" class="space-y-2 text-base sm:text-lg"></div>
       <div id="correctAnswerReveal" class="text-center text-green-300 font-bold text-lg mt-4 hidden"></div>
     </div>
-
     <div id="countdownBottom" class="text-center text-sm text-white mt-4">⏳ New theme song in ...</div>
   </div>
 
-  <!-- External JS Module -->
   <script type="module" src="js/main.js"></script>
 </body>
 </html>
