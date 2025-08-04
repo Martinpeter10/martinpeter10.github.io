@@ -9,6 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 </head>
 <body class="bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-800 min-h-screen text-white">
+
   <!-- Already Played Modal -->
   <div id="alreadyPlayedModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden">
     <div class="bg-white text-black rounded-xl p-6 w-full max-w-md text-center">
@@ -37,25 +38,25 @@
       <span>🏆 Best: <span id="bestStreak" class="font-bold">0</span></span>
     </div>
     <div class="mt-2">
-      <button id="shareBtn" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded font-semibold text-white text-sm sm:text-base">
-        Share Result
-      </button>
+      <button id="shareBtn" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded font-semibold text-white text-sm sm:text-base">Share Result</button>
     </div>
   </div>
 
-  <!-- Gameplay -->
+  <!-- Gameplay Area -->
   <div class="container mx-auto px-4 py-2 max-w-4xl">
     <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 mb-6 relative">
       <div class="text-center mb-6">
         <h2 class="text-xl font-semibold mb-2">Listen to the theme song:</h2>
+
+        <!-- Audio Player Element -->
         <audio id="audioPlayer" preload="auto"></audio>
+
         <div class="flex justify-center gap-4 mt-4 mb-4">
           <button id="playSnippet" class="bg-green-500 hover:bg-green-600 px-6 py-2 rounded-lg font-semibold">▶️ Play Snippet</button>
           <button id="skipBtn" class="bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 disabled:cursor-not-allowed px-6 py-2 rounded-lg font-semibold">⏭️ Skip</button>
         </div>
-        <div class="text-sm opacity-75">
-          Guess <span id="currentGuess">1</span> of 6 • Listen time: <span id="listenTime">1 second</span>
-        </div>
+
+        <div class="text-sm opacity-75">Guess <span id="currentGuess">1</span> of 6 • Listen time: <span id="listenTime">1 second</span></div>
       </div>
 
       <div class="mb-6 relative">
@@ -67,6 +68,7 @@
       <div id="guessHistory" class="space-y-2 text-base sm:text-lg"></div>
       <div id="correctAnswerReveal" class="text-center text-green-300 font-bold text-lg mt-4 hidden"></div>
     </div>
+
     <div id="countdownBottom" class="text-center text-sm text-white mt-4">⏳ New theme song in ...</div>
   </div>
 
