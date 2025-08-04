@@ -9,7 +9,6 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 </head>
 <body class="bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-800 min-h-screen text-white">
-  <!-- --- Already Played Modal --- -->
   <div id="alreadyPlayedModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden">
     <div class="bg-white text-black rounded-xl p-6 w-full max-w-md text-center">
       <h2 class="text-2xl font-bold mb-2">🎧 You've already played today!</h2>
@@ -19,16 +18,14 @@
     </div>
   </div>
 
-  <!-- --- Game Over Modal --- -->
-  <div id="resultModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden transition-opacity duration-300">
-    <div class="bg-white text-black rounded-xl p-6 w-full max-w-md text-center transform scale-95 transition-transform duration-300">
+  <div id="resultModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+    <div class="bg-white text-black rounded-xl p-6 w-full max-w-md text-center">
       <h2 class="text-2xl font-bold mb-2">Game Over</h2>
       <p id="resultAnswer" class="text-lg mb-4"></p>
       <button id="resultCloseBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Close</button>
     </div>
   </div>
 
-  <!-- --- Header & Stats Section --- -->
   <div class="container mx-auto px-4 pt-6 pb-2 max-w-4xl text-center">
     <h1 class="text-4xl font-bold mb-2">🎵 Cartoondle 🎵</h1>
     <div class="bg-white/10 rounded-xl py-4 px-6 mt-4 mb-2 inline-block text-white text-lg sm:text-xl font-semibold">
@@ -43,7 +40,6 @@
     </div>
   </div>
 
-  <!-- --- Gameplay Area --- -->
   <div class="container mx-auto px-4 py-2 max-w-4xl">
     <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 mb-6">
       <div class="text-center mb-6">
@@ -51,7 +47,7 @@
         <audio id="audioPlayer" preload="auto"></audio>
         <div class="flex justify-center gap-4 mt-4 mb-4">
           <button id="playSnippet" class="bg-green-500 hover:bg-green-600 px-6 py-2 rounded-lg font-semibold">▶️ Play Snippet</button>
-          <button id="skipBtn" class="bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 disabled:cursor-not-allowed px-6 py-2 rounded-lg font-semibold">⏭️ Skip</button>
+          <button id="skipBtn" class="bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold">⏭️ Skip</button>
         </div>
         <div class="text-sm opacity-75">
           Guess <span id="currentGuess">1</span> of 6 • Listen time: <span id="listenTime">1 second</span>
