@@ -1,14 +1,42 @@
+// === Configuration ===
+const CLIENT_ID = 'SSz86sqjFz89WiIDMTCnBLjsrqIgDkS9'; // 🔁 Replace this with your real client ID
+
 const playlist = [
-  { id: "1641348812", title: "The Simpsons" },
-  { id: "1641348482", title: "SpongeBob SquarePants" },
-  { id: "1641347950", title: "Animaniacs" },
-  { id: "1641347648", title: "Avatar: The Last Airbender" },
-  { id: "1641347005", title: "Teen Titans" },
-  { id: "1641346529", title: "The Fairly OddParents" },
-  { id: "1641346035", title: "Futurama" }
+  { url: "https://soundcloud.com/your-user/the-simpsons", title: "The Simpsons" },
+  { url: "https://soundcloud.com/your-user/spongebob", title: "SpongeBob SquarePants" },
+  { url: "https://soundcloud.com/your-user/animaniacs", title: "Animaniacs" },
+  { url: "https://soundcloud.com/your-user/avatar", title: "Avatar: The Last Airbender" },
+  { url: "https://soundcloud.com/your-user/teen-titans", title: "Teen Titans" },
+  { url: "https://soundcloud.com/your-user/fairly-oddparents", title: "The Fairly OddParents" },
+  { url: "https://soundcloud.com/your-user/futurama", title: "Futurama" }
 ];
 
+// === Utility ===
+async function resolveTrackId(trackUrl) {
+  try {
+    const res = await fetch(`https://api.soundcloud.com/resolve?url=${encodeURIComponent(trackUrl)}&client_id=${CLIENT_ID}`);
+    if (!res.ok) throw new Error("Failed to resolve track ID");
+    const data = await res.json();
+    return data.id;
+  } catch (error) {
+    console.error("Error resolving SoundCloud track:", error);
+    return null;
+  }
+}
+
+// === Game Setup ===
 const maxGuesses = 6;
+const todayIndex = (() => {
+  const dateKey = new Date().toLocaleDateString('en-US', { timeZone: 'America/Chicago' });
+  return dateKey.split('/').reduce((a, b) => a + parseInt(b), 0) % playlist.length;
+})();
+const todayTrack = playlist[todayIndex];
+const todayKey = `played-${todayIndex}`;
+let currentGuessCount = 0;
+const guessedSet = new Set();
+let widget;
+
+// === DOM References ===
 const elements = {
   guessInput: document.getElementById("guessInput"),
   autocompleteList: document.getElementById("autocomplete-list"),
@@ -28,27 +56,16 @@ const elements = {
   bestStreak: document.getElementById("bestStreak"),
   countdownBottom: document.getElementById("countdownBottom"),
   alreadyPlayedModal: document.getElementById("alreadyPlayedModal"),
-  alreadyPlayedOkBtn: document.getElementById("alreadyPlayedOkBtn")
+  alreadyPlayedOkBtn: document.getElementById("alreadyPlayedOkBtn"),
+  iframe: document.getElementById("sc-player")
 };
 
-const todayIndex = (() => {
-  const dateKey = new Date().toLocaleDateString('en-US', { timeZone: 'America/Chicago' });
-  return dateKey.split('/').reduce((a, b) => a + parseInt(b), 0) % playlist.length;
-})();
-const todayTrack = playlist[todayIndex];
-const todayKey = `played-${todayIndex}`;
-
-let widget;
-let currentGuessCount = 0;
-const guessedSet = new Set();
-
+// === Game Logic ===
 function disableInputs() {
   elements.playBtn.disabled = true;
   elements.skipBtn.disabled = true;
   elements.submitBtn.disabled = true;
   elements.guessInput.disabled = true;
-
-  elements.skipBtn.classList.add("bg-orange-500", "hover:bg-orange-600");
 }
 
 function updateCountdown() {
@@ -56,9 +73,9 @@ function updateCountdown() {
   const midnight = new Date(now);
   midnight.setHours(24, 0, 0, 0);
   const diff = midnight - now;
-  const hrs = Math.floor(diff / (1000 * 60 * 60));
-  const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-  const secs = Math.floor((diff % (1000 * 60)) / 1000);
+  const hrs = Math.floor(diff / 3600000);
+  const mins = Math.floor((diff % 3600000) / 60000);
+  const secs = Math.floor((diff % 60000) / 1000);
   const msg = `⏳ New theme song in ${hrs}h ${mins}m ${secs}s`;
   elements.countdownBottom.textContent = msg;
   document.getElementById("countdownModal").textContent = msg;
@@ -168,22 +185,23 @@ function handleAutocomplete() {
   elements.autocompleteList.classList.remove("hidden");
 }
 
-window.addEventListener("DOMContentLoaded", () => {
+// === Init Game on Load ===
+window.addEventListener("DOMContentLoaded", async () => {
   updateCountdown();
   setInterval(updateCountdown, 1000);
   updateStatsDisplay();
 
-  const iframe = document.getElementById("sc-player");
-  iframe.src = `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${todayTrack.id}&auto_play=false&hide_related=true`;
-  widget = SC.Widget(iframe);
+  const resolvedId = await resolveTrackId(todayTrack.url);
+  if (resolvedId) {
+    elements.iframe.src = `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${resolvedId}&auto_play=false&hide_related=true`;
+    widget = SC.Widget(elements.iframe);
+  }
 
   if (localStorage.getItem(todayKey) === 'done') {
     elements.correctAnswerReveal.textContent = `🎯 The correct answer was: ${todayTrack.title}`;
     elements.correctAnswerReveal.classList.remove("hidden");
     elements.alreadyPlayedModal.classList.remove("hidden");
-    elements.alreadyPlayedOkBtn.onclick = () => {
-      elements.alreadyPlayedModal.classList.add("hidden");
-    };
+    elements.alreadyPlayedOkBtn.onclick = () => elements.alreadyPlayedModal.classList.add("hidden");
     disableInputs();
   }
 
