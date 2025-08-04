@@ -1,5 +1,5 @@
 // Config
-const CLIENT_ID = 'SSz86sqjFz89WiIDMTCnBLjsrqIgDkS9'; 
+const CLIENT_ID = 'SSz86sqjFz89WiIDMTCnBLjsrqIgDkS9';
 const PLAYLIST_URL = 'https://soundcloud.com/peter-martin-657527787/sets/playlist';
 const titles = [
   "Chowder","All Grown Up","Ben 10","Teenage Mutant Ninja Turtles",
@@ -56,7 +56,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     alreadyOk: document.getElementById('alreadyPlayedOkBtn')
   };
 
-  // Set audio source for direct playback
+  // Set audio source for snippet play
   el.audio.src = `https://api.soundcloud.com/tracks/${today.id}/stream?client_id=${CLIENT_ID}`;
 
   let count = 0, max = 6;
@@ -95,10 +95,10 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 
   function updateCountdown() {
-    const now = new Date(), m = new Date(now);
-    m.setHours(24,0,0,0);
-    const diff = m - now, h = Math.floor(diff / 3600000);
-    const mn = Math.floor((diff % 3600000)/60000), s = Math.floor((diff % 60000)/1000);
+    const n = new Date(), m = new Date(n);
+    m.setHours(24, 0, 0, 0);
+    const diff = m - n, h = Math.floor(diff / 3600000);
+    const mn = Math.floor((diff % 3600000) / 60000), s = Math.floor((diff % 60000) / 1000);
     el.countdown.textContent = `⏳ New theme song in ${h}h ${mn}m ${s}s`;
     document.getElementById('countdownModal').textContent = el.countdown.textContent;
   }
