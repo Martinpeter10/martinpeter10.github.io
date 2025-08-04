@@ -1,4 +1,3 @@
-// Playlist using self-hosted MP3 URLs
 const playlist = [
   { title: "Chowder", url: "audio/chowder.mp3" },
   { title: "All Grown Up", url: "audio/all-grown-up.mp3" },
@@ -11,7 +10,6 @@ const playlist = [
   { title: "The Amazing Adventures of Gumball", url: "audio/gumball.mp3" }
 ];
 
-// Calculate today's index
 function getTodayIndex() {
   const key = new Date().toLocaleDateString("en-US", { timeZone: "America/Chicago" });
   return key.split("/").reduce((a, b) => a + parseInt(b), 0) % playlist.length;
@@ -46,40 +44,9 @@ window.addEventListener("DOMContentLoaded", () => {
   };
 
   el.audio.src = today.url;
-
   let currentGuess = 0;
   const maxGuesses = 6;
   const guessedSet = new Set();
-
-  updateStats();
-  updateCountdown();
-  setInterval(updateCountdown, 1000);
-
-  if (localStorage.getItem(todayKey) === "done") {
-    el.correctReveal.textContent = `🎯 The correct answer was: ${today.title}`;
-    el.correctReveal.classList.remove("hidden");
-    el.alreadyModal.classList.remove("hidden");
-    el.alreadyOk.onclick = () => el.alreadyModal.classList.add("hidden");
-    disableAll();
-  }
-
-  el.play.onclick = () => {
-    if (currentGuess >= maxGuesses) return;
-    el.audio.currentTime = 0;
-    el.audio.play();
-    const t = [1, 2, 3, 5, 10, 15][Math.min(currentGuess, 5)];
-    setTimeout(() => el.audio.pause(), t * 1000);
-  };
-
-  el.skip.onclick = handleSkip;
-  el.submit.onclick = handleGuess;
-  el.resultClose.onclick = () => el.resultModal.classList.add("hidden");
-  el.share.onclick = shareResults;
-
-  el.guessInput.addEventListener("input", autoComplete);
-  el.guessInput.addEventListener("keyup", (e) => {
-    if (e.key === "Enter") handleGuess();
-  });
 
   function updateStats() {
     el.gamesPlayed.textContent = localStorage.getItem("gamesPlayed") || 0;
@@ -89,15 +56,43 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   function updateCountdown() {
-    const now = new Date(),
-      midnight = new Date(now);
-    midnight.setHours(24, 0, 0, 0);
+    const now = new Date();
+    const midnight = new Date(now); midnight.setHours(24, 0, 0, 0);
     const diff = midnight - now;
-    const h = Math.floor(diff / 3600000),
-      m = Math.floor((diff % 3600000) / 60000),
-      s = Math.floor((diff % 60000) / 1000);
-    el.countdown.textContent = `⏳ New theme song in ${h}h ${m}m ${s}s`;
-    document.getElementById("countdownModal").textContent = el.countdown.textContent;
+    const hrs = Math.floor(diff / 3600000),
+          mins = Math.floor((diff % 3600000) / 60000),
+          secs = Math.floor((diff % 60000) / 1000);
+    const msg = `⏳ New theme song in ${hrs}h ${mins}m ${secs}s`;
+    el.countdown.textContent = msg;
+    document.getElementById("countdownModal").textContent = msg;
+  }
+
+  function disableAll() {
+    el.play.disabled = el.skip.disabled = el.submit.disabled = el.guessInput.disabled = true;
+    el.skip.classList.add("bg-orange-500", "hover:bg-orange-600");
+  }
+
+  function finishGame(correct) {
+    localStorage.setItem(todayKey, "done");
+    el.correctReveal.textContent = `🎯 The correct answer was: ${today.title}`;
+    el.correctReveal.classList.remove("hidden");
+    el.resultAnswer.textContent = el.correctReveal.textContent;
+    el.resultModal.classList.remove("hidden");
+    disableAll();
+
+    let gp = parseInt(localStorage.getItem("gamesPlayed") || "0", 10) + 1;
+    let cs = parseInt(localStorage.getItem("currentStreak") || "0", 10);
+    let bs = parseInt(localStorage.getItem("bestStreak") || "0", 10);
+    if (correct) {
+      cs++;
+      if (cs > bs) bs = cs;
+    } else {
+      cs = 0;
+    }
+    localStorage.setItem("gamesPlayed", gp);
+    localStorage.setItem("currentStreak", cs);
+    localStorage.setItem("bestStreak", bs);
+    updateStats();
   }
 
   function handleGuess() {
@@ -139,34 +134,6 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function finishGame(correct) {
-    localStorage.setItem(todayKey, "done");
-    el.correctReveal.textContent = `🎯 The correct answer was: ${today.title}`;
-    el.correctReveal.classList.remove("hidden");
-    el.resultAnswer.textContent = el.correctReveal.textContent;
-    el.resultModal.classList.remove("hidden");
-    disableAll();
-
-    let gp = parseInt(localStorage.getItem("gamesPlayed") || "0", 10) + 1;
-    let cs = parseInt(localStorage.getItem("currentStreak") || "0", 10);
-    let bs = parseInt(localStorage.getItem("bestStreak") || "0", 10);
-    if (correct) {
-      cs++;
-      if (cs > bs) bs = cs;
-    } else {
-      cs = 0;
-    }
-    localStorage.setItem("gamesPlayed", gp);
-    localStorage.setItem("currentStreak", cs);
-    localStorage.setItem("bestStreak", bs);
-    updateStats();
-  }
-
-  function disableAll() {
-    el.play.disabled = el.skip.disabled = el.submit.disabled = el.guessInput.disabled = true;
-    el.skip.classList.add("bg-orange-500", "hover:bg-orange-600");
-  }
-
   function shareResults() {
     const msg = `🎵 Cartoondle—Streak: ${el.currentStreak.textContent} | Best: ${el.bestStreak.textContent}`;
     navigator.share?.({ title: "Cartoondle", text: msg, url: location.href }) || alert(msg);
@@ -190,4 +157,33 @@ window.addEventListener("DOMContentLoaded", () => {
       });
     el.autocomplete.classList.remove("hidden");
   }
+
+  updateStats();
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  if (localStorage.getItem(todayKey) === "done") {
+    el.correctReveal.textContent = `🎯 The correct answer was: ${today.title}`;
+    el.correctReveal.classList.remove("hidden");
+    el.alreadyModal.classList.remove("hidden");
+    el.alreadyOk.onclick = () => el.alreadyModal.classList.add("hidden");
+    disableAll();
+  }
+
+  el.play.onclick = () => {
+    if (currentGuess >= maxGuesses) return;
+    el.audio.currentTime = 0;
+    el.audio.play();
+    const t = [1, 2, 3, 5, 10, 15][Math.min(currentGuess, 5)];
+    setTimeout(() => el.audio.pause(), t * 1000);
+  };
+
+  el.skip.onclick = handleSkip;
+  el.submit.onclick = handleGuess;
+  el.resultClose.onclick = () => el.resultModal.classList.add("hidden");
+  el.share.onclick = shareResults;
+  el.guessInput.addEventListener("input", autoComplete);
+  el.guessInput.addEventListener("keyup", (e) => {
+    if (e.key === "Enter") handleGuess();
+  });
 });
