@@ -1,5 +1,5 @@
 // === Config ===
-const CLIENT_ID = 'YOUR_CLIENT_ID_HERE';  // Replace with your real SoundCloud Client ID
+const CLIENT_ID = 'SSz86sqjFz89WiIDMTCnBLjsrqIgDkS9';  // Replace with your real SoundCloud Client ID
 const PLAYLIST_URL = 'https://soundcloud.com/peter-martin-657527787/sets/playlist';
 const titles = [
   "Chowder",
