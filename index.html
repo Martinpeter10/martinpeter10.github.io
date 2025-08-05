@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Guess the theme song in 6 tries or less! Listen to clips and test your knowledge of TV show themes." />
+  <meta name="description" content="Guess the theme song in 6 tries or less!" />
   <title>Themedle</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="css/styles.css" />
@@ -11,7 +11,7 @@
 </head>
 <body class="bg-gray-900 text-white min-h-screen">
   <div class="container mx-auto px-2 py-4 max-w-3xl">
-    
+
     <!-- Header -->
     <div class="text-center mb-6">
       <h1 class="text-3xl font-bold mb-1">Themedle</h1>
@@ -28,26 +28,23 @@
       </div>
     </div>
 
-    <!-- Guess Display -->
+    <!-- Guesses -->
     <div class="mb-5">
       <h3 class="text-lg font-semibold mb-3 text-center">Your Guesses</h3>
       <div class="grid gap-2 max-w-2xl mx-auto">
-        <!-- 6 Guess Slots -->
-        <div id="guessSlot-1" class="guess-box">Guess 1</div>
-        <div id="guessSlot-2" class="guess-box">Guess 2</div>
-        <div id="guessSlot-3" class="guess-box">Guess 3</div>
-        <div id="guessSlot-4" class="guess-box">Guess 4</div>
-        <div id="guessSlot-5" class="guess-box">Guess 5</div>
-        <div id="guessSlot-6" class="guess-box">Guess 6</div>
+        <div id="guessSlot-1" class="guess-box"><span>Guess 1</span><span>1s</span></div>
+        <div id="guessSlot-2" class="guess-box"><span>Guess 2</span><span>2s</span></div>
+        <div id="guessSlot-3" class="guess-box"><span>Guess 3</span><span>3s</span></div>
+        <div id="guessSlot-4" class="guess-box"><span>Guess 4</span><span>5s</span></div>
+        <div id="guessSlot-5" class="guess-box"><span>Guess 5</span><span>10s</span></div>
+        <div id="guessSlot-6" class="guess-box"><span>Guess 6</span><span>15s</span></div>
       </div>
     </div>
 
     <!-- Audio Player -->
     <div class="mb-5 flex flex-col items-center space-y-3">
       <div class="flex items-center space-x-3">
-        <button id="playBtn" class="bg-green-500 hover:bg-green-600 text-black px-4 py-2 rounded-full font-semibold transition-colors">
-          ▶ Play
-        </button>
+        <button id="playBtn" class="bg-green-500 hover:bg-green-600 text-black px-4 py-2 rounded-full font-semibold transition-colors">▶ Play</button>
         <div class="flex items-center space-x-1 text-sm">
           <span>🔊</span>
           <input type="range" id="volumeSlider" class="slider w-20 h-2 bg-gray-600 rounded-lg cursor-pointer" min="0" max="100" value="50" />
@@ -86,12 +83,8 @@
           <div id="suggestions" class="absolute top-full left-0 right-0 bg-gray-800 border border-gray-600 rounded-lg mt-1 max-h-40 overflow-y-auto z-10 hidden"></div>
         </div>
         <div class="flex space-x-3">
-          <button id="submitGuess" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-            Submit Guess
-          </button>
-          <button id="skipGuess" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-1 rounded-lg text-sm transition-colors">
-            Skip (+1s)
-          </button>
+          <button id="submitGuess" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed">Submit Guess</button>
+          <button id="skipGuess" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-1 rounded-lg text-sm transition-colors">Skip (+1s)</button>
         </div>
       </div>
     </div>
@@ -106,9 +99,7 @@
           <p id="correctAnswer" class="text-xl font-semibold text-yellow-300">Breaking Bad</p>
         </div>
         <p class="text-sm text-gray-300 mb-4">🎵 Playing full theme song</p>
-        <button id="closeModal" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">
-          Close
-        </button>
+        <button id="closeModal" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">Close</button>
       </div>
     </div>
   </div>
