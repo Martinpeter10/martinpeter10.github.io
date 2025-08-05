@@ -40,7 +40,6 @@ function disableGame(el) {
 
 document.addEventListener("DOMContentLoaded", () => {
   const stateKey = `songless-state-${getTodayIndex()}`;
-  const doneKey = `songless-done-${getTodayIndex()}`;
   const answer = playlist[getTodayIndex()].title.toLowerCase();
   let state = getState(stateKey);
 
@@ -69,6 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
   el.audio.src = playlist[getTodayIndex()].url;
 
   function renderSegments() {
+    if (!el.progressSegments) return;
     el.progressSegments.innerHTML = '';
     const total = durations[durations.length - 1];
     durations.forEach((sec, idx) => {
@@ -77,6 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
       div.style.height = '100%';
       div.style.backgroundColor = idx < state.count ? '#34D399' : '#374151';
       div.style.position = 'relative';
+      div.style.overflow = 'hidden';
       el.progressSegments.appendChild(div);
     });
   }
@@ -85,31 +86,32 @@ document.addEventListener("DOMContentLoaded", () => {
     if (state.finished) return;
     const stage = state.count < durations.length ? state.count : durations.length - 1;
     const sec = durations[stage];
+    const total = durations[durations.length - 1];
+
     el.audio.currentTime = 0;
     el.audio.play();
 
     renderSegments();
-    const start = performance.now();
-    const total = durations[durations.length - 1];
-    const segEls = el.progressSegments.children;
 
-    const timer = setInterval(() => {
-      const elapsed = (performance.now() - start) / 1000;
-      const pct = Math.min(elapsed / sec, 1);
-      for (let i = 0; i < stage; i++) {
-        segEls[i].style.backgroundColor = '#34D399';
-        segEls[i].innerHTML = '';
-      }
-      const cur = segEls[stage];
-      cur.style.backgroundColor = '#374151';
-      cur.innerHTML = `<div style="width:${pct * 100}%;height:100%;background:#34D399;"></div>`;
-      if (pct >= 1) {
-        clearInterval(timer);
-        el.audio.pause();
-        cur.innerHTML = '';
-        cur.style.backgroundColor = '#34D399';
-      }
-    }, 40);
+    const progressBar = el.progressSegments;
+    const playDiv = document.createElement('div');
+    playDiv.style.position = 'absolute';
+    playDiv.style.height = '100%';
+    playDiv.style.left = '0';
+    playDiv.style.backgroundColor = '#34D399';
+    playDiv.style.width = '0%';
+    playDiv.style.transition = `width ${sec}s linear`;
+
+    progressBar.appendChild(playDiv);
+    requestAnimationFrame(() => {
+      playDiv.style.width = `${(sec / total) * 100}%`;
+    });
+
+    setTimeout(() => {
+      el.audio.pause();
+      el.audio.currentTime = 0;
+      renderSegments();
+    }, sec * 1000);
   }
 
   function handleGuess(guess) {
@@ -138,7 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
     disableGame(el);
     const correct = playlist[getTodayIndex()].title;
     el.correctAnswer.textContent = correct;
-    if (!state.finished || !state.correct) {
+    if (!state.correct) {
       el.resultModal.classList.remove('hidden');
       el.resultAnswer.textContent = correct;
     }
