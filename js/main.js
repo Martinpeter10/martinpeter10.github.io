@@ -32,6 +32,7 @@ window.addEventListener("DOMContentLoaded", () => {
     currentGuess: document.getElementById("currentGuess"),
     listenTime: document.getElementById("listenTime"),
     resultModal: document.getElementById("resultModal"),
+    resultTitle: document.getElementById("resultTitle"),
     resultAnswer: document.getElementById("resultAnswer"),
     resultClose: document.getElementById("resultCloseBtn"),
     share: document.getElementById("shareBtn"),
@@ -81,8 +82,10 @@ window.addEventListener("DOMContentLoaded", () => {
   function finishGame(correct) {
     localStorage.setItem(todayKey, "done");
     if (correct) {
+      el.resultTitle.textContent = "🎉 You got it!";
       el.correctReveal.textContent = "🎉 You got it!";
     } else {
+      el.resultTitle.textContent = "Game Over";
       el.correctReveal.textContent = `🎯 The correct answer was: ${today.title}`;
     }
     el.correctReveal.classList.remove("hidden");
@@ -150,7 +153,9 @@ window.addEventListener("DOMContentLoaded", () => {
       const pct = Math.min((el.audio.currentTime/duration)*100, 100);
       el.progressBar.style.width = `${pct}%`;
       if (el.audio.currentTime >= duration) {
-        clearInterval(interval); el.audio.pause(); el.progressBar.style.width = "0%";
+        clearInterval(interval);
+        el.audio.pause();
+        el.progressBar.style.width = "0%";
       }
     }, 100);
   }
