@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF‑8">
   <title>Themedle</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
@@ -9,26 +9,25 @@
 </head>
 <body class="bg-gray-900 text-white flex flex-col items-center justify-center min-h-screen px-4 py-8">
   <div class="w-full max-w-xl flex flex-col items-center">
-    <h1 class="text-4xl font-extrabold text-white mb-1">Themedle</h1>
-    <p id="countdown" class="text-sm text-gray-400 mb-4">Next theme song in: ...</p>
+    <h1 class="text-4xl font-extrabold text-white mb-2">Themedle</h1>
+    <p id="countdown" class="text-sm text-gray-400 mb-4">Next theme song in: …</p>
 
     <div class="flex space-x-8 text-center text-sm text-gray-300 mb-6">
-      <div><div class="text-lg font-bold" id="gamesPlayed">0</div>GAMES</div>
-      <div><div class="text-lg font-bold" id="currentStreak">0</div>STREAK</div>
-      <div><div class="text-lg font-bold" id="bestStreak">0</div>BEST</div>
+      <div><div id="gamesPlayed" class="text-lg font-bold">0</div>GAMES</div>
+      <div><div id="currentStreak" class="text-lg font-bold">0</div>STREAK</div>
+      <div><div id="bestStreak" class="text-lg font-bold">0</div>BEST</div>
     </div>
 
-    <div id="guessGrid" class="grid grid-cols-1 gap-2 mb-6 w-full max-w-md"></div>
+    <div id="guessGrid" class="grid grid-cols-1 gap-2 mb-4 w-full max-w-md"></div>
 
     <div class="mb-6 flex justify-center">
-      <button id="playBtn" class="relative w-16 h-16 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center text-white text-2xl shadow-lg focus:outline-none">
+      <button id="playBtn" class="w-16 h-16 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center text-white shadow-lg focus:outline-none">
         <svg class="w-10 h-10 text-white" viewBox="0 0 24 24" fill="currentColor">
           <polygon points="6,4 20,12 6,20"></polygon>
         </svg>
       </button>
     </div>
 
-   <!-- Timestamp layout -->
   <div class="w-full mb-6">
     <div id="progressSegments" class="relative flex h-2 bg-gray-700 rounded overflow-hidden mb-2"></div>
     <div class="relative w-full text-xs text-gray-400 px-1">
@@ -42,14 +41,14 @@
   </div>
 
     <div class="relative w-full max-w-md mb-4">
-      <input
-        id="guessInput"
+      <input id="guessInput"
         type="text"
         placeholder="Search for the title..."
         autocomplete="off"
-        class="w-full p-3 rounded bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 z-10 relative"
+        class="w-full p-3 rounded bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
-      <div id="autocompleteList" class="absolute top-full left-0 w-full bg-white text-black border border-gray-300 rounded shadow-md hidden z-20 max-h-40 overflow-auto"></div>
+      <div id="autocompleteList"
+        class="absolute top-full left-0 w-full bg-white text-black border border-gray-300 rounded shadow-md hidden max-h-40 overflow-auto z-20"></div>
     </div>
 
     <div class="flex items-center gap-4 w-full max-w-md mb-4">
@@ -61,19 +60,18 @@
   </div>
 
   <audio id="audioPlayer" preload="auto"></audio>
-  <input id="volumeSlider" type="range" min="0" max="1" step="0.01" value="0.5" class="hidden">
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script type="module" src="js/main.js"></script>
 
-  <div id="resultModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-30">
+  <div id="resultModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-30">
     <div class="bg-white text-black p-6 rounded w-full max-w-md text-center">
-      <p id="resultAnswer" class="font-bold text-lg mb-4"></p>
+      <p id="resultAnswer" class="text-lg font-bold mb-4"></p>
       <button id="resultCloseBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Close</button>
     </div>
   </div>
 
-  <div id="alreadyPlayedModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-30">
+  <div id="alreadyPlayedModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-30">
     <div class="bg-white text-black p-6 rounded w-full max-w-md text-center">
       <p id="alreadyDesc" class="mb-4">Come back tomorrow for a new theme song.</p>
       <button id="alreadyOk" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">OK</button>
