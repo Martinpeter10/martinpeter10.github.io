@@ -15,8 +15,8 @@ const maxGuesses = 6;
 
 function getTodayIndex() {
   const base = new Date('2024-01-01T00:00:00-06:00');
-  const now = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Chicago" }));
-  return Math.floor((now - base) / (1000 * 60 * 60 * 24)) % playlist.length;
+  const nowCST = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Chicago" }));
+  return Math.floor((nowCST - base) / (1000 * 60 * 60 * 24)) % playlist.length;
 }
 
 function formatCountdown() {
@@ -30,6 +30,14 @@ function formatCountdown() {
   return `${h}:${m}:${s}`;
 }
 
+function getState(key) {
+  return JSON.parse(localStorage.getItem(key) || '{"count":0,"guessed":[],"finished":false}');
+}
+
+function saveState(key, state) {
+  localStorage.setItem(key, JSON.stringify(state));
+}
+
 function disableGameActions(el) {
   el.playBtn.disabled = true;
   el.skipBtn.disabled = true;
@@ -39,18 +47,10 @@ function disableGameActions(el) {
 function renderProgressBar(el, count) {
   el.progressSegments.innerHTML = '';
   durations.forEach((sec, idx) => {
-    const div = document.createElement('div');
-    div.className = `flex-1 h-2 ${idx <= count ? 'bg-green-400' : 'bg-gray-700'}`;
-    el.progressSegments.appendChild(div);
+    const seg = document.createElement('div');
+    seg.className = `flex-1 h-2 ${idx <= count ? 'bg-green-400' : 'bg-gray-700'}`;
+    el.progressSegments.appendChild(seg);
   });
-}
-
-function getState(key) {
-  return JSON.parse(localStorage.getItem(key) || '{"count":0,"guessed":[],"finished":false}');
-}
-
-function saveState(key, state) {
-  localStorage.setItem(key, JSON.stringify(state));
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -67,8 +67,8 @@ document.addEventListener("DOMContentLoaded", () => {
     bestStreak: document.getElementById('bestStreak'),
     guessGrid: document.getElementById('guessGrid'),
     playBtn: document.getElementById('playBtn'),
-    progressSegments: document.getElementById('progressSegments'),
     playProgress: document.getElementById('playProgress'),
+    progressSegments: document.getElementById('progressSegments'),
     guessInput: document.getElementById('guessInput'),
     autocompleteList: document.getElementById('autocompleteList'),
     submitBtn: document.getElementById('submitBtn'),
@@ -89,15 +89,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const volumeSlider = document.getElementById('volumeSlider');
   if (volumeSlider) {
     audio.volume = parseFloat(volumeSlider.value);
-    volumeSlider.addEventListener('input', e => {
-      audio.volume = parseFloat(e.target.value);
-    });
+    volumeSlider.addEventListener('input', e => { audio.volume = parseFloat(e.target.value); });
   }
 
-  // build guess boxes (with truncate support via Tailwind)
+  // Build guess boxes wider
   for (let i = 0; i < maxGuesses; i++) {
     const box = document.createElement('div');
     box.className = 'h-12 bg-gray-800 rounded flex items-center justify-center text-sm truncate';
+    box.style.minWidth = '8rem'; // wider boxes
     el.guessGrid.appendChild(box);
   }
 
@@ -120,10 +119,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function finish(correct) {
-    state.finished = true;
-    saveState(stateKey, state);
+    state.finished = true; saveState(stateKey, state);
     localStorage.setItem(doneKey, 'yes');
-
     let gp = parseInt(localStorage.getItem('gamesPlayed')) + 1;
     let cs = parseInt(localStorage.getItem('currentStreak'));
     let bs = parseInt(localStorage.getItem('bestStreak'));
@@ -138,15 +135,12 @@ document.addEventListener("DOMContentLoaded", () => {
       cs = 0;
       el.resultTitle.textContent = 'Game Over';
     }
-
     el.resultAnswer.textContent = today.title;
     el.correctAnswer.textContent = today.title;
     el.correctAnswer.classList.remove('hidden');
-
     localStorage.setItem('gamesPlayed', gp);
     localStorage.setItem('currentStreak', cs);
     localStorage.setItem('bestStreak', bs);
-
     updateStats();
     el.resultModal.classList.remove('hidden');
     disableGameActions(el);
@@ -161,38 +155,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
   renderProgressBar(el, state.count);
   updateStats();
-
   if (state.finished || localStorage.getItem(doneKey)) {
     el.alreadyPlayedModal.classList.remove('hidden');
     disableGameActions(el);
   }
 
-  el.guessInput.addEventListener('input', () => {
-    const val = el.guessInput.value.trim().toLowerCase();
+  el.guessInput.addEventListener('input', function () {
+    const val = this.value.trim().toLowerCase();
     el.autocompleteList.innerHTML = '';
-    if (!val) {
-      el.autocompleteList.classList.add('hidden');
-      return;
-    }
+    if (!val) { el.autocompleteList.classList.add('hidden'); return; }
     const matches = playlist.filter(p => p.title.toLowerCase().includes(val));
-    if (!matches.length) {
-      el.autocompleteList.classList.add('hidden');
-      return;
-    }
+    if (!matches.length) { el.autocompleteList.classList.add('hidden'); return; }
     matches.forEach(m => {
       const opt = document.createElement('div');
       opt.textContent = m.title;
       opt.className = 'px-3 py-2 hover:bg-gray-200 cursor-pointer';
-      opt.addEventListener('click', () => {
+      opt.onclick = () => {
         el.guessInput.value = m.title;
         el.autocompleteList.classList.add('hidden');
-      });
+      };
       el.autocompleteList.appendChild(opt);
     });
     el.autocompleteList.classList.remove('hidden');
   });
 
-  el.submitBtn.addEventListener('click', () => {
+  el.submitBtn.addEventListener('click', function () {
     if (state.finished || state.count >= maxGuesses) return;
     const val = el.guessInput.value.trim();
     if (!val || state.guessed.includes(val.toLowerCase())) return;
@@ -205,13 +192,13 @@ document.addEventListener("DOMContentLoaded", () => {
     el.autocompleteList.classList.add('hidden');
   });
 
-  el.skipBtn.addEventListener('click', () => {
+  el.skipBtn.addEventListener('click', function () {
     if (state.finished || state.count >= maxGuesses) return;
     reveal('', false, true);
     if (state.count >= maxGuesses) finish(false);
   });
 
-  el.playBtn.addEventListener('click', () => {
+  el.playBtn.addEventListener('click', function () {
     if (state.finished) return;
     const t = durations[Math.min(state.count, durations.length - 1)];
     audio.currentTime = 0;
@@ -230,15 +217,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }, t * 1000);
   });
 
-  el.guessInput.addEventListener('keydown', e => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      el.submitBtn.click();
-    }
+  el.guessInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { e.preventDefault(); el.submitBtn.click(); }
   });
 
-  el.resultCloseBtn.addEventListener('click', () => el.resultModal.classList.add('hidden'));
-  el.alreadyOk.addEventListener('click', () => el.alreadyPlayedModal.classList.add('hidden'));
+  el.resultCloseBtn.onclick = () => el.resultModal.classList.add('hidden');
+  el.alreadyOk.onclick = () => el.alreadyPlayedModal.classList.add('hidden');
 
   setInterval(() => {
     el.countdown.textContent = `Next theme song in: ${formatCountdown()}`;
