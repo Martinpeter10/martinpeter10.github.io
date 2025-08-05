@@ -1,4 +1,12 @@
-const playlist = [ /* same playlist as before */ ];
+const playlist = [
+  { title: "Chowder", url: "audio/chowder.mp3" },
+  { title: "All Grown Up", url: "audio/all‑grown‑up.mp3" },
+  { title: "Ben 10", url: "audio/ben10.mp3" },
+  { title: "Adventure Time", url: "audio/adventure‑time.mp3" },
+  { title: "Grim Adventures of Billy and Mandy", url: "audio/grim‑adventures.mp3" },
+  { title: "Kids Next Door", url: "audio/kids‑next‑door.mp3" },
+  { title: "The Amazing Adventures of Gumball", url: "audio/gumball.mp3" }
+];
 
 const durations = [1, 2, 3, 5, 10, 15];
 
