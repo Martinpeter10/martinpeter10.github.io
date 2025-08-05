@@ -27,17 +27,17 @@
       </button>
     </div>
 
-    <div class="w-full mb-6 relative">
-      <div id="progressContainer" class="relative w-full h-2 bg-gray-700 rounded overflow-hidden"></div>
-      <div class="relative w-full text-xs text-gray-400 px-1">
-        <span class="absolute left-0 transform -translate-x-1/2">1s</span>
-        <span class="absolute" style="left: calc((2/15)*100%)">2s</span>
-        <span class="absolute" style="left: calc((3/15)*100%)">3s</span>
-        <span class="absolute" style="left: calc((5/15)*100%)">5s</span>
-        <span class="absolute" style="left: calc((10/15)*100%)">10s</span>
-        <span class="absolute right-0 transform translate-x-1/2">15s</span>
-      </div>
+    <div class="w-full mb-6">
+    <div id="progressSegments" class="relative flex h-2 bg-gray-700 rounded overflow-hidden mb-2"></div>
+    <div class="relative w-full text-xs text-gray-400 px-1">
+      <span class="absolute" style="left: calc((.1 / 15) * 100%)">1s</span>
+      <span class="absolute" style="left: calc((1 / 15) * 100%)">2s</span>
+      <span class="absolute" style="left: calc((2.2 / 15) * 100%)">3s</span>
+      <span class="absolute" style="left: calc((4.3 / 15) * 100%)">5s</span>
+      <span class="absolute" style="left: calc((9.4 / 15) * 100%)">10s</span>
+      <span class="absolute right-0 transform translate-x-1/2">15s</span>
     </div>
+  </div>
 
     <div class="relative w-full max-w-md mb-4">
       <input id="guessInput" type="text" placeholder="Search for the title…" autocomplete="off"
