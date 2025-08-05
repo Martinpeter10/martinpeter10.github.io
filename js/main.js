@@ -9,7 +9,7 @@ const playlist = [
   { title: "Regular Show", url: "audio/regularshow.mp3" },
   { title: "The Amazing Adventures of Gumball", url: "audio/gumball.mp3" }
 ];
-const durations = [1, 2, 3, 5, 10, 15];
+const durations = [1,2,3,5,10,15];
 const maxGuesses = 6;
 
 function getTodayIndex() {
@@ -20,12 +20,11 @@ function getTodayIndex() {
 
 function formatCountdown() {
   const now = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Chicago" }));
-  const midnight = new Date(now);
-  midnight.setHours(24, 0, 0, 0);
+  const midnight = new Date(now); midnight.setHours(24,0,0,0);
   const diff = midnight - now;
-  const h = String(Math.floor(diff / 3600000)).padStart(2, '0');
-  const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
-  const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+  const h = String(Math.floor(diff / 3600000)).padStart(2,'0');
+  const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2,'0');
+  const s = String(Math.floor((diff % 60000) / 1000)).padStart(2,'0');
   return `${h}:${m}:${s}`;
 }
 
@@ -48,11 +47,43 @@ function renderSegments(el) {
   const total = durations[durations.length - 1];
   durations.forEach((sec, idx) => {
     const seg = document.createElement('div');
-    seg.style.flex = (sec / total);
+    seg.style.flex = sec / total;
     seg.style.height = '4px';
     seg.style.backgroundColor = idx < el.filledCount ? '#34D399' : '#374151';
     el.progressSegments.appendChild(seg);
   });
+}
+
+function playStage(el, state) {
+  if (state.finished) return;
+  const stage = state.count < durations.length ? state.count : durations.length - 1;
+  const secs = durations[stage];
+  el.audio.currentTime = 0;
+  el.audio.play();
+
+  Array.from(el.progressSegments.children).forEach(c => c.innerHTML = '');
+
+  const start = performance.now();
+  const total = durations[durations.length-1];
+  const segEls = el.progressSegments.children;
+
+  const timer = setInterval(() => {
+    const elapsed = (performance.now() - start) / 1000;
+    const pct = Math.min(elapsed / secs, 1);
+
+    for (let i = 0; i < stage; i++) segEls[i].style.backgroundColor = '#34D399';
+
+    const curSeg = segEls[stage];
+    curSeg.style.backgroundColor = '#374151';
+    curSeg.innerHTML = `<div style="width:${pct*100}%;height:100%;background:#34D399;"></div>`;
+
+    if (pct >= 1) {
+      clearInterval(timer);
+      el.audio.pause();
+      curSeg.innerHTML = '';
+      curSeg.style.backgroundColor = '#34D399';
+    }
+  }, 40);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -87,25 +118,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
   el.audio.src = today.url;
 
-  // Build guess grid
-  const inputWidth = el.guessInput.offsetWidth + 'px';
+  const inputW = el.guessInput.offsetWidth + 'px';
   for (let i = 0; i < maxGuesses; i++) {
     const d = document.createElement('div');
     d.className = 'h-12 bg-gray-800 rounded flex items-center justify-center text-sm truncate';
-    d.style.width = inputWidth;
+    d.style.width = inputW;
     el.guessGrid.appendChild(d);
   }
 
-  function updateStats() {
-    if (!localStorage.getItem('gamesPlayed')) localStorage.setItem('gamesPlayed', 0);
-    if (!localStorage.getItem('currentStreak')) localStorage.setItem('currentStreak', 0);
-    if (!localStorage.getItem('bestStreak')) localStorage.setItem('bestStreak', 0);
+  function updateStats(){
+    if (!localStorage.getItem('gamesPlayed')) localStorage.setItem('gamesPlayed',0);
+    if (!localStorage.getItem('currentStreak')) localStorage.setItem('currentStreak',0);
+    if (!localStorage.getItem('bestStreak')) localStorage.setItem('bestStreak',0);
     el.gamesPlayed.textContent = localStorage.getItem('gamesPlayed');
     el.currentStreak.textContent = localStorage.getItem('currentStreak');
     el.bestStreak.textContent = localStorage.getItem('bestStreak');
   }
 
-  function reveal(guess, correct, skipped = false) {
+  function reveal(guess, correct, skipped=false){
     const box = el.guessGrid.children[state.count];
     box.textContent = skipped ? 'Skipped' : guess;
     box.classList.add(skipped ? 'text-gray-400' : correct ? 'bg-green-600' : 'bg-red-600');
@@ -115,11 +145,10 @@ document.addEventListener("DOMContentLoaded", () => {
     renderSegments(el);
   }
 
-  function finish(correct) {
+  function finish(correct){
     state.finished = true;
     saveState(stateKey, state);
     localStorage.setItem(doneKey, 'yes');
-
     let gp = Number(localStorage.getItem('gamesPlayed')) + 1;
     let cs = Number(localStorage.getItem('currentStreak'));
     let bs = Number(localStorage.getItem('bestStreak'));
@@ -130,21 +159,18 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       cs = 0;
     }
-
     el.resultAnswer.textContent = today.title;
     el.correctAnswer.textContent = today.title;
     el.correctAnswer.classList.remove('hidden');
-
     localStorage.setItem('gamesPlayed', gp);
     localStorage.setItem('currentStreak', cs);
     localStorage.setItem('bestStreak', bs);
-
     updateStats();
     el.resultModal.classList.remove('hidden');
     disableGame(el);
   }
 
-  state.guessed.forEach((g, i) => {
+  state.guessed.forEach((g,i)=>{
     const isCorrect = g.toLowerCase() === today.title.toLowerCase();
     const b = el.guessGrid.children[i];
     b.textContent = g;
@@ -158,51 +184,9 @@ document.addEventListener("DOMContentLoaded", () => {
     disableGame(el);
   }
 
-  function playStage() {
-    if (state.finished) return;
-    const stage = state.count < durations.length ? state.count : durations.length - 1;
-    const secs = durations[stage];
-    el.audio.currentTime = 0;
-    el.audio.play();
+  el.playBtn.addEventListener('click', () => playStage(el, state));
 
-    const start = Date.now();
-    const total = durations[durations.length - 1];
-    const segCount = el.progressSegments.children.length;
-    const segEls = el.progressSegments.children;
-
-    const timer = setInterval(() => {
-      const elapsed = (Date.now() - start) / 1000;
-      const pct = Math.min(elapsed / secs, 1);
-
-      // update color fill
-      let accum = 0;
-      for (let i = 0; i < segCount; i++) {
-        const sec = durations[i];
-        const widthPct = sec / total;
-        accum += widthPct;
-        if (accum <= stage / total) {
-          segEls[i].style.backgroundColor = '#34D399';
-        } else {
-          segEls[i].style.backgroundColor = '#374151';
-        }
-      }
-
-      // dynamic partial fill on current segment
-      const cur = segEls[stage];
-      const segTotalWidth = cur.offsetWidth;
-      cur.style.position = 'relative';
-      cur.innerHTML = `<div style="position:absolute; top:0; left:0; height:100%; width:${pct * 100}%; background:#34D399;"></div>`;
-
-      if (pct >= 1) {
-        clearInterval(timer);
-        el.audio.pause();
-      }
-    }, 50);
-  }
-
-  el.playBtn.addEventListener('click', playStage);
-
-  el.guessInput.addEventListener('input', function () {
+  el.guessInput.addEventListener('input', function(){
     const val = this.value.trim().toLowerCase();
     el.autocompleteList.innerHTML = '';
     if (!val) return el.autocompleteList.classList.add('hidden');
@@ -212,16 +196,13 @@ document.addEventListener("DOMContentLoaded", () => {
       const d = document.createElement('div');
       d.textContent = m.title;
       d.className = 'px-3 py-2 hover:bg-gray-200 cursor-pointer';
-      d.onclick = () => {
-        el.guessInput.value = m.title;
-        el.autocompleteList.classList.add('hidden');
-      };
+      d.onclick = () => { el.guessInput.value = m.title; el.autocompleteList.classList.add('hidden'); };
       el.autocompleteList.appendChild(d);
     });
     el.autocompleteList.classList.remove('hidden');
   });
 
-  el.submitBtn.addEventListener('click', function () {
+  el.submitBtn.addEventListener('click', function(){
     if (state.finished || state.count >= maxGuesses) return;
     const val = el.guessInput.value.trim();
     if (!val || state.guessed.includes(val.toLowerCase())) return;
@@ -234,17 +215,14 @@ document.addEventListener("DOMContentLoaded", () => {
     el.autocompleteList.classList.add('hidden');
   });
 
-  el.skipBtn.addEventListener('click', function () {
+  el.skipBtn.addEventListener('click', function(){
     if (state.finished || state.count >= maxGuesses) return;
     reveal('', false, true);
     if (state.count >= maxGuesses) finish(false);
   });
 
   el.guessInput.addEventListener('keydown', e => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      el.submitBtn.click();
-    }
+    if (e.key === 'Enter') { e.preventDefault(); el.submitBtn.click(); }
   });
 
   el.resultCloseBtn.onclick = () => el.resultModal.classList.add('hidden');
@@ -253,4 +231,5 @@ document.addEventListener("DOMContentLoaded", () => {
   setInterval(() => {
     el.countdown.textContent = `Next theme song in: ${formatCountdown()}`;
   }, 1000);
+
 });
