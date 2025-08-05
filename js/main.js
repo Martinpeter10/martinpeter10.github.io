@@ -1,83 +1,195 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cartoondle</title>
-  <link rel="icon" href="favicon.png" type="image/png">
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-</head>
-<body class="bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-800 min-h-screen text-white">
+const playlist = [
+  { title: "Chowder", url: "audio/chowder.mp3" },
+  { title: "All Grown Up", url: "audio/all-grown-up.mp3" },
+  { title: "Ben 10", url: "audio/ben10.mp3" },
+  { title: "Teenage Mutant Ninja Turtles", url: "audio/tmnt.mp3" },
+  { title: "Adventure Time", url: "audio/adventure-time.mp3" },
+  { title: "The Grim Adventures of Billy and Mandy", url: "audio/grim-adventures.mp3" },
+  { title: "Code Name Kids Next Door", url: "audio/kids-next-door.mp3" },
+  { title: "Regular Show", url: "audio/regular-show.mp3" },
+  { title: "The Amazing Adventures of Gumball", url: "audio/gumball.mp3" }
+];
 
-  <!-- Already Played Modal -->
-  <div id="alreadyPlayedModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden">
-    <div class="bg-white text-black rounded-xl p-6 w-full max-w-md text-center">
-      <h2 class="text-2xl font-bold mb-2">🎧 You've already played today!</h2>
-      <p class="text-lg mb-4">Come back tomorrow for a new challenge.</p>
-      <div id="countdownModal" class="text-sm mb-4"></div>
-      <button id="alreadyPlayedOkBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">OK</button>
-    </div>
-  </div>
+function getTodayIndex() {
+  const key = new Date().toLocaleDateString("en-US", { timeZone: "America/Chicago" });
+  return key.split("/").reduce((a,b)=>a+parseInt(b),0) % playlist.length;
+}
 
-  <!-- Game Over Modal -->
-  <div id="resultModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden">
-    <div class="bg-white text-black rounded-xl p-6 w-full max-w-md text-center">
-      <h2 class="text-2xl font-bold mb-2">Game Over</h2>
-      <p id="resultAnswer" class="text-lg mb-4"></p>
-      <button id="resultCloseBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Close</button>
-    </div>
-  </div>
+window.addEventListener("DOMContentLoaded", () => {
+  const idx = getTodayIndex();
+  const today = playlist[idx];
+  const todayKey = `played-${idx}`;
 
-  <!-- Header & Stats -->
-  <div class="container mx-auto px-4 pt-6 pb-2 max-w-4xl text-center">
-    <h1 class="text-4xl font-bold mb-2">🎵 Cartoondle 🎵</h1>
-    <div class="bg-white/10 rounded-xl py-4 px-6 mt-4 mb-2 inline-block text-white text-lg sm:text-xl font-semibold">
-      <span class="mr-4">📊 Games: <span id="gamesPlayed" class="font-bold">0</span></span>
-      <span class="mr-4">🔥 Streak: <span id="currentStreak" class="font-bold">0</span></span>
-      <span>🏆 Best: <span id="bestStreak" class="font-bold">0</span></span>
-    </div>
-    <button id="shareBtn" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded font-semibold text-white text-sm sm:text-base">Share Result</button>
-  </div>
+  const el = {
+    audio: document.getElementById("audioPlayer"),
+    play: document.getElementById("playSnippet"),
+    skip: document.getElementById("skipBtn"),
+    guessInput: document.getElementById("guessInput"),
+    autocomplete: document.getElementById("autocomplete-list"),
+    submit: document.getElementById("submitBtn"),
+    history: document.getElementById("guessHistory"),
+    correctReveal: document.getElementById("correctAnswerReveal"),
+    currentGuess: document.getElementById("currentGuess"),
+    listenTime: document.getElementById("listenTime"),
+    resultModal: document.getElementById("resultModal"),
+    resultAnswer: document.getElementById("resultAnswer"),
+    resultClose: document.getElementById("resultCloseBtn"),
+    share: document.getElementById("shareBtn"),
+    gamesPlayed: document.getElementById("gamesPlayed"),
+    currentStreak: document.getElementById("currentStreak"),
+    bestStreak: document.getElementById("bestStreak"),
+    countdown: document.getElementById("countdownBottom"),
+    alreadyModal: document.getElementById("alreadyPlayedModal"),
+    alreadyOk: document.getElementById("alreadyPlayedOkBtn"),
+    volume: document.getElementById("volumeSlider"),
+    progressBar: document.getElementById("progressBar")
+  };
 
-  <!-- Gameplay -->
-  <div class="container mx-auto px-4 py-2 max-w-4xl">
-    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 mb-6">
-      <div class="text-center mb-6">
-        <h2 class="text-xl font-semibold mb-2">Listen to the theme song:</h2>
-        <audio id="audioPlayer" preload="auto"></audio>
+  el.audio.src = today.url;
+  el.audio.volume = el.volume.value;
 
-        <!-- Progress bar and controls -->
-        <div class="my-4">
-          <div id="progressContainer" class="w-full bg-gray-500 rounded-lg h-2 overflow-hidden">
-            <div id="progressBar" class="bg-green-400 h-full w-0"></div>
-          </div>
-          <div class="mt-2 flex justify-center gap-4">
-            <button id="playSnippet" class="bg-green-500 hover:bg-green-600 px-6 py-2 rounded-lg font-semibold">▶️ Play Snippet</button>
-            <button id="skipBtn" class="bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold">⏭️ Skip</button>
-          </div>
-          <div class="mt-4 flex justify-center items-center gap-2">
-            <label for="volumeSlider" class="text-sm">🔊</label>
-            <input id="volumeSlider" type="range" min="0" max="1" step="0.01" value="0.5" class="w-1/4">
-          </div>
-        </div>
+  el.volume.addEventListener("input", () => {
+    el.audio.volume = parseFloat(el.volume.value);
+  });
 
-        <div class="text-sm opacity-75">Guess <span id="currentGuess">1</span> of 6 • Listen time: <span id="listenTime">1 second</span></div>
-      </div>
+  let guessCount = 0;
+  const max = 6;
+  const guessed = new Set();
 
-      <div class="mb-6 relative">
-        <input id="guessInput" placeholder="Enter your guess..." class="w-full p-4 rounded-lg text-black text-base sm:text-lg border-2 focus:border-yellow-400 focus:outline-none">
-        <div id="autocomplete-list" class="hidden absolute bg-white text-black border mt-1 rounded w-full z-50"></div>
-        <button id="submitBtn" class="w-full mt-3 bg-blue-500 hover:bg-blue-600 py-3 rounded-lg font-semibold text-lg">Submit Guess</button>
-      </div>
+  function updateStats() {
+    el.gamesPlayed.textContent = localStorage.getItem("gamesPlayed") || 0;
+    const s = parseInt(localStorage.getItem("currentStreak") || "0", 10);
+    el.currentStreak.textContent = s + (s >= 5 ? " 🔥" : "");
+    el.bestStreak.textContent = localStorage.getItem("bestStreak") || 0;
+  }
 
-      <div id="guessHistory" class="space-y-2 text-base sm:text-lg"></div>
-      <div id="correctAnswerReveal" class="text-center text-green-300 font-bold text-lg mt-4 hidden"></div>
-    </div>
+  function updateCountdown() {
+    const now = new Date(), m = new Date(now);
+    m.setHours(24,0,0,0);
+    const diff = m - now;
+    const h = Math.floor(diff/3600000), mm = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
+    const msg = `⏳ New theme song in ${h}h ${mm}m ${s}s`;
+    el.countdown.textContent = msg;
+    document.getElementById("countdownModal").textContent = msg;
+  }
 
-    <div id="countdownBottom" class="text-center text-sm text-white mt-4">⏳ New theme song in ...</div>
-  </div>
+  function disableAll() {
+    el.play.disabled = el.skip.disabled = el.submit.disabled = el.guessInput.disabled = true;
+    el.skip.classList.add("bg-orange-500", "hover:bg-orange-600");
+  }
 
-  <script type="module" src="js/main.js"></script>
-</body>
-</html>
+  function finishGame(correct) {
+    localStorage.setItem(todayKey, "done");
+    if (correct) {
+      el.correctReveal.textContent = "🎉 You got it!";
+    } else {
+      el.correctReveal.textContent = `🎯 The correct answer was: ${today.title}`;
+    }
+    el.correctReveal.classList.remove("hidden");
+    el.resultAnswer.textContent = el.correctReveal.textContent;
+    el.resultModal.classList.remove("hidden");
+    disableAll();
+
+    let gp = parseInt(localStorage.getItem("gamesPlayed") || "0", 10) + 1;
+    let cs = parseInt(localStorage.getItem("currentStreak") || "0", 10);
+    let bs = parseInt(localStorage.getItem("bestStreak") || "0", 10);
+    if (correct) { cs++; if (cs > bs) bs = cs; } else { cs = 0; }
+
+    localStorage.setItem("gamesPlayed", gp);
+    localStorage.setItem("currentStreak", cs);
+    localStorage.setItem("bestStreak", bs);
+    updateStats();
+  }
+
+  function handleGuess() {
+    const g = el.guessInput.value.trim();
+    if (!g || guessed.has(g.toLowerCase()) || guessCount >= max) return;
+    guessed.add(g.toLowerCase());
+    const t = [1,2,3,5,10,15][Math.min(guessCount,5)];
+    const correct = g.toLowerCase() === today.title.toLowerCase();
+    const d = document.createElement("div");
+    d.textContent = `${correct ? "✅" : "❌"} ${g} @ ${t}s`;
+    d.className = correct ? "text-green-300 font-bold" : "text-red-300";
+    el.history.appendChild(d);
+
+    el.guessInput.value = "";
+    guessCount++;
+    el.currentGuess.textContent = Math.min(guessCount+1, max);
+    el.listenTime.textContent = `${t} second`;
+
+    if (correct) {
+      confetti({ particleCount:150, spread:70, origin:{y:0.6}});
+      finishGame(true);
+    } else if (guessCount >= max) {
+      finishGame(false);
+    }
+  }
+
+  function handleSkip() {
+    if (guessCount >= max) return;
+    const t = [1,2,3,5,10,15][Math.min(guessCount,5)];
+    const d = document.createElement("div");
+    d.textContent = `⏭️ Skipped @ ${t}s`;
+    d.className = "text-yellow-200";
+    el.history.appendChild(d);
+
+    guessCount++;
+    el.currentGuess.textContent = Math.min(guessCount+1, max);
+    el.listenTime.textContent = `${t} second`;
+
+    if (guessCount >= max) finishGame(false);
+  }
+
+  function playSnippetWithProgress() {
+    if (guessCount >= max) return;
+    el.audio.currentTime = 0;
+    el.audio.play();
+    const duration = [1,2,3,5,10,15][Math.min(guessCount,5)];
+    el.progressBar.style.width = "0%";
+    const interval = setInterval(() => {
+      const pct = Math.min((el.audio.currentTime/duration)*100, 100);
+      el.progressBar.style.width = `${pct}%`;
+      if (el.audio.currentTime >= duration) {
+        clearInterval(interval); el.audio.pause(); el.progressBar.style.width = "0%";
+      }
+    }, 100);
+  }
+
+  el.play.onclick = playSnippetWithProgress;
+  el.skip.onclick = handleSkip;
+  el.submit.onclick = handleGuess;
+  el.resultClose.onclick = () => el.resultModal.classList.add("hidden");
+  el.share.onclick = () => {
+    const msg = `🎵 Cartoondle—Streak: ${el.currentStreak.textContent} | Best: ${el.bestStreak.textContent}`;
+    navigator.share?.({ title: "Cartoondle", text: msg, url: location.href }) || alert(msg);
+  };
+
+  el.guessInput.addEventListener("input", autoComplete);
+  el.guessInput.addEventListener("keyup", (e) => { if (e.key === "Enter") handleGuess(); });
+
+  function autoComplete() {
+    const v = el.guessInput.value.toLowerCase();
+    el.autocomplete.innerHTML = "";
+    if (!v) return el.autocomplete.classList.add("hidden");
+    playlist.filter(t => t.title.toLowerCase().includes(v)).forEach(t => {
+      const div = document.createElement("div");
+      div.textContent = t.title;
+      div.className = "cursor-pointer px-3 py-1 hover:bg-gray-200";
+      div.onclick = () => { el.guessInput.value = t.title; el.autocomplete.classList.add("hidden"); };
+      el.autocomplete.appendChild(div);
+    });
+    el.autocomplete.classList.remove("hidden");
+  }
+
+  updateStats();
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  if (localStorage.getItem(todayKey) === "done") {
+    el.correctReveal.textContent = `🎯 The correct answer was: ${today.title}`;
+    el.correctReveal.classList.remove("hidden");
+    el.alreadyModal.classList.remove("hidden");
+    el.alreadyOk.onclick = () => el.alreadyModal.classList.add("hidden");
+    disableAll();
+  }
+});
