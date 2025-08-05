@@ -1,26 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Themedle</title>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
 </head>
 <body class="bg-gray-900 text-white flex flex-col items-center p-6 space-y-6 min-h-screen">
-
   <h1 class="text-4xl font-bold">Themedle</h1>
-
   <div class="flex gap-8 text-center">
-    <div><p class="text-xs text-gray-400 uppercase">Games</p><p id="gamesPlayed" class="text-2xl font-bold">0</p></div>
-    <div><p class="text-xs text-gray-400 uppercase">Streak</p><p id="currentStreak" class="text-2xl font-bold">0</p></div>
-    <div><p class="text-xs text-gray-400 uppercase">Best</p><p id="bestStreak" class="text-2xl font-bold">0</p></div>
+    <div><p class="uppercase text-xs text-gray-400">Games</p><p id="gamesPlayed" class="text-2xl font-bold">0</p></div>
+    <div><p class="uppercase text-xs text-gray-400">Streak</p><p id="currentStreak" class="text-2xl font-bold">0</p></div>
+    <div><p class="uppercase text-xs text-gray-400">Best</p><p id="bestStreak" class="text-2xl font-bold">0</p></div>
   </div>
 
   <div id="guessGrid" class="grid grid-cols-6 gap-2 w-full max-w-xl"></div>
 
-  <div class="flex flex-col items-center w-full max-w-xl space-y-3">
+  <div class="w-full max-w-xl flex flex-col items-center space-y-3">
     <button id="playBtn" class="bg-green-500 hover:bg-green-600 w-16 h-16 rounded-full text-2xl flex items-center justify-center">▶</button>
-    <div class="w-full h-1 bg-gray-700 rounded overflow-hidden">
+    <div class="w-full h-1 bg-gray-700 rounded overflow-hidden mb-4">
       <div id="progressBar" class="h-full bg-green-400 w-0"></div>
     </div>
   </div>
@@ -29,18 +27,18 @@
 
   <div class="w-full max-w-xl space-y-3">
     <div class="relative">
-      <input id="guessInput" class="w-full px-4 py-2 bg-gray-800 rounded border border-gray-700 text-white focus:outline-none" placeholder="Search title..." />
-      <div id="autocompleteList" class="absolute top-full left-0 right-0 bg-white text-black rounded shadow z-10 hidden max-h-48 overflow-auto"></div>
+      <input id="guessInput" class="w-full px-4 py-2 bg-gray-800 text-white rounded border border-gray-700 focus:outline-none" placeholder="Search for the title…" />
+      <div id="autocompleteList" class="absolute top-full left-0 right-0 bg-white text-black rounded shadow max-h-48 overflow-auto hidden z-10"></div>
     </div>
     <div class="flex gap-3">
       <button id="skipBtn" class="flex-1 bg-gray-500 hover:bg-gray-600 py-2 rounded">SKIP</button>
-      <input id="volumeSlider" type="range" min="0" max="1" step="0.01" value="0.5" class="w-24" />
+      <input id="volumeSlider" type="range" min="0" max="1" step="0.01" value="0.5" class="w-24">
       <button id="submitBtn" class="flex-1 bg-green-600 hover:bg-green-700 py-2 rounded">SUBMIT</button>
     </div>
   </div>
 
   <div id="resultModal" class="fixed inset-0 bg-black bg-opacity-80 hidden flex items-center justify-center z-50">
-    <div class="bg-white text-black p-6 rounded-lg max-w-md w-full text-center">
+    <div class="bg-white text-black p-6 rounded-lg text-center max-w-md w-full">
       <h2 id="resultTitle" class="text-2xl font-bold mb-3">Game Over</h2>
       <p id="resultAnswer" class="text-green-600 text-xl font-semibold"></p>
       <button id="resultCloseBtn" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Close</button>
@@ -48,7 +46,7 @@
   </div>
 
   <div id="alreadyPlayedModal" class="fixed inset-0 bg-black bg-opacity-80 hidden flex items-center justify-center z-50">
-    <div class="bg-white text-black p-6 rounded-lg max-w-md w-full text-center">
+    <div class="bg-white text-black p-6 rounded-lg text-center max-w-md w-full">
       <h2 class="text-2xl font-bold mb-3">You've already played today</h2>
       <p id="alreadyDesc" class="mb-4"></p>
       <button id="alreadyOk" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">OK</button>
