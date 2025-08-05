@@ -15,8 +15,8 @@ const maxGuesses = 6;
 
 function getTodayIndex() {
   const base = new Date('2024-01-01T00:00:00-06:00');
-  const now = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Chicago" }));
-  return Math.floor((now - base) / (1000 * 60 * 60 * 24)) % playlist.length;
+  const nowCST = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Chicago" }));
+  return Math.floor((nowCST - base) / (1000 * 60 * 60 * 24)) % playlist.length;
 }
 
 function formatCountdown() {
@@ -36,18 +36,17 @@ function disableGameActions(el) {
   el.submitBtn.disabled = true;
 }
 
-function renderProgressBar(el, guessCount) {
+function renderProgressBar(el, count) {
   el.progressSegments.innerHTML = '';
   durations.forEach((sec, idx) => {
     const div = document.createElement('div');
-    div.className = `flex-1 h-2 ${idx <= guessCount ? 'bg-green-400' : 'bg-gray-700'}`;
+    div.className = `flex-1 h-2 ${idx <= count ? 'bg-green-400' : 'bg-gray-700'}`;
     el.progressSegments.appendChild(div);
   });
 }
 
-function restoreState(key) {
-  const raw = localStorage.getItem(key);
-  return raw ? JSON.parse(raw) : { count: 0, guessed: [], finished: false };
+function getState(key) {
+  return JSON.parse(localStorage.getItem(key) || '{"count":0,"guessed":[],"finished":false}');
 }
 
 function saveState(key, state) {
@@ -59,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const today = playlist[idx];
   const stateKey = `songless-state-${idx}`;
   const doneKey = `songless-done-${idx}`;
-  const audio = document.getElementById('audioPlayer');
+  const state = getState(stateKey);
 
   const el = {
     countdown: document.getElementById('countdown'),
@@ -80,23 +79,20 @@ document.addEventListener("DOMContentLoaded", () => {
     alreadyPlayedModal: document.getElementById('alreadyPlayedModal'),
     alreadyDesc: document.getElementById('alreadyDesc'),
     alreadyOk: document.getElementById('alreadyOk'),
+    progressSegmentsEl: document.getElementById('progressSegments')
   };
 
-  let state = restoreState(stateKey);
+  const audio = document.getElementById('audioPlayer');
   audio.src = today.url;
+
   const volumeSlider = document.getElementById('volumeSlider');
   if (volumeSlider) {
-  audio.volume = parseFloat(volumeSlider.value);
-  volumeSlider.addEventListener('input', (e) => {
-    audio.volume = parseFloat(e.target.value);
-  });
-}
+    audio.volume = parseFloat(volumeSlider.value);
+    volumeSlider.addEventListener('input', e => {
+      audio.volume = parseFloat(e.target.value);
+    });
+  }
 
-  document.getElementById('volumeSlider').addEventListener('input', (e) => {
-    audio.volume = parseFloat(e.target.value);
-  });
-
-  // Build guess boxes:
   for (let i = 0; i < maxGuesses; i++) {
     const box = document.createElement('div');
     box.className = 'h-12 bg-gray-800 rounded flex items-center justify-center text-sm';
@@ -112,7 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
     el.bestStreak.textContent = localStorage.getItem('bestStreak');
   }
 
-  function reveal(guess, correct, skipped=false) {
+  function reveal(guess, correct, skipped = false) {
     const box = el.guessGrid.children[state.count];
     box.textContent = skipped ? 'Skipped' : guess;
     box.classList.add(skipped ? 'text-gray-400' : correct ? 'bg-green-600' : 'bg-red-600');
@@ -122,43 +118,37 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function finish(correct) {
-    state.finished = true;
-    saveState(stateKey, state);
+    state.finished = true; saveState(stateKey, state);
     localStorage.setItem(doneKey, 'yes');
-
-    let games = parseInt(localStorage.getItem('gamesPlayed')) + 1;
-    let streak = parseInt(localStorage.getItem('currentStreak'));
-    let best = parseInt(localStorage.getItem('bestStreak'));
+    let gp = parseInt(localStorage.getItem('gamesPlayed')) + 1;
+    let cs = parseInt(localStorage.getItem('currentStreak'));
+    let bs = parseInt(localStorage.getItem('bestStreak'));
     if (correct) {
-      streak += 1;
-      if (streak > best) best = streak;
+      cs++; if (cs > bs) bs = cs;
       confetti({ particleCount: 100, spread: 50 });
       el.resultTitle.textContent = '';
       audio.currentTime = 0;
       audio.play();
     } else {
-      streak = 0;
+      cs = 0;
       el.resultTitle.textContent = 'Game Over';
     }
-
     el.resultAnswer.textContent = today.title;
-    el.alreadyDesc.textContent = `Correct: ${today.title}`;
-    localStorage.setItem('gamesPlayed', games);
-    localStorage.setItem('currentStreak', streak);
-    localStorage.setItem('bestStreak', best);
+    localStorage.setItem('gamesPlayed', gp);
+    localStorage.setItem('currentStreak', cs);
+    localStorage.setItem('bestStreak', bs);
     updateStats();
-
     el.resultModal.classList.remove('hidden');
     disableGameActions(el);
   }
 
-  // Restore previous guesses if any:
-  state.guessed.forEach((g, idx) => {
+  state.guessed.forEach((g, i) => {
     const correct = g.toLowerCase() === today.title.toLowerCase();
-    const box = el.guessGrid.children[idx];
+    const box = el.guessGrid.children[i];
     box.textContent = g;
     box.classList.add(correct ? 'bg-green-600' : 'bg-red-600');
   });
+
   renderProgressBar(el, state.count);
   updateStats();
 
@@ -167,37 +157,23 @@ document.addEventListener("DOMContentLoaded", () => {
     disableGameActions(el);
   }
 
-  // Typeahead search:
   el.guessInput.addEventListener('input', () => {
-    const val = el.guessInput.value.toLowerCase();
+    const val = el.guessInput.value.trim().toLowerCase();
     el.autocompleteList.innerHTML = '';
-    if (val.length === 0) {
-      el.autocompleteList.classList.add('hidden');
-      return;
-    }
+    if (!val) { el.autocompleteList.classList.add('hidden'); return; }
     const matches = playlist.filter(p => p.title.toLowerCase().includes(val));
-    matches.forEach(p => {
-      const div = document.createElement('div');
-      div.textContent = p.title;
-      div.className = 'px-3 py-1 hover:bg-gray-200 cursor-pointer';
-      div.addEventListener('click', () => {
-        el.guessInput.value = p.title;
+    if (!matches.length) { el.autocompleteList.classList.add('hidden'); return; }
+    matches.forEach(m => {
+      const opt = document.createElement('div');
+      opt.textContent = m.title;
+      opt.className = 'px-3 py-2 hover:bg-gray-200 cursor-pointer';
+      opt.addEventListener('click', () => {
+        el.guessInput.value = m.title;
         el.autocompleteList.classList.add('hidden');
       });
-      el.autocompleteList.appendChild(div);
+      el.autocompleteList.appendChild(opt);
     });
-    if (matches.length > 0) {
-      el.autocompleteList.classList.remove('hidden');
-    } else {
-      el.autocompleteList.classList.add('hidden');
-    }
-  });
-
-  el.skipBtn.addEventListener('click', () => {
-    if (!state.finished && state.count < maxGuesses) {
-      reveal('', false, true);
-      if (state.count >= maxGuesses) finish(false);
-    }
+    el.autocompleteList.classList.remove('hidden');
   });
 
   el.submitBtn.addEventListener('click', () => {
@@ -213,6 +189,12 @@ document.addEventListener("DOMContentLoaded", () => {
     el.autocompleteList.classList.add('hidden');
   });
 
+  el.skipBtn.addEventListener('click', () => {
+    if (state.finished || state.count >= maxGuesses) return;
+    reveal('', false, true);
+    if (state.count >= maxGuesses) finish(false);
+  });
+
   el.playBtn.addEventListener('click', () => {
     if (state.finished) return;
     const t = durations[Math.min(state.count, durations.length - 1)];
@@ -223,20 +205,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   el.guessInput.addEventListener('keydown', e => {
     if (e.key === 'Enter') {
-      el.submitBtn.click();
       e.preventDefault();
+      el.submitBtn.click();
     }
   });
 
-  el.resultCloseBtn.addEventListener('click', () => {
-    el.resultModal.classList.add('hidden');
-  });
+  el.resultCloseBtn.addEventListener('click', () => el.resultModal.classList.add('hidden'));
+  el.alreadyOk.addEventListener('click', () => el.alreadyPlayedModal.classList.add('hidden'));
 
-  el.alreadyOk.addEventListener('click', () => {
-    el.alreadyPlayedModal.classList.add('hidden');
-  });
-
-  // Countdown timer
   setInterval(() => {
     el.countdown.textContent = `Next theme song in: ${formatCountdown()}`;
   }, 1000);
