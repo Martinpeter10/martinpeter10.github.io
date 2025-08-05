@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Themedle</title>
+  <link rel="icon" type="image/png" href="favicon.png" />
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
 </head>
@@ -18,9 +19,7 @@
 
   <div class="w-full max-w-xl flex flex-col items-center space-y-3">
     <button id="playBtn" class="bg-green-500 hover:bg-green-600 w-16 h-16 rounded-full text-2xl flex items-center justify-center">▶</button>
-    <div class="w-full h-1 bg-gray-700 rounded overflow-hidden mb-4">
-      <div id="progressBar" class="h-full bg-green-400 w-0"></div>
-    </div>
+    <div id="progressSegments" class="w-full flex gap-1 justify-between text-xs text-center text-gray-300"></div>
   </div>
 
   <audio id="audioPlayer" preload="auto" class="hidden"></audio>
