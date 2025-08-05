@@ -15,8 +15,8 @@ const maxGuesses = 6;
 
 function getTodayIndex() {
   const base = new Date('2024-01-01T00:00:00-06:00');
-  const nowCST = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Chicago" }));
-  return Math.floor((nowCST - base) / (1000 * 60 * 60 * 24)) % playlist.length;
+  const now = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Chicago" }));
+  return Math.floor((now - base) / (1000 * 60 * 60 * 24)) % playlist.length;
 }
 
 function formatCountdown() {
@@ -68,18 +68,19 @@ document.addEventListener("DOMContentLoaded", () => {
     guessGrid: document.getElementById('guessGrid'),
     playBtn: document.getElementById('playBtn'),
     progressSegments: document.getElementById('progressSegments'),
+    playProgress: document.getElementById('playProgress'),
     guessInput: document.getElementById('guessInput'),
     autocompleteList: document.getElementById('autocompleteList'),
     submitBtn: document.getElementById('submitBtn'),
     skipBtn: document.getElementById('skipBtn'),
+    correctAnswer: document.getElementById('correctAnswer'),
     resultModal: document.getElementById('resultModal'),
     resultTitle: document.getElementById('resultTitle'),
     resultAnswer: document.getElementById('resultAnswer'),
     resultCloseBtn: document.getElementById('resultCloseBtn'),
     alreadyPlayedModal: document.getElementById('alreadyPlayedModal'),
     alreadyDesc: document.getElementById('alreadyDesc'),
-    alreadyOk: document.getElementById('alreadyOk'),
-    progressSegmentsEl: document.getElementById('progressSegments')
+    alreadyOk: document.getElementById('alreadyOk')
   };
 
   const audio = document.getElementById('audioPlayer');
@@ -93,9 +94,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // build guess boxes (with truncate support via Tailwind)
   for (let i = 0; i < maxGuesses; i++) {
     const box = document.createElement('div');
-    box.className = 'h-12 bg-gray-800 rounded flex items-center justify-center text-sm';
+    box.className = 'h-12 bg-gray-800 rounded flex items-center justify-center text-sm truncate';
     el.guessGrid.appendChild(box);
   }
 
@@ -118,13 +120,16 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function finish(correct) {
-    state.finished = true; saveState(stateKey, state);
+    state.finished = true;
+    saveState(stateKey, state);
     localStorage.setItem(doneKey, 'yes');
+
     let gp = parseInt(localStorage.getItem('gamesPlayed')) + 1;
     let cs = parseInt(localStorage.getItem('currentStreak'));
     let bs = parseInt(localStorage.getItem('bestStreak'));
     if (correct) {
-      cs++; if (cs > bs) bs = cs;
+      cs++;
+      if (cs > bs) bs = cs;
       confetti({ particleCount: 100, spread: 50 });
       el.resultTitle.textContent = '';
       audio.currentTime = 0;
@@ -133,10 +138,15 @@ document.addEventListener("DOMContentLoaded", () => {
       cs = 0;
       el.resultTitle.textContent = 'Game Over';
     }
+
     el.resultAnswer.textContent = today.title;
+    el.correctAnswer.textContent = today.title;
+    el.correctAnswer.classList.remove('hidden');
+
     localStorage.setItem('gamesPlayed', gp);
     localStorage.setItem('currentStreak', cs);
     localStorage.setItem('bestStreak', bs);
+
     updateStats();
     el.resultModal.classList.remove('hidden');
     disableGameActions(el);
@@ -160,9 +170,15 @@ document.addEventListener("DOMContentLoaded", () => {
   el.guessInput.addEventListener('input', () => {
     const val = el.guessInput.value.trim().toLowerCase();
     el.autocompleteList.innerHTML = '';
-    if (!val) { el.autocompleteList.classList.add('hidden'); return; }
+    if (!val) {
+      el.autocompleteList.classList.add('hidden');
+      return;
+    }
     const matches = playlist.filter(p => p.title.toLowerCase().includes(val));
-    if (!matches.length) { el.autocompleteList.classList.add('hidden'); return; }
+    if (!matches.length) {
+      el.autocompleteList.classList.add('hidden');
+      return;
+    }
     matches.forEach(m => {
       const opt = document.createElement('div');
       opt.textContent = m.title;
@@ -200,7 +216,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const t = durations[Math.min(state.count, durations.length - 1)];
     audio.currentTime = 0;
     audio.play();
-    setTimeout(() => audio.pause(), t * 1000);
+    if (el.playProgress) el.playProgress.style.width = '0%';
+    const start = Date.now();
+    const timer = setInterval(() => {
+      const elapsed = (Date.now() - start) / 1000;
+      const pct = Math.min((elapsed / t) * 100, 100);
+      if (el.playProgress) el.playProgress.style.width = pct + '%';
+    }, 50);
+    setTimeout(() => {
+      audio.pause();
+      clearInterval(timer);
+      if (el.playProgress) el.playProgress.style.width = '0%';
+    }, t * 1000);
   });
 
   el.guessInput.addEventListener('keydown', e => {
