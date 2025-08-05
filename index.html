@@ -2,52 +2,66 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Daily Jamm</title>
+  <title>Themedle</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Tailwind CDN -->
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link rel="icon" type="image/png" href="favicon.png">
 </head>
-<body class="bg-gray-900 text-white flex flex-col items-center justify-center min-h-screen px-4">
-  <div class="w-full max-w-md">
-    <h1 class="text-2xl font-bold text-center mb-2">🎵 Daily Jamm</h1>
-    <p id="countdown" class="text-sm text-center mb-4 text-gray-300">Next theme song in: ...</p>
+<body class="bg-gray-900 text-white flex flex-col items-center justify-center min-h-screen px-4 py-8">
+  <div class="w-full max-w-xl flex flex-col items-center">
+    <h1 class="text-4xl font-extrabold text-white mb-1">Themedle</h1>
+    <p id="countdown" class="text-sm text-gray-400 mb-4">Next theme song in: ...</p>
 
-    <div id="guessGrid" class="grid grid-cols-1 gap-2 mb-4"></div>
+    <!-- Stats -->
+    <div class="flex space-x-8 text-center text-sm text-gray-300 mb-6">
+      <div><div class="text-lg font-bold" id="gamesPlayed">0</div>GAMES</div>
+      <div><div class="text-lg font-bold" id="currentStreak">0</div>STREAK</div>
+      <div><div class="text-lg font-bold" id="bestStreak">0</div>BEST</div>
+    </div>
 
-    <!-- ✅ Progress bar now AFTER the guess grid -->
-    <div id="progressSegments" class="mb-4 flex gap-1"></div>
+    <!-- Guess Grid -->
+    <div id="guessGrid" class="grid grid-cols-5 gap-2 mb-6 w-full max-w-md">
+      <!-- Filled dynamically -->
+    </div>
 
-    <!-- ✅ Typeahead box styled and open -->
-    <div class="relative mb-4">
+    <!-- Play Button -->
+    <div class="mb-6">
+      <button id="playBtn" class="w-16 h-16 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center text-white text-2xl shadow-lg focus:outline-none">
+        ▶
+      </button>
+    </div>
+
+    <!-- Progress Bar with Labels -->
+    <div class="w-full mb-6">
+      <div id="progressSegments" class="flex h-2 bg-gray-700 rounded overflow-hidden mb-2"></div>
+      <div class="flex justify-between text-xs text-gray-400 px-1">
+        <span>1s</span>
+        <span>2s</span>
+        <span>3s</span>
+        <span>5s</span>
+        <span>10s</span>
+        <span>15s</span>
+      </div>
+    </div>
+
+    <!-- Input + Autocomplete -->
+    <div class="relative w-full max-w-md mb-4">
       <input
         id="guessInput"
         type="text"
+        placeholder="Search for the title..."
+        class="w-full p-3 rounded bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
         autocomplete="off"
-        placeholder="Guess the show title"
-        class="w-full p-2 border border-gray-400 rounded bg-white text-black focus:outline-none focus:ring-2 focus:ring-blue-400 z-10 relative"
       />
-      <div id="autocompleteList"
-        class="absolute top-full left-0 w-full bg-white text-black border border-gray-300 rounded shadow-md hidden z-20 max-h-40 overflow-auto"
-      ></div>
+      <div id="autocompleteList" class="absolute top-full left-0 w-full bg-white text-black border border-gray-300 rounded shadow-md hidden z-20 max-h-40 overflow-auto"></div>
     </div>
 
-    <div class="flex gap-2 mb-4">
-      <button id="playBtn" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded">Play</button>
-      <button id="submitBtn" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded">Submit</button>
-      <button id="skipBtn" class="bg-yellow-500 hover:bg-yellow-600 px-4 py-2 rounded">Skip</button>
-    </div>
-
-    <div class="mb-4">
-      <label for="volumeSlider" class="block mb-1 text-sm">Volume</label>
-      <input id="volumeSlider" type="range" min="0" max="1" step="0.01" value="0.5" class="w-full">
-    </div>
-
-    <div class="text-sm text-center text-gray-400 mb-4">
-      Games Played: <span id="gamesPlayed">0</span> |
-      Streak: <span id="currentStreak">0</span> |
-      Best: <span id="bestStreak">0</span>
+    <!-- Skip/Submit Buttons -->
+    <div class="flex items-center gap-4 w-full max-w-md">
+      <button id="skipBtn" class="flex-1 bg-gray-500 hover:bg-gray-600 px-4 py-3 rounded text-white">SKIP</button>
+      <button id="submitBtn" class="flex-1 bg-green-600 hover:bg-green-700 px-4 py-3 rounded text-white">SUBMIT</button>
     </div>
   </div>
 
