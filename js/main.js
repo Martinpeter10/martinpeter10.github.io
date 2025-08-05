@@ -8,13 +8,17 @@ const playlist = [
   { title: "The Amazing Adventures of Gumball", url: "audio/gumball.mp3" }
 ];
 
+const durations = [1, 2, 3, 5, 10, 15];
+
 function getTodayIndex() {
-  const ds = new Date().toLocaleDateString("en‑US", { timeZone: "America/Chicago" });
-  return ds.split("/").reduce((a, b) => a + parseInt(b), 0) % playlist.length;
+  const base = new Date('2024-01-01T00:00:00-06:00');
+  const now = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Chicago" }));
+  const days = Math.floor((now - base) / (1000 * 60 * 60 * 24));
+  return days % playlist.length;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  const idx = getTodayIndex(), today = playlist[idx], todayKey = `played‑${idx}`;
+  const idx = getTodayIndex(), today = playlist[idx], todayKey = `played-${idx}`;
   const audio = document.getElementById("audioPlayer");
 
   const el = {
@@ -43,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
   audio.volume = parseFloat(el.vol.value);
   el.vol.oninput = () => audio.volume = parseFloat(el.vol.value);
 
-  for (let i=0; i<max; i++) {
+  for (let i = 0; i < max; i++) {
     const box = document.createElement("div");
     box.className = "h-12 bg-gray-800 rounded flex items-center justify-center text-sm";
     el.grid.appendChild(box);
@@ -58,12 +62,12 @@ document.addEventListener("DOMContentLoaded", () => {
   function finish(correct) {
     finished = true;
     localStorage.setItem(todayKey, "done");
-    let gp = parseInt(localStorage.getItem("gamesPlayed")||0)+1;
-    let cs = parseInt(localStorage.getItem("currentStreak")||0);
-    let bs = parseInt(localStorage.getItem("bestStreak")||0);
+    let gp = parseInt(localStorage.getItem("gamesPlayed") || 0) + 1;
+    let cs = parseInt(localStorage.getItem("currentStreak") || 0);
+    let bs = parseInt(localStorage.getItem("bestStreak") || 0);
     if (correct) {
-      cs++; if (cs>bs) bs=cs;
-      confetti({ particleCount:150, spread:70 });
+      cs++; if (cs > bs) bs = cs;
+      confetti({ particleCount: 150, spread: 70 });
       el.title.textContent = "";
       audio.currentTime = 0;
       audio.play();
@@ -80,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
     el.skip.disabled = el.submit.disabled = el.input.disabled = true;
   }
 
-  function reveal(text, correct=false, skip=false) {
+  function reveal(text, correct = false, skip = false) {
     const cell = el.grid.children[guessCount];
     cell.textContent = skip ? "Skipped" : text;
     const cls = skip ? "bg-gray-600 italic" : correct ? "bg-green-600" : "bg-red-600";
@@ -106,7 +110,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (guessCount >= max) finish(false);
   }
 
-  const durations = [1, 2, 3, 5, 10, 15];
   el.playBtn.onclick = () => {
     if (finished) return;
     const t = durations[Math.min(guessCount, durations.length - 1)];
@@ -147,11 +150,11 @@ document.addEventListener("DOMContentLoaded", () => {
   if (localStorage.getItem(todayKey) === "done") {
     el.alreadyModal.classList.remove("hidden");
     const now = new Date(), mid = new Date(now);
-    mid.setHours(24,0,0,0);
+    mid.setHours(24, 0, 0, 0);
     const diff = mid - now;
-    const hrs = Math.floor(diff/36e5);
-    const mins = Math.floor((diff % 36e5)/6e4);
-    const secs = Math.floor((diff % 6e4)/1000);
+    const hrs = Math.floor(diff / 36e5);
+    const mins = Math.floor((diff % 36e5) / 6e4);
+    const secs = Math.floor((diff % 6e4) / 1000);
     el.alreadyDesc.textContent = `Come back in ${hrs}h ${mins}m ${secs}s`;
     el.alreadyOk.onclick = () => el.alreadyModal.classList.add("hidden");
   }
