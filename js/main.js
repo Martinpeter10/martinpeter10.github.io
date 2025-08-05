@@ -84,7 +84,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let state = restoreState(stateKey);
   audio.src = today.url;
-  audio.volume = parseFloat(document.getElementById('volumeSlider').value);
+  const volumeSlider = document.getElementById('volumeSlider');
+  if (volumeSlider) {
+  audio.volume = parseFloat(volumeSlider.value);
+  volumeSlider.addEventListener('input', (e) => {
+    audio.volume = parseFloat(e.target.value);
+  });
+}
 
   document.getElementById('volumeSlider').addEventListener('input', (e) => {
     audio.volume = parseFloat(e.target.value);
