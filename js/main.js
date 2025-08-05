@@ -27,12 +27,10 @@ function getTimeUntilMidnightCST() {
   return `${h}h ${m}m ${s}s`;
 }
 
-function disableAllGameInput(el) {
+function disableGameActions(el) {
   el.submit.disabled = true;
   el.skip.disabled = true;
   el.playBtn.disabled = true;
-  el.input.setAttribute("readonly", true);
-  el.input.classList.add("opacity-60", "cursor-not-allowed");
 }
 
 function renderSegments(el, guessCount) {
@@ -134,7 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
     localStorage.setItem("bestStreak", bs);
     updateStats();
     el.modal.classList.remove("hidden");
-    disableAllGameInput(el);
+    disableGameActions(el);
   }
 
   function handleGuess() {
@@ -211,7 +209,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (state.finished || localStorage.getItem(todayKey) === "done") {
     el.alreadyModal.classList.remove("hidden");
-    disableAllGameInput(el);
+    disableGameActions(el);
     const now = new Date(), mid = new Date(now);
     mid.setHours(24, 0, 0, 0);
     const diff = mid - now;
