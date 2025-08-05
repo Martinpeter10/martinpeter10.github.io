@@ -258,7 +258,7 @@ function completeGame(won) {
 
 function openModal(won) {
   displayedAnswer.textContent = currentSong.title;
-  correctAnswerEl.href = `https://www.youtube.com/results?search_query=${encodeURIComponent(currentSong.title + " theme song")}`;
+  correctAnswerEl.href = currentSong.url;
   gameOverTitle.textContent = won ? "🎉 You got it!" : "Game Over";
   gameOverMessage.textContent = won ? "You guessed it right!" : "Better luck next time.";
   gameOverModal.classList.remove('hidden');
