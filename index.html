@@ -4,8 +4,7 @@
   <meta charset="UTF-8">
   <title>Themedle</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Tailwind CDN -->
+  <!-- Tailwind CSS via CDN -->
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link rel="icon" type="image/png" href="favicon.png">
 </head>
@@ -14,63 +13,50 @@
     <h1 class="text-4xl font-extrabold text-white mb-1">Themedle</h1>
     <p id="countdown" class="text-sm text-gray-400 mb-4">Next theme song in: ...</p>
 
-    <!-- Stats -->
     <div class="flex space-x-8 text-center text-sm text-gray-300 mb-6">
       <div><div class="text-lg font-bold" id="gamesPlayed">0</div>GAMES</div>
       <div><div class="text-lg font-bold" id="currentStreak">0</div>STREAK</div>
       <div><div class="text-lg font-bold" id="bestStreak">0</div>BEST</div>
     </div>
 
-    <!-- Guess Grid -->
-    <div id="guessGrid" class="grid grid-cols-5 gap-2 mb-6 w-full max-w-md">
-      <!-- Filled dynamically -->
-    </div>
+    <div id="guessGrid" class="grid grid-cols-5 gap-2 mb-6 w-full max-w-md"></div>
 
-    <!-- Play Button -->
     <div class="mb-6">
       <button id="playBtn" class="w-16 h-16 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center text-white text-2xl shadow-lg focus:outline-none">
         ▶
       </button>
     </div>
 
-    <!-- Progress Bar with Labels -->
     <div class="w-full mb-6">
       <div id="progressSegments" class="flex h-2 bg-gray-700 rounded overflow-hidden mb-2"></div>
       <div class="flex justify-between text-xs text-gray-400 px-1">
-        <span>1s</span>
-        <span>2s</span>
-        <span>3s</span>
-        <span>5s</span>
-        <span>10s</span>
-        <span>15s</span>
+        <span>1s</span><span>2s</span><span>3s</span><span>5s</span><span>10s</span><span>15s</span>
       </div>
     </div>
 
-    <!-- Input + Autocomplete -->
     <div class="relative w-full max-w-md mb-4">
       <input
         id="guessInput"
         type="text"
         placeholder="Search for the title..."
-        class="w-full p-3 rounded bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
         autocomplete="off"
+        class="w-full p-3 rounded bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 z-10 relative"
       />
       <div id="autocompleteList" class="absolute top-full left-0 w-full bg-white text-black border border-gray-300 rounded shadow-md hidden z-20 max-h-40 overflow-auto"></div>
     </div>
 
-    <!-- Skip/Submit Buttons -->
     <div class="flex items-center gap-4 w-full max-w-md">
       <button id="skipBtn" class="flex-1 bg-gray-500 hover:bg-gray-600 px-4 py-3 rounded text-white">SKIP</button>
       <button id="submitBtn" class="flex-1 bg-green-600 hover:bg-green-700 px-4 py-3 rounded text-white">SUBMIT</button>
     </div>
   </div>
 
-  <!-- Audio + Script -->
   <audio id="audioPlayer" preload="auto"></audio>
+  <input id="volumeSlider" type="range" min="0" max="1" step="0.01" value="0.5" class="hidden">
+
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script type="module" src="js/main.js"></script>
 
-  <!-- Result Modal -->
   <div id="resultModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-30">
     <div class="bg-white text-black p-6 rounded w-full max-w-md text-center">
       <h2 id="resultTitle" class="text-xl font-semibold mb-2">🎉</h2>
@@ -80,7 +66,6 @@
     </div>
   </div>
 
-  <!-- Already Played Modal -->
   <div id="alreadyPlayedModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-30">
     <div class="bg-white text-black p-6 rounded w-full max-w-md text-center">
       <h2 class="text-xl font-semibold mb-2">You've already played today!</h2>
