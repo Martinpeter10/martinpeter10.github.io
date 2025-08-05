@@ -1,14 +1,48 @@
-// === Themedle: main.js ===
+// === Themedle Game Logic ===
 
-// Theme Songs List
 const themeSongs = [
   { title: "Adventure Time", url: "audio/adventuretime.mp3" },
   { title: "All Grown Up", url: "audio/allgrownup.mp3" },
-  
-  // Add more as needed in the same format!
+  { title: "As Told By Ginger", url: "audio/astoldbyginger.mp3" },
+  { title: "Avatar The Last Airbender", url: "audio/avatarthelastairbender.mp3" },
+  { title: "Back At The Barnyard", url: "audio/backatthebarnyard.mp3" },
+  { title: "Barney", url: "audio/barney.mp3" },
+  { title: "Bear In The Big Blue House", url: "audio/bearinthebigbluehouse.mp3" },
+  { title: "Ben 10", url: "audio/ben10.mp3" },
+  { title: "Between The Lions", url: "audio/betweenthelions.mp3" },
+  { title: "Blues Clues", url: "audio/bluesclues.mp3" },
+  { title: "Bob The Builder", url: "audio/bobthebuilder.mp3" },
+  { title: "Caillou", url: "audio/caillou.mp3" },
+  { title: "Camp Lazlo", url: "audio/camplazlo.mp3" },
+  { title: "CatDog", url: "audio/catdog.mp3" },
+  { title: "Catscratch", url: "audio/catscratch.mp3" },
+  { title: "Charlie and Lola", url: "audio/charlieandlola.mp3" },
+  { title: "Chowder", url: "audio/chowder.mp3" },
+  { title: "Clifford The Big Red Dog", url: "audio/cliffordthebigreddog.mp3" },
+  { title: "Code Lyoko", url: "audio/codelyoko.mp3" },
+  { title: "Codename: Kids Next Door", url: "audio/codenamekidsnextdoor.mp3" },
+  { title: "Cory In The House", url: "audio/coryinthehouse.mp3" },
+  { title: "Courage The Cowardly Dog", url: "audio/couragethecowardlydog.mp3" },
+  { title: "Cyber Chase", url: "audio/cyberchase.mp3" },
+  { title: "Danny Phantom", url: "audio/dannyphantom.mp3" },
+  { title: "Degrassi", url: "audio/degrassi.mp3" },
+  { title: "Dexters Laboratory", url: "audio/dexterslaboratory.mp3" },
+  { title: "Dora The Explorer", url: "audio/doratheexplorer.mp3" },
+  { title: "Doug", url: "audio/doug.mp3" },
+  { title: "Dragon Tales", url: "audio/dragontales.mp3" },
+  { title: "Drake and Josh", url: "audio/drakeandjosh.mp3" },
+  { title: "Ed Edd n Eddy", url: "audio/ededdneddy.mp3" },
+  { title: "El Tigre", url: "audio/eltigre.mp3" },
+  { title: "Even Stevens", url: "audio/evenstevens.mp3" },
+  { title: "The Grim Adventures of Billy and Mandy", url: "audio/grimadventures.mp3" },
+  { title: "The Amazing World of Gumball", url: "audio/gumball.mp3" },
+  { title: "The Amanda Show", url: "audio/theamandashow.mp3" },
+  { title: "The Angry Beavers", url: "audio/theangrybeavers.mp3" },
+  { title: "The Backyardigans", url: "audio/thebackyardigans.mp3" },
+  { title: "The Berenstain Bears", url: "audio/theberenstainbears.mp3" },
+  { title: "The Fairly Odd Parents", url: "audio/thefairlyoddparents.mp3" }
 ];
 
-// Game Constants
 const timeIncrements = [1, 2, 3, 5, 10, 15];
 let currentGuess = 1;
 let currentClipLength = timeIncrements[0];
@@ -18,7 +52,7 @@ let audio = null;
 let playbackInterval = null;
 let simulatedTime = 0;
 
-// DOM Elements
+// DOM elements
 const guessInput = document.getElementById("guessInput");
 const playBtn = document.getElementById("playBtn");
 const volumeSlider = document.getElementById("volumeSlider");
@@ -37,11 +71,12 @@ const answerDisplay = document.getElementById("answerDisplay");
 const displayedAnswer = document.getElementById("displayedAnswer");
 const suggestionsDiv = document.getElementById("suggestions");
 
-// Game State
+// Game state
 let currentSong;
-let gameStats = { currentStreak: 0, bestStreak: 0, gamesPlayed: 0, lastPlayedDate: null };
+let gameStats = { currentStreak: 0, bestStreak: 0, gamesPlayed: 0 };
 let dailyGameState = { date: null, completed: false, won: false, guesses: [], currentGuess: 1, songIndex: 0 };
 
+// Time logic
 function getTodayCST() {
   const now = new Date();
   const utc = now.getTime() + now.getTimezoneOffset() * 60000;
@@ -59,6 +94,7 @@ function getDailySongIndex() {
   return Math.abs(hash) % themeSongs.length;
 }
 
+// LocalStorage
 function loadStats() {
   const saved = localStorage.getItem('themedleStats');
   if (saved) gameStats = JSON.parse(saved);
@@ -91,7 +127,7 @@ function loadDailyGameState() {
     won: false,
     guesses: [],
     currentGuess: 1,
-    songIndex: getDailySongIndex()
+    songIndex: themeSongs.length > 0 ? getDailySongIndex() % themeSongs.length : 0
   };
   saveDailyGameState();
   return false;
@@ -101,6 +137,7 @@ function saveDailyGameState() {
   localStorage.setItem('themedleDailyState', JSON.stringify(dailyGameState));
 }
 
+// UI
 function updateCountdown() {
   const now = new Date();
   const utc = now.getTime() + now.getTimezoneOffset() * 60000;
@@ -134,6 +171,7 @@ function showGameOverModal(won) {
   answerDisplay.classList.remove('hidden');
 }
 
+// Audio
 function playClip() {
   if (isPlaying) {
     audio.pause();
@@ -169,20 +207,19 @@ function playClip() {
   }, 50);
 }
 
-// Event Listeners
+// Events
 playBtn.addEventListener('click', playClip);
 volumeSlider.addEventListener('input', () => {
   const volume = volumeSlider.value;
   audio.volume = volume / 100;
   volumePercent.textContent = `${volume}%`;
 });
-
 document.getElementById("closeModal").addEventListener("click", () => {
   gameOverModal.classList.add('hidden');
   gameOverModal.classList.remove('flex');
 });
 
-// Game Initialization
+// Init
 function init() {
   loadStats();
   const hasPlayed = loadDailyGameState();
