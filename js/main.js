@@ -1,286 +1,365 @@
-const playlist = [
-  { title: "Adventure Time", url: "audio/adventuretime.mp3" },
-  { title: "All Grown Up", url: "audio/allgrownup.mp3" },
-  { title: "As Told By Ginger", url: "audio/astoldbyginger.mp3" },
-  { title: "Avatar The Last Airbender", url: "audio/avatarthelastairbender.mp3" },
-  { title: "Back At The Barnyard", url: "audio/backatthebarnyard.mp3" },
-  { title: "Barney", url: "audio/barney.mp3" },
-  { title: "Bear In The Big Blue House", url: "audio/bearinthebigbluehouse.mp3" },
-  { title: "Ben 10", url: "audio/ben10.mp3" },
-  { title: "Between The Lions", url: "audio/betweenthelions.mp3" },
-  { title: "Blues Clues", url: "audio/bluesclues.mp3" },
-  { title: "Bob The Builder", url: "audio/bobthebuilder.mp3" },
-  { title: "Caillou", url: "audio/caillou.mp3" },
-  { title: "Camp Lazlo", url: "audio/camplazlo.mp3" },
-  { title: "CatDog", url: "audio/catdog.mp3" },
-  { title: "Catscratch", url: "audio/catscratch.mp3" },
-  { title: "Charlie and Lola", url: "audio/charlieandlola.mp3" },
-  { title: "Chowder", url: "audio/chowder.mp3" },
-  { title: "Clifford The Big Red Dog", url: "audio/cliffordthebigreddog.mp3" },
-  { title: "Code Lyoko", url: "audio/codelyoko.mp3" },
-  { title: "Codename: Kids Next Door", url: "audio/codenamekidsnextdoor.mp3" },
-  { title: "Cory In The House", url: "audio/coryinthehouse.mp3" },
-  { title: "Courage The Cowardly Dog", url: "audio/couragethecowardlydog.mp3" },
-  { title: "Cyber Chase", url: "audio/cyberchase.mp3" },
-  { title: "Danny Phantom", url: "audio/dannyphantom.mp3" },
-  { title: "Degrassi", url: "audio/degrassi.mp3" },
-  { title: "Dexters Laboratory", url: "audio/dexterslaboratory.mp3" },
-  { title: "Dora The Explorer", url: "audio/doratheexplorer.mp3" },
-  { title: "Doug", url: "audio/doug.mp3" },
-  { title: "Dragon Tales", url: "audio/dragontales.mp3" },
-  { title: "Drake and Josh", url: "audio/drakeandjosh.mp3" },
-  { title: "Ed Edd n Eddy", url: "audio/ededdneddy.mp3" },
-  { title: "El Tigre", url: "audio/eltigre.mp3" },
-  { title: "Even Stevens", url: "audio/evenstevens.mp3" },
-  { title: "The Grim Adventures of Billy and Mandy", url: "audio/grimadventures.mp3" },
-  { title: "The Amazing World of Gumball", url: "audio/gumball.mp3" },
-  { title: "The Amanda Show", url: "audio/theamandashow.mp3" },
-  { title: "The Angry Beavers", url: "audio/theangrybeavers.mp3" },
-  { title: "The Backyardigans", url: "audio/thebackyardigans.mp3" },
-  { title: "The Berenstain Bears", url: "audio/theberenstainbears.mp3" },
-  { title: "The Fairly Odd Parents", url: "audio/thefairlyoddparents.mp3" },
+// Project: Themedle – main.js
+
+const timeIncrements = [1,2,3,5,10,15];
+let currentGuess = 1;
+let currentClipLength = timeIncrements[0];
+let isPlaying = false;
+let gameOver = false;
+
+const playBtn = document.getElementById('playBtn');
+const volumeSlider = document.getElementById('volumeSlider');
+const clipLengthSpan = document.getElementById('clipLength');
+const progressBar = document.getElementById('progressBar');
+const maxClipIndicator = document.getElementById('maxClipIndicator');
+const guessInput = document.getElementById('guessInput');
+const suggestionsDiv = document.getElementById('suggestions');
+const submitBtn = document.getElementById('submitGuess');
+const skipBtn = document.getElementById('skipGuess');
+const gameOverModal = document.getElementById('gameOverModal');
+const gameOverTitle = document.getElementById('gameOverTitle');
+const gameOverMessage = document.getElementById('gameOverMessage');
+const correctAnswerEl = document.getElementById('correctAnswer');
+const currentStreakEl = document.getElementById('currentStreak');
+const bestStreakEl = document.getElementById('bestStreak');
+const gamesPlayedEl = document.getElementById('gamesPlayed');
+const countdownEl = document.getElementById('countdown');
+const displayedAnswerEl = document.getElementById('displayedAnswer');
+const answerDisplay = document.getElementById('answerDisplay');
+
+const gameStats = {
+  currentStreak: 0, bestStreak: 0, gamesPlayed: 0, lastPlayedDate: null
+};
+let dailyGameState = {
+  date: null, completed: false, won: false,
+  guesses: [], currentGuess: 1, songIndex: 0
+};
+
+const themeSongs = [
+  { title:"Adventure Time", url:"../audio/adventuretime.mp3" },
+  { title:"All Grown Up", url:"../audio/allgrownup.mp3" },
+  { title:"Avatar The Last Airbender", url:"../audio/avatarthelastairbender.mp3" }
+  // ... expand with your other theme songs
 ];
 
-const durations = [1, 2, 3, 5, 10, 15];
-const maxGuesses = 6;
-
-function getTodayIndex() {
-  const base = new Date("2024-01-01T00:00:00-06:00");
-  return Math.floor((new Date() - base) / (1000*60*60*24)) % playlist.length;
+function getTodayCST(){
+  const now = new Date();
+  const utc = now.getTime() + now.getTimezoneOffset()*60000;
+  const cst = new Date(utc + (-6*3600000));
+  return cst.toDateString();
 }
 
-function formatCountdown() {
-  const now = new Date(), mid = new Date();
-  mid.setHours(24, 0, 0, 0);
-  const diff = mid - now;
-  const h = Math.floor(diff / 3600000),
-        m = Math.floor((diff % 3600000) / 60000),
-        s = Math.floor((diff % 60000) / 1000);
-  return `Come back in ${h}h ${m}m ${s}s`;
+function getDailySongIndex(){
+  const today = getTodayCST().replace(/\s/g,'');
+  let hash = 0;
+  for(let i=0;i<today.length;i++){
+    hash = ((hash<<5) - hash) + today.charCodeAt(i);
+    hash = hash & hash;
+  }
+  return Math.abs(hash) % themeSongs.length;
 }
 
-function getState(key) {
-  return JSON.parse(localStorage.getItem(key) || '{"guesses":[],"count":0,"finished":false,"won":false,"statsDone":false}');
-}
-function saveState(key, st) {
-  localStorage.setItem(key, JSON.stringify(st));
-}
-
-function disableInput(el) {
-  el.skipBtn.disabled = true;
-  el.submitBtn.disabled = true;
+function loadStats(){
+  const saved = localStorage.getItem('themedleStats');
+  if(saved) Object.assign(gameStats, JSON.parse(saved));
+  updateStatsDisplay();
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  const idx = getTodayIndex();
-  const answer = playlist[idx].title;
-  const stateKey = `daily-state-${idx}`;
-  const state = getState(stateKey);
+function saveStats(){
+  localStorage.setItem('themedleStats', JSON.stringify(gameStats));
+}
 
-  const el = {
-    audio: document.getElementById("audioPlayer"),
-    playBtn: document.getElementById("playBtn"),
-    progressContainer: document.getElementById("progressContainer"),
-    guessGrid: document.getElementById("guessGrid"),
-    guessInput: document.getElementById("guessInput"),
-    acList: document.getElementById("autocompleteList"),
-    submitBtn: document.getElementById("submitBtn"),
-    skipBtn: document.getElementById("skipBtn"),
-    correctAnswer: document.getElementById("correctAnswer"),
-    countdown: document.getElementById("countdown"),
-    gamesPlayed: document.getElementById("gamesPlayed"),
-    currentStreak: document.getElementById("currentStreak"),
-    bestStreak: document.getElementById("bestStreak"),
-    alreadyModal: document.getElementById("alreadyPlayedModal"),
-    alreadyDesc: document.getElementById("alreadyDesc"),
-    alreadyOk: document.getElementById("alreadyOk"),
-    winModal: document.getElementById("winModal"),
-    winAnswer: document.getElementById("winAnswer"),
-    winOk: document.getElementById("winOk"),
-    gameOverModal: document.getElementById("gameOverModal"),
-    gameOverAnswer: document.getElementById("gameOverAnswer"),
-    gameOverOk: document.getElementById("gameOverOk")
+function loadDailyGameState(){
+  const saved = localStorage.getItem('themedleDailyState');
+  const today = getTodayCST();
+  if(saved){
+    const st = JSON.parse(saved);
+    if(st.date === today){
+      dailyGameState = st;
+      return true;
+    }
+  }
+  dailyGameState = {
+    date: today, completed:false, won:false,
+    guesses:[], currentGuess:1, songIndex: getDailySongIndex()
   };
+  saveDailyGameState();
+  return false;
+}
 
-  el.audio.src = playlist[idx].url;
+function saveDailyGameState(){
+  localStorage.setItem('themedleDailyState', JSON.stringify(dailyGameState));
+}
 
-  // ✅ Initialize stats display from localStorage
-  el.gamesPlayed.textContent = localStorage.getItem("games") || "0";
-  el.currentStreak.textContent = localStorage.getItem("streak") || "0";
-  el.bestStreak.textContent = localStorage.getItem("best") || "0";
+function updateStatsDisplay(){
+  currentStreakEl.textContent = gameStats.currentStreak;
+  bestStreakEl.textContent = gameStats.bestStreak;
+  gamesPlayedEl.textContent = gameStats.gamesPlayed;
+}
 
-  function renderStaticProgress() {
-    el.progressContainer.innerHTML = "";
-    const total = durations[durations.length - 1];
-    const sec = durations[Math.min(state.count, durations.length - 1)];
-    const fillDiv = document.createElement("div");
-    fillDiv.style.width = ((sec / total) * 100) + "%";
-    fillDiv.style.height = "100%";
-    fillDiv.style.backgroundColor = "#34D399";
-    fillDiv.style.position = "absolute";
-    el.progressContainer.appendChild(fillDiv);
+function updateCountdown(){
+  const nowUTC = Date.now() + new Date().getTimezoneOffset()*60000;
+  const cst = new Date(nowUTC + (-6*3600000));
+  const tomorrow = new Date(cst);
+  tomorrow.setDate(tomorrow.getDate()+1);
+  tomorrow.setHours(0,0,0,0);
+  const diff = tomorrow - cst;
+  const hrs = String(Math.floor(diff/3600000)).padStart(2,'0');
+  const mins = String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
+  const secs = String(Math.floor((diff%60000)/1000)).padStart(2,'0');
+  countdownEl.textContent = `${hrs}:${mins}:${secs}`;
+}
+
+function updateMaxClipIndicator(){
+  const pct = (currentClipLength / 15)*100;
+  maxClipIndicator.style.width = pct + '%';
+}
+
+function updateSkipButton(){
+  if(currentGuess < 6){
+    const inc = timeIncrements[currentGuess] - currentClipLength;
+    skipBtn.textContent = `Skip (+${inc}s)`;
   }
+}
 
-  function animatePlayback(full = false) {
-    if (state.finished && !full) return;
-
-    const total = durations[durations.length - 1];
-    const stage = full ? durations.length - 1 : Math.min(state.count, durations.length - 1);
-    const sec = full ? total : durations[stage];
-
-    el.audio.currentTime = 0;
-    el.audio.play();
-    renderStaticProgress();
-
-    const overlay = document.createElement("div");
-    overlay.style.position = "absolute";
-    overlay.style.top = overlay.style.left = "0";
-    overlay.style.height = "100%";
-    overlay.style.backgroundColor = "#34D399";
-    overlay.style.width = "0%";
-    overlay.style.transition = `width ${sec}s linear`;
-    el.progressContainer.appendChild(overlay);
-
-    requestAnimationFrame(() => {
-      overlay.style.width = ((sec / total) * 100) + "%";
-    });
-
-    setTimeout(() => {
-      el.audio.pause();
-      renderStaticProgress();
-    }, sec * 1000);
-  }
-
-  function placeGuesses() {
-    const w = el.guessInput.offsetWidth + "px";
-    el.guessGrid.innerHTML = "";
-    state.guesses.slice(0, maxGuesses).forEach(txt => {
-      const div = document.createElement("div");
-      div.className = "h-12 rounded flex items-center justify-center text-sm text-white mb-2";
-      div.style.width = w;
-      div.style.backgroundColor = txt === "Skipped" ? "#4B5563"
-        : (txt.toLowerCase() === answer.toLowerCase() ? "#34D399" : "#EF4444");
-      div.textContent = txt;
-      el.guessGrid.appendChild(div);
-    });
-    for (let i = state.guesses.length; i < maxGuesses; i++) {
-      const div = document.createElement("div");
-      div.className = "h-12 bg-gray-800 rounded flex items-center justify-center text-sm text-white mb-2";
-      div.style.width = w;
-      el.guessGrid.appendChild(div);
+function restoreGameState(){
+  currentGuess = dailyGameState.currentGuess;
+  currentClipLength = timeIncrements[currentGuess-1];
+  clipLengthSpan.textContent = `${currentClipLength} ${currentClipLength===1?'second':'seconds'}`;
+  updateMaxClipIndicator();
+  updateSkipButton();
+  dailyGameState.guesses.forEach((g,i)=>{
+    const slot = document.getElementById(`guessSlot-${i+1}`);
+    slot.style.opacity='1';
+    slot.classList.remove('border-gray-600');
+    if(g.type==='correct'){
+      slot.classList.add('border-green-500','bg-green-900/30');
+      slot.innerHTML = `<span class="text-green-300 font-semibold">${g.text}</span><span class="text-sm text-green-400">${g.clipLength}s</span>`;
+    } else if(g.type==='wrong'){
+      slot.classList.add('border-red-500','bg-red-900/30');
+      slot.innerHTML = `<span class="text-red-300">${g.text}</span><span class="text-sm text-red-400">${g.clipLength}s</span>`;
+    } else if(g.type==='skipped'){
+      slot.classList.add('border-yellow-500','bg-yellow-900/30');
+      slot.innerHTML = `<span class="text-yellow-300">Skipped</span><span class="text-sm text-yellow-400">${g.clipLength}s</span>`;
     }
+  });
+}
+
+function disableGameControls(){
+  guessInput.disabled = true;
+  submitBtn.disabled = true;
+  skipBtn.disabled = true;
+  guessInput.placeholder = 'Game completed for today';
+  answerDisplay.classList.remove('hidden');
+  displayedAnswerEl.textContent = currentSong.title;
+}
+
+function showGameOverModal(won){
+  gameOverModal.classList.remove('hidden');
+  gameOverModal.classList.add('flex');
+  correctAnswerEl.textContent = currentSong.title;
+  if(won){
+    gameOverTitle.textContent = '🎉 Congratulations!';
+    gameOverMessage.textContent = `You guessed it in ${currentGuess} ${currentGuess===1?'try':'tries'}!`;
+  } else {
+    gameOverTitle.textContent = '😔 Game Over';
+    gameOverMessage.textContent = 'Better luck next time!';
   }
+  setTimeout(()=> { playBtn.click(); }, 500);
+}
 
-  function updateStats(won) {
-    const games = (Number(localStorage.getItem("games")) || 0) + 1;
-    localStorage.setItem("games", games);
-    el.gamesPlayed.textContent = games;
+function showSuggestions(q){
+  if(!q.trim()) { suggestionsDiv.classList.add('hidden'); return; }
+  const matches = themeSongs.filter(s => s.title.toLowerCase().includes(q.toLowerCase()));
+  if(matches.length===0){ suggestionsDiv.classList.add('hidden'); return; }
+  suggestionsDiv.innerHTML = matches.map((s,i)=>`<div class="suggestion-item px-4 py-2 hover:bg-gray-700 cursor-pointer text-white" data-title="${s.title}" data-index="${i}">${s.title}</div>`).join('');
+  suggestionsDiv.classList.remove('hidden');
+}
 
-    let streak = Number(localStorage.getItem("streak") || 0);
-    if (won) {
-      streak++;
-      localStorage.setItem("streak", streak);
-      const best = Number(localStorage.getItem("best") || 0);
-      if (streak > best) localStorage.setItem("best", streak);
-    } else {
-      streak = 0;
-      localStorage.setItem("streak", "0");
-    }
-    el.currentStreak.textContent = streak;
-    el.bestStreak.textContent = localStorage.getItem("best") || "0";
-  }
+function selectSuggestion(title){
+  guessInput.value = title;
+  suggestionsDiv.classList.add('hidden');
+}
 
-  function finishGame() {
-    disableInput(el);
-    if (!state.statsDone) {
-      updateStats(state.won);
-      state.statsDone = true;
-      saveState(stateKey, state);
-    }
+let audio = new Audio();
+let playbackInterval, simulatedTime=0;
 
-    if (state.won) {
-      confetti({ particleCount: 150, spread: 60 });
-      el.winAnswer.textContent = answer;
-      el.winModal.classList.remove("hidden");
-    } else {
-      el.correctAnswer.textContent = answer;
-      el.correctAnswer.classList.remove("hidden");
-      el.gameOverAnswer.textContent = answer;
-      el.gameOverModal.classList.remove("hidden");
-    }
-
-    animatePlayback(true);
-  }
-
-  function handleGuess(txt) {
-    state.guesses.push(txt);
-    if (txt.toLowerCase() === answer.toLowerCase()) {
-      state.finished = state.won = true;
-    } else {
-      state.count++;
-      if (state.count >= maxGuesses) state.finished = true;
-    }
-    saveState(stateKey, state);
-    placeGuesses();
-    renderStaticProgress();
-    el.guessInput.value = "";
-
-    if (state.finished) setTimeout(finishGame, 300);
-  }
-
-  function showAutocomplete() {
-    el.acList.innerHTML = "";
-    const q = el.guessInput.value.trim().toLowerCase();
-    if (!q) return;
-    playlist.forEach(song => {
-      if (song.title.toLowerCase().includes(q)) {
-        const div = document.createElement("div");
-        div.textContent = song.title;
-        div.className = "px-2 py-1 hover:bg-gray-700 cursor-pointer";
-        div.onclick = () => {
-          el.guessInput.value = song.title;
-          el.acList.innerHTML = "";
-          el.acList.classList.add("hidden");
-        };
-        el.acList.appendChild(div);
+playBtn.addEventListener('click',()=> {
+  if(!isPlaying){
+    isPlaying = true;
+    playBtn.textContent = '■ Pause';
+    playBtn.classList.add('pulse-animation');
+    simulatedTime=0;
+    if(audio.play){ audio.currentTime=0; audio.play().catch(()=>{}); }
+    const playLen = gameOver ? 15 : currentClipLength;
+    playbackInterval = setInterval(()=>{
+      simulatedTime += 0.05;
+      const prog = simulatedTime/playLen;
+      const maxPct = (playLen/15)*100;
+      progressBar.style.width = Math.min(prog,1)*maxPct + '%';
+      if(simulatedTime>=playLen){
+        clearInterval(playbackInterval);
+        isPlaying=false;
+        playBtn.textContent='▶ Play';
+        playBtn.classList.remove('pulse-animation');
+        progressBar.style.width='0%'; simulatedTime=0;
       }
-    });
-    el.acList.children.length ? el.acList.classList.remove("hidden") : el.acList.classList.add("hidden");
+    },50);
+  } else {
+    isPlaying=false;
+    playBtn.textContent='▶ Play';
+    playBtn.classList.remove('pulse-animation');
+    audio.pause();
+    clearInterval(playbackInterval);
+    simulatedTime=0; progressBar.style.width='0%';
   }
-
-  function showAlreadyModal() {
-    el.alreadyDesc.textContent = formatCountdown();
-    el.alreadyModal.classList.remove("hidden");
-  }
-
-  el.alreadyOk.addEventListener("click", () => el.alreadyModal.classList.add("hidden"));
-  el.winOk.addEventListener("click", () => el.winModal.classList.add("hidden"));
-  el.gameOverOk.addEventListener("click", () => el.gameOverModal.classList.add("hidden"));
-
-  placeGuesses();
-  renderStaticProgress();
-
-  if (state.finished) {
-    disableInput(el);
-    showAlreadyModal();
-  }
-
-  el.playBtn.addEventListener("click", () => animatePlayback(false));
-  el.submitBtn.addEventListener("click", () => {
-    const v = el.guessInput.value.trim();
-    if (v) handleGuess(v);
-  });
-  el.guessInput.addEventListener("keydown", e => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      const v = el.guessInput.value.trim();
-      if (v) handleGuess(v);
-    }
-  });
-  el.skipBtn.addEventListener("click", () => {
-    if (!state.finished) handleGuess("Skipped");
-  });
-  el.guessInput.addEventListener("input", showAutocomplete);
-
-  setInterval(() => el.countdown.textContent = formatCountdown(), 1000);
 });
+
+volumeSlider.addEventListener('input',()=>{
+  const vol = volumeSlider.value/100;
+  audio.volume=vol;
+  document.getElementById('volumePercent').textContent = `${volumeSlider.value}%`;
+});
+
+submitBtn.addEventListener('click',()=>{
+  if(gameOver) return;
+  const guess = guessInput.value.trim();
+  if(!guess) return;
+  const lowercase = guess.toLowerCase();
+  const slot = document.getElementById(`guessSlot-${currentGuess}`);
+  slot.style.opacity = '1';
+  if(lowercase === currentSong.title.toLowerCase()){
+    slot.classList.add('border-green-500','bg-green-900/30');
+    slot.innerHTML = `<span class="text-green-300 font-semibold">${guess}</span><span class="text-sm text-green-400">${currentClipLength}s</span>`;
+    dailyGameState.guesses.push({ type:'correct', text:guess, clipLength:currentClipLength });
+    dailyGameState.completed = true; dailyGameState.won = true; dailyGameState.currentGuess = currentGuess;
+    saveDailyGameState();
+    gameOver = true;
+    const today = getTodayCST();
+    if(gameStats.lastPlayedDate !== today){
+      gameStats.currentStreak++;
+      gameStats.gamesPlayed++;
+      gameStats.lastPlayedDate = today;
+      if(gameStats.currentStreak > gameStats.bestStreak) gameStats.bestStreak = gameStats.currentStreak;
+      saveStats();
+    }
+    updateStatsDisplay();
+    disableGameControls();
+    clipLengthSpan.textContent = '15 seconds (full song)';
+    maxClipIndicator.style.width = '100%';
+    showGameOverModal(true);
+  } else {
+    slot.classList.add('border-red-500','bg-red-900/30');
+    slot.innerHTML = `<span class="text-red-300">${guess}</span><span class="text-sm text-red-400">${currentClipLength}s</span>`;
+    dailyGameState.guesses.push({ type:'wrong', text:guess, clipLength:currentClipLength });
+    currentGuess++;
+    dailyGameState.currentGuess = currentGuess;
+    if(currentGuess > 6){
+      dailyGameState.completed = true; dailyGameState.won = false;
+      saveDailyGameState();
+      gameOver = true;
+      const today = getTodayCST();
+      if(gameStats.lastPlayedDate !== today){
+        gameStats.currentStreak = 0;
+        gameStats.gamesPlayed++;
+        gameStats.lastPlayedDate = today;
+        saveStats();
+      }
+      updateStatsDisplay();
+      disableGameControls();
+      clipLengthSpan.textContent = '15 seconds (full song)';
+      maxClipIndicator.style.width = '100%';
+      showGameOverModal(false);
+    } else {
+      saveDailyGameState();
+      currentClipLength = timeIncrements[currentGuess-1];
+      clipLengthSpan.textContent = `${currentClipLength} seconds`;
+      updateMaxClipIndicator();
+      updateSkipButton();
+    }
+  }
+  guessInput.value = ''; guessInput.focus();
+});
+
+skipBtn.addEventListener('click',()=>{
+  if(gameOver) return;
+  const slot = document.getElementById(`guessSlot-${currentGuess}`);
+  slot.style.opacity = '1';
+  slot.classList.add('border-yellow-500','bg-yellow-900/30');
+  slot.innerHTML = `<span class="text-yellow-300">Skipped</span><span class="text-sm text-yellow-400">${currentClipLength}s</span>`;
+  dailyGameState.guesses.push({ type:'skipped', text:'Skipped', clipLength:currentClipLength });
+  currentGuess++; dailyGameState.currentGuess = currentGuess;
+  if(currentGuess > 6){
+    dailyGameState.completed = true; dailyGameState.won = false;
+    saveDailyGameState();
+    gameOver = true;
+    const today = getTodayCST();
+    if(gameStats.lastPlayedDate !== today){
+      gameStats.currentStreak = 0;
+      gameStats.gamesPlayed++;
+      gameStats.lastPlayedDate = today;
+      saveStats();
+    }
+    updateStatsDisplay();
+    disableGameControls();
+    clipLengthSpan.textContent = '15 seconds (full song)';
+    maxClipIndicator.style.width = '100%';
+    showGameOverModal(false);
+  } else {
+    saveDailyGameState();
+    currentClipLength = timeIncrements[currentGuess-1];
+    clipLengthSpan.textContent = `${currentClipLength} seconds`;
+    updateMaxClipIndicator();
+    updateSkipButton();
+  }
+});
+
+guessInput.addEventListener('input', e => showSuggestions(e.target.value));
+suggestionsDiv.addEventListener('click', e => {
+  if(e.target.matches('.suggestion-item')){
+    selectSuggestion(e.target.dataset.title);
+    submitBtn.click();
+  }
+});
+guessInput.addEventListener('keydown', e => {
+  const items = suggestionsDiv.querySelectorAll('.suggestion-item');
+  if(e.key==='ArrowDown'){ e.preventDefault(); navSuggestions(1, items); }
+  else if(e.key==='ArrowUp'){ e.preventDefault(); navSuggestions(-1, items); }
+  else if(e.key==='Enter'){ e.preventDefault(); if(items[selectedIdx]) selectSuggestion(items[selectedIdx].dataset.title); submitBtn.click(); }
+  else if(e.key==='Escape'){ suggestionsDiv.classList.add('hidden'); selectedIdx = -1; }
+});
+let selectedIdx = -1;
+function navSuggestions(delta, items){
+  selectedIdx = Math.max(0, Math.min(selectedIdx+delta, items.length-1));
+  items.forEach((it,i)=>it.classList.toggle('bg-gray-700', i===selectedIdx));
+}
+
+let currentSong = null;
+
+function init(){
+  loadStats();
+  const played = loadDailyGameState();
+  currentSong = themeSongs[dailyGameState.songIndex];
+  audio = new Audio(currentSong.url);
+  audio.volume = volumeSlider.value / 100;
+  audio.addEventListener('error', ()=>{ console.warn('Audio load failed'); });
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  if(played && dailyGameState.completed){
+    gameOver = true;
+    restoreGameState();
+    disableGameControls();
+    setTimeout(()=>showGameOverModal(dailyGameState.won), 500);
+  } else if(played && !dailyGameState.completed){
+    restoreGameState();
+    updateMaxClipIndicator();
+    updateSkipButton();
+    guessInput.focus();
+  } else {
+    updateMaxClipIndicator();
+    updateSkipButton();
+    guessInput.focus();
+  }
+}
+
+init();
