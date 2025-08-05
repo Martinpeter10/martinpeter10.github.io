@@ -11,24 +11,26 @@ const playlist = [
 ];
 
 function getTodayIndex() {
-  const key = new Date().toLocaleDateString("en-US", { timeZone: "America/Chicago" });
-  return key.split("/").reduce((a,b) => a + parseInt(b), 0) % playlist.length;
+  const date = new Date().toLocaleDateString("en-US", { timeZone: "America/Chicago" });
+  return date.split("/").reduce((a, b) => a + parseInt(b), 0) % playlist.length;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  const todayIdx = getTodayIndex();
-  const today = playlist[todayIdx];
-  const todayKey = `played-${todayIdx}`;
+  const todayIndex = getTodayIndex();
+  const todayTrack = playlist[todayIndex];
+  const todayKey = `played-${todayIndex}`;
+  const audio = new Audio(todayTrack.url);
 
+  // Elements
   const el = {
-    audio: document.createElement("audio"),
+    guessGrid: document.getElementById("guessGrid"),
+    guessInput: document.getElementById("guessInput"),
+    autocompleteList: document.getElementById("autocomplete-list"),
     playBtn: document.getElementById("playBtn"),
     progressBar: document.getElementById("progressBar"),
-    volumeSlider: document.getElementById("volumeSlider"),
     skipBtn: document.getElementById("skipBtn"),
     submitBtn: document.getElementById("submitBtn"),
-    guessInput: document.getElementById("guessInput"),
-    guessGrid: document.getElementById("guessGrid"),
+    volumeSlider: document.getElementById("volumeSlider"),
     resultModal: document.getElementById("resultModal"),
     resultTitle: document.getElementById("resultTitle"),
     resultAnswer: document.getElementById("resultAnswer"),
@@ -38,108 +40,128 @@ document.addEventListener("DOMContentLoaded", () => {
     bestStreak: document.getElementById("bestStreak")
   };
 
-  document.body.appendChild(el.audio);
-  el.audio.src = today.url;
-  el.audio.volume = parseFloat(el.volumeSlider.value);
-
-  el.volumeSlider.addEventListener("input", () => {
-    el.audio.volume = parseFloat(el.volumeSlider.value);
-  });
-
-  let guessCount = 0, max = 6, finished = false;
+  // Init state
+  let guessCount = 0;
+  const maxGuesses = 6;
   const guessedSet = new Set();
+  let finished = false;
 
-  // fill guess boxes
-  for (let i = 0; i < max; i++) {
+  // Setup UI
+  for (let i = 0; i < maxGuesses; i++) {
     const div = document.createElement("div");
     div.className = "h-12 bg-gray-800 rounded flex items-center justify-center text-sm";
     el.guessGrid.appendChild(div);
   }
 
+  audio.volume = parseFloat(el.volumeSlider.value);
+  el.volumeSlider.oninput = () => (audio.volume = parseFloat(el.volumeSlider.value));
+
+  // Stats
   const updateStats = () => {
     el.gamesPlayed.textContent = localStorage.getItem("gamesPlayed") || 0;
     el.currentStreak.textContent = localStorage.getItem("currentStreak") || 0;
     el.bestStreak.textContent = localStorage.getItem("bestStreak") || 0;
   };
 
-  const disableAll = () => {
-    finished = true;
-    el.skipBtn.disabled = el.submitBtn.disabled = el.guessInput.disabled = true;
-  };
-
   const endGame = (correct) => {
     finished = true;
     localStorage.setItem(todayKey, "done");
-    let gp = parseInt(localStorage.getItem("gamesPlayed")||0) + 1;
-    let cs = parseInt(localStorage.getItem("currentStreak")||0);
-    let bs = parseInt(localStorage.getItem("bestStreak")||0);
+    let gp = parseInt(localStorage.getItem("gamesPlayed") || 0) + 1;
+    let cs = parseInt(localStorage.getItem("currentStreak") || 0);
+    let bs = parseInt(localStorage.getItem("bestStreak") || 0);
+
     if (correct) {
-      cs++; if (cs > bs) bs = cs;
-      confetti({ particleCount: 100, spread: 60, origin: { y: 0.6 } });
+      cs++;
+      if (cs > bs) bs = cs;
+      confetti({ particleCount: 150, spread: 70 });
       el.resultTitle.textContent = "";
-      el.audio.currentTime = 0;
-      el.audio.play();
+      audio.currentTime = 0;
+      audio.play();
     } else {
+      cs = 0;
       el.resultTitle.textContent = "Game Over";
     }
-    el.resultAnswer.textContent = today.title;
-    el.resultModal.classList.remove("hidden");
+
     localStorage.setItem("gamesPlayed", gp);
     localStorage.setItem("currentStreak", cs);
     localStorage.setItem("bestStreak", bs);
     updateStats();
-    disableAll();
+
+    el.resultAnswer.textContent = todayTrack.title;
+    el.resultModal.classList.remove("hidden");
   };
 
   const handleGuess = () => {
-    if (finished) return;
-    const g = el.guessInput.value.trim();
-    if (!g || guessedSet.has(g.toLowerCase()) || guessCount >= max) return;
-    guessedSet.add(g.toLowerCase());
+    if (finished || guessCount >= maxGuesses) return;
+    const guess = el.guessInput.value.trim();
+    if (!guess || guessedSet.has(guess.toLowerCase())) return;
+
     const box = el.guessGrid.children[guessCount];
-    box.textContent = g;
-    box.classList.add("bg-gray-700", "text-white");
-    guessCount++;
-    if (g.toLowerCase() === today.title.toLowerCase()) {
+    box.textContent = guess;
+    guessedSet.add(guess.toLowerCase());
+
+    if (guess.toLowerCase() === todayTrack.title.toLowerCase()) {
       endGame(true);
-    } else if (guessCount >= max) {
-      endGame(false);
+    } else {
+      guessCount++;
+      if (guessCount >= maxGuesses) endGame(false);
     }
     el.guessInput.value = "";
   };
 
   const handleSkip = () => {
-    if (finished || guessCount >= max) return;
+    if (finished || guessCount >= maxGuesses) return;
     const box = el.guessGrid.children[guessCount];
     box.textContent = "Skipped";
-    box.classList.add("bg-gray-600", "italic", "text-white");
+    box.classList.add("italic", "text-gray-300");
     guessCount++;
-    if (guessCount >= max) endGame(false);
+    if (guessCount >= maxGuesses) endGame(false);
   };
 
   el.playBtn.onclick = () => {
     if (finished) return;
-    const duration = [1,2,3,5,10,15][Math.min(guessCount,5)];
-    el.audio.currentTime = 0;
-    el.audio.play();
-    setTimeout(() => el.audio.pause(), duration * 1000);
+    const duration = [1,2,3,5,10,15][Math.min(guessCount, 5)];
+    audio.currentTime = 0;
+    audio.play();
+    setTimeout(() => audio.pause(), duration * 1000);
   };
 
-  el.audio.addEventListener("timeupdate", () => {
-    const pct = (el.audio.currentTime / el.audio.duration) * 100;
+  audio.addEventListener("timeupdate", () => {
+    const pct = (audio.currentTime / audio.duration) * 100;
     el.progressBar.style.width = `${pct}%`;
   });
 
+  // Autocomplete
+  el.guessInput.addEventListener("input", () => {
+    const val = el.guessInput.value.toLowerCase();
+    el.autocompleteList.innerHTML = "";
+    if (!val) return el.autocompleteList.classList.add("hidden");
+
+    playlist.filter(t => t.title.toLowerCase().includes(val)).forEach(t => {
+      const div = document.createElement("div");
+      div.textContent = t.title;
+      div.className = "cursor-pointer px-3 py-1 hover:bg-gray-200";
+      div.onclick = () => {
+        el.guessInput.value = t.title;
+        el.autocompleteList.classList.add("hidden");
+      };
+      el.autocompleteList.appendChild(div);
+    });
+
+    el.autocompleteList.classList.remove("hidden");
+  });
+
+  // Bindings
   el.submitBtn.onclick = handleGuess;
   el.skipBtn.onclick = handleSkip;
+  el.guessInput.onkeydown = e => (e.key === "Enter" && handleGuess());
   el.resultCloseBtn.onclick = () => el.resultModal.classList.add("hidden");
-  el.guessInput.onkeydown = e => { if (e.key === "Enter") handleGuess(); };
 
   updateStats();
 
   if (localStorage.getItem(todayKey) === "done") {
-    el.resultAnswer.textContent = today.title;
+    el.resultAnswer.textContent = todayTrack.title;
     el.resultModal.classList.remove("hidden");
-    disableAll();
+    finished = true;
   }
 });
