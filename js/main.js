@@ -257,25 +257,32 @@ function completeGame(won) {
 }
 
 function openModal(won) {
-  if (!currentSong || !currentSong.title) return;
-
   displayedAnswer.textContent = currentSong.title;
 
-  const link = document.getElementById("correctAnswerEl");
-  if (link && currentSong.url) {
-    link.href = currentSong.url;
-    link.textContent = "Play Full Theme";
+  try {
+    const link = document.getElementById("correctAnswerEl");
+    if (link && currentSong.url) {
+      link.href = currentSong.url;
+      link.textContent = "Play Full Theme";
+    }
+  } catch (err) {
+    console.error("Error setting correctAnswerEl href:", err);
   }
 
   gameOverTitle.textContent = won ? "🎉 You got it!" : "Game Over";
   gameOverMessage.textContent = won ? "You guessed it right!" : "Better luck next time.";
 
-  gameOverModal.classList.remove('hidden');
-  gameOverModal.classList.add('flex');
+  if (gameOverModal) {
+    gameOverModal.classList.remove('hidden');
+    gameOverModal.classList.add('flex');
+  }
 
-  audio.currentTime = 0;
-  audio.play();
+  if (audio) {
+    audio.currentTime = 0;
+    audio.play();
+  }
 }
+
 
 
 function handleAutocomplete() {
