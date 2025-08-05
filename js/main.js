@@ -313,6 +313,7 @@ function init() {
   setInterval(updateCountdown, 1000);
 
   if (gameOver) {
+    displayedAnswer.textContent = currentSong.title;
     guessInput.disabled = true;
     submitBtn.disabled = true;
     skipBtn.disabled = true;
