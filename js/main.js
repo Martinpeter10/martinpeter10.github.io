@@ -1,12 +1,12 @@
 const playlist = [
   { title: "Chowder", url: "audio/chowder.mp3" },
-  { title: "All Grown Up", url: "audio/allgrownup.mp3" },
+  { title: "All Grown Up", url: "audio/all-grown-up.mp3" },
   { title: "Ben 10", url: "audio/ben10.mp3" },
   { title: "Teenage Mutant Ninja Turtles", url: "audio/tmnt.mp3" },
-  { title: "Adventure Time", url: "audio/adventuretime.mp3" },
-  { title: "Grim Adventures of Billy and Mandy", url: "audio/grimadventures.mp3" },
-  { title: "Kids Next Door", url: "audio/kidsnextdoor.mp3" },
-  { title: "Regular Show", url: "audio/regularshow.mp3" },
+  { title: "Adventure Time", url: "audio/adventure-time.mp3" },
+  { title: "Grim Adventures of Billy and Mandy", url: "audio/grim-adventures.mp3" },
+  { title: "Kids Next Door", url: "audio/kids-next-door.mp3" },
+  { title: "Regular Show", url: "audio/regular-show.mp3" },
   { title: "The Amazing Adventures of Gumball", url: "audio/gumball.mp3" }
 ];
 
@@ -28,10 +28,11 @@ function getTimeUntilMidnightCST() {
 }
 
 function disableAllGameInput(el) {
-  el.input.disabled = true;
   el.submit.disabled = true;
   el.skip.disabled = true;
   el.playBtn.disabled = true;
+  el.input.setAttribute("readonly", true);
+  el.input.classList.add("opacity-60", "cursor-not-allowed");
 }
 
 function renderSegments(el, guessCount) {
