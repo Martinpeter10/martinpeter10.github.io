@@ -258,7 +258,11 @@ function completeGame(won) {
 
 function openModal(won) {
   displayedAnswer.textContent = currentSong.title;
-  correctAnswerEl.href = currentSong.url;
+  const link = document.getElementById("correctAnswerEl");
+  if (link) {
+    link.href = currentSong.url;
+    link.textContent = "Play Full Theme";
+  }
   gameOverTitle.textContent = won ? "🎉 You got it!" : "Game Over";
   gameOverMessage.textContent = won ? "You guessed it right!" : "Better luck next time.";
   gameOverModal.classList.remove('hidden');
