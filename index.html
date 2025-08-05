@@ -8,7 +8,6 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 </head>
 <body class="bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-800 min-h-screen text-white">
-
   <!-- Already Played Modal -->
   <div id="alreadyPlayedModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden">
     <div class="bg-white text-black rounded-xl p-6 w-full max-w-md text-center">
@@ -22,7 +21,7 @@
   <!-- Game Over Modal -->
   <div id="resultModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden">
     <div class="bg-white text-black rounded-xl p-6 w-full max-w-md text-center">
-      <h2 class="text-2xl font-bold mb-2">Game Over</h2>
+      <h2 id="resultTitle" class="text-2xl font-bold mb-2">Game Over</h2>
       <p id="resultAnswer" class="text-lg mb-4"></p>
       <button id="resultCloseBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Close</button>
     </div>
@@ -41,7 +40,7 @@
     </button>
   </div>
 
-  <!-- Gameplay Area -->
+  <!-- Gameplay -->
   <div class="container mx-auto px-4 py-2 max-w-4xl">
     <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 mb-6">
       <div class="text-center mb-6">
