@@ -1,4 +1,4 @@
-# 🎵 Cartoondle
+# 🎵 Themedle
 
 A fun cartoon theme song guessing game inspired by Wordle-style gameplay. Listen to a snippet of a cartoon intro and try to guess the correct show title in 6 tries or fewer!
 
