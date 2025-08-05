@@ -44,15 +44,6 @@ function disableGameActions(el) {
   el.submitBtn.disabled = true;
 }
 
-function renderProgressBar(el, count) {
-  el.progressSegments.innerHTML = '';
-  durations.forEach((sec, idx) => {
-    const seg = document.createElement('div');
-    seg.className = `flex-1 h-2 ${idx <= count ? 'bg-green-400' : 'bg-gray-700'}`;
-    el.progressSegments.appendChild(seg);
-  });
-}
-
 document.addEventListener("DOMContentLoaded", () => {
   const idx = getTodayIndex();
   const today = playlist[idx];
@@ -67,7 +58,6 @@ document.addEventListener("DOMContentLoaded", () => {
     bestStreak: document.getElementById('bestStreak'),
     guessGrid: document.getElementById('guessGrid'),
     playBtn: document.getElementById('playBtn'),
-    playProgress: document.getElementById('playProgress'),
     progressSegments: document.getElementById('progressSegments'),
     guessInput: document.getElementById('guessInput'),
     autocompleteList: document.getElementById('autocompleteList'),
@@ -92,11 +82,11 @@ document.addEventListener("DOMContentLoaded", () => {
     volumeSlider.addEventListener('input', e => { audio.volume = parseFloat(e.target.value); });
   }
 
-  // Build guess boxes wider
+  // Build guess boxes full width
   for (let i = 0; i < maxGuesses; i++) {
     const box = document.createElement('div');
     box.className = 'h-12 bg-gray-800 rounded flex items-center justify-center text-sm truncate';
-    box.style.minWidth = '8rem'; // wider boxes
+    box.style.width = el.guessInput.offsetWidth + 'px';
     el.guessGrid.appendChild(box);
   }
 
@@ -109,13 +99,22 @@ document.addEventListener("DOMContentLoaded", () => {
     el.bestStreak.textContent = localStorage.getItem('bestStreak');
   }
 
+  function renderProgressBar(count) {
+    el.progressSegments.innerHTML = '';
+    durations.forEach((sec, idx) => {
+      const seg = document.createElement('div');
+      seg.className = `flex-1 h-2 ${idx <= count ? 'bg-green-400' : 'bg-gray-700'}`;
+      el.progressSegments.appendChild(seg);
+    });
+  }
+
   function reveal(guess, correct, skipped = false) {
     const box = el.guessGrid.children[state.count];
     box.textContent = skipped ? 'Skipped' : guess;
     box.classList.add(skipped ? 'text-gray-400' : correct ? 'bg-green-600' : 'bg-red-600');
     state.count++;
     saveState(stateKey, state);
-    renderProgressBar(el, state.count);
+    renderProgressBar(state.count);
   }
 
   function finish(correct) {
@@ -125,8 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let cs = parseInt(localStorage.getItem('currentStreak'));
     let bs = parseInt(localStorage.getItem('bestStreak'));
     if (correct) {
-      cs++;
-      if (cs > bs) bs = cs;
+      cs++; if (cs > bs) bs = cs;
       confetti({ particleCount: 100, spread: 50 });
       el.resultTitle.textContent = '';
       audio.currentTime = 0;
@@ -153,8 +151,9 @@ document.addEventListener("DOMContentLoaded", () => {
     box.classList.add(correct ? 'bg-green-600' : 'bg-red-600');
   });
 
-  renderProgressBar(el, state.count);
+  renderProgressBar(state.count);
   updateStats();
+
   if (state.finished || localStorage.getItem(doneKey)) {
     el.alreadyPlayedModal.classList.remove('hidden');
     disableGameActions(el);
@@ -203,18 +202,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const t = durations[Math.min(state.count, durations.length - 1)];
     audio.currentTime = 0;
     audio.play();
-    if (el.playProgress) el.playProgress.style.width = '0%';
+    // animate the same progressSegments
+    const segmentCount = durations.length;
+    const totalWidth = el.progressSegments.clientWidth;
     const start = Date.now();
     const timer = setInterval(() => {
       const elapsed = (Date.now() - start) / 1000;
-      const pct = Math.min((elapsed / t) * 100, 100);
-      if (el.playProgress) el.playProgress.style.width = pct + '%';
+      const pct = Math.min(elapsed / t, 1);
+      el.progressSegments.style.setProperty('--prog-pct', pct);
+      for (let i = 0; i < segmentCount; i++) {
+        const seg = el.progressSegments.children[i];
+        const segPct = (i + 1) / segmentCount;
+        seg.style.backgroundColor = pct >= segPct ? '#34D399' : '#374151';
+      }
+      if (pct >= 1) clearInterval(timer);
     }, 50);
-    setTimeout(() => {
-      audio.pause();
-      clearInterval(timer);
-      if (el.playProgress) el.playProgress.style.width = '0%';
-    }, t * 1000);
   });
 
   el.guessInput.addEventListener('keydown', function (e) {
