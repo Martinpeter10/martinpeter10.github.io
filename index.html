@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cartoondle</title>
   <link rel="icon" href="favicon.png" type="image/png">
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
@@ -37,17 +36,19 @@
       <span class="mr-4">🔥 Streak: <span id="currentStreak" class="font-bold">0</span></span>
       <span>🏆 Best: <span id="bestStreak" class="font-bold">0</span></span>
     </div>
-    <button id="shareBtn" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded font-semibold text-white text-sm sm:text-base">Share Result</button>
+    <button id="shareBtn" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded font-semibold text-white text-sm sm:text-base">
+      Share Result
+    </button>
   </div>
 
-  <!-- Gameplay -->
+  <!-- Gameplay Area -->
   <div class="container mx-auto px-4 py-2 max-w-4xl">
     <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 mb-6">
       <div class="text-center mb-6">
         <h2 class="text-xl font-semibold mb-2">Listen to the theme song:</h2>
         <audio id="audioPlayer" preload="auto"></audio>
 
-        <!-- Progress bar and controls -->
+        <!-- Progress + Controls -->
         <div class="my-4">
           <div id="progressContainer" class="w-full bg-gray-500 rounded-lg h-2 overflow-hidden">
             <div id="progressBar" class="bg-green-400 h-full w-0"></div>
@@ -62,7 +63,9 @@
           </div>
         </div>
 
-        <div class="text-sm opacity-75">Guess <span id="currentGuess">1</span> of 6 • Listen time: <span id="listenTime">1 second</span></div>
+        <div class="text-sm opacity-75">
+          Guess <span id="currentGuess">1</span> of 6 • Listen time: <span id="listenTime">1 second</span>
+        </div>
       </div>
 
       <div class="mb-6 relative">
