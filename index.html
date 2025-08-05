@@ -26,13 +26,12 @@
     </div>
   </div>
 
-  <!-- AUDIO ELEMENT (must exist before JS references it) -->
   <audio id="audioPlayer" preload="auto" class="hidden"></audio>
 
   <div class="w-full max-w-xl space-y-3">
     <div class="relative">
       <input id="guessInput" class="w-full px-4 py-2 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none" placeholder="Search for the title..." />
-      <div id="autocomplete-list" class="absolute top-full left-0 right-0 bg-white text-black rounded shadow-md hidden z-10 max-h-48 overflow-auto"></div>
+      <div id="autocompleteList" class="absolute top-full left-0 right-0 bg-white text-black rounded shadow-md hidden z-10 max-h-48 overflow-auto"></div>
     </div>
     <div class="flex justify-between items-center gap-3">
       <button id="skipBtn" class="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded w-1/3">SKIP</button>
@@ -41,7 +40,7 @@
     </div>
   </div>
 
-  <div id="resultModal" class="fixed inset-0 bg-black bg-opacity-80 hidden justify-center items-center z-50">
+  <div id="resultModal" class="fixed inset-0 bg-black bg-opacity-80 hidden flex items-center justify-center z-50">
     <div class="bg-white text-black p-6 rounded-lg text-center max-w-md w-full">
       <h2 id="resultTitle" class="text-2xl font-bold mb-3">Game Over</h2>
       <p id="resultAnswer" class="text-green-600 text-xl font-bold"></p>
