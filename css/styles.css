@@ -1,0 +1,60 @@
+/* styles.css – Themedle Game Styles */
+
+/* Play button animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.pulse-animation {
+  animation: pulse 2s infinite;
+}
+
+/* Slider Thumb Styling */
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  background: #10b981; /* Tailwind green-500 */
+  border: 2px solid #ffffff;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.slider::-moz-range-thumb {
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  background: #10b981;
+  border: 2px solid #ffffff;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+/* Guess Box Utility */
+.guess-box {
+  background-color: rgba(55, 65, 81, 0.5); /* gray-700/50 */
+  border: 2px solid #4B5563;               /* gray-600 */
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  min-height: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  opacity: 0.5;
+}
+
+/* Suggestions list item hover */
+.suggestion-item:hover {
+  background-color: #374151; /* Tailwind gray-700 */
+}
+
+/* General smoother scroll experience */
+body {
+  scroll-behavior: smooth;
+}
