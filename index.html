@@ -1,61 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Themedle</title>
-  <link rel="icon" href="favicon.png" type="image/png">
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="icon" href="favicon.png" type="image/png"/>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 </head>
-<body class="bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-800 min-h-screen text-white flex flex-col items-center">
+<body class="bg-gray-900 text-white font-sans min-h-screen flex flex-col items-center p-6">
 
-  <h1 class="text-5xl font-bold mt-8 mb-6">Themedle</h1>
+  <!-- Title -->
+  <h1 class="text-5xl font-bold mb-4">Themedle</h1>
 
-  <div class="flex gap-8 mb-6">
-    <div class="flex flex-col items-center">
-      <span class="text-lg uppercase">Games</span>
-      <span id="gamesPlayed" class="mt-1 text-2xl font-semibold">0</span>
+  <!-- Streaks -->
+  <div class="flex justify-center gap-10 text-center mb-6">
+    <div>
+      <p class="uppercase text-sm text-gray-300">Games</p>
+      <p id="gamesPlayed" class="text-xl font-semibold">0</p>
     </div>
-    <div class="flex flex-col items-center">
-      <span class="text-lg uppercase">Streak</span>
-      <span id="currentStreak" class="mt-1 text-2xl font-semibold">0</span>
+    <div>
+      <p class="uppercase text-sm text-gray-300">Streak</p>
+      <p id="currentStreak" class="text-xl font-semibold">0</p>
     </div>
-    <div class="flex flex-col items-center">
-      <span class="text-lg uppercase">Best</span>
-      <span id="bestStreak" class="mt-1 text-2xl font-semibold">0</span>
+    <div>
+      <p class="uppercase text-sm text-gray-300">Best</p>
+      <p id="bestStreak" class="text-xl font-semibold">0</p>
     </div>
   </div>
 
-  <div id="guessGrid" class="grid grid-cols-6 gap-4 mb-6 w-3/4">
-    <div class="h-12 bg-white/30 rounded"></div>
-    <div class="h-12 bg-white/30 rounded"></div>
-    <div class="h-12 bg-white/30 rounded"></div>
-    <div class="h-12 bg-white/30 rounded"></div>
-    <div class="h-12 bg-white/30 rounded"></div>
-    <div class="h-12 bg-white/30 rounded"></div>
+  <!-- Guess Boxes -->
+  <div id="guessGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full max-w-xl mb-8">
+    <!-- Filled dynamically -->
   </div>
 
-  <div class="w-full max-w-lg mb-6">
-    <div id="progressContainer" class="w-full bg-gray-500 rounded-full h-1 overflow-hidden mb-4">
-      <div id="progressBar" class="bg-green-400 h-full w-0"></div>
+  <!-- Audio & Progress -->
+  <div class="relative w-full max-w-xl flex items-center justify-center mb-6">
+    <audio id="audioPlayer" class="hidden" preload="auto"></audio>
+    <button id="playBtn" class="bg-green-500 hover:bg-green-600 rounded-full w-16 h-16 flex items-center justify-center">
+      ▶
+    </button>
+    <div class="absolute bottom-[-1.5rem] left-0 right-0 h-1 bg-gray-600 rounded-full overflow-hidden">
+      <div id="progressBar" class="h-full bg-green-400 w-0 transition-all"></div>
     </div>
-    <audio id="audioPlayer" preload="auto"></audio>
   </div>
 
-  <div class="w-full max-w-lg relative mb-12">
-    <input id="guessInput" placeholder="Enter your guess" class="w-full p-4 rounded-lg text-black text-base sm:text-lg border-2 focus:border-yellow-400 focus:outline-none">
+  <!-- Guess + Controls -->
+  <div class="relative w-full max-w-xl">
+    <input id="guessInput" type="text" placeholder="Know it? Search for the title"
+      class="w-full px-4 py-3 rounded bg-gray-800 text-white border border-gray-700 mb-3 focus:outline-none focus:ring focus:border-blue-500"/>
+
+    <div class="flex justify-between">
+      <button id="skipBtn" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded uppercase font-bold">Skip</button>
+      <button id="submitBtn" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded uppercase font-bold">Submit</button>
+    </div>
+
+    <!-- Vertical volume bar -->
     <input id="volumeSlider" type="range" min="0" max="1" step="0.01" value="0.5"
-      class="absolute right-0 top-2 h-48 w-2 -rotate-90 transform origin-top">
-    <button id="skipBtn" class="absolute left-0 bottom-[-3rem] bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold">Skip</button>
-    <button id="submitBtn" class="absolute right-0 bottom-[-3rem] bg-blue-500 hover:bg-blue-600 px-6 py-2 rounded-lg font-semibold">Submit</button>
+      class="absolute right-[-3rem] top-0 h-40 transform rotate-[-90deg] origin-top"/>
   </div>
 
   <!-- Result Modal -->
-  <div id="resultModal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 hidden">
-    <div class="bg-white text-black rounded-xl p-6 w-full max-w-md text-center">
-      <h2 id="resultTitle" class="text-2xl font-bold mb-2">Game Over</h2>
-      <p id="resultAnswer" class="text-xl text-green-600 font-semibold mb-4"></p>
-      <button id="resultCloseBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Close</button>
+  <div id="resultModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden">
+    <div class="bg-white text-black rounded-lg p-6 w-full max-w-md text-center">
+      <h2 id="resultTitle" class="text-2xl font-bold mb-4"></h2>
+      <p id="resultAnswer" class="text-xl font-semibold text-green-600"></p>
+      <button id="resultCloseBtn" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Close</button>
     </div>
   </div>
 
