@@ -1,6 +1,3 @@
-// === Themedle – Full main.js ===
-
-// Full themeSongs list
 const themeSongs = [
   { title: "Adventure Time", url: "audio/adventuretime.mp3" },
   { title: "All Grown Up", url: "audio/allgrownup.mp3" },
@@ -54,7 +51,6 @@ let simulatedTime = 0;
 let gameOver = false;
 let currentSong = null;
 
-// DOM elements
 const guessInput = document.getElementById("guessInput");
 const playBtn = document.getElementById("playBtn");
 const volumeSlider = document.getElementById("volumeSlider");
@@ -74,16 +70,8 @@ const displayedAnswer = document.getElementById("displayedAnswer");
 const suggestionsDiv = document.getElementById("suggestions");
 
 let gameStats = { currentStreak: 0, bestStreak: 0, gamesPlayed: 0 };
-let dailyState = {
-  date: null,
-  completed: false,
-  won: false,
-  guesses: [],
-  currentGuess: 1,
-  songIndex: 0
-};
+let dailyState = { date: null, completed: false, won: false, guesses: [], currentGuess: 1, songIndex: 0 };
 
-// Helpers: CST date, hashing value
 function getTodayCST() {
   const now = new Date();
   const utc = now.getTime() + now.getTimezoneOffset() * 60000;
@@ -100,7 +88,6 @@ function getDailySongIndex() {
   return Math.abs(hash) % themeSongs.length;
 }
 
-// State load/save
 function loadState() {
   const s = localStorage.getItem("themedleDailyState");
   const today = getTodayCST();
@@ -108,14 +95,7 @@ function loadState() {
     const st = JSON.parse(s);
     if (st.date === today) dailyState = st;
   } else {
-    dailyState = {
-      date: today,
-      completed: false,
-      won: false,
-      guesses: [],
-      currentGuess: 1,
-      songIndex: getDailySongIndex()
-    };
+    dailyState = { date: today, completed: false, won: false, guesses: [], currentGuess: 1, songIndex: getDailySongIndex() };
     localStorage.setItem("themedleDailyState", JSON.stringify(dailyState));
   }
 }
@@ -124,21 +104,21 @@ function saveState() {
   localStorage.setItem("themedleDailyState", JSON.stringify(dailyState));
 }
 
-// Stats
 function loadStats() {
   const s = localStorage.getItem("themedleStats");
   if (s) gameStats = JSON.parse(s);
 }
+
 function saveStats() {
   localStorage.setItem("themedleStats", JSON.stringify(gameStats));
 }
+
 function updateStatsUI() {
   document.getElementById("currentStreak").textContent = gameStats.currentStreak;
   document.getElementById("bestStreak").textContent = gameStats.bestStreak;
   document.getElementById("gamesPlayed").textContent = gameStats.gamesPlayed;
 }
 
-// Guess slots
 function updateGuessSlots() {
   dailyState.guesses.forEach((g, i) => {
     const slot = document.getElementById(`guessSlot-${i + 1}`);
@@ -156,7 +136,6 @@ function updateGuessSlots() {
   });
 }
 
-// Clip UI
 function updateClipUI() {
   clipLengthSpan.textContent = `${currentClipLength}s`;
   maxClipIndicator.style.width = `${(currentClipLength / 15) * 100}%`;
@@ -166,22 +145,18 @@ function updateClipUI() {
   }
 }
 
-// Countdown
 function updateCountdown() {
   const now = new Date();
   const utc = now.getTime() + now.getTimezoneOffset() * 60000;
   const cst = new Date(utc - 6 * 3600000);
-  const tomorrow = new Date(cst);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  tomorrow.setHours(0, 0, 0, 0);
-  const diff = tomorrow - cst;
+  const t = new Date(cst); t.setDate(t.getDate() + 1); t.setHours(0, 0, 0, 0);
+  const diff = t - cst;
   const hh = String(Math.floor(diff / 3600000)).padStart(2, '0');
   const mm = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
   const ss = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
   countdownEl.textContent = `${hh}:${mm}:${ss}`;
 }
 
-// Play clip logic (fixed playback bar)
 function playClip() {
   if (isPlaying) {
     clearInterval(playbackInterval);
@@ -191,6 +166,7 @@ function playClip() {
     progressBar.style.width = '0%';
     return;
   }
+
   isPlaying = true;
   simulatedTime = 0;
   audio.currentTime = 0;
@@ -204,6 +180,7 @@ function playClip() {
     simulatedTime += 0.05;
     const pct = Math.min(simulatedTime / clipSeconds, 1);
     progressBar.style.width = `${pct * maxWidth}%`;
+
     if (simulatedTime >= clipSeconds) {
       clearInterval(playbackInterval);
       audio.pause();
@@ -214,10 +191,15 @@ function playClip() {
   }, 50);
 }
 
-// Handlers for skip, submit, modal, autocomplete
+volumeSlider.addEventListener('input', () => {
+  const vol = volumeSlider.value;
+  volumePercent.textContent = `${vol}%`;
+  if (audio) audio.volume = vol / 100;
+});
+
 function handleSkip() {
   if (gameOver || currentGuess > 6) return;
-  dailyState.guesses.push({ type:'skipped', text:'Skipped', clipLength: currentClipLength });
+  dailyState.guesses.push({ type: 'skipped', text: 'Skipped', clipLength: currentClipLength });
   currentGuess++;
   dailyState.currentGuess = currentGuess;
   currentClipLength = timeIncrements[currentGuess - 1] || 15;
@@ -232,35 +214,42 @@ function handleSubmit() {
   const val = guessInput.value.trim();
   if (!val) return;
   const isCorrect = val.toLowerCase() === currentSong.title.toLowerCase();
-  dailyState.guesses.push({ type: isCorrect ? 'correct' : 'wrong', text: val, clipLength: currentClipLength });
+  const guessType = isCorrect ? 'correct' : 'wrong';
+
+  dailyState.guesses.push({
+    type: guessType,
+    text: val,
+    clipLength: currentClipLength
+  });
+
+  currentGuess++;
+  dailyState.currentGuess = currentGuess;
+  currentClipLength = timeIncrements[currentGuess - 1] || 15;
+
   updateGuessSlots();
-  if (isCorrect) {
-    completeGame(true);
-  } else {
-    currentGuess++;
-    dailyState.currentGuess = currentGuess;
-    if (currentGuess > 6) completeGame(false);
-  }
   updateClipUI();
   saveState();
+
+  if (isCorrect) completeGame(true);
+  else if (currentGuess > 6) completeGame(false);
+
   guessInput.value = '';
-  guessInput.blur();
+  suggestionsDiv.classList.add('hidden');
 }
 
 function completeGame(won) {
   gameOver = true;
   dailyState.completed = true;
   dailyState.won = won;
-  guessInput.disabled = true;
-  submitBtn.disabled = true;
-  skipBtn.disabled = true;
+  saveState();
+
+  gameStats.gamesPlayed++;
   if (won) {
     gameStats.currentStreak++;
-    gameStats.gamesPlayed++;
-    if (gameStats.currentStreak > gameStats.bestStreak) gameStats.bestStreak = gameStats.currentStreak;
+    if (gameStats.currentStreak > gameStats.bestStreak)
+      gameStats.bestStreak = gameStats.currentStreak;
   } else {
     gameStats.currentStreak = 0;
-    gameStats.gamesPlayed++;
   }
   saveStats();
   updateStatsUI();
@@ -268,40 +257,41 @@ function completeGame(won) {
 }
 
 function openModal(won) {
-  gameOverTitle.textContent = won ? '🎉 Correct!' : '😔 Game Over';
-  gameOverMessage.textContent = won
-    ? `You got it in ${currentGuess} guess${currentGuess === 1 ? '' : 'es'}!`
-    : 'Try again tomorrow!';
-  correctAnswerEl.textContent = currentSong.title;
   displayedAnswer.textContent = currentSong.title;
-  answerDisplay.classList.remove('hidden');
+  correctAnswerEl.href = `https://www.youtube.com/results?search_query=${encodeURIComponent(currentSong.title + " theme song")}`;
+  gameOverTitle.textContent = won ? "🎉 You got it!" : "Game Over";
+  gameOverMessage.textContent = won ? "You guessed it right!" : "Better luck next time.";
   gameOverModal.classList.remove('hidden');
   gameOverModal.classList.add('flex');
-
-  clearInterval(playbackInterval);
-  audio.pause();
   audio.currentTime = 0;
-  isPlaying = false;
   audio.play();
 }
 
 function handleAutocomplete() {
-  if (gameOver) return;
-  const q = guessInput.value.trim().toLowerCase();
-  suggestionsDiv.innerHTML = '';
-  if (!q) return suggestionsDiv.classList.add('hidden');
-  const matches = themeSongs.filter(s => s.title.toLowerCase().includes(q));
-  if (!matches.length) return suggestionsDiv.classList.add('hidden');
+  const input = guessInput.value.trim().toLowerCase();
+  if (!input) {
+    suggestionsDiv.classList.add('hidden');
+    return;
+  }
+
+  const matches = themeSongs
+    .map(song => song.title)
+    .filter(title => title.toLowerCase().includes(input));
+
+  if (matches.length === 0) {
+    suggestionsDiv.classList.add('hidden');
+    return;
+  }
+
+  suggestionsDiv.innerHTML = matches.map(m => `<div class="p-2 hover:bg-gray-800 cursor-pointer">${m}</div>`).join('');
   suggestionsDiv.classList.remove('hidden');
-  matches.forEach(s => {
-    const div = document.createElement('div');
-    div.textContent = s.title;
-    div.className = 'p-2 cursor-pointer hover:bg-gray-700';
-    div.onclick = () => {
-      guessInput.value = s.title;
+
+  Array.from(suggestionsDiv.children).forEach(child => {
+    child.addEventListener('click', () => {
+      guessInput.value = child.textContent;
       suggestionsDiv.classList.add('hidden');
-    };
-    suggestionsDiv.appendChild(div);
+      guessInput.focus();
+    });
   });
 }
 
@@ -314,6 +304,7 @@ function init() {
   currentSong = themeSongs[dailyState.songIndex];
   audio = new Audio(currentSong.url);
   audio.volume = volumeSlider.value / 100;
+  volumePercent.textContent = `${volumeSlider.value}%`;
 
   updateStatsUI();
   updateGuessSlots();
@@ -329,7 +320,6 @@ function init() {
   }
 }
 
-// Event Listeners
 playBtn.addEventListener('click', playClip);
 submitBtn.addEventListener('click', handleSubmit);
 skipBtn.addEventListener('click', handleSkip);
@@ -340,10 +330,12 @@ guessInput.addEventListener('keydown', e => {
     handleSubmit();
   }
 });
+
 document.getElementById("closeModal").addEventListener("click", () => {
   gameOverModal.classList.add('hidden');
   gameOverModal.classList.remove('flex');
 });
+
 document.addEventListener('click', e => {
   if (!suggestionsDiv.contains(e.target) && e.target !== guessInput) {
     suggestionsDiv.classList.add('hidden');
@@ -351,3 +343,6 @@ document.addEventListener('click', e => {
 });
 
 init();
+
+
+
