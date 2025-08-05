@@ -1,49 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>Themedle</title>
   <link rel="icon" href="favicon.png" type="image/png" />
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-900 text-white font-sans min-h-screen flex flex-col items-center p-6 space-y-6">
+<body class="bg-gray-900 text-white font-sans p-6 flex flex-col items-center space-y-6 min-h-screen">
 
-  <h1 class="text-5xl font-bold">Themedle</h1>
+  <h1 class="text-4xl font-bold">Themedle</h1>
 
-  <div class="flex justify-center gap-10 text-center">
-    <div><p class="uppercase text-sm text-gray-300">Games</p><p id="gamesPlayed" class="text-xl font-semibold">0</p></div>
-    <div><p class="uppercase text-sm text-gray-300">Streak</p><p id="currentStreak" class="text-xl font-semibold">0</p></div>
-    <div><p class="uppercase text-sm text-gray-300">Best</p><p id="bestStreak" class="text-xl font-semibold">0</p></div>
+  <!-- STATS -->
+  <div class="flex gap-8 text-center">
+    <div><p class="uppercase text-xs text-gray-400">Games</p><p id="gamesPlayed" class="text-2xl font-bold">0</p></div>
+    <div><p class="uppercase text-xs text-gray-400">Streak</p><p id="currentStreak" class="text-2xl font-bold">0</p></div>
+    <div><p class="uppercase text-xs text-gray-400">Best</p><p id="bestStreak" class="text-2xl font-bold">0</p></div>
   </div>
 
-  <div id="guessGrid" class="grid grid-cols-6 gap-4 w-full max-w-xl"></div>
+  <!-- GUESS GRID -->
+  <div id="guessGrid" class="grid grid-cols-3 sm:grid-cols-6 gap-2 w-full max-w-xl"></div>
 
-  <div class="w-full max-w-xl flex flex-col items-center">
-    <button id="playBtn" class="bg-green-500 hover:bg-green-600 rounded-full w-16 h-16 flex items-center justify-center mb-4 text-2xl">▶</button>
-    <div class="w-full bg-gray-600 h-1 rounded mb-6">
+  <!-- AUDIO & CONTROLS -->
+  <div class="w-full max-w-xl space-y-3">
+    <button id="playBtn" class="mx-auto bg-green-500 hover:bg-green-600 rounded-full w-16 h-16 text-2xl flex justify-center items-center">▶</button>
+    <div class="w-full h-1 bg-gray-700 rounded overflow-hidden">
       <div id="progressBar" class="h-full bg-green-400 w-0"></div>
     </div>
   </div>
 
-  <div class="w-full max-w-xl space-y-2">
-    <input id="guessInput" placeholder="Know it? Search for the title" class="w-full px-4 py-3 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none focus:border-blue-500 mb-3" />
+  <!-- INPUT AREA -->
+  <div class="w-full max-w-xl space-y-3">
+    <div class="relative">
+      <input id="guessInput" class="w-full px-4 py-2 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none" placeholder="Search for the title..." />
+      <div id="autocomplete-list" class="absolute top-full left-0 right-0 bg-white text-black rounded shadow-md hidden z-10 max-h-48 overflow-auto"></div>
+    </div>
 
-    <div class="flex items-center justify-between gap-3">
-      <button id="skipBtn" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 rounded uppercase font-bold">Skip</button>
-      <input id="volumeSlider" type="range" min="0" max="1" step="0.01" value="0.5" class="w-24 h-2 bg-gray-700 rounded appearance-none cursor-pointer" />
-      <button id="submitBtn" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded uppercase font-bold">Submit</button>
+    <div class="flex justify-between items-center gap-3">
+      <button id="skipBtn" class="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded w-1/3">SKIP</button>
+      <input id="volumeSlider" type="range" min="0" max="1" step="0.01" value="0.5" class="w-24" />
+      <button id="submitBtn" class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded w-1/3">SUBMIT</button>
     </div>
   </div>
 
-  <div id="resultModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden">
-    <div class="bg-white text-black rounded-lg p-6 w-full max-w-md text-center">
-      <h2 id="resultTitle" class="text-2xl font-bold mb-4"></h2>
-      <p id="resultAnswer" class="text-xl font-semibold text-green-600"></p>
+  <!-- RESULT MODAL -->
+  <div id="resultModal" class="fixed inset-0 bg-black bg-opacity-80 hidden justify-center items-center z-50">
+    <div class="bg-white text-black p-6 rounded-lg text-center max-w-md w-full">
+      <h2 id="resultTitle" class="text-2xl font-bold mb-3">Game Over</h2>
+      <p id="resultAnswer" class="text-green-600 text-xl font-bold"></p>
       <button id="resultCloseBtn" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Close</button>
     </div>
   </div>
 
-  <script type="module" src="js/main.js"></script>
+  <script src="main.js" type="module"></script>
 </body>
 </html>
