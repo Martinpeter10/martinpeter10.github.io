@@ -4,13 +4,17 @@
   <meta charset="UTF-8">
   <title>Themedle</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <link rel="icon" href="favicon.png" type="image/png">
+  <link
+    href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+    rel="stylesheet"
+  >
+  <link rel="icon" type="image/png" href="favicon.png">
 </head>
 <body class="bg-gray-900 text-white flex flex-col items-center justify-center min-h-screen p-6">
+
   <div class="w-full max-w-xl flex flex-col items-center">
     <h1 class="text-4xl font-bold mb-2">Themedle</h1>
-    <p id="countdownText"><span id="countdown"></span></p>
+    <p id="countdown" class="text-gray-400 text-sm mb-4"></p>
 
     <div class="flex gap-8 text-center text-gray-300 mb-6">
       <div><div id="gamesPlayed" class="text-2xl font-bold">0</div>GAMES</div>
@@ -22,8 +26,8 @@
 
     <div class="mb-6 flex justify-center">
       <button id="playBtn" class="w-16 h-16 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center shadow-lg">
-        <svg class="w-10 h-10 text-white" viewBox="0 0 24 24" fill="white">
-          <polygon points="6,4 20,12 6,20"/>
+        <svg class="w-10 h-10 text-white" viewBox="0 0 24 24" fill="currentColor">
+          <polygon points="6,4 20,12 6,20" />
         </svg>
       </button>
     </div>
@@ -48,10 +52,9 @@
         autocomplete="off"
         class="w-full p-3 bg-gray-800 border border-gray-600 rounded text-white focus:outline-none"
       />
-      <div
-        id="autocompleteList"
-        class="absolute top-full left-0 w-full bg-white text-black border border-gray-300 rounded shadow-md hidden max-h-40 overflow-auto z-20"
-      ></div>
+      <div id="autocompleteList"
+        class="absolute top-full left-0 w-full bg-white text-black border border-gray-300 rounded shadow-md hidden max-h-40 overflow-auto z-20">
+      </div>
     </div>
 
     <div class="flex gap-4 w-full max-w-md mb-4">
@@ -59,25 +62,39 @@
       <button id="submitBtn" class="flex-1 bg-green-600 hover:bg-green-700 py-2 rounded">SUBMIT</button>
     </div>
 
-    <div id="correctAnswer" class="text-green-400 font-semibold mb-4 hidden"></div>
+    <div id="correctAnswer" class="hidden text-green-400 font-semibold mb-4"></div>
   </div>
 
   <audio id="audioPlayer" preload="auto"></audio>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script type="module" src="js/main.js"></script>
 
-  <div id="resultModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-30">
+  <!-- Already Played -->
+  <div id="alreadyPlayedModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-30">
     <div class="bg-white text-center p-6 rounded w-full max-w-md">
-      <p id="resultAnswer" class="text-xl font-bold mb-4"></p>
-      <button id="resultCloseBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Close</button>
+      <h2 class="text-2xl font-bold mb-2">You've already played today</h2>
+      <p id="alreadyDesc" class="mb-4 text-gray-700"></p>
+      <button id="alreadyOk" class="bg-blue-600 text-white px-4 py-2 rounded">OK</button>
     </div>
   </div>
 
-  <div id="alreadyPlayedModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-30">
+  <!-- Win Modal -->
+  <div id="winModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-30">
     <div class="bg-white text-center p-6 rounded w-full max-w-md">
-      <p id="alreadyDesc" class="mb-4">You've already played, come back tomorrow for a new theme song</p>
-      <button id="alreadyOk" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">OK</button>
+      <h2 class="text-2xl font-bold mb-2">You got it!</h2>
+      <p id="winAnswer" class="text-xl font-semibold mb-4"></p>
+      <button id="winOk" class="bg-blue-600 text-white px-4 py-2 rounded">OK</button>
     </div>
   </div>
+
+  <!-- Game Over Modal -->
+  <div id="gameOverModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-30">
+    <div class="bg-white text-center p-6 rounded w-full max-w-md">
+      <h2 class="text-2xl font-bold mb-2">Game Over</h2>
+      <p id="gameOverAnswer" class="text-xl font-semibold mb-4 text-red-600"></p>
+      <button id="gameOverOk" class="bg-blue-600 text-white px-4 py-2 rounded">OK</button>
+    </div>
+  </div>
+
 </body>
 </html>
