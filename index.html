@@ -30,8 +30,13 @@
 
     <div class="w-full mb-6">
       <div id="progressSegments" class="flex h-2 bg-gray-700 rounded overflow-hidden mb-2"></div>
-      <div class="flex justify-between text-xs text-gray-400 px-1">
-        <span>1s</span><span>2s</span><span>3s</span><span>5s</span><span>10s</span><span>15s</span>
+      <div class="relative w-full text-xs text-gray-400 px-1">
+        <span class="absolute left-0 transform -translate-x-1/2">1s</span>
+        <span class="absolute" style="left: calc((2/15)*100%)">2s</span>
+        <span class="absolute" style="left: calc((3/15)*100%)">3s</span>
+        <span class="absolute" style="left: calc((5/15)*100%)">5s</span>
+        <span class="absolute" style="left: calc((10/15)*100%)">10s</span>
+        <span class="absolute right-0 transform translate-x-1/2">15s</span>
       </div>
     </div>
 
@@ -62,8 +67,6 @@
 
   <div id="resultModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-30">
     <div class="bg-white text-black p-6 rounded w-full max-w-md text-center">
-      <h2 id="resultTitle" class="text-xl font-semibold mb-2"></h2>
-      <p class="mb-2">The correct answer was:</p>
       <p id="resultAnswer" class="font-bold text-lg mb-4"></p>
       <button id="resultCloseBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Close</button>
     </div>
@@ -71,7 +74,6 @@
 
   <div id="alreadyPlayedModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-30">
     <div class="bg-white text-black p-6 rounded w-full max-w-md text-center">
-      <h2 class="text-xl font-semibold mb-2">You've already played today!</h2>
       <p id="alreadyDesc" class="mb-4">Come back tomorrow for a new theme song.</p>
       <button id="alreadyOk" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">OK</button>
     </div>
