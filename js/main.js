@@ -64,7 +64,7 @@ const skipBtn = document.getElementById("skipGuess");
 const gameOverModal = document.getElementById("gameOverModal");
 const gameOverTitle = document.getElementById("gameOverTitle");
 const gameOverMessage = document.getElementById("gameOverMessage");
-const correctAnswerEl = document.getElementById("correctAnswer");
+const correctAnswerEl = document.getElementById("correctAnswerEl");
 const answerDisplay = document.getElementById("answerDisplay");
 const displayedAnswer = document.getElementById("displayedAnswer");
 const suggestionsDiv = document.getElementById("suggestions");
@@ -114,99 +114,92 @@ function saveStats() {
 }
 
 function updateStatsUI() {
+  document.getElementById("gamesPlayed").textContent = gameStats.gamesPlayed;
   document.getElementById("currentStreak").textContent = gameStats.currentStreak;
   document.getElementById("bestStreak").textContent = gameStats.bestStreak;
-  document.getElementById("gamesPlayed").textContent = gameStats.gamesPlayed;
 }
 
 function updateGuessSlots() {
-  dailyState.guesses.forEach((g, i) => {
-    const slot = document.getElementById(`guessSlot-${i + 1}`);
-    slot.style.opacity = '1';
-    if (g.type === 'correct') {
-      slot.classList.add('border-green-500', 'bg-green-900/30');
-      slot.innerHTML = `<span class="text-green-300 font-semibold">${g.text}</span><span class="text-sm text-green-400">${g.clipLength}s</span>`;
-    } else if (g.type === 'wrong') {
-      slot.classList.add('border-red-500', 'bg-red-900/30');
-      slot.innerHTML = `<span class="text-red-300">${g.text}</span><span class="text-sm text-red-400">${g.clipLength}s</span>`;
-    } else if (g.type === 'skipped') {
-      slot.classList.add('border-yellow-500', 'bg-yellow-900/30');
-      slot.innerHTML = `<span class="text-yellow-300">Skipped</span><span class="text-sm text-yellow-400">${g.clipLength}s</span>`;
+  const container = document.getElementById("guessSlots");
+  container.innerHTML = "";
+  for (let i = 0; i < 6; i++) {
+    const slot = document.createElement("div");
+    slot.className = "guess-box";
+    if (dailyState.guesses[i]) {
+      const g = dailyState.guesses[i];
+      slot.textContent = g.text || "Skipped";
+      slot.classList.add(g.type);
     }
-  });
+    container.appendChild(slot);
+  }
 }
 
 function updateClipUI() {
-  clipLengthSpan.textContent = `${currentClipLength}s`;
+  clipLengthSpan.textContent = currentClipLength + "s";
   maxClipIndicator.style.width = `${(currentClipLength / 15) * 100}%`;
-  if (currentGuess <= 6) {
-    const next = timeIncrements[currentGuess] || 15;
-    skipBtn.textContent = `Skip (+${next - currentClipLength}s)`;
-  }
+  progressBar.style.width = "0%";
 }
 
 function updateCountdown() {
   const now = new Date();
-  const utc = now.getTime() + now.getTimezoneOffset() * 60000;
-  const cst = new Date(utc - 6 * 3600000);
-  const t = new Date(cst); t.setDate(t.getDate() + 1); t.setHours(0, 0, 0, 0);
-  const diff = t - cst;
-  const hh = String(Math.floor(diff / 3600000)).padStart(2, '0');
-  const mm = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
-  const ss = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
-  countdownEl.textContent = `${hh}:${mm}:${ss}`;
+  const midnight = new Date(now);
+  midnight.setHours(24, 0, 0, 0);
+  const diff = midnight - now;
+  const hrs = String(Math.floor(diff / 3600000)).padStart(2, '0');
+  const mins = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
+  const secs = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+  countdownEl.textContent = `${hrs}:${mins}:${secs}`;
 }
 
 function playClip() {
-  if (isPlaying) {
-    clearInterval(playbackInterval);
-    audio.pause();
-    isPlaying = false;
-    playBtn.textContent = '▶ Play';
-    progressBar.style.width = '0%';
-    return;
-  }
-
+  if (!audio || isPlaying || gameOver) return;
   isPlaying = true;
-  simulatedTime = 0;
   audio.currentTime = 0;
   audio.play();
-  playBtn.textContent = '■ Pause';
 
-  const clipSeconds = gameOver ? 15 : currentClipLength;
-  const maxWidth = (clipSeconds / 15) * 100;
+  simulatedTime = 0;
+  progressBar.style.width = "0%";
 
   playbackInterval = setInterval(() => {
-    simulatedTime += 0.05;
-    const pct = Math.min(simulatedTime / clipSeconds, 1);
-    progressBar.style.width = `${pct * maxWidth}%`;
-
-    if (simulatedTime >= clipSeconds) {
-      clearInterval(playbackInterval);
+    simulatedTime += 0.1;
+    if (simulatedTime >= currentClipLength) {
       audio.pause();
       isPlaying = false;
-      playBtn.textContent = '▶ Play';
-      progressBar.style.width = '0%';
+      clearInterval(playbackInterval);
+      progressBar.style.width = `${(currentClipLength / 15) * 100}%`;
+    } else {
+      const widthPercent = (simulatedTime / 15) * 100;
+      progressBar.style.width = `${widthPercent}%`;
     }
-  }, 50);
+  }, 100);
 }
 
 volumeSlider.addEventListener('input', () => {
   const vol = volumeSlider.value;
   volumePercent.textContent = `${vol}%`;
-  if (audio) audio.volume = vol / 100;
+  if (audio) {
+    audio.volume = vol / 100;
+  }
 });
 
 function handleSkip() {
   if (gameOver || currentGuess > 6) return;
-  dailyState.guesses.push({ type: 'skipped', text: 'Skipped', clipLength: currentClipLength });
+
+  dailyState.guesses.push({
+    type: "skipped",
+    text: "",
+    clipLength: currentClipLength
+  });
+
   currentGuess++;
   dailyState.currentGuess = currentGuess;
   currentClipLength = timeIncrements[currentGuess - 1] || 15;
-  if (currentGuess > 6) completeGame(false);
+
   updateGuessSlots();
   updateClipUI();
   saveState();
+
+  if (currentGuess > 6) completeGame(false);
 }
 
 function handleSubmit() {
@@ -241,6 +234,7 @@ function completeGame(won) {
   gameOver = true;
   dailyState.completed = true;
   dailyState.won = won;
+  displayedAnswer.textContent = currentSong.title;
   saveState();
 
   gameStats.gamesPlayed++;
@@ -259,31 +253,17 @@ function completeGame(won) {
 function openModal(won) {
   displayedAnswer.textContent = currentSong.title;
 
-  try {
-    const link = document.getElementById("correctAnswerEl");
-    if (link && currentSong.url) {
-      link.href = currentSong.url;
-      link.textContent = "Play Full Theme";
-    }
-  } catch (err) {
-    console.error("Error setting correctAnswerEl href:", err);
-  }
-
   gameOverTitle.textContent = won ? "🎉 You got it!" : "Game Over";
   gameOverMessage.textContent = won ? "You guessed it right!" : "Better luck next time.";
 
-  if (gameOverModal) {
-    gameOverModal.classList.remove('hidden');
-    gameOverModal.classList.add('flex');
-  }
+  gameOverModal.classList.remove('hidden');
+  gameOverModal.classList.add('flex');
 
   if (audio) {
     audio.currentTime = 0;
     audio.play();
   }
 }
-
-
 
 function handleAutocomplete() {
   const input = guessInput.value.trim().toLowerCase();
@@ -312,56 +292,51 @@ function handleAutocomplete() {
     });
   });
 }
-
 function init() {
   loadStats();
   loadState();
-  currentGuess = dailyState.currentGuess;
-  currentClipLength = timeIncrements[currentGuess - 1] || 15;
-  gameOver = dailyState.completed;
-  currentSong = themeSongs[dailyState.songIndex];
-  audio = new Audio(currentSong.url);
-  audio.volume = volumeSlider.value / 100;
-  volumePercent.textContent = `${volumeSlider.value}%`;
 
   updateStatsUI();
   updateGuessSlots();
-  updateClipUI();
-  updateCountdown();
-  setInterval(updateCountdown, 1000);
 
-  if (gameOver) {
+  currentGuess = dailyState.currentGuess;
+  currentClipLength = timeIncrements[currentGuess - 1] || 15;
+
+  currentSong = themeSongs[dailyState.songIndex % themeSongs.length];
+
+  audio = new Audio(currentSong.url);
+  audio.volume = volumeSlider.value / 100;
+
+  clipLengthSpan.textContent = currentClipLength + "s";
+  maxClipIndicator.style.width = `${(currentClipLength / 15) * 100}%`;
+  volumePercent.textContent = `${volumeSlider.value}%`;
+
+  if (dailyState.completed) {
+    gameOver = true;
     displayedAnswer.textContent = currentSong.title;
     guessInput.disabled = true;
     submitBtn.disabled = true;
     skipBtn.disabled = true;
     openModal(dailyState.won);
   }
+
+  setInterval(updateCountdown, 1000);
 }
 
-playBtn.addEventListener('click', playClip);
-submitBtn.addEventListener('click', handleSubmit);
-skipBtn.addEventListener('click', handleSkip);
-guessInput.addEventListener('input', handleAutocomplete);
-guessInput.addEventListener('keydown', e => {
-  if (e.key === 'Enter') {
-    e.preventDefault();
-    handleSubmit();
-  }
+playBtn.addEventListener("click", playClip);
+skipBtn.addEventListener("click", handleSkip);
+submitBtn.addEventListener("click", handleSubmit);
+guessInput.addEventListener("input", handleAutocomplete);
+guessInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") handleSubmit();
 });
 
-document.getElementById("closeModal").addEventListener("click", () => {
-  gameOverModal.classList.add('hidden');
-  gameOverModal.classList.remove('flex');
-});
-
-document.addEventListener('click', e => {
+document.addEventListener("click", (e) => {
   if (!suggestionsDiv.contains(e.target) && e.target !== guessInput) {
-    suggestionsDiv.classList.add('hidden');
+    suggestionsDiv.classList.add("hidden");
   }
 });
 
-init();
-
+window.onload = init;
 
 
