@@ -1,6 +1,6 @@
-// === Themedle: main.js ===
+// === Themedle – Full main.js ===
 
-// 🎵 Theme Songs (your full list)
+// Full themeSongs list
 const themeSongs = [
   { title: "Adventure Time", url: "audio/adventuretime.mp3" },
   { title: "All Grown Up", url: "audio/allgrownup.mp3" },
@@ -54,7 +54,7 @@ let simulatedTime = 0;
 let gameOver = false;
 let currentSong = null;
 
-// DOM references
+// DOM elements
 const guessInput = document.getElementById("guessInput");
 const playBtn = document.getElementById("playBtn");
 const volumeSlider = document.getElementById("volumeSlider");
@@ -83,7 +83,7 @@ let dailyState = {
   songIndex: 0
 };
 
-// Utility: CST date hash for deterministic song
+// Helpers: CST date, hashing value
 function getTodayCST() {
   const now = new Date();
   const utc = now.getTime() + now.getTimezoneOffset() * 60000;
@@ -92,23 +92,21 @@ function getTodayCST() {
 
 function getDailySongIndex() {
   const key = getTodayCST().replace(/\s/g, '');
-  let h = 0;
+  let hash = 0;
   for (let c of key) {
-    h = ((h << 5) - h) + c.charCodeAt(0);
-    h |= 0;
+    hash = ((hash << 5) - hash) + c.charCodeAt(0);
+    hash |= 0;
   }
-  return Math.abs(h) % themeSongs.length;
+  return Math.abs(hash) % themeSongs.length;
 }
 
-// Load/Save daily game state
+// State load/save
 function loadState() {
-  const saved = localStorage.getItem("themedleDailyState");
+  const s = localStorage.getItem("themedleDailyState");
   const today = getTodayCST();
-  if (saved) {
-    const st = JSON.parse(saved);
-    if (st.date === today) {
-      dailyState = st;
-    }
+  if (s) {
+    const st = JSON.parse(s);
+    if (st.date === today) dailyState = st;
   } else {
     dailyState = {
       date: today,
@@ -126,7 +124,7 @@ function saveState() {
   localStorage.setItem("themedleDailyState", JSON.stringify(dailyState));
 }
 
-// Load/save overall stats
+// Stats
 function loadStats() {
   const s = localStorage.getItem("themedleStats");
   if (s) gameStats = JSON.parse(s);
@@ -134,33 +132,31 @@ function loadStats() {
 function saveStats() {
   localStorage.setItem("themedleStats", JSON.stringify(gameStats));
 }
-
-// Update stats UI
 function updateStatsUI() {
   document.getElementById("currentStreak").textContent = gameStats.currentStreak;
   document.getElementById("bestStreak").textContent = gameStats.bestStreak;
   document.getElementById("gamesPlayed").textContent = gameStats.gamesPlayed;
 }
 
-// Update guess slots rendering
+// Guess slots
 function updateGuessSlots() {
   dailyState.guesses.forEach((g, i) => {
-    const slot = document.getElementById(`guessSlot-${i+1}`);
+    const slot = document.getElementById(`guessSlot-${i + 1}`);
     slot.style.opacity = '1';
     if (g.type === 'correct') {
-      slot.classList.add('border-green-500','bg-green-900/30');
+      slot.classList.add('border-green-500', 'bg-green-900/30');
       slot.innerHTML = `<span class="text-green-300 font-semibold">${g.text}</span><span class="text-sm text-green-400">${g.clipLength}s</span>`;
     } else if (g.type === 'wrong') {
-      slot.classList.add('border-red-500','bg-red-900/30');
+      slot.classList.add('border-red-500', 'bg-red-900/30');
       slot.innerHTML = `<span class="text-red-300">${g.text}</span><span class="text-sm text-red-400">${g.clipLength}s</span>`;
     } else if (g.type === 'skipped') {
-      slot.classList.add('border-yellow-500','bg-yellow-900/30');
+      slot.classList.add('border-yellow-500', 'bg-yellow-900/30');
       slot.innerHTML = `<span class="text-yellow-300">Skipped</span><span class="text-sm text-yellow-400">${g.clipLength}s</span>`;
     }
   });
 }
 
-// Update clip UI (length text & indicators)
+// Clip UI
 function updateClipUI() {
   clipLengthSpan.textContent = `${currentClipLength}s`;
   maxClipIndicator.style.width = `${(currentClipLength / 15) * 100}%`;
@@ -170,22 +166,22 @@ function updateClipUI() {
   }
 }
 
-// Update countdown clock UI
+// Countdown
 function updateCountdown() {
   const now = new Date();
   const utc = now.getTime() + now.getTimezoneOffset() * 60000;
   const cst = new Date(utc - 6 * 3600000);
   const tomorrow = new Date(cst);
   tomorrow.setDate(tomorrow.getDate() + 1);
-  tomorrow.setHours(0,0,0,0);
+  tomorrow.setHours(0, 0, 0, 0);
   const diff = tomorrow - cst;
-  const hh = String(Math.floor(diff / 3600000)).padStart(2,'0');
-  const mm = String(Math.floor((diff % 3600000) / 60000)).padStart(2,'0');
-  const ss = String(Math.floor((diff % 60000) / 1000)).padStart(2,'0');
+  const hh = String(Math.floor(diff / 3600000)).padStart(2, '0');
+  const mm = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
+  const ss = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
   countdownEl.textContent = `${hh}:${mm}:${ss}`;
 }
 
-// Play or pause logic
+// Play clip logic (fixed playback bar)
 function playClip() {
   if (isPlaying) {
     clearInterval(playbackInterval);
@@ -201,13 +197,14 @@ function playClip() {
   audio.play();
   playBtn.textContent = '■ Pause';
 
-  const total = gameOver ? 15 : currentClipLength;
+  const clipSeconds = gameOver ? 15 : currentClipLength;
+  const maxWidth = (clipSeconds / 15) * 100;
+
   playbackInterval = setInterval(() => {
     simulatedTime += 0.05;
-    const pct = Math.min(simulatedTime / total, 1);
-    const maxFrac = currentClipLength / 15;
-    progressBar.style.width = `${pct * maxFrac * 100}%`;
-    if (simulatedTime >= total) {
+    const pct = Math.min(simulatedTime / clipSeconds, 1);
+    progressBar.style.width = `${pct * maxWidth}%`;
+    if (simulatedTime >= clipSeconds) {
       clearInterval(playbackInterval);
       audio.pause();
       isPlaying = false;
@@ -217,28 +214,25 @@ function playClip() {
   }, 50);
 }
 
-// Skip handler
+// Handlers for skip, submit, modal, autocomplete
 function handleSkip() {
   if (gameOver || currentGuess > 6) return;
   dailyState.guesses.push({ type:'skipped', text:'Skipped', clipLength: currentClipLength });
   currentGuess++;
   dailyState.currentGuess = currentGuess;
   currentClipLength = timeIncrements[currentGuess - 1] || 15;
-  if (currentGuess > 6) {
-    completeGame(false);
-  }
+  if (currentGuess > 6) completeGame(false);
   updateGuessSlots();
   updateClipUI();
   saveState();
 }
 
-// Submit handler (button or Enter)
 function handleSubmit() {
   if (gameOver) return;
   const val = guessInput.value.trim();
   if (!val) return;
   const isCorrect = val.toLowerCase() === currentSong.title.toLowerCase();
-  dailyState.guesses.push({ type: isCorrect ? 'correct':'wrong', text:val, clipLength: currentClipLength });
+  dailyState.guesses.push({ type: isCorrect ? 'correct' : 'wrong', text: val, clipLength: currentClipLength });
   updateGuessSlots();
   if (isCorrect) {
     completeGame(true);
@@ -253,7 +247,6 @@ function handleSubmit() {
   guessInput.blur();
 }
 
-// Complete game logic
 function completeGame(won) {
   gameOver = true;
   dailyState.completed = true;
@@ -274,16 +267,16 @@ function completeGame(won) {
   openModal(won);
 }
 
-// Show modal and play full song
 function openModal(won) {
   gameOverTitle.textContent = won ? '🎉 Correct!' : '😔 Game Over';
   gameOverMessage.textContent = won
-    ? `You got it in ${currentGuess} ${currentGuess === 1 ? 'guess' : 'guesses'}!`
-    : 'Come back tomorrow!';
+    ? `You got it in ${currentGuess} guess${currentGuess === 1 ? '' : 'es'}!`
+    : 'Try again tomorrow!';
   correctAnswerEl.textContent = currentSong.title;
   displayedAnswer.textContent = currentSong.title;
   answerDisplay.classList.remove('hidden');
-  gameOverModal.classList.remove('hidden'); gameOverModal.classList.add('flex');
+  gameOverModal.classList.remove('hidden');
+  gameOverModal.classList.add('flex');
 
   clearInterval(playbackInterval);
   audio.pause();
@@ -292,20 +285,13 @@ function openModal(won) {
   audio.play();
 }
 
-// Autocomplete suggestions
 function handleAutocomplete() {
   if (gameOver) return;
   const q = guessInput.value.trim().toLowerCase();
-  if (!q) {
-    suggestionsDiv.classList.add('hidden');
-    return;
-  }
-  const matches = themeSongs.filter(s => s.title.toLowerCase().includes(q));
   suggestionsDiv.innerHTML = '';
-  if (!matches.length) {
-    suggestionsDiv.classList.add('hidden');
-    return;
-  }
+  if (!q) return suggestionsDiv.classList.add('hidden');
+  const matches = themeSongs.filter(s => s.title.toLowerCase().includes(q));
+  if (!matches.length) return suggestionsDiv.classList.add('hidden');
   suggestionsDiv.classList.remove('hidden');
   matches.forEach(s => {
     const div = document.createElement('div');
@@ -319,7 +305,6 @@ function handleAutocomplete() {
   });
 }
 
-// Initialization
 function init() {
   loadStats();
   loadState();
@@ -344,7 +329,7 @@ function init() {
   }
 }
 
-// Event listeners
+// Event Listeners
 playBtn.addEventListener('click', playClip);
 submitBtn.addEventListener('click', handleSubmit);
 skipBtn.addEventListener('click', handleSkip);
