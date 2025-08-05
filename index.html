@@ -2,82 +2,61 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cartoondle</title>
+  <title>Themedle</title>
   <link rel="icon" href="favicon.png" type="image/png">
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 </head>
-<body class="bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-800 min-h-screen text-white">
-  <!-- Already Played Modal -->
-  <div id="alreadyPlayedModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden">
-    <div class="bg-white text-black rounded-xl p-6 w-full max-w-md text-center">
-      <h2 class="text-2xl font-bold mb-2">🎧 You've already played today!</h2>
-      <p class="text-lg mb-4">Come back tomorrow for a new challenge.</p>
-      <div id="countdownModal" class="text-sm mb-4"></div>
-      <button id="alreadyPlayedOkBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">OK</button>
+<body class="bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-800 min-h-screen text-white flex flex-col items-center">
+
+  <h1 class="text-5xl font-bold mt-8 mb-6">Themedle</h1>
+
+  <div class="flex gap-8 mb-6">
+    <div class="flex flex-col items-center">
+      <span class="text-lg uppercase">Games</span>
+      <span id="gamesPlayed" class="mt-1 text-2xl font-semibold">0</span>
+    </div>
+    <div class="flex flex-col items-center">
+      <span class="text-lg uppercase">Streak</span>
+      <span id="currentStreak" class="mt-1 text-2xl font-semibold">0</span>
+    </div>
+    <div class="flex flex-col items-center">
+      <span class="text-lg uppercase">Best</span>
+      <span id="bestStreak" class="mt-1 text-2xl font-semibold">0</span>
     </div>
   </div>
 
-  <!-- Game Over Modal -->
-  <div id="resultModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+  <div id="guessGrid" class="grid grid-cols-6 gap-4 mb-6 w-3/4">
+    <div class="h-12 bg-white/30 rounded"></div>
+    <div class="h-12 bg-white/30 rounded"></div>
+    <div class="h-12 bg-white/30 rounded"></div>
+    <div class="h-12 bg-white/30 rounded"></div>
+    <div class="h-12 bg-white/30 rounded"></div>
+    <div class="h-12 bg-white/30 rounded"></div>
+  </div>
+
+  <div class="w-full max-w-lg mb-6">
+    <div id="progressContainer" class="w-full bg-gray-500 rounded-full h-1 overflow-hidden mb-4">
+      <div id="progressBar" class="bg-green-400 h-full w-0"></div>
+    </div>
+    <audio id="audioPlayer" preload="auto"></audio>
+  </div>
+
+  <div class="w-full max-w-lg relative mb-12">
+    <input id="guessInput" placeholder="Enter your guess" class="w-full p-4 rounded-lg text-black text-base sm:text-lg border-2 focus:border-yellow-400 focus:outline-none">
+    <input id="volumeSlider" type="range" min="0" max="1" step="0.01" value="0.5"
+      class="absolute right-0 top-2 h-48 w-2 -rotate-90 transform origin-top">
+    <button id="skipBtn" class="absolute left-0 bottom-[-3rem] bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold">Skip</button>
+    <button id="submitBtn" class="absolute right-0 bottom-[-3rem] bg-blue-500 hover:bg-blue-600 px-6 py-2 rounded-lg font-semibold">Submit</button>
+  </div>
+
+  <!-- Result Modal -->
+  <div id="resultModal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 hidden">
     <div class="bg-white text-black rounded-xl p-6 w-full max-w-md text-center">
       <h2 id="resultTitle" class="text-2xl font-bold mb-2">Game Over</h2>
-      <p id="resultAnswer" class="text-lg mb-4"></p>
+      <p id="resultAnswer" class="text-xl text-green-600 font-semibold mb-4"></p>
       <button id="resultCloseBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Close</button>
     </div>
-  </div>
-
-  <!-- Header & Stats -->
-  <div class="container mx-auto px-4 pt-6 pb-2 max-w-4xl text-center">
-    <h1 class="text-4xl font-bold mb-2">🎵 Cartoondle 🎵</h1>
-    <div class="bg-white/10 rounded-xl py-4 px-6 mt-4 mb-2 inline-block text-white text-lg sm:text-xl font-semibold">
-      <span class="mr-4">📊 Games: <span id="gamesPlayed" class="font-bold">0</span></span>
-      <span class="mr-4">🔥 Streak: <span id="currentStreak" class="font-bold">0</span></span>
-      <span>🏆 Best: <span id="bestStreak" class="font-bold">0</span></span>
-    </div>
-    <button id="shareBtn" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded font-semibold text-white text-sm sm:text-base">
-      Share Result
-    </button>
-  </div>
-
-  <!-- Gameplay -->
-  <div class="container mx-auto px-4 py-2 max-w-4xl">
-    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 mb-6">
-      <div class="text-center mb-6">
-        <h2 class="text-xl font-semibold mb-2">Listen to the theme song:</h2>
-        <audio id="audioPlayer" preload="auto"></audio>
-
-        <!-- Progress + Controls -->
-        <div class="my-4">
-          <div id="progressContainer" class="w-full bg-gray-500 rounded-lg h-2 overflow-hidden">
-            <div id="progressBar" class="bg-green-400 h-full w-0"></div>
-          </div>
-          <div class="mt-2 flex justify-center gap-4">
-            <button id="playSnippet" class="bg-green-500 hover:bg-green-600 px-6 py-2 rounded-lg font-semibold">▶️ Play Snippet</button>
-            <button id="skipBtn" class="bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold">⏭️ Skip</button>
-          </div>
-          <div class="mt-4 flex justify-center items-center gap-2">
-            <label for="volumeSlider" class="text-sm">🔊</label>
-            <input id="volumeSlider" type="range" min="0" max="1" step="0.01" value="0.5" class="w-1/4">
-          </div>
-        </div>
-
-        <div class="text-sm opacity-75">
-          Guess <span id="currentGuess">1</span> of 6 • Listen time: <span id="listenTime">1 second</span>
-        </div>
-      </div>
-
-      <div class="mb-6 relative">
-        <input id="guessInput" placeholder="Enter your guess..." class="w-full p-4 rounded-lg text-black text-base sm:text-lg border-2 focus:border-yellow-400 focus:outline-none">
-        <div id="autocomplete-list" class="hidden absolute bg-white text-black border mt-1 rounded w-full z-50"></div>
-        <button id="submitBtn" class="w-full mt-3 bg-blue-500 hover:bg-blue-600 py-3 rounded-lg font-semibold text-lg">Submit Guess</button>
-      </div>
-
-      <div id="guessHistory" class="space-y-2 text-base sm:text-lg"></div>
-      <div id="correctAnswerReveal" class="text-center text-green-300 font-bold text-lg mt-4 hidden"></div>
-    </div>
-
-    <div id="countdownBottom" class="text-center text-sm text-white mt-4">⏳ New theme song in ...</div>
   </div>
 
   <script type="module" src="js/main.js"></script>
