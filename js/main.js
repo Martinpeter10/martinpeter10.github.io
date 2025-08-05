@@ -257,19 +257,26 @@ function completeGame(won) {
 }
 
 function openModal(won) {
+  if (!currentSong || !currentSong.title) return;
+
   displayedAnswer.textContent = currentSong.title;
+
   const link = document.getElementById("correctAnswerEl");
-  if (link) {
+  if (link && currentSong.url) {
     link.href = currentSong.url;
     link.textContent = "Play Full Theme";
   }
+
   gameOverTitle.textContent = won ? "🎉 You got it!" : "Game Over";
   gameOverMessage.textContent = won ? "You guessed it right!" : "Better luck next time.";
+
   gameOverModal.classList.remove('hidden');
   gameOverModal.classList.add('flex');
+
   audio.currentTime = 0;
   audio.play();
 }
+
 
 function handleAutocomplete() {
   const input = guessInput.value.trim().toLowerCase();
