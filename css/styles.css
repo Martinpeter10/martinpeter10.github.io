@@ -1,6 +1,4 @@
-/* === styles.css === */
-
-/* Pulse animation for play button */
+/* Pulse animation */
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
@@ -15,31 +13,46 @@
   height: 16px;
   width: 16px;
   border-radius: 50%;
-  background: #10b981; /* Tailwind green-500 */
-  border: 2px solid #ffffff;
+  background: #10b981;
+  border: 2px solid #fff;
   cursor: pointer;
   transition: background 0.3s;
 }
 
-/* Guess slot box */
+/* Guess slot styling */
 .guess-box {
-  background-color: rgba(55, 65, 81, 0.5); /* gray-700/50 */
-  border: 2px solid #4B5563; /* gray-600 */
+  background-color: rgba(55, 65, 81, 0.5);
+  border: 2px solid #4B5563;
   border-radius: 0.5rem;
   padding: 0.5rem;
-  min-height: 40px;
+  opacity: 0.5;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  opacity: 0.5;
+  justify-content: center;
+  min-height: 40px;
+}
+.guess-box.correct {
+  border-color: #22c55e;
+  background-color: rgba(22, 163, 74, 0.3);
+  opacity: 1;
+}
+.guess-box.wrong {
+  border-color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.3);
+  opacity: 1;
+}
+.guess-box.skipped {
+  border-color: #eab308;
+  background-color: rgba(234, 179, 8, 0.3);
+  opacity: 1;
 }
 
-/* Suggestion item hover effect */
-.suggestion-item:hover {
-  background-color: #374151; /* Tailwind gray-700 */
+/* Suggestion hover */
+.suggestions div:hover {
+  background-color: #374151;
 }
 
-/* Smooth scroll behavior */
+/* Smooth scroll */
 body {
   scroll-behavior: smooth;
 }
