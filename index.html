@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>Themedle</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Tailwind CSS via CDN -->
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link rel="icon" type="image/png" href="favicon.png">
 </head>
@@ -22,9 +21,14 @@
     <div id="guessGrid" class="grid grid-cols-5 gap-2 mb-6 w-full max-w-md"></div>
 
     <div class="mb-6">
-      <button id="playBtn" class="w-16 h-16 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center text-white text-2xl shadow-lg focus:outline-none">
-        ▶
+      <button id="playBtn" class="relative w-16 h-16 bg-transparent rounded-full flex items-center justify-center focus:outline-none">
+        <svg class="w-10 h-10 text-white" viewBox="0 0 24 24" fill="currentColor">
+          <polygon points="6,4 20,12 6,20"></polygon>
+        </svg>
       </button>
+      <div id="playProgressContainer" class="relative w-48 h-1 bg-gray-700 rounded overflow-hidden mt-1">
+        <div id="playProgress" class="absolute left-0 top-0 h-full bg-green-400 w-0"></div>
+      </div>
     </div>
 
     <div class="w-full mb-6">
@@ -45,10 +49,12 @@
       <div id="autocompleteList" class="absolute top-full left-0 w-full bg-white text-black border border-gray-300 rounded shadow-md hidden z-20 max-h-40 overflow-auto"></div>
     </div>
 
-    <div class="flex items-center gap-4 w-full max-w-md">
+    <div class="flex items-center gap-4 w-full max-w-md mb-4">
       <button id="skipBtn" class="flex-1 bg-gray-500 hover:bg-gray-600 px-4 py-3 rounded text-white">SKIP</button>
       <button id="submitBtn" class="flex-1 bg-green-600 hover:bg-green-700 px-4 py-3 rounded text-white">SUBMIT</button>
     </div>
+
+    <div id="correctAnswer" class="text-green-400 font-semibold mb-4 hidden"></div>
   </div>
 
   <audio id="audioPlayer" preload="auto"></audio>
