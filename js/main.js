@@ -2,9 +2,11 @@ const playlist = [
   { title: "Chowder", url: "audio/chowder.mp3" },
   { title: "All Grown Up", url: "audio/all‑grown‑up.mp3" },
   { title: "Ben 10", url: "audio/ben10.mp3" },
+  { title: "Teenage Mutant Ninja Turtles", url: "audio/tmnt.mp3" },
   { title: "Adventure Time", url: "audio/adventure‑time.mp3" },
   { title: "Grim Adventures of Billy and Mandy", url: "audio/grim‑adventures.mp3" },
   { title: "Kids Next Door", url: "audio/kids‑next‑door.mp3" },
+  { title: "Regular Show", url: "audio/regular‑show.mp3" },
   { title: "The Amazing Adventures of Gumball", url: "audio/gumball.mp3" }
 ];
 
@@ -26,7 +28,6 @@ document.addEventListener("DOMContentLoaded", () => {
     input: document.getElementById("guessInput"),
     ac: document.getElementById("autocompleteList"),
     playBtn: document.getElementById("playBtn"),
-    bar: document.getElementById("progressBar"),
     skip: document.getElementById("skipBtn"),
     submit: document.getElementById("submitBtn"),
     vol: document.getElementById("volumeSlider"),
@@ -39,7 +40,8 @@ document.addEventListener("DOMContentLoaded", () => {
     alreadyOk: document.getElementById("alreadyOk"),
     games: document.getElementById("gamesPlayed"),
     streak: document.getElementById("currentStreak"),
-    best: document.getElementById("bestStreak")
+    best: document.getElementById("bestStreak"),
+    segments: document.getElementById("progressSegments")
   };
 
   let guessCount = 0, max = 6, guessed = new Set(), finished = false;
@@ -54,9 +56,24 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function updateStats() {
-    el.games.textContent = localStorage.getItem("gamesPlayed") || 0;
-    el.streak.textContent = localStorage.getItem("currentStreak") || 0;
-    el.best.textContent = localStorage.getItem("bestStreak") || 0;
+    if (!localStorage.getItem("gamesPlayed")) localStorage.setItem("gamesPlayed", 0);
+    if (!localStorage.getItem("currentStreak")) localStorage.setItem("currentStreak", 0);
+    if (!localStorage.getItem("bestStreak")) localStorage.setItem("bestStreak", 0);
+    el.games.textContent = localStorage.getItem("gamesPlayed");
+    el.streak.textContent = localStorage.getItem("currentStreak");
+    el.best.textContent = localStorage.getItem("bestStreak");
+  }
+
+  function renderSegments() {
+    el.segments.innerHTML = "";
+    durations.forEach((s, i) => {
+      const seg = document.createElement("div");
+      seg.className = `flex-1 text-xs text-center relative`;
+      seg.innerHTML = `
+        <div class="h-1 w-full rounded ${i <= guessCount ? 'bg-green-400' : 'bg-gray-600'}"></div>
+        <div class="absolute top-full left-1/2 -translate-x-1/2 mt-1">${s}s</div>`;
+      el.segments.appendChild(seg);
+    });
   }
 
   function finish(correct) {
@@ -90,6 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const cls = skip ? "bg-gray-600 italic" : correct ? "bg-green-600" : "bg-red-600";
     cell.className = `h-12 rounded flex items-center justify-center text-sm text-white ${cls}`;
     guessCount++;
+    renderSegments();
   }
 
   function handleGuess() {
@@ -102,6 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (correct) finish(true);
     else if (guessCount >= max) finish(false);
     el.input.value = "";
+    el.ac.classList.add("hidden");
   }
 
   function handleSkip() {
@@ -118,21 +137,19 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => audio.pause(), t * 1000);
   };
 
-  audio.addEventListener("timeupdate", () => {
-    const p = (audio.currentTime / audio.duration) || 0;
-    el.bar.style.width = `${p * 100}%`;
-  });
-
-  el.submit.onclick = handleGuess;
-  el.skip.onclick = handleSkip;
-  el.input.onkeydown = e => e.key === "Enter" && handleGuess();
-  el.closeModal.onclick = () => el.modal.classList.add("hidden");
-
   el.input.addEventListener("input", () => {
     const val = el.input.value.toLowerCase();
     el.ac.innerHTML = "";
-    if (!val) return el.ac.classList.add("hidden");
-    playlist.filter(p => p.title.toLowerCase().includes(val)).forEach(p => {
+    if (!val) {
+      el.ac.classList.add("hidden");
+      return;
+    }
+    const matches = playlist.filter(p => p.title.toLowerCase().includes(val));
+    if (matches.length === 0) {
+      el.ac.classList.add("hidden");
+      return;
+    }
+    matches.forEach(p => {
       const d = document.createElement("div");
       d.textContent = p.title;
       d.className = "px-3 py-1 hover:bg-gray-200 cursor-pointer";
@@ -145,6 +162,14 @@ document.addEventListener("DOMContentLoaded", () => {
     el.ac.classList.remove("hidden");
   });
 
+  el.submit.onclick = handleGuess;
+  el.skip.onclick = handleSkip;
+  el.input.onkeydown = e => e.key === "Enter" && handleGuess();
+  el.closeModal.onclick = () => el.modal.classList.add("hidden");
+
+  el.alreadyOk.onclick = () => el.alreadyModal.classList.add("hidden");
+
+  renderSegments();
   updateStats();
 
   if (localStorage.getItem(todayKey) === "done") {
@@ -156,6 +181,5 @@ document.addEventListener("DOMContentLoaded", () => {
     const mins = Math.floor((diff % 36e5) / 6e4);
     const secs = Math.floor((diff % 6e4) / 1000);
     el.alreadyDesc.textContent = `Come back in ${hrs}h ${mins}m ${secs}s`;
-    el.alreadyOk.onclick = () => el.alreadyModal.classList.add("hidden");
   }
 });
