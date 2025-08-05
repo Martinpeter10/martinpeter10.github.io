@@ -14,13 +14,11 @@ const maxGuesses = 6;
 
 function getTodayIndex() {
   const base = new Date("2024-01-01T00:00:00-06:00");
-  const diff = Math.floor((Date.now() - base) / (1000 * 60 * 60 * 24));
-  return diff % playlist.length;
+  const days = Math.floor((Date.now() - base) / (1000 * 60 * 60 * 24));
+  return days % playlist.length;
 }
-
 function formatCountdown() {
-  const now = new Date();
-  const next = new Date();
+  const now = new Date(), next = new Date();
   next.setHours(24, 0, 0, 0);
   const diff = next - now;
   const h = Math.floor(diff / 3600000),
@@ -28,23 +26,18 @@ function formatCountdown() {
         s = Math.floor((diff % 60000) / 1000);
   return `${h}h ${m}m ${s}s`;
 }
-
-function getState(k) {
-  return JSON.parse(localStorage.getItem(k) || '{"guesses":[],"count":0,"finished":false,"correct":false}');
+function getState(key) {
+  return JSON.parse(localStorage.getItem(key) || '{"guesses":[],"count":0,"finished":false}');
 }
-function saveState(k, st) {
-  localStorage.setItem(k, JSON.stringify(st));
+function saveState(key, st) {
+  localStorage.setItem(key, JSON.stringify(st));
 }
-
 function disableGame(el) {
-  el.playBtn.disabled = true;
-  el.skipBtn.disabled = true;
-  el.submitBtn.disabled = true;
+  el.playBtn.disabled = el.skipBtn.disabled = el.submitBtn.disabled = true;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   const idx = getTodayIndex();
-  const answer = playlist[idx].title.toLowerCase();
   const stateKey = `songless-state-${idx}`;
   let state = getState(stateKey);
 
@@ -78,7 +71,6 @@ document.addEventListener("DOMContentLoaded", () => {
       div.style.height = '100%';
       div.style.backgroundColor = i < state.count ? '#34D399' : '#374151';
       div.style.position = 'relative';
-      div.style.overflow = 'hidden';
       el.progressSegments.appendChild(div);
     });
   }
@@ -97,11 +89,12 @@ document.addEventListener("DOMContentLoaded", () => {
     playDiv.style.position = 'absolute';
     playDiv.style.height = '100%';
     playDiv.style.left = '0';
+    playDiv.style.top = '0';
     playDiv.style.backgroundColor = '#34D399';
     playDiv.style.width = '0%';
     playDiv.style.transition = `width ${sec}s linear`;
-
     el.progressSegments.appendChild(playDiv);
+
     requestAnimationFrame(() => {
       playDiv.style.width = `${(sec / total) * 100}%`;
     });
@@ -113,19 +106,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }, sec * 1000);
   }
 
-  function handleGuess(text) {
+  function handleGuess(txt) {
     const box = el.guessGrid.children[state.count];
-    box.textContent = text;
-    if (text.toLowerCase() === answer) {
-      box.style.backgroundColor = '#34D399';
+    box.textContent = txt;
+    box.classList.remove('bg-gray-800');
+    box.classList.add(txt.toLowerCase() === playlist[idx].title.toLowerCase() ? 'bg-green-600' : 'bg-red-600');
+    if (txt.toLowerCase() === playlist[idx].title.toLowerCase()) {
       state.finished = true;
       finishGame(true);
     } else {
-      box.style.backgroundColor = '#EF4444';
       state.count++;
       if (state.count >= maxGuesses) finishGame(false);
     }
-    state.guesses.push(text);
+    state.guesses.push(txt);
     saveState(stateKey, state);
     renderSegments();
     el.guessInput.value = '';
@@ -133,20 +126,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function finishGame(won) {
     disableGame(el);
-    const correct = playlist[idx].title;
-    el.correctAnswer.textContent = correct;
-    if (!state.correct) {
-      el.resultAnswer.textContent = correct;
+    el.correctAnswer.textContent = playlist[idx].title;
+    el.correctAnswer.classList.remove('hidden');
+    if (!won) {
+      el.resultAnswer.textContent = playlist[idx].title;
       el.resultModal.classList.remove('hidden');
     }
     updateStats(won);
   }
 
   function updateStats(won) {
-    const g = Number(localStorage.getItem('games') || 0) + 1;
-    localStorage.setItem('games', g);
-    el.gamesPlayed.textContent = g;
-
+    const total = (Number(localStorage.getItem('games')) || 0) + 1;
+    localStorage.setItem('games', total);
+    el.gamesPlayed.textContent = total;
     let streak = Number(localStorage.getItem('streak') || 0);
     if (won) {
       streak++;
@@ -155,7 +147,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (streak > best) localStorage.setItem('best', streak);
     } else {
       streak = 0;
-      localStorage.setItem('streak', '0');
+      localStorage.setItem('streak', 0);
     }
     el.currentStreak.textContent = streak;
     el.bestStreak.textContent = localStorage.getItem('best') || '0';
@@ -165,13 +157,13 @@ document.addEventListener("DOMContentLoaded", () => {
     el.autocompleteList.innerHTML = '';
     const q = el.guessInput.value.trim().toLowerCase();
     if (!q) return;
-    playlist.forEach(song => {
-      if (song.title.toLowerCase().includes(q)) {
+    playlist.forEach(item => {
+      if (item.title.toLowerCase().includes(q)) {
         const d = document.createElement('div');
-        d.textContent = song.title;
+        d.textContent = item.title;
         d.className = 'px-2 py-1 hover:bg-gray-700 cursor-pointer';
         d.onclick = () => {
-          el.guessInput.value = song.title;
+          el.guessInput.value = item.title;
           el.autocompleteList.innerHTML = '';
         };
         el.autocompleteList.appendChild(d);
@@ -179,17 +171,32 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  renderSegments();
+  const width = el.guessInput.offsetWidth + 'px';
   for (let i = 0; i < maxGuesses; i++) {
     const d = document.createElement('div');
-    d.className = 'w-full text-center py-3 bg-gray-700 rounded text-white mb-2';
-    d.textContent = state.guesses[i] || '';
+    d.className = 'h-12 bg-gray-800 rounded flex items-center justify-center text-sm text-white';
+    d.style.width = width;
     el.guessGrid.appendChild(d);
+  }
+
+  if (state.guesses) {
+    state.guesses.forEach((g, i) => {
+      if (i < maxGuesses && el.guessGrid.children[i]) {
+        const b = el.guessGrid.children[i];
+        b.textContent = g;
+        if (g.toLowerCase() === playlist[idx].title.toLowerCase()) {
+          b.classList.replace('bg-gray-800','bg-green-600');
+        } else {
+          b.classList.replace('bg-gray-800','bg-red-600');
+        }
+      }
+    });
   }
 
   if (state.finished) {
     disableGame(el);
     el.correctAnswer.textContent = playlist[idx].title;
+    el.correctAnswer.classList.remove('hidden');
   }
 
   el.playBtn.addEventListener('click', playStage);
@@ -198,13 +205,16 @@ document.addEventListener("DOMContentLoaded", () => {
     if (el.guessInput.value.trim()) handleGuess(el.guessInput.value.trim());
   });
   el.skipBtn.addEventListener('click', () => {
-    if (!state.finished) {
-      handleGuess('Skipped');
-    }
+    if (!state.finished) handleGuess('Skipped');
   });
-  el.resultCloseBtn.addEventListener('click', () => el.resultModal.classList.add('hidden'));
+  el.resultCloseBtn.addEventListener('click', () =>
+    el.resultModal.classList.add('hidden')
+  );
 
   setInterval(() => {
     el.countdown.textContent = formatCountdown();
   }, 1000);
+
+  renderSegments();
+  updateStats(state.guesses[state.count - 1] === playlist[idx].title.toLowerCase());
 });
