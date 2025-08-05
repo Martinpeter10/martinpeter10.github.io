@@ -3,32 +3,41 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Guess the theme song in 6 tries or less!" />
+  <meta name="description" content="Guess the theme song in 6 tries!" />
   <title>Themedle</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="css/styles.css" />
-  <link rel="icon" type="image/png" href="images/favicon.png" />
+  <link rel="icon" href="images/favicon.png" />
 </head>
 <body class="bg-gray-900 text-white min-h-screen">
+
   <div class="container mx-auto px-2 py-4 max-w-3xl">
 
     <!-- Header -->
     <div class="text-center mb-6">
       <h1 class="text-3xl font-bold mb-1">Themedle</h1>
       <p class="text-base opacity-90">
-        Next theme song in:
-        <span id="countdown" class="font-mono text-yellow-300">--:--:--</span>
+        Next theme song in: <span id="countdown" class="font-mono text-yellow-300">--:--:--</span>
       </p>
       <div class="mt-3 bg-white/10 rounded-lg p-3">
         <div class="flex justify-center space-x-6 text-sm">
-          <div><span class="font-semibold">Current Streak:</span> <span id="currentStreak" class="ml-1 text-yellow-300">0</span></div>
-          <div><span class="font-semibold">Best Streak:</span> <span id="bestStreak" class="ml-1 text-green-300">0</span></div>
-          <div><span class="font-semibold">Games Played:</span> <span id="gamesPlayed" class="ml-1 text-blue-300">0</span></div>
+          <div>
+            <span class="font-semibold">Current Streak:</span>
+            <span id="currentStreak" class="ml-1 text-yellow-300">0</span>
+          </div>
+          <div>
+            <span class="font-semibold">Best Streak:</span>
+            <span id="bestStreak" class="ml-1 text-green-300">0</span>
+          </div>
+          <div>
+            <span class="font-semibold">Games Played:</span>
+            <span id="gamesPlayed" class="ml-1 text-blue-300">0</span>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Guesses -->
+    <!-- Guess Slots -->
     <div class="mb-5">
       <h3 class="text-lg font-semibold mb-3 text-center">Your Guesses</h3>
       <div class="grid gap-2 max-w-2xl mx-auto">
@@ -41,17 +50,17 @@
       </div>
     </div>
 
-    <!-- Audio Player -->
+    <!-- Audio & Controls -->
     <div class="mb-5 flex flex-col items-center space-y-3">
       <div class="flex items-center space-x-3">
         <button id="playBtn" class="bg-green-500 hover:bg-green-600 text-black px-4 py-2 rounded-full font-semibold transition-colors">▶ Play</button>
         <div class="flex items-center space-x-1 text-sm">
           <span>🔊</span>
-          <input type="range" id="volumeSlider" class="slider w-20 h-2 bg-gray-600 rounded-lg cursor-pointer" min="0" max="100" value="50" />
+          <input id="volumeSlider" type="range" min="0" max="100" value="50" class="slider w-20 h-2 bg-gray-600 rounded-lg cursor-pointer"/>
           <span id="volumePercent" class="text-gray-300">50%</span>
         </div>
       </div>
-      <p class="text-sm text-gray-300 mb-1">Clip Length: <span id="clipLength">1 second</span></p>
+      <p class="text-sm text-gray-300 mb-1">Clip Length: <span id="clipLength">1s</span></p>
       <div class="w-64 relative">
         <div class="bg-gray-700 rounded-full h-3 relative overflow-hidden">
           <div id="maxClipIndicator" class="bg-gray-600 h-3 rounded-full transition-all duration-500" style="width: 6.67%;"></div>
@@ -77,9 +86,8 @@
       <h3 class="text-lg font-semibold mb-3 text-center">Make Your Guess</h3>
       <div class="flex flex-col items-center space-y-3">
         <div class="w-full max-w-md relative">
-          <input type="text" id="guessInput" placeholder="Search for the title..."
-                 class="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500"
-                 autocomplete="off" />
+          <input id="guessInput" type="text" placeholder="Search for the title..." autocomplete="off"
+            class="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500"/>
           <div id="suggestions" class="absolute top-full left-0 right-0 bg-gray-800 border border-gray-600 rounded-lg mt-1 max-h-40 overflow-y-auto z-10 hidden"></div>
         </div>
         <div class="flex space-x-3">
@@ -93,7 +101,7 @@
     <div id="gameOverModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center backdrop-blur-sm z-50">
       <div class="bg-gray-800 rounded-xl p-6 max-w-md mx-3 text-center">
         <h2 id="gameOverTitle" class="text-2xl font-bold mb-3">🎉 Congratulations!</h2>
-        <p id="gameOverMessage" class="text-lg mb-4">You guessed it correctly!</p>
+        <p id="gameOverMessage" class="text-lg mb-4">You guessed correctly!</p>
         <div class="bg-white/10 rounded-lg p-3 mb-4">
           <p class="text-sm text-gray-300 mb-1">The answer was:</p>
           <p id="correctAnswer" class="text-xl font-semibold text-yellow-300">Breaking Bad</p>
@@ -102,15 +110,16 @@
         <button id="closeModal" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">Close</button>
       </div>
     </div>
+
   </div>
 
   <!-- Footer -->
   <div class="text-center py-4 text-xs text-gray-500 border-t border-gray-800 mt-6">
     <p class="mb-1">© 2025 DailyJamm. Fan‑made game for entertainment purposes only.</p>
-    <p>All theme songs & related content are property of respective creators. No affiliation intended.</p>
+    <p>All theme songs & related content are property of their respective creators. Not affiliated.</p>
   </div>
 
-  <!-- Game Logic -->
+  <!-- JavaScript -->
   <script src="js/main.js" defer></script>
 </body>
 </html>
