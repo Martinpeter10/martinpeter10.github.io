@@ -21,18 +21,9 @@
       </p>
       <div class="mt-3 bg-white/10 rounded-lg p-3">
         <div class="flex justify-center space-x-6 text-sm">
-          <div>
-            <span class="font-semibold">Current Streak:</span>
-            <span id="currentStreak" class="ml-1 text-yellow-300">0</span>
-          </div>
-          <div>
-            <span class="font-semibold">Best Streak:</span>
-            <span id="bestStreak" class="ml-1 text-green-300">0</span>
-          </div>
-          <div>
-            <span class="font-semibold">Games Played:</span>
-            <span id="gamesPlayed" class="ml-1 text-blue-300">0</span>
-          </div>
+          <div><span class="font-semibold">Current Streak:</span> <span id="currentStreak" class="ml-1 text-yellow-300">0</span></div>
+          <div><span class="font-semibold">Best Streak:</span> <span id="bestStreak" class="ml-1 text-green-300">0</span></div>
+          <div><span class="font-semibold">Games Played:</span> <span id="gamesPlayed" class="ml-1 text-blue-300">0</span></div>
         </div>
       </div>
     </div>
@@ -53,18 +44,27 @@
     <!-- Audio & Controls -->
     <div class="mb-5 flex flex-col items-center space-y-3">
       <div class="flex items-center space-x-3">
-        <button id="playBtn" class="bg-green-500 hover:bg-green-600 text-black px-4 py-2 rounded-full font-semibold transition-colors">▶ Play</button>
+        <button id="playBtn" class="bg-green-500 hover:bg-green-600 text-black px-4 py-2 rounded-full font-semibold transition-colors">
+          ▶ Play
+        </button>
         <div class="flex items-center space-x-1 text-sm">
           <span>🔊</span>
-          <input id="volumeSlider" type="range" min="0" max="100" value="50" class="slider w-20 h-2 bg-gray-600 rounded-lg cursor-pointer"/>
+          <input id="volumeSlider" type="range" min="0" max="100" value="50"
+                 class="slider w-20 h-2 bg-gray-600 rounded-lg cursor-pointer"/>
           <span id="volumePercent" class="text-gray-300">50%</span>
         </div>
       </div>
-      <p class="text-sm text-gray-300 mb-1">Clip Length: <span id="clipLength">1s</span></p>
+      <p class="text-sm text-gray-300 mb-1">
+        Clip Length: <span id="clipLength">1s</span>
+      </p>
       <div class="w-64 relative">
         <div class="bg-gray-700 rounded-full h-3 relative overflow-hidden">
-          <div id="maxClipIndicator" class="bg-gray-600 h-3 rounded-full transition-all duration-500" style="width: 6.67%;"></div>
-          <div id="progressBar" class="bg-green-500 h-3 rounded-full absolute top-0 left-0 transition-all duration-300" style="width: 0%;"></div>
+          <div id="maxClipIndicator"
+               class="bg-gray-600 h-3 rounded-full transition-all duration-500"
+               style="width: 6.67%;"></div>
+          <div id="progressBar"
+               class="bg-green-500 h-3 rounded-full absolute top-0 left-0 transition-all duration-300"
+               style="width: 0%;"></div>
         </div>
         <div class="flex justify-between text-xs text-gray-400 mt-1">
           <span>0s</span><span>5s</span><span>10s</span><span>15s</span>
@@ -86,13 +86,20 @@
       <h3 class="text-lg font-semibold mb-3 text-center">Make Your Guess</h3>
       <div class="flex flex-col items-center space-y-3">
         <div class="w-full max-w-md relative">
-          <input id="guessInput" type="text" placeholder="Search for the title..." autocomplete="off"
-            class="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500"/>
-          <div id="suggestions" class="absolute top-full left-0 right-0 bg-gray-800 border border-gray-600 rounded-lg mt-1 max-h-40 overflow-y-auto z-10 hidden"></div>
+          <input id="guessInput" type="text" placeholder="Search for the title…" autocomplete="off"
+                 class="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500"/>
+          <div id="suggestions"
+               class="absolute top-full left-0 right-0 bg-gray-800 border border-gray-600 rounded-lg mt-1 max-h-40 overflow-y-auto z-10 hidden"></div>
         </div>
         <div class="flex space-x-3">
-          <button id="submitGuess" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed">Submit Guess</button>
-          <button id="skipGuess" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-1 rounded-lg text-sm transition-colors">Skip (+1s)</button>
+          <button id="submitGuess"
+                  class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            Submit Guess
+          </button>
+          <button id="skipGuess"
+                  class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-1 rounded-lg text-sm transition-colors">
+            Skip (+1s)
+          </button>
         </div>
       </div>
     </div>
@@ -107,7 +114,10 @@
           <p id="correctAnswer" class="text-xl font-semibold text-yellow-300">Breaking Bad</p>
         </div>
         <p class="text-sm text-gray-300 mb-4">🎵 Playing full theme song</p>
-        <button id="closeModal" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">Close</button>
+        <button id="closeModal"
+                class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">
+          Close
+        </button>
       </div>
     </div>
 
@@ -116,10 +126,9 @@
   <!-- Footer -->
   <div class="text-center py-4 text-xs text-gray-500 border-t border-gray-800 mt-6">
     <p class="mb-1">© 2025 DailyJamm. Fan‑made game for entertainment purposes only.</p>
-    <p>All theme songs & related content are property of their respective creators. Not affiliated.</p>
+    <p>All theme songs & related content are property of their respective creators. No affiliation intended.</p>
   </div>
 
-  <!-- JavaScript -->
   <script src="js/main.js" defer></script>
 </body>
 </html>
