@@ -4,7 +4,11 @@
   <meta charset="UTF-8">
   <title>Daily Jamm</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="input.css" rel="stylesheet">
+
+  <!-- ✅ Tailwind CSS via CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+  <!-- ✅ Favicon -->
   <link rel="icon" type="image/png" href="favicon.png">
 </head>
 <body class="bg-gray-900 text-white flex flex-col items-center justify-center min-h-screen px-4">
@@ -13,7 +17,6 @@
     <p id="countdown" class="text-sm text-center mb-4 text-gray-300">Next theme song in: ...</p>
 
     <div id="progressSegments" class="mb-4 flex gap-1"></div>
-
     <div id="guessGrid" class="grid grid-cols-1 gap-2 mb-4"></div>
 
     <div class="relative mb-4">
@@ -45,11 +48,12 @@
     </div>
   </div>
 
+  <!-- Audio + JS -->
   <audio id="audioPlayer" preload="auto"></audio>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script type="module" src="js/main.js"></script>
 
-  <!-- Result Modal -->
+  <!-- 🎯 Result Modal -->
   <div id="resultModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-30">
     <div class="bg-white text-black p-6 rounded w-full max-w-md text-center">
       <h2 id="resultTitle" class="text-xl font-semibold mb-2">🎉</h2>
@@ -59,7 +63,7 @@
     </div>
   </div>
 
-  <!-- Already Played Modal -->
+  <!-- 🚫 Already Played Modal -->
   <div id="alreadyPlayedModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-30">
     <div class="bg-white text-black p-6 rounded w-full max-w-md text-center">
       <h2 class="text-xl font-semibold mb-2">You've already played today!</h2>
