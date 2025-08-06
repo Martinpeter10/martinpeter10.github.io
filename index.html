@@ -221,6 +221,50 @@
             { title: "The Amazing Adventures of Gumball", url: "audio/gumball.mp3" }
         ];
 
+        function initializeSongQueue() {
+    const existing = localStorage.getItem('themedleSongQueue');
+    if (!existing) {
+        const shuffled = [...themeSongs].sort(() => Math.random() - 0.5);
+        localStorage.setItem('themedleSongQueue', JSON.stringify(shuffled));
+        localStorage.setItem('themedleUsedSongs', JSON.stringify([]));
+    }
+}
+
+function getTodayCST() {
+    const now = new Date();
+    const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+    const cst = new Date(utc + (-6 * 3600000)); // CST is UTC-6
+    return cst.toDateString();
+}
+
+function getDailySong() {
+    const today = getTodayCST();
+    const lastUsed = localStorage.getItem('lastUsedDate');
+
+    if (lastUsed === today) {
+        return JSON.parse(localStorage.getItem('currentSong'));
+    }
+
+    let queue = JSON.parse(localStorage.getItem('themedleSongQueue'));
+    let used = JSON.parse(localStorage.getItem('themedleUsedSongs'));
+
+    if (!queue || queue.length === 0) {
+        queue = [...themeSongs].sort(() => Math.random() - 0.5);
+        used = [];
+    }
+
+    const song = queue.shift();
+    used.push(song.title);
+
+    localStorage.setItem('themedleSongQueue', JSON.stringify(queue));
+    localStorage.setItem('themedleUsedSongs', JSON.stringify(used));
+    localStorage.setItem('lastUsedDate', today);
+    localStorage.setItem('currentSong', JSON.stringify(song));
+
+    return song;
+}
+
+
         // Generate deterministic song index based on date
         function getDailySongIndex() {
             const today = getTodayCST();
@@ -341,7 +385,7 @@
                 won: false,
                 guesses: [],
                 currentGuess: 1,
-                songIndex: getDailySongIndex()
+                songIndex: null // We'll set currentSong directly using getDailySong()
             };
             saveDailyGameState();
             return false; // New game
@@ -768,7 +812,8 @@
         const hasPlayedToday = loadDailyGameState();
         
         // Set up current song based on daily state
-        currentSong = themeSongs[dailyGameState.songIndex];
+        initializeSongQueue();
+        currentSong = getDailySong();
         audioElement = new Audio();
         
         // Handle audio loading with fallback
