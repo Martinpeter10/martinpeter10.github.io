@@ -28,8 +28,19 @@
   opacity: 0.5;
   display: flex;
   align-items: center;
-  justify-content: center;
   min-height: 40px;
+}
+
+/* Left-aligned */
+.guess-left {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+/* Right-aligned */
+.guess-right {
+  justify-content: flex-end;
+  text-align: right;
 }
 .guess-box.correct {
   border-color: #22c55e;
