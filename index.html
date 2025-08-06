@@ -225,25 +225,26 @@
             { title: "The Amazing Adventures of Gumball", url: "audio/gumball.mp3" }
         ];
 
-        function initializeSongQueue() {
-    const existing = localStorage.getItem('themedleSongQueue');
-    if (!existing) {
-        const shuffled = [...themeSongs].sort(() => Math.random() - 0.5);
-        localStorage.setItem('themedleSongQueue', JSON.stringify(shuffled));
-        localStorage.setItem('themedleUsedSongs', JSON.stringify([]));
-    }
-}
+
+// Fixed, consistent song order (do not shuffle)
+const launchDate = new Date(2024, 0, 1); // Starting point (Jan 1, 2024)
 
 function getTodayCST() {
     const now = new Date();
     const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
     const cst = new Date(utc + (-6 * 3600000)); // CST is UTC-6
-    return cst.toDateString();
+    return new Date(cst.getFullYear(), cst.getMonth(), cst.getDate());
 }
 
-function getDailySong() {
+function getSongIndexFromDate() {
     const today = getTodayCST();
-    const lastUsed = localStorage.getItem('lastUsedDate');
+    const diffDays = Math.floor((today - launchDate) / (1000 * 60 * 60 * 24));
+    return diffDays % themeSongs.length;
+}
+
+
+
+
 
     if (lastUsed === today) {
         return JSON.parse(localStorage.getItem('currentSong'));
@@ -281,6 +282,9 @@ function getDailySong() {
             }
             return Math.abs(hash) % themeSongs.length;
         }
+
+        currentSong = themeSongs[getSongIndexFromDate()];
+
 
         let currentSong;
         let audioElement;
@@ -816,8 +820,6 @@ function getDailySong() {
         const hasPlayedToday = loadDailyGameState();
         
         // Set up current song based on daily state
-        initializeSongQueue();
-        currentSong = getDailySong();
         audioElement = new Audio();
         
         // Handle audio loading with fallback
