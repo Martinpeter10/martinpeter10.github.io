@@ -44,9 +44,12 @@
     <!-- Audio & Controls -->
     <div class="mb-5 flex flex-col items-center space-y-3">
       <div class="flex items-center space-x-3">
-        <button id="playBtn" class="bg-green-500 hover:bg-green-600 text-black px-4 py-2 rounded-full font-semibold transition-colors">
-          ▶ Play
-        </button>
+        <button id="playBtn" class="bg-green-500 hover:bg-green-600 text-black px-4 py-2 rounded-full font-semibold transition-colors flex items-center space-x-2">
+  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 fill-black" viewBox="0 0 24 24">
+    <path d="M8 5v14l11-7z"/>
+  </svg>
+  <span>Play</span>
+</button>
         <div class="flex items-center space-x-1 text-sm">
           <span>🔊</span>
           <input id="volumeSlider" type="range" min="0" max="100" value="50"
