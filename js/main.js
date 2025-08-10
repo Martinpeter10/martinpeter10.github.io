@@ -1,0 +1,587 @@
+// main.js — Themedle game logic
+// Assumes the following DOM IDs exist in index.html:
+// playBtn, volumeSlider, clipLength, progressBar, maxClipIndicator, guessInput,
+// suggestions, submitGuess, skipGuess, gameOverModal, gameOverTitle, gameOverMessage,
+// correctAnswer, currentStreak, bestStreak, gamesPlayed, countdown, answerDisplay, displayedAnswer,
+// closeModal, plus guessSlot-1 .. guessSlot-6
+
+// -------------------- Game State --------------------
+let currentGuess = 1;
+let gameOver = false;
+let currentClipLength = 1;
+let isPlaying = false;
+let currentSong;
+let audioElement;
+
+let gameStats = {
+  currentStreak: 0,
+  bestStreak: 0,
+  gamesPlayed: 0,
+  lastPlayedDate: null
+};
+
+let dailyGameState = {
+  date: null,
+  completed: false,
+  won: false,
+  guesses: [],
+  currentGuess: 1,
+  songIndex: 0
+};
+
+// -------------------- Data --------------------
+const themeSongs = [
+  { title: "Adventure Time", url: "/assets/audio/adventuretime.mp3" },
+  { title: "All Grown Up", url: "/assets/audio/allgrownup.mp3" },
+  { title: "As Told By Ginger", url: "/assets/audio/astoldbyginger.mp3" },
+  { title: "Avatar The Last Airbender", url: "/assets/audio/avatarthelastairbender.mp3" },
+  { title: "Back At The Barnyard", url: "/assets/audio/backatthebarnyard.mp3" },
+  { title: "Barney", url: "/assets/audio/barney.mp3" },
+  { title: "Bear In The Big Blue House", url: "/assets/audio/bearinthebigbluehouse.mp3" },
+  { title: "Ben 10", url: "/assets/audio/ben10.mp3" },
+  { title: "Between The Lions", url: "/assets/audio/betweenthelions.mp3" },
+  { title: "Blues Clues", url: "/assets/audio/bluesclues.mp3" },
+  { title: "Bob The Builder", url: "/assets/audio/bobthebuilder.mp3" },
+  { title: "Caillou", url: "/assets/audio/caillou.mp3" },
+  { title: "Camp Lazlo", url: "/assets/audio/camplazlo.mp3" },
+  { title: "CatDog", url: "/assets/audio/catdog.mp3" },
+  { title: "Catscratch", url: "/assets/audio/catscratch.mp3" },
+  { title: "Charlie and Lola", url: "/assets/audio/charlieandlola.mp3" },
+  { title: "Chowder", url: "/assets/audio/chowder.mp3" },
+  { title: "Clifford The Big Red Dog", url: "/assets/audio/cliffordthebigreddog.mp3" },
+  { title: "Code Lyoko", url: "/assets/audio/codelyoko.mp3" },
+  { title: "Codename: Kids Next Door", url: "/assets/audio/codenamekidsnextdoor.mp3" },
+  { title: "Cory In The House", url: "/assets/audio/coryinthehouse.mp3" },
+  { title: "Courage The Cowardly Dog", url: "/assets/audio/couragethecowardlydog.mp3" },
+  { title: "Cyber Chase", url: "/assets/audio/cyberchase.mp3" },
+  { title: "Danny Phantom", url: "/assets/audio/dannyphantom.mp3" },
+  { title: "Degrassi", url: "/assets/audio/degrassi.mp3" },
+  { title: "Dexters Laboratory", url: "/assets/audio/dexterslaboratory.mp3" },
+  { title: "Dora The Explorer", url: "/assets/audio/doratheexplorer.mp3" },
+  { title: "Doug", url: "/assets/audio/doug.mp3" },
+  { title: "Dragon Tales", url: "/assets/audio/dragontales.mp3" },
+  { title: "Drake and Josh", url: "/assets/audio/drakeandjosh.mp3" },
+  { title: "Ed Edd n Eddy", url: "/assets/audio/ededdneddy.mp3" },
+  { title: "El Tigre", url: "/assets/audio/eltigre.mp3" },
+  { title: "Even Stevens", url: "/assets/audio/evenstevens.mp3" },
+  { title: "The Grim Adventures of Billy and Mandy", url: "/assets/audio/grimadventures.mp3" },
+  { title: "The Amazing World of Gumball", url: "/assets/audio/gumball.mp3" },
+  { title: "The Amanda Show", url: "/assets/audio/theamandashow.mp3" },
+  { title: "The Angry Beavers", url: "/assets/audio/theangrybeavers.mp3" },
+  { title: "The Backyardigans", url: "/assets/audio/thebackyardigans.mp3" },
+  { title: "The Berenstain Bears", url: "/assets/audio/theberenstainbears.mp3" },
+  { title: "The Fairly Odd Parents", url: "/assets/audio/thefairlyoddparents.mp3" }
+];
+
+// Time increments: 1, 2, 3, 5, 10, 15 seconds
+const timeIncrements = [1, 2, 3, 5, 10, 15];
+
+// -------------------- DOM --------------------
+const playBtn = document.getElementById('playBtn');
+const volumeSlider = document.getElementById('volumeSlider');
+const clipLengthSpan = document.getElementById('clipLength');
+const progressBar = document.getElementById('progressBar');
+const maxClipIndicator = document.getElementById('maxClipIndicator');
+const guessInput = document.getElementById('guessInput');
+const suggestionsDiv = document.getElementById('suggestions');
+const submitBtn = document.getElementById('submitGuess');
+const skipBtn = document.getElementById('skipGuess');
+
+// -------------------- Date Helpers (DST-safe Chicago) --------------------
+function getTodayCST() {
+  return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
+}
+function getChicagoYear() {
+  return parseInt(new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Chicago', year: 'numeric' }).format(new Date()), 10);
+}
+const SEASON_SEED = getChicagoYear();
+
+// -------------------- Deterministic Rotation (no repeats) --------------------
+function mulberry32(seed) {
+  return function () {
+    let t = seed += 0x6D2B79F5;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function seededShuffle(arr, seed) {
+  const a = arr.slice();
+  const rand = mulberry32(seed);
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function getPermutation(length) {
+  const key = `themedleOrder_v${SEASON_SEED}_${length}`;
+  let order = null;
+  try { order = JSON.parse(localStorage.getItem(key)); } catch (e) { order = null; }
+  if (!Array.isArray(order) || order.length !== length) {
+    order = seededShuffle([...Array(length).keys()], SEASON_SEED);
+    try { localStorage.setItem(key, JSON.stringify(order)); } catch (e) {}
+  }
+  return order;
+}
+function getDayIndexFromISO(dateISO) {
+  return Math.floor(new Date(dateISO).getTime() / 86400000);
+}
+function getDailySongIndex() {
+  const todayISO = getTodayCST();
+  const order = getPermutation(themeSongs.length);
+  const dayIndex = getDayIndexFromISO(todayISO);
+  const idx = order[dayIndex % themeSongs.length];
+  try {
+    const saved = JSON.parse(localStorage.getItem('themedleDailyState'));
+    if (saved && saved.date === todayISO && typeof saved.songIndex === 'number') {
+      return saved.songIndex;
+    }
+  } catch (e) {}
+  return idx;
+}
+
+// -------------------- Suggestions --------------------
+let selectedSuggestionIndex = -1;
+
+function showSuggestions(query) {
+  if (!query.trim()) {
+    suggestionsDiv.classList.add('hidden');
+    return;
+  }
+  const matches = themeSongs.filter(song => song.title.toLowerCase().includes(query.toLowerCase()));
+  if (matches.length === 0) {
+    suggestionsDiv.classList.add('hidden');
+    return;
+  }
+  suggestionsDiv.innerHTML = matches.map((song, index) => 
+    `<div class="suggestion-item px-4 py-2 hover:bg-gray-700 cursor-pointer text-white" data-title="${song.title}" data-index="${index}">${song.title}</div>`
+  ).join('');
+  suggestionsDiv.classList.remove('hidden');
+  selectedSuggestionIndex = -1;
+}
+function selectSuggestion(title) {
+  guessInput.value = title;
+  suggestionsDiv.classList.add('hidden');
+  selectedSuggestionIndex = -1;
+}
+function highlightSuggestion(index) {
+  const items = suggestionsDiv.querySelectorAll('.suggestion-item');
+  items.forEach((item, i) => {
+    if (i === index) item.classList.add('bg-gray-700');
+    else item.classList.remove('bg-gray-700');
+  });
+}
+
+// -------------------- Stats --------------------
+function loadStats() {
+  const saved = localStorage.getItem('themedleStats');
+  if (saved) {
+    gameStats = JSON.parse(saved);
+    updateStatsDisplay();
+  }
+}
+function saveStats() {
+  localStorage.setItem('themedleStats', JSON.stringify(gameStats));
+}
+function updateStatsDisplay() {
+  const cur = document.getElementById('currentStreak');
+  const best = document.getElementById('bestStreak');
+  const played = document.getElementById('gamesPlayed');
+  if (cur) cur.textContent = gameStats.currentStreak;
+  if (best) best.textContent = gameStats.bestStreak;
+  if (played) played.textContent = gameStats.gamesPlayed;
+}
+
+// -------------------- Daily State --------------------
+function loadDailyGameState() {
+  const saved = localStorage.getItem('themedleDailyState');
+  const today = getTodayCST();
+  if (saved) {
+    const savedState = JSON.parse(saved);
+    if (savedState.date === today) {
+      dailyGameState = savedState;
+      return true;
+    }
+  }
+  dailyGameState = {
+    date: today,
+    completed: false,
+    won: false,
+    guesses: [],
+    currentGuess: 1,
+    songIndex: getDailySongIndex()
+  };
+  saveDailyGameState();
+  return false;
+}
+function saveDailyGameState() {
+  localStorage.setItem('themedleDailyState', JSON.stringify(dailyGameState));
+}
+
+// -------------------- UI Helpers --------------------
+function restoreGameState() {
+  currentGuess = dailyGameState.currentGuess;
+  currentClipLength = timeIncrements[currentGuess - 1];
+  dailyGameState.guesses.forEach((guess, index) => {
+    const guessSlot = document.getElementById(`guessSlot-${index + 1}`);
+    if (!guessSlot) return;
+    guessSlot.style.opacity = '1';
+    guessSlot.classList.remove('border-gray-600');
+    if (guess.type === 'correct') {
+      guessSlot.classList.add('border-green-500', 'bg-green-900/30');
+      guessSlot.innerHTML = `<span class="text-green-300 font-semibold">${guess.text}</span><span class="text-sm text-green-400">${guess.clipLength}s</span>`;
+    } else if (guess.type === 'wrong') {
+      guessSlot.classList.add('border-red-500', 'bg-red-900/30');
+      guessSlot.innerHTML = `<span class="text-red-300">${guess.text}</span><span class="text-sm text-red-400">${guess.clipLength}s</span>`;
+    } else if (guess.type === 'skipped') {
+      guessSlot.classList.add('border-yellow-500', 'bg-yellow-900/30');
+      guessSlot.innerHTML = `<span class="text-yellow-300">Skipped</span><span class="text-sm text-yellow-400">${guess.clipLength}s</span>`;
+    }
+  });
+}
+function disableGameControls() {
+  const gi = document.getElementById('guessInput');
+  const sg = document.getElementById('submitGuess');
+  const sk = document.getElementById('skipGuess');
+  if (gi) gi.disabled = true;
+  if (sg) sg.disabled = true;
+  if (sk) sk.disabled = true;
+  if (gi) gi.placeholder = "Game completed for today";
+
+  const answerDisplay = document.getElementById('answerDisplay');
+  const displayedAnswer = document.getElementById('displayedAnswer');
+  if (answerDisplay) answerDisplay.classList.remove('hidden');
+  if (displayedAnswer) displayedAnswer.textContent = currentSong.title;
+}
+function updateMaxClipIndicator() {
+  const maxWidth = (currentClipLength / 15) * 100;
+  if (maxClipIndicator) maxClipIndicator.style.width = maxWidth + '%';
+}
+function updateSkipButton() {
+  if (currentGuess < 6) {
+    const nextClipLength = timeIncrements[currentGuess];
+    const increment = nextClipLength - currentClipLength;
+    if (skipBtn) skipBtn.textContent = `Skip (+${increment}s)`;
+  }
+}
+
+// -------------------- Countdown (DST-safe) --------------------
+function updateCountdown() {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Chicago',
+    hour12: false,
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit'
+  }).formatToParts(new Date());
+  const map = Object.fromEntries(parts.map(p => [p.type, p.value]));
+  const h = parseInt(map.hour, 10);
+  const m = parseInt(map.minute, 10);
+  const s = parseInt(map.second, 10);
+  const secsToday = h * 3600 + m * 60 + s;
+  const secsInDay = 24 * 3600;
+  let remaining = secsInDay - secsToday;
+  if (remaining < 0) remaining = 0;
+  const hours = Math.floor(remaining / 3600);
+  const minutes = Math.floor((remaining % 3600) / 60);
+  const seconds = remaining % 60;
+  const el = document.getElementById('countdown');
+  if (el) el.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
+// -------------------- Volume --------------------
+if (volumeSlider) {
+  volumeSlider.addEventListener('input', function () {
+    const volume = this.value / 100;
+    if (audioElement) audioElement.volume = volume;
+    const vp = document.getElementById('volumePercent');
+    if (vp) vp.textContent = this.value + '%';
+  });
+}
+
+// -------------------- Playback --------------------
+let playbackInterval;
+let simulatedTime = 0;
+
+if (playBtn) {
+  playBtn.addEventListener('click', function () {
+    if (!isPlaying) {
+      isPlaying = true;
+      playBtn.textContent = '■ Pause';
+      playBtn.classList.add('pulse-animation');
+      simulatedTime = 0;
+      if (audioElement && audioElement.play) {
+        audioElement.currentTime = 0;
+        audioElement.play().catch(() => { console.log('Audio playback failed, using visual-only mode'); });
+      }
+      const playLength = gameOver ? 15 : currentClipLength;
+      playbackInterval = setInterval(() => {
+        simulatedTime += 0.05;
+        const progressPercent = Math.min(simulatedTime / playLength, 1);
+        const maxClipWidthPercent = (playLength / 15) * 100;
+        const progressWidth = progressPercent * maxClipWidthPercent;
+        if (progressBar) progressBar.style.width = progressWidth + '%';
+        if (simulatedTime >= playLength) {
+          if (audioElement && audioElement.pause) audioElement.pause();
+          clearInterval(playbackInterval);
+          isPlaying = false;
+          playBtn.textContent = '▶ Play';
+          playBtn.classList.remove('pulse-animation');
+          if (progressBar) progressBar.style.width = '0%';
+          simulatedTime = 0;
+        }
+      }, 50);
+    } else {
+      isPlaying = false;
+      playBtn.textContent = '▶ Play';
+      playBtn.classList.remove('pulse-animation');
+      if (audioElement && audioElement.pause) audioElement.pause();
+      clearInterval(playbackInterval);
+      simulatedTime = 0;
+      if (progressBar) progressBar.style.width = '0%';
+    }
+  });
+}
+
+// -------------------- Guess Submit --------------------
+if (submitBtn) {
+  submitBtn.addEventListener('click', function () {
+    const guess = guessInput.value.trim().toLowerCase();
+    if (!guess || gameOver) return;
+    const guessSlot = document.getElementById(`guessSlot-${currentGuess}`);
+    if (guessSlot) guessSlot.style.opacity = '1';
+
+    if (guess === currentSong.title.toLowerCase()) {
+      if (guessSlot) {
+        guessSlot.classList.remove('border-gray-600');
+        guessSlot.classList.add('border-green-500', 'bg-green-900/30');
+        guessSlot.innerHTML = `<span class="text-green-300 font-semibold">${guessInput.value}</span><span class="text-sm text-green-400">${currentClipLength}s</span>`;
+      }
+      dailyGameState.guesses.push({ type: 'correct', text: guessInput.value, clipLength: currentClipLength });
+      dailyGameState.completed = true;
+      dailyGameState.won = true;
+      dailyGameState.currentGuess = currentGuess;
+      saveDailyGameState();
+      gameOver = true;
+
+      const today = getTodayCST();
+      if (gameStats.lastPlayedDate !== today) {
+        gameStats.currentStreak++;
+        gameStats.gamesPlayed++;
+        gameStats.lastPlayedDate = today;
+        if (gameStats.currentStreak > gameStats.bestStreak) gameStats.bestStreak = gameStats.currentStreak;
+        saveStats();
+      }
+      updateStatsDisplay();
+      disableGameControls();
+      if (clipLengthSpan) clipLengthSpan.textContent = '15 seconds';
+      if (maxClipIndicator) maxClipIndicator.style.width = '100%';
+      showGameOverModal(true);
+    } else {
+      if (guessSlot) {
+        guessSlot.classList.remove('border-gray-600');
+        guessSlot.classList.add('border-red-500', 'bg-red-900/30');
+        guessSlot.innerHTML = `<span class="text-red-300">${guessInput.value}</span><span class="text-sm text-red-400">${currentClipLength}s</span>`;
+      }
+      dailyGameState.guesses.push({ type: 'wrong', text: guessInput.value, clipLength: currentClipLength });
+      currentGuess++;
+      dailyGameState.currentGuess = currentGuess;
+
+      if (currentGuess > 6) {
+        dailyGameState.completed = true;
+        dailyGameState.won = false;
+        saveDailyGameState();
+        gameOver = true;
+        const today = getTodayCST();
+        if (gameStats.lastPlayedDate !== today) {
+          gameStats.currentStreak = 0;
+          gameStats.gamesPlayed++;
+          gameStats.lastPlayedDate = today;
+          saveStats();
+        }
+        updateStatsDisplay();
+        disableGameControls();
+        if (clipLengthSpan) clipLengthSpan.textContent = '15 seconds';
+        if (maxClipIndicator) maxClipIndicator.style.width = '100%';
+        showGameOverModal(false);
+      } else {
+        saveDailyGameState();
+        currentClipLength = timeIncrements[currentGuess - 1];
+        if (clipLengthSpan) clipLengthSpan.textContent = currentClipLength + (currentClipLength === 1 ? ' second' : ' seconds');
+        updateMaxClipIndicator();
+        updateSkipButton();
+      }
+    }
+    guessInput.value = '';
+    if (!gameOver) guessInput.focus();
+  });
+}
+
+// -------------------- Skip --------------------
+if (skipBtn) {
+  skipBtn.addEventListener('click', function () {
+    if (currentGuess <= 6 && !gameOver) {
+      const guessSlot = document.getElementById(`guessSlot-${currentGuess}`);
+      if (guessSlot) {
+        guessSlot.style.opacity = '1';
+        guessSlot.classList.remove('border-gray-600');
+        guessSlot.classList.add('border-yellow-500', 'bg-yellow-900/30');
+        guessSlot.innerHTML = `<span class="text-yellow-300">Skipped</span><span class="text-sm text-yellow-400">${currentClipLength}s</span>`;
+      }
+      dailyGameState.guesses.push({ type: 'skipped', text: 'Skipped', clipLength: currentClipLength });
+      currentGuess++;
+      dailyGameState.currentGuess = currentGuess;
+
+      if (currentGuess > 6) {
+        dailyGameState.completed = true;
+        dailyGameState.won = false;
+        saveDailyGameState();
+        gameOver = true;
+        const today = getTodayCST();
+        if (gameStats.lastPlayedDate !== today) {
+          gameStats.currentStreak = 0;
+          gameStats.gamesPlayed++;
+          gameStats.lastPlayedDate = today;
+          saveStats();
+        }
+        updateStatsDisplay();
+        disableGameControls();
+        if (clipLengthSpan) clipLengthSpan.textContent = '15 seconds';
+        if (maxClipIndicator) maxClipIndicator.style.width = '100%';
+        showGameOverModal(false);
+      } else {
+        saveDailyGameState();
+        currentClipLength = timeIncrements[currentGuess - 1];
+        if (clipLengthSpan) clipLengthSpan.textContent = currentClipLength + (currentClipLength === 1 ? ' second' : ' seconds');
+        updateMaxClipIndicator();
+        updateSkipButton();
+      }
+    }
+  });
+}
+
+// -------------------- Typeahead Events --------------------
+if (guessInput) {
+  guessInput.addEventListener('input', function (e) {
+    showSuggestions(e.target.value);
+  });
+  guessInput.addEventListener('keydown', function (e) {
+    const items = suggestionsDiv.querySelectorAll('.suggestion-item');
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (items.length > 0) {
+        selectedSuggestionIndex = Math.min(selectedSuggestionIndex + 1, items.length - 1);
+        highlightSuggestion(selectedSuggestionIndex);
+      }
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (items.length > 0) {
+        selectedSuggestionIndex = Math.max(selectedSuggestionIndex - 1, -1);
+        if (selectedSuggestionIndex === -1) items.forEach(item => item.classList.remove('bg-gray-700'));
+        else highlightSuggestion(selectedSuggestionIndex);
+      }
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (selectedSuggestionIndex >= 0 && items[selectedSuggestionIndex]) {
+        const title = items[selectedSuggestionIndex].dataset.title;
+        selectSuggestion(title);
+      }
+      if (submitBtn) submitBtn.click();
+    } else if (e.key === 'Escape') {
+      suggestionsDiv.classList.add('hidden');
+      selectedSuggestionIndex = -1;
+    }
+  });
+  suggestionsDiv.addEventListener('click', function (e) {
+    if (e.target.classList.contains('suggestion-item')) {
+      const title = e.target.dataset.title;
+      selectSuggestion(title);
+    }
+  });
+  document.addEventListener('click', function (e) {
+    if (!guessInput.contains(e.target) && !suggestionsDiv.contains(e.target)) {
+      suggestionsDiv.classList.add('hidden');
+      selectedSuggestionIndex = -1;
+    }
+  });
+}
+
+// -------------------- Modal --------------------
+function showGameOverModal(won) {
+  const modal = document.getElementById('gameOverModal');
+  const title = document.getElementById('gameOverTitle');
+  const message = document.getElementById('gameOverMessage');
+  const answer = document.getElementById('correctAnswer');
+  if (!modal || !title || !message || !answer) return;
+
+  if (won) {
+    title.textContent = '🎉 Congratulations!';
+    message.textContent = `You guessed it in ${currentGuess} ${currentGuess === 1 ? 'try' : 'tries'}!`;
+  } else {
+    title.textContent = '😔 Game Over';
+    message.textContent = 'Better luck next time!';
+  }
+  answer.textContent = currentSong.title;
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+
+  setTimeout(() => {
+    if (!isPlaying && playBtn) {
+      playBtn.click();
+    }
+  }, 500);
+}
+
+const closeModalBtn = document.getElementById('closeModal');
+if (closeModalBtn) {
+  closeModalBtn.addEventListener('click', function () {
+    const modal = document.getElementById('gameOverModal');
+    if (!modal) return;
+    modal.classList.remove('flex');
+    modal.classList.add('hidden');
+  });
+}
+
+// -------------------- Boot --------------------
+function boot() {
+  loadStats();
+  const hasPlayedToday = loadDailyGameState();
+  currentSong = themeSongs[dailyGameState.songIndex];
+  audioElement = new Audio();
+  audioElement.addEventListener('error', function () {
+    console.log('Audio failed to load, using fallback');
+    audioElement = {
+      play: function () { return Promise.resolve(); },
+      pause: function () { },
+      currentTime: 0,
+      volume: 0.5,
+      addEventListener: function () { }
+    };
+  });
+  audioElement.src = currentSong.url;
+  audioElement.preload = 'auto';
+  audioElement.volume = 0.5;
+
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  if (hasPlayedToday && dailyGameState.completed) {
+    gameOver = true;
+    restoreGameState();
+    disableGameControls();
+    if (clipLengthSpan) clipLengthSpan.textContent = '15 seconds';
+    if (maxClipIndicator) maxClipIndicator.style.width = '100%';
+    setTimeout(() => { showGameOverModal(dailyGameState.won); }, 500);
+  } else if (hasPlayedToday && !dailyGameState.completed) {
+    restoreGameState();
+    updateMaxClipIndicator();
+    updateSkipButton();
+    if (guessInput) guessInput.focus();
+  } else {
+    updateMaxClipIndicator();
+    updateSkipButton();
+    if (guessInput) guessInput.focus();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', boot);
