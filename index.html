@@ -1,858 +1,158 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Guess the theme song in 6 tries or less! Listen to short clips of themes songs and test your knowledge of TV show themes in this daily music guessing game.">
-    <title>Themedle</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="icon" href="images/favicon.png" />
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4552090282675465"
-     crossorigin="anonymous"></script>
-    <style>
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        .pulse-animation { animation: pulse 2s infinite; }
-        
-
-        
-        /* Volume slider styling */
-        .slider::-webkit-slider-thumb {
-            appearance: none;
-            height: 16px;
-            width: 16px;
-            border-radius: 50%;
-            background: #10b981;
-            cursor: pointer;
-            border: 2px solid #ffffff;
-        }
-        
-        .slider::-moz-range-thumb {
-            height: 16px;
-            width: 16px;
-            border-radius: 50%;
-            background: #10b981;
-            cursor: pointer;
-            border: 2px solid #ffffff;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Guess the theme song in 6 tries or less! Listen to short clips of TV theme songs and test your knowledge in this daily music guessing game.">
+  <title>Themedle</title>
+  <link rel="icon" href="/assets/img/favicon.png">
+  <link rel="stylesheet" href="/assets/css/styles.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4552090282675465" crossorigin="anonymous"></script>
 </head>
 <body class="bg-gray-900 min-h-screen text-white">
-    <div class="container mx-auto px-4 py-8 max-w-4xl">
-        <!-- Header -->
-        <div class="text-center mb-8">
-            <h1 class="text-4xl font-bold mb-2">Themedle</h1>
-            <p class="text-lg opacity-90">Next theme song in: <span id="countdown" class="font-mono text-yellow-300">--:--:--</span></p>
-            <div class="mt-4 bg-white/10 rounded-lg p-4">
-                <div class="flex justify-center space-x-8 text-sm">
-                    <div>
-                        <span class="font-semibold">Current Streak:</span>
-                        <span id="currentStreak" class="ml-1 text-yellow-300">0</span>
-                    </div>
-                    <div>
-                        <span class="font-semibold">Best Streak:</span>
-                        <span id="bestStreak" class="ml-1 text-green-300">0</span>
-                    </div>
-                    <div>
-                        <span class="font-semibold">Games Played:</span>
-                        <span id="gamesPlayed" class="ml-1 text-blue-300">0</span>
-                    </div>
-                </div>
-            </div>
+  <div class="container mx-auto px-4 py-8 max-w-4xl">
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <h1 class="text-4xl font-bold mb-2">Themedle</h1>
+      <p class="text-lg opacity-90">Next theme song in: <span id="countdown" class="font-mono text-yellow-300">--:--:--</span></p>
+      <div class="mt-4 bg-white/10 rounded-lg p-4">
+        <div class="flex justify-center space-x-8 text-sm">
+          <div>
+            <span class="font-semibold">Current Streak:</span>
+            <span id="currentStreak" class="ml-1 text-yellow-300">0</span>
+          </div>
+          <div>
+            <span class="font-semibold">Best Streak:</span>
+            <span id="bestStreak" class="ml-1 text-green-300">0</span>
+          </div>
+          <div>
+            <span class="font-semibold">Games Played:</span>
+            <span id="gamesPlayed" class="ml-1 text-blue-300">0</span>
+          </div>
         </div>
+      </div>
+    </div>
 
-        <!-- Guess Display - 6 Constant Rectangles -->
-<div class="mb-6">
-    <h3 class="text-lg font-semibold mb-4 text-center">Your Guesses</h3>
-    
-    <div class="grid grid-cols-1 gap-3 max-w-2xl mx-auto">
+    <!-- Guess Display - 6 Constant Rectangles -->
+    <div class="mb-6">
+      <h3 class="text-lg font-semibold mb-4 text-center">Your Guesses</h3>
+      <div class="grid grid-cols-1 gap-3 max-w-2xl mx-auto">
         <div id="guessSlot-1" class="bg-gray-700/50 border-2 border-gray-600 rounded-lg p-2 min-h-[40px] flex items-center justify-between opacity-50">
-            <span class="text-sm text-gray-400">Guess 1</span>
-            <span class="text-xs text-gray-500">1s</span>
+          <span class="text-sm text-gray-400">Guess 1</span>
+          <span class="text-xs text-gray-500">1s</span>
         </div>
         <div id="guessSlot-2" class="bg-gray-700/50 border-2 border-gray-600 rounded-lg p-2 min-h-[40px] flex items-center justify-between opacity-50">
-            <span class="text-sm text-gray-400">Guess 2</span>
-            <span class="text-xs text-gray-500">2s</span>
+          <span class="text-sm text-gray-400">Guess 2</span>
+          <span class="text-xs text-gray-500">2s</span>
         </div>
         <div id="guessSlot-3" class="bg-gray-700/50 border-2 border-gray-600 rounded-lg p-2 min-h-[40px] flex items-center justify-between opacity-50">
-            <span class="text-sm text-gray-400">Guess 3</span>
-            <span class="text-xs text-gray-500">3s</span>
+          <span class="text-sm text-gray-400">Guess 3</span>
+          <span class="text-xs text-gray-500">3s</span>
         </div>
         <div id="guessSlot-4" class="bg-gray-700/50 border-2 border-gray-600 rounded-lg p-2 min-h-[40px] flex items-center justify-between opacity-50">
-            <span class="text-sm text-gray-400">Guess 4</span>
-            <span class="text-xs text-gray-500">5s</span>
+          <span class="text-sm text-gray-400">Guess 4</span>
+          <span class="text-xs text-gray-500">5s</span>
         </div>
         <div id="guessSlot-5" class="bg-gray-700/50 border-2 border-gray-600 rounded-lg p-2 min-h-[40px] flex items-center justify-between opacity-50">
-            <span class="text-sm text-gray-400">Guess 5</span>
-            <span class="text-xs text-gray-500">10s</span>
+          <span class="text-sm text-gray-400">Guess 5</span>
+          <span class="text-xs text-gray-500">10s</span>
         </div>
         <div id="guessSlot-6" class="bg-gray-700/50 border-2 border-gray-600 rounded-lg p-2 min-h-[40px] flex items-center justify-between opacity-50">
-            <span class="text-sm text-gray-400">Guess 6</span>
-            <span class="text-xs text-gray-500">15s</span>
+          <span class="text-sm text-gray-400">Guess 6</span>
+          <span class="text-xs text-gray-500">15s</span>
         </div>
+      </div>
     </div>
-</div>
 
-        <!-- Audio Player Section -->
+    <!-- Audio Player Section -->
+    <div class="mb-6">
+      <div class="flex flex-col items-center space-y-4">
+        <div class="flex items-center space-x-4">
+          <button id="playBtn" class="bg-green-500 hover:bg-green-600 text-black px-6 py-3 rounded-full font-semibold transition-colors">
+            ▶ Play
+          </button>
+          <div class="flex items-center space-x-2">
+            <span class="text-sm">🔊</span>
+            <input type="range" id="volumeSlider" class="slider w-24 h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer" min="0" max="100" value="50">
+            <span id="volumePercent" class="text-sm text-gray-300 min-w-[35px]">50%</span>
+          </div>
+        </div>
+        <div class="text-center">
+          <p class="text-sm text-gray-300 mb-2">Clip Length: <span id="clipLength">1 second</span></p>
+          <div class="w-80 relative">
+            <div class="bg-gray-700 rounded-full h-3 relative overflow-hidden">
+              <div id="maxClipIndicator" class="bg-gray-600 h-3 rounded-full transition-all duration-500" style="width: 6.67%"></div>
+              <div id="progressBar" class="bg-green-500 h-3 rounded-full absolute top-0 left-0 transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <div class="flex justify-between text-xs text-gray-400 mt-1">
+              <span>0s</span>
+              <span>5s</span>
+              <span>10s</span>
+              <span>15s</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Answer Display (hidden at start) -->
+    <div id="answerDisplay" class="mb-6 hidden">
+      <div class="bg-gradient-to-r from-green-900/30 to-green-800/30 border border-green-500/50 rounded-lg p-6 text-center max-w-md mx-auto">
+        <h3 class="text-lg font-semibold mb-2 text-green-300">Today's Answer</h3>
+        <p id="displayedAnswer" class="text-2xl font-bold text-green-100 mb-2">Adventure Time</p>
+        <p class="text-sm text-green-200/80">Come back tomorrow for a new theme song!</p>
+      </div>
+    </div>
+
+    <!-- Guess Input Section -->
+    <div class="mb-6">
+      <h3 class="text-lg font-semibold mb-4 text-center">Make Your Guess</h3>
+      <div class="flex flex-col items-center space-y-4">
+        <div class="w-full max-w-md relative">
+          <input type="text" id="guessInput" placeholder="Search for the title..."
+                 class="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500"
+                 autocomplete="off">
+          <div id="suggestions" class="absolute top-full left-0 right-0 bg-gray-800 border border-gray-600 rounded-lg mt-1 max-h-48 overflow-y-auto z-10 hidden"></div>
+        </div>
+        <div class="flex space-x-4">
+          <button id="submitGuess" class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            Submit Guess
+          </button>
+          <button id="skipGuess" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg text-sm transition-colors">
+            Skip (+1s)
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div id="gameOverModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
+      <div class="bg-gray-800 rounded-xl p-8 max-w-md mx-4 text-center">
+        <h2 id="gameOverTitle" class="text-2xl font-bold mb-4">🎉 Congratulations!</h2>
+        <p id="gameOverMessage" class="text-lg mb-6">You guessed it correctly!</p>
+        <div class="bg-white/10 rounded-lg p-4 mb-6">
+          <p class="text-sm text-gray-300 mb-2">The answer was:</p>
+          <p id="correctAnswer" class="text-xl font-semibold text-yellow-300">Breaking Bad</p>
+        </div>
         <div class="mb-6">
-            <div class="flex flex-col items-center space-y-4">
-                <div class="flex items-center space-x-4">
-                    <button id="playBtn" class="bg-green-500 hover:bg-green-600 text-black px-6 py-3 rounded-full font-semibold transition-colors">
-                        ▶ Play
-                    </button>
-                    <div class="flex items-center space-x-2">
-                        <span class="text-sm">🔊</span>
-                        <input type="range" id="volumeSlider" class="slider w-24 h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer" min="0" max="100" value="50">
-                        <span id="volumePercent" class="text-sm text-gray-300 min-w-[35px]">50%</span>
-                    </div>
-                </div>
-                <div class="text-center">
-                    <p class="text-sm text-gray-300 mb-2">Clip Length: <span id="clipLength">1 second</span></p>
-                    <div class="w-80 relative">
-                        <!-- Background track showing max clip length -->
-                        <div class="bg-gray-700 rounded-full h-3 relative overflow-hidden">
-                            <div id="maxClipIndicator" class="bg-gray-600 h-3 rounded-full transition-all duration-500" style="width: 6.67%"></div>
-                            <!-- Progress bar showing current playback -->
-                            <div id="progressBar" class="bg-green-500 h-3 rounded-full absolute top-0 left-0 transition-all duration-300" style="width: 0%"></div>
-                        </div>
-                        <!-- Time markers -->
-                        <div class="flex justify-between text-xs text-gray-400 mt-1">
-                            <span>0s</span>
-                            <span>5s</span>
-                            <span>10s</span>
-                            <span>15s</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+          <p class="text-sm text-gray-300">🎵 Playing full theme song</p>
         </div>
-
-        <!-- Answer Display (shown when game is completed) -->
-        <div id="answerDisplay" class="mb-6 hidden">
-            <div class="bg-gradient-to-r from-green-900/30 to-green-800/30 border border-green-500/50 rounded-lg p-6 text-center max-w-md mx-auto">
-                <h3 class="text-lg font-semibold mb-2 text-green-300">Today's Answer</h3>
-                <p id="displayedAnswer" class="text-2xl font-bold text-green-100 mb-2">Adventure Time</p>
-                <p class="text-sm text-green-200/80">Come back tomorrow for a new theme song!</p>
-            </div>
+        <div class="flex justify-center">
+          <button id="closeModal" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg transition-colors">Close</button>
         </div>
-
-        <!-- Guess Input Section -->
-        <div class="mb-6">
-            <h3 class="text-lg font-semibold mb-4 text-center">Make Your Guess</h3>
-            <div class="flex flex-col items-center space-y-4">
-                <div class="w-full max-w-md relative">
-                    <input type="text" id="guessInput" placeholder="Search for the title..." 
-                           class="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500"
-                           autocomplete="off">
-                    <div id="suggestions" class="absolute top-full left-0 right-0 bg-gray-800 border border-gray-600 rounded-lg mt-1 max-h-48 overflow-y-auto z-10 hidden">
-                        <!-- Suggestions will be populated here -->
-                    </div>
-                </div>
-                <div class="flex space-x-4">
-                    <button id="submitGuess" class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                        Submit Guess
-                    </button>
-                    <button id="skipGuess" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg text-sm transition-colors">
-                        Skip (+1s)
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Game Over Modal -->
-        <div id="gameOverModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
-            <div class="bg-gray-800 rounded-xl p-8 max-w-md mx-4 text-center">
-                <h2 id="gameOverTitle" class="text-2xl font-bold mb-4">🎉 Congratulations!</h2>
-                <p id="gameOverMessage" class="text-lg mb-6">You guessed it correctly!</p>
-                <div class="bg-white/10 rounded-lg p-4 mb-6">
-                    <p class="text-sm text-gray-300 mb-2">The answer was:</p>
-                    <p id="correctAnswer" class="text-xl font-semibold text-yellow-300">Breaking Bad</p>
-                </div>
-                
-                <!-- Audio status in modal -->
-                <div class="mb-6">
-                    <p class="text-sm text-gray-300">🎵 Playing full theme song</p>
-                </div>
-                
-                <div class="flex justify-center">
-                    <button id="closeModal" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg transition-colors">
-                        Close
-                    </button>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Copyright Notice -->
-    <div class="text-center py-6 text-xs text-gray-500 border-t border-gray-800 mt-8">
-        <p class="mb-1">© 2024 Themedle. This is a fan-made game for entertainment purposes only.</p>
-        <p>All theme songs and related content are the property of their respective owners and creators.</p>
-        <p>No copyright infringement intended. This game is not affiliated with or endorsed by any of the original content creators.</p>
-    </div>
+  <!-- Footer -->
+  <div class="text-center py-6 text-xs text-gray-500 border-t border-gray-800 mt-8">
+    <p class="mb-1">© 2024 Themedle. This is a fan-made game for entertainment purposes only.</p>
+    <p>All theme songs and related content are the property of their respective owners and creators.</p>
+    <p>No copyright infringement intended. This game is not affiliated with or endorsed by any of the original content creators.</p>
+  </div>
 
-    <script>
-        // Game state
-        let currentGuess = 1;
-        let gameOver = false;
-        let currentClipLength = 1;
-        let isPlaying = false;
-        let gameStats = {
-            currentStreak: 0,
-            bestStreak: 0,
-            gamesPlayed: 0,
-            lastPlayedDate: null
-        };
-        let dailyGameState = {
-            date: null,
-            completed: false,
-            won: false,
-            guesses: [],
-            currentGuess: 1,
-            songIndex: 0
-        };
-
-        // Theme songs database with audio files
-        const themeSongs = [
-  { title: "Adventure Time", url: "audio/adventuretime.mp3" },
-  { title: "All Grown Up", url: "audio/allgrownup.mp3" },
-  { title: "As Told By Ginger", url: "audio/astoldbyginger.mp3" },
-  { title: "Avatar The Last Airbender", url: "audio/avatarthelastairbender.mp3" },
-  { title: "Back At The Barnyard", url: "audio/backatthebarnyard.mp3" },
-  { title: "Barney", url: "audio/barney.mp3" },
-  { title: "Bear In The Big Blue House", url: "audio/bearinthebigbluehouse.mp3" },
-  { title: "Ben 10", url: "audio/ben10.mp3" },
-  { title: "Between The Lions", url: "audio/betweenthelions.mp3" },
-  { title: "Blues Clues", url: "audio/bluesclues.mp3" },
-  { title: "Bob The Builder", url: "audio/bobthebuilder.mp3" },
-  { title: "Caillou", url: "audio/caillou.mp3" },
-  { title: "Camp Lazlo", url: "audio/camplazlo.mp3" },
-  { title: "CatDog", url: "audio/catdog.mp3" },
-  { title: "Catscratch", url: "audio/catscratch.mp3" },
-  { title: "Charlie and Lola", url: "audio/charlieandlola.mp3" },
-  { title: "Chowder", url: "audio/chowder.mp3" },
-  { title: "Clifford The Big Red Dog", url: "audio/cliffordthebigreddog.mp3" },
-  { title: "Code Lyoko", url: "audio/codelyoko.mp3" },
-  { title: "Codename: Kids Next Door", url: "audio/codenamekidsnextdoor.mp3" },
-  { title: "Cory In The House", url: "audio/coryinthehouse.mp3" },
-  { title: "Courage The Cowardly Dog", url: "audio/couragethecowardlydog.mp3" },
-  { title: "Cyber Chase", url: "audio/cyberchase.mp3" },
-  { title: "Danny Phantom", url: "audio/dannyphantom.mp3" },
-  { title: "Degrassi", url: "audio/degrassi.mp3" },
-  { title: "Dexters Laboratory", url: "audio/dexterslaboratory.mp3" },
-  { title: "Dora The Explorer", url: "audio/doratheexplorer.mp3" },
-  { title: "Doug", url: "audio/doug.mp3" },
-  { title: "Dragon Tales", url: "audio/dragontales.mp3" },
-  { title: "Drake and Josh", url: "audio/drakeandjosh.mp3" },
-  { title: "Ed Edd n Eddy", url: "audio/ededdneddy.mp3" },
-  { title: "El Tigre", url: "audio/eltigre.mp3" },
-  { title: "Even Stevens", url: "audio/evenstevens.mp3" },
-  { title: "The Grim Adventures of Billy and Mandy", url: "audio/grimadventures.mp3" },
-  { title: "The Amazing World of Gumball", url: "audio/gumball.mp3" },
-  { title: "The Amanda Show", url: "audio/theamandashow.mp3" },
-  { title: "The Angry Beavers", url: "audio/theangrybeavers.mp3" },
-  { title: "The Backyardigans", url: "audio/thebackyardigans.mp3" },
-  { title: "The Berenstain Bears", url: "audio/theberenstainbears.mp3" },
-  { title: "The Fairly Odd Parents", url: "audio/thefairlyoddparents.mp3" }
-        ];
-
-        // Generate deterministic song index based on date
-        function getDailySongIndex() {
-            const today = getTodayCST();
-            const dateStr = today.replace(/\s/g, ''); // Remove spaces
-            let hash = 0;
-            for (let i = 0; i < dateStr.length; i++) {
-                const char = dateStr.charCodeAt(i);
-                hash = ((hash << 5) - hash) + char;
-                hash = hash & hash; // Convert to 32-bit integer
-            }
-            return Math.abs(hash) % themeSongs.length;
-        }
-
-        let currentSong;
-        let audioElement;
-
-        // Time increments: 1, 2, 3, 5, 10, 15 seconds
-        const timeIncrements = [1, 2, 3, 5, 10, 15];
-
-        // DOM elements
-        const playBtn = document.getElementById('playBtn');
-        const volumeSlider = document.getElementById('volumeSlider');
-        const clipLengthSpan = document.getElementById('clipLength');
-        const progressBar = document.getElementById('progressBar');
-        const maxClipIndicator = document.getElementById('maxClipIndicator');
-        const guessInput = document.getElementById('guessInput');
-        const suggestionsDiv = document.getElementById('suggestions');
-        const submitBtn = document.getElementById('submitGuess');
-        const skipBtn = document.getElementById('skipGuess');
-        const gameOverModal = document.getElementById('gameOverModal');
-
-        // Type-ahead functionality
-        let selectedSuggestionIndex = -1;
-
-        function showSuggestions(query) {
-            if (!query.trim()) {
-                suggestionsDiv.classList.add('hidden');
-                return;
-            }
-
-            const matches = themeSongs.filter(song => 
-                song.title.toLowerCase().includes(query.toLowerCase())
-            );
-
-            if (matches.length === 0) {
-                suggestionsDiv.classList.add('hidden');
-                return;
-            }
-
-            suggestionsDiv.innerHTML = matches.map((song, index) => 
-                `<div class="suggestion-item px-4 py-2 hover:bg-gray-700 cursor-pointer text-white" data-title="${song.title}" data-index="${index}">
-                    ${song.title}
-                </div>`
-            ).join('');
-
-            suggestionsDiv.classList.remove('hidden');
-            selectedSuggestionIndex = -1;
-        }
-
-        function selectSuggestion(title) {
-            guessInput.value = title;
-            suggestionsDiv.classList.add('hidden');
-            selectedSuggestionIndex = -1;
-        }
-
-        function highlightSuggestion(index) {
-            const items = suggestionsDiv.querySelectorAll('.suggestion-item');
-            items.forEach((item, i) => {
-                if (i === index) {
-                    item.classList.add('bg-gray-700');
-                } else {
-                    item.classList.remove('bg-gray-700');
-                }
-            });
-        }
-
-        // Get today's date in CST
-        function getTodayCST() {
-            const now = new Date();
-            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-            const cst = new Date(utc + (-6 * 3600000)); // CST is UTC-6
-            return cst.toDateString();
-        }
-
-
-
-        // Load stats from localStorage
-        function loadStats() {
-            const saved = localStorage.getItem('themedleStats');
-            if (saved) {
-                gameStats = JSON.parse(saved);
-                updateStatsDisplay();
-            }
-        }
-
-        // Save stats to localStorage
-        function saveStats() {
-            localStorage.setItem('themedleStats', JSON.stringify(gameStats));
-        }
-
-        // Load daily game state
-        function loadDailyGameState() {
-            const saved = localStorage.getItem('themedleDailyState');
-            const today = getTodayCST();
-            
-            if (saved) {
-                const savedState = JSON.parse(saved);
-                if (savedState.date === today) {
-                    dailyGameState = savedState;
-                    return true; // Game already played today
-                }
-            }
-            
-            // New day, reset daily state
-            dailyGameState = {
-                date: today,
-                completed: false,
-                won: false,
-                guesses: [],
-                currentGuess: 1,
-                songIndex: getDailySongIndex()
-            };
-            saveDailyGameState();
-            return false; // New game
-        }
-
-        // Save daily game state
-        function saveDailyGameState() {
-            localStorage.setItem('themedleDailyState', JSON.stringify(dailyGameState));
-        }
-
-        // Restore game state from saved data
-        function restoreGameState() {
-            currentGuess = dailyGameState.currentGuess;
-            currentClipLength = timeIncrements[currentGuess - 1];
-            
-            // Restore guess slots
-            dailyGameState.guesses.forEach((guess, index) => {
-                const guessSlot = document.getElementById(`guessSlot-${index + 1}`);
-                guessSlot.style.opacity = '1';
-                guessSlot.classList.remove('border-gray-600');
-                
-                if (guess.type === 'correct') {
-                    guessSlot.classList.add('border-green-500', 'bg-green-900/30');
-                    guessSlot.innerHTML = `
-                        <span class="text-green-300 font-semibold">${guess.text}</span>
-                        <span class="text-sm text-green-400">${guess.clipLength}s</span>
-                    `;
-                } else if (guess.type === 'wrong') {
-                    guessSlot.classList.add('border-red-500', 'bg-red-900/30');
-                    guessSlot.innerHTML = `
-                        <span class="text-red-300">${guess.text}</span>
-                        <span class="text-sm text-red-400">${guess.clipLength}s</span>
-                    `;
-                } else if (guess.type === 'skipped') {
-                    guessSlot.classList.add('border-yellow-500', 'bg-yellow-900/30');
-                    guessSlot.innerHTML = `
-                        <span class="text-yellow-300">Skipped</span>
-                        <span class="text-sm text-yellow-400">${guess.clipLength}s</span>
-                    `;
-                }
-            });
-        }
-
-        // Disable game controls and show answer
-        function disableGameControls() {
-            document.getElementById('guessInput').disabled = true;
-            document.getElementById('submitGuess').disabled = true;
-            document.getElementById('skipGuess').disabled = true;
-            document.getElementById('guessInput').placeholder = "Game completed for today";
-            
-            // Show the answer display
-            document.getElementById('answerDisplay').classList.remove('hidden');
-            document.getElementById('displayedAnswer').textContent = currentSong.title;
-        }
-
-        // Update stats display
-        function updateStatsDisplay() {
-            document.getElementById('currentStreak').textContent = gameStats.currentStreak;
-            document.getElementById('bestStreak').textContent = gameStats.bestStreak;
-            document.getElementById('gamesPlayed').textContent = gameStats.gamesPlayed;
-        }
-
-        // Update countdown timer to midnight CST
-        function updateCountdown() {
-            const now = new Date();
-            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-            const cst = new Date(utc + (-6 * 3600000)); // CST is UTC-6
-            
-            const tomorrow = new Date(cst);
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            tomorrow.setHours(0, 0, 0, 0);
-            
-            const diff = tomorrow - cst;
-            const hours = Math.floor(diff / (1000 * 60 * 60));
-            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-            
-            document.getElementById('countdown').textContent = 
-                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        }
-
-        // Update max clip indicator
-        function updateMaxClipIndicator() {
-            const maxWidth = (currentClipLength / 15) * 100; // 15 seconds is max
-            maxClipIndicator.style.width = maxWidth + '%';
-        }
-
-        // Update skip button text
-        function updateSkipButton() {
-            const skipBtn = document.getElementById('skipGuess');
-            if (currentGuess < 6) {
-                const nextClipLength = timeIncrements[currentGuess];
-                const increment = nextClipLength - currentClipLength;
-                skipBtn.textContent = `Skip (+${increment}s)`;
-            }
-        }
-
-        // Volume slider functionality
-        volumeSlider.addEventListener('input', function() {
-            const volume = this.value / 100;
-            if (audioElement) {
-                audioElement.volume = volume;
-            }
-            document.getElementById('volumePercent').textContent = this.value + '%';
-        });
-
-        // Play button functionality
-        let playbackInterval;
-        let simulatedTime = 0;
-        
-        playBtn.addEventListener('click', function() {
-            if (!isPlaying) {
-                isPlaying = true;
-                playBtn.textContent = '■ Pause';
-                playBtn.classList.add('pulse-animation');
-                
-                // Reset simulated time
-                simulatedTime = 0;
-                
-                // Try to play actual audio
-                if (audioElement && audioElement.play) {
-                    audioElement.currentTime = 0;
-                    audioElement.play().catch(() => {
-                        console.log('Audio playback failed, using visual-only mode');
-                    });
-                }
-                
-                // Determine clip length - if game is over, play full song (15s), otherwise current clip length
-                const playLength = gameOver ? 15 : currentClipLength;
-                
-                // Update progress bar with simulated timing
-                playbackInterval = setInterval(() => {
-                    simulatedTime += 0.05; // Increment by 50ms
-                    const progressPercent = Math.min(simulatedTime / playLength, 1);
-                    const maxClipWidthPercent = (playLength / 15) * 100;
-                    const progressWidth = progressPercent * maxClipWidthPercent;
-                    progressBar.style.width = progressWidth + '%';
-                    
-                    if (simulatedTime >= playLength) {
-                        if (audioElement && audioElement.pause) {
-                            audioElement.pause();
-                        }
-                        clearInterval(playbackInterval);
-                        isPlaying = false;
-                        playBtn.textContent = '▶ Play';
-                        playBtn.classList.remove('pulse-animation');
-                        progressBar.style.width = '0%';
-                        simulatedTime = 0;
-                    }
-                }, 50);
-            } else {
-                // Pause functionality
-                isPlaying = false;
-                playBtn.textContent = '▶ Play';
-                playBtn.classList.remove('pulse-animation');
-                if (audioElement && audioElement.pause) {
-                    audioElement.pause();
-                }
-                clearInterval(playbackInterval);
-                simulatedTime = 0;
-                progressBar.style.width = '0%';
-            }
-        });
-
-        // Submit guess
-        submitBtn.addEventListener('click', function() {
-            const guess = guessInput.value.trim().toLowerCase();
-            if (!guess || gameOver) return;
-
-            const guessSlot = document.getElementById(`guessSlot-${currentGuess}`);
-            guessSlot.style.opacity = '1';
-            
-            if (guess === currentSong.title.toLowerCase()) {
-                // Correct guess
-                guessSlot.classList.remove('border-gray-600');
-                guessSlot.classList.add('border-green-500', 'bg-green-900/30');
-                guessSlot.innerHTML = `
-                    <span class="text-green-300 font-semibold">${guessInput.value}</span>
-                    <span class="text-sm text-green-400">${currentClipLength}s</span>
-                `;
-                
-                // Save guess to daily state
-                dailyGameState.guesses.push({
-                    type: 'correct',
-                    text: guessInput.value,
-                    clipLength: currentClipLength
-                });
-                dailyGameState.completed = true;
-                dailyGameState.won = true;
-                dailyGameState.currentGuess = currentGuess;
-                saveDailyGameState();
-                
-                gameOver = true;
-                
-                // Only update stats if this is a new completion (not restoring from saved state)
-                const today = getTodayCST();
-                if (gameStats.lastPlayedDate !== today) {
-                    gameStats.currentStreak++;
-                    gameStats.gamesPlayed++;
-                    gameStats.lastPlayedDate = today;
-                    if (gameStats.currentStreak > gameStats.bestStreak) {
-                        gameStats.bestStreak = gameStats.currentStreak;
-                    }
-                    saveStats();
-                }
-                updateStatsDisplay();
-                disableGameControls();
-                
-                // Update clip length display to show full song
-                clipLengthSpan.textContent = '15 seconds';
-                maxClipIndicator.style.width = '100%';
-                
-                showGameOverModal(true);
-            } else {
-                // Wrong guess
-                guessSlot.classList.remove('border-gray-600');
-                guessSlot.classList.add('border-red-500', 'bg-red-900/30');
-                guessSlot.innerHTML = `
-                    <span class="text-red-300">${guessInput.value}</span>
-                    <span class="text-sm text-red-400">${currentClipLength}s</span>
-                `;
-                
-                // Save guess to daily state
-                dailyGameState.guesses.push({
-                    type: 'wrong',
-                    text: guessInput.value,
-                    clipLength: currentClipLength
-                });
-                
-                currentGuess++;
-                dailyGameState.currentGuess = currentGuess;
-                
-                if (currentGuess > 6) {
-                    // Game over - lost
-                    dailyGameState.completed = true;
-                    dailyGameState.won = false;
-                    saveDailyGameState();
-                    
-                    gameOver = true;
-                    
-                    // Only update stats if this is a new completion (not restoring from saved state)
-                    const today = getTodayCST();
-                    if (gameStats.lastPlayedDate !== today) {
-                        gameStats.currentStreak = 0;
-                        gameStats.gamesPlayed++;
-                        gameStats.lastPlayedDate = today;
-                        saveStats();
-                    }
-                    updateStatsDisplay();
-                    disableGameControls();
-                    
-                    // Update clip length display to show full song
-                    clipLengthSpan.textContent = '15 seconds';
-                    maxClipIndicator.style.width = '100%';
-                    
-                    showGameOverModal(false);
-                } else {
-                    // Continue game
-                    saveDailyGameState();
-                    currentClipLength = timeIncrements[currentGuess - 1];
-                    clipLengthSpan.textContent = currentClipLength + (currentClipLength === 1 ? ' second' : ' seconds');
-                    updateMaxClipIndicator();
-                    updateSkipButton();
-                }
-            }
-            
-            guessInput.value = '';
-            if (!gameOver) {
-                guessInput.focus();
-            }
-        });
-
-        // Skip guess
-        skipBtn.addEventListener('click', function() {
-            if (currentGuess <= 6 && !gameOver) {
-                // Mark current guess slot as skipped
-                const guessSlot = document.getElementById(`guessSlot-${currentGuess}`);
-                guessSlot.style.opacity = '1';
-                guessSlot.classList.remove('border-gray-600');
-                guessSlot.classList.add('border-yellow-500', 'bg-yellow-900/30');
-                guessSlot.innerHTML = `
-                    <span class="text-yellow-300">Skipped</span>
-                    <span class="text-sm text-yellow-400">${currentClipLength}s</span>
-                `;
-                
-                // Save skip to daily state
-                dailyGameState.guesses.push({
-                    type: 'skipped',
-                    text: 'Skipped',
-                    clipLength: currentClipLength
-                });
-                
-                currentGuess++;
-                dailyGameState.currentGuess = currentGuess;
-                
-                if (currentGuess > 6) {
-                    // Game over - lost
-                    dailyGameState.completed = true;
-                    dailyGameState.won = false;
-                    saveDailyGameState();
-                    
-                    gameOver = true;
-                    
-                    // Only update stats if this is a new completion (not restoring from saved state)
-                    const today = getTodayCST();
-                    if (gameStats.lastPlayedDate !== today) {
-                        gameStats.currentStreak = 0;
-                        gameStats.gamesPlayed++;
-                        gameStats.lastPlayedDate = today;
-                        saveStats();
-                    }
-                    updateStatsDisplay();
-                    disableGameControls();
-                    
-                    // Update clip length display to show full song
-                    clipLengthSpan.textContent = '15 seconds';
-                    maxClipIndicator.style.width = '100%';
-                    
-                    showGameOverModal(false);
-                } else {
-                    // Continue game
-                    saveDailyGameState();
-                    currentClipLength = timeIncrements[currentGuess - 1];
-                    clipLengthSpan.textContent = currentClipLength + (currentClipLength === 1 ? ' second' : ' seconds');
-                    updateMaxClipIndicator();
-                    updateSkipButton();
-                }
-            }
-        });
-
-        // Type-ahead input events
-        guessInput.addEventListener('input', function(e) {
-            showSuggestions(e.target.value);
-        });
-
-        guessInput.addEventListener('keydown', function(e) {
-            const items = suggestionsDiv.querySelectorAll('.suggestion-item');
-            
-            if (e.key === 'ArrowDown') {
-                e.preventDefault();
-                if (items.length > 0) {
-                    selectedSuggestionIndex = Math.min(selectedSuggestionIndex + 1, items.length - 1);
-                    highlightSuggestion(selectedSuggestionIndex);
-                }
-            } else if (e.key === 'ArrowUp') {
-                e.preventDefault();
-                if (items.length > 0) {
-                    selectedSuggestionIndex = Math.max(selectedSuggestionIndex - 1, -1);
-                    if (selectedSuggestionIndex === -1) {
-                        items.forEach(item => item.classList.remove('bg-gray-700'));
-                    } else {
-                        highlightSuggestion(selectedSuggestionIndex);
-                    }
-                }
-            } else if (e.key === 'Enter') {
-                e.preventDefault();
-                if (selectedSuggestionIndex >= 0 && items[selectedSuggestionIndex]) {
-                    const title = items[selectedSuggestionIndex].dataset.title;
-                    selectSuggestion(title);
-                }
-                submitBtn.click();
-            } else if (e.key === 'Escape') {
-                suggestionsDiv.classList.add('hidden');
-                selectedSuggestionIndex = -1;
-            }
-        });
-
-        // Click on suggestions
-        suggestionsDiv.addEventListener('click', function(e) {
-            if (e.target.classList.contains('suggestion-item')) {
-                const title = e.target.dataset.title;
-                selectSuggestion(title);
-            }
-        });
-
-        // Hide suggestions when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!guessInput.contains(e.target) && !suggestionsDiv.contains(e.target)) {
-                suggestionsDiv.classList.add('hidden');
-                selectedSuggestionIndex = -1;
-            }
-        });
-
-
-
-        // Show game over modal
-        function showGameOverModal(won) {
-            const modal = document.getElementById('gameOverModal');
-            const title = document.getElementById('gameOverTitle');
-            const message = document.getElementById('gameOverMessage');
-            const answer = document.getElementById('correctAnswer');
-            
-            if (won) {
-                title.textContent = '🎉 Congratulations!';
-                message.textContent = `You guessed it in ${currentGuess} ${currentGuess === 1 ? 'try' : 'tries'}!`;
-            } else {
-                title.textContent = '😔 Game Over';
-                message.textContent = 'Better luck next time!';
-            }
-            
-            answer.textContent = currentSong.title;
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            
-            // Auto-play the full song when modal appears
-            setTimeout(() => {
-                if (!isPlaying) {
-                    playBtn.click(); // This will start playing the full 15-second clip
-                }
-            }, 500); // Small delay to let modal appear
-        }
-
-        // Modal buttons
-        document.getElementById('closeModal').addEventListener('click', function() {
-            const modal = document.getElementById('gameOverModal');
-            modal.classList.remove('flex');
-            modal.classList.add('hidden');
-        });
-
-
-
-        // Initialize game
-        loadStats();
-        const hasPlayedToday = loadDailyGameState();
-        
-        // Set up current song based on daily state
-        currentSong = themeSongs[dailyGameState.songIndex];
-        audioElement = new Audio();
-        
-        // Handle audio loading with fallback
-        audioElement.addEventListener('error', function() {
-            console.log('Audio failed to load, using fallback');
-            // Create a silent audio context for demo purposes
-            audioElement = {
-                play: function() { return Promise.resolve(); },
-                pause: function() {},
-                currentTime: 0,
-                volume: 0.5,
-                addEventListener: function() {}
-            };
-        });
-        
-        audioElement.src = currentSong.url;
-        audioElement.preload = 'auto';
-        audioElement.volume = 0.5;
-        
-        updateCountdown();
-        setInterval(updateCountdown, 1000);
-        
-        if (hasPlayedToday && dailyGameState.completed) {
-            // Game already completed today
-            gameOver = true;
-            restoreGameState();
-            disableGameControls();
-            
-            // Show full song length
-            clipLengthSpan.textContent = '15 seconds';
-            maxClipIndicator.style.width = '100%';
-            
-            // Show completion modal immediately
-            setTimeout(() => {
-                showGameOverModal(dailyGameState.won);
-            }, 500);
-        } else if (hasPlayedToday && !dailyGameState.completed) {
-            // Game in progress, restore state
-            restoreGameState();
-            updateMaxClipIndicator();
-            updateSkipButton();
-            guessInput.focus();
-        } else {
-            // New game
-            updateMaxClipIndicator();
-            updateSkipButton();
-            guessInput.focus();
-        }
-    </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96a8ebeb1395d1aa',t:'MTc1NDQyNDQ1NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+  <!-- Main JS -->
+  <script src="/assets/js/main.js" defer></script>
+</body>
 </html>
