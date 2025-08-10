@@ -1,5 +1,6 @@
-// main.js — Themedle game logic
-// Assumes the following DOM IDs exist in index.html:
+// main.js — Themedle game logic (with CSS-timed playback bar)
+//
+// Expects these DOM IDs in index.html:
 // playBtn, volumeSlider, clipLength, progressBar, maxClipIndicator, guessInput,
 // suggestions, submitGuess, skipGuess, gameOverModal, gameOverTitle, gameOverMessage,
 // correctAnswer, currentStreak, bestStreak, gamesPlayed, countdown, answerDisplay, displayedAnswer,
@@ -189,7 +190,7 @@ function updateStatsDisplay() {
   const best = document.getElementById('bestStreak');
   const played = document.getElementById('gamesPlayed');
   if (cur) cur.textContent = gameStats.currentStreak;
-  if (best) best.textContent = gameStats.bestStreak;
+  if (best) cur && (best.textContent = gameStats.bestStreak);
   if (played) played.textContent = gameStats.gamesPlayed;
 }
 
@@ -299,46 +300,83 @@ if (volumeSlider) {
   });
 }
 
-// -------------------- Playback --------------------
-let playbackInterval;
-let simulatedTime = 0;
+// -------------------- Playback (CSS-timed, no drift) --------------------
+let playbackTimeout;
+
+function startPlayback(playLength) {
+  stopPlayback(false); // clear any old run
+
+  isPlaying = true;
+  if (playBtn) {
+    playBtn.textContent = '■ Pause';
+    playBtn.classList.add('pulse-animation');
+  }
+
+  // Ensure grey "max clip" reflects current state
+  updateMaxClipIndicator();
+
+  // Animate green bar to target width over exactly playLength seconds
+  const targetWidth = (playLength / 15) * 100;
+  if (progressBar) {
+    progressBar.style.transition = 'none';
+    progressBar.style.width = '0%';
+    // Force reflow so 0% is applied before animating
+    void progressBar.offsetWidth;
+    progressBar.style.transition = `width ${playLength}s linear`;
+    progressBar.style.width = `${targetWidth}%`;
+  }
+
+  // Audio start
+  if (audioElement && audioElement.play) {
+    audioElement.currentTime = 0;
+    audioElement.play().catch(() => {
+      console.log('Audio playback failed, using visual-only mode');
+    });
+  }
+
+  // Stop exactly at playLength
+  playbackTimeout = setTimeout(() => {
+    stopPlayback(true);
+  }, playLength * 1000);
+}
+
+function stopPlayback(completed) {
+  if (playbackTimeout) {
+    clearTimeout(playbackTimeout);
+    playbackTimeout = null;
+  }
+  if (audioElement && audioElement.pause) {
+    audioElement.pause();
+  }
+
+  isPlaying = false;
+  if (playBtn) {
+    playBtn.textContent = '▶ Play';
+    playBtn.classList.remove('pulse-animation');
+  }
+
+  if (progressBar) {
+    if (completed) {
+      // brief hold so users see the end, then reset
+      setTimeout(() => {
+        progressBar.style.transition = 'width 0.3s linear';
+        progressBar.style.width = '0%';
+      }, 150);
+    } else {
+      // user paused
+      progressBar.style.transition = 'width 0.3s linear';
+      progressBar.style.width = '0%';
+    }
+  }
+}
 
 if (playBtn) {
   playBtn.addEventListener('click', function () {
     if (!isPlaying) {
-      isPlaying = true;
-      playBtn.textContent = '■ Pause';
-      playBtn.classList.add('pulse-animation');
-      simulatedTime = 0;
-      if (audioElement && audioElement.play) {
-        audioElement.currentTime = 0;
-        audioElement.play().catch(() => { console.log('Audio playback failed, using visual-only mode'); });
-      }
       const playLength = gameOver ? 15 : currentClipLength;
-      playbackInterval = setInterval(() => {
-        simulatedTime += 0.05;
-        const progressPercent = Math.min(simulatedTime / playLength, 1);
-        const maxClipWidthPercent = (playLength / 15) * 100;
-        const progressWidth = progressPercent * maxClipWidthPercent;
-        if (progressBar) progressBar.style.width = progressWidth + '%';
-        if (simulatedTime >= playLength) {
-          if (audioElement && audioElement.pause) audioElement.pause();
-          clearInterval(playbackInterval);
-          isPlaying = false;
-          playBtn.textContent = '▶ Play';
-          playBtn.classList.remove('pulse-animation');
-          if (progressBar) progressBar.style.width = '0%';
-          simulatedTime = 0;
-        }
-      }, 50);
+      startPlayback(playLength);
     } else {
-      isPlaying = false;
-      playBtn.textContent = '▶ Play';
-      playBtn.classList.remove('pulse-animation');
-      if (audioElement && audioElement.pause) audioElement.pause();
-      clearInterval(playbackInterval);
-      simulatedTime = 0;
-      if (progressBar) progressBar.style.width = '0%';
+      stopPlayback(false); // user pause
     }
   });
 }
@@ -374,6 +412,8 @@ if (submitBtn) {
       }
       updateStatsDisplay();
       disableGameControls();
+
+      // Full song visuals
       if (clipLengthSpan) clipLengthSpan.textContent = '15 seconds';
       if (maxClipIndicator) maxClipIndicator.style.width = '100%';
       showGameOverModal(true);
