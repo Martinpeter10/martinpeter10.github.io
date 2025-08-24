@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Guess the theme song in 6 tries or less! Listen to short clips of TV theme songs and test your knowledge in this daily music guessing game.">
+  <title>Themedle</title>
+  <link rel="icon" href="/assets/img/favicon.png">
+  <link rel="stylesheet" href="/assets/css/styles.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4552090282675465" crossorigin="anonymous"></script>
+</head>
+<body class="bg-gray-900 min-h-screen text-white">
+  <div class="container mx-auto px-4 py-8 max-w-4xl">
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <h1 class="text-4xl font-bold mb-2">Themedle</h1>
+      <p class="text-lg opacity-90">Next theme song in: <span id="countdown" class="font-mono text-yellow-300">--:--:--</span></p>
+      <div class="mt-4 bg-white/10 rounded-lg p-4">
+        <div class="flex justify-center space-x-8 text-sm">
+          <div>
+            <span class="font-semibold">Current Streak:</span>
+            <span id="currentStreak" class="ml-1 text-yellow-300">0</span>
+          </div>
+          <div>
+            <span class="font-semibold">Best Streak:</span>
+            <span id="bestStreak" class="ml-1 text-green-300">0</span>
+          </div>
+          <div>
+            <span class="font-semibold">Games Played:</span>
+            <span id="gamesPlayed" class="ml-1 text-blue-300">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Guess Display - 6 Constant Rectangles -->
+    <div class="mb-6">
+      <h3 class="text-lg font-semibold mb-4 text-center">Your Guesses</h3>
+      <div class="grid grid-cols-1 gap-3 max-w-2xl mx-auto">
+        <div id="guessSlot-1" class="bg-gray-700/50 border-2 border-gray-600 rounded-lg p-2 min-h-[40px] flex items-center justify-between opacity-50">
+          <span class="text-sm text-gray-400">Guess 1</span>
+          <span class="text-xs text-gray-500">1s</span>
+        </div>
+        <div id="guessSlot-2" class="bg-gray-700/50 border-2 border-gray-600 rounded-lg p-2 min-h-[40px] flex items-center justify-between opacity-50">
+          <span class="text-sm text-gray-400">Guess 2</span>
+          <span class="text-xs text-gray-500">2s</span>
+        </div>
+        <div id="guessSlot-3" class="bg-gray-700/50 border-2 border-gray-600 rounded-lg p-2 min-h-[40px] flex items-center justify-between opacity-50">
+          <span class="text-sm text-gray-400">Guess 3</span>
+          <span class="text-xs text-gray-500">3s</span>
+        </div>
+        <div id="guessSlot-4" class="bg-gray-700/50 border-2 border-gray-600 rounded-lg p-2 min-h-[40px] flex items-center justify-between opacity-50">
+          <span class="text-sm text-gray-400">Guess 4</span>
+          <span class="text-xs text-gray-500">5s</span>
+        </div>
+        <div id="guessSlot-5" class="bg-gray-700/50 border-2 border-gray-600 rounded-lg p-2 min-h-[40px] flex items-center justify-between opacity-50">
+          <span class="text-sm text-gray-400">Guess 5</span>
+          <span class="text-xs text-gray-500">10s</span>
+        </div>
+        <div id="guessSlot-6" class="bg-gray-700/50 border-2 border-gray-600 rounded-lg p-2 min-h-[40px] flex items-center justify-between opacity-50">
+          <span class="text-sm text-gray-400">Guess 6</span>
+          <span class="text-xs text-gray-500">15s</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Audio Player Section -->
+    <div class="mb-6">
+      <div class="flex flex-col items-center space-y-4">
+        <div class="flex items-center space-x-4">
+          <button id="playBtn" class="bg-green-500 hover:bg-green-600 text-black px-6 py-3 rounded-full font-semibold transition-colors">
+            ▶ Play
+          </button>
+          <div class="flex items-center space-x-2">
+            <span class="text-sm">🔊</span>
+            <input type="range" id="volumeSlider" class="slider w-24 h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer" min="0" max="100" value="50">
+            <span id="volumePercent" class="text-sm text-gray-300 min-w-[35px]">50%</span>
+          </div>
+        </div>
+        <div class="text-center">
+          <p class="text-sm text-gray-300 mb-2">Clip Length: <span id="clipLength">1 second</span></p>
+          <div class="w-80 relative">
+            <div class="bg-gray-700 rounded-full h-3 relative overflow-hidden">
+              <div id="maxClipIndicator" class="bg-gray-600 h-3 rounded-full transition-all duration-500" style="width: 6.67%"></div>
+              <div id="progressBar" class="bg-green-500 h-3 rounded-full absolute top-0 left-0 transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <div class="flex justify-between text-xs text-gray-400 mt-1">
+              <span>0s</span>
+              <span>5s</span>
+              <span>10s</span>
+              <span>15s</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Answer Display (hidden at start) -->
+    <div id="answerDisplay" class="mb-6 hidden">
+      <div class="bg-gradient-to-r from-green-900/30 to-green-800/30 border border-green-500/50 rounded-lg p-6 text-center max-w-md mx-auto">
+        <h3 class="text-lg font-semibold mb-2 text-green-300">Today's Answer</h3>
+        <p id="displayedAnswer" class="text-2xl font-bold text-green-100 mb-2">Adventure Time</p>
+        <p class="text-sm text-green-200/80">Come back tomorrow for a new theme song!</p>
+      </div>
+    </div>
+
+    <!-- Guess Input Section -->
+    <div class="mb-6">
+      <h3 class="text-lg font-semibold mb-4 text-center">Make Your Guess</h3>
+      <div class="flex flex-col items-center space-y-4">
+        <div class="w-full max-w-md relative">
+          <input type="text" id="guessInput" placeholder="Search for the title..."
+                 class="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500"
+                 autocomplete="off">
+          <div id="suggestions" class="absolute top-full left-0 right-0 bg-gray-800 border border-gray-600 rounded-lg mt-1 max-h-48 overflow-y-auto z-10 hidden"></div>
+        </div>
+        <div class="flex space-x-4">
+          <button id="submitGuess" class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            Submit Guess
+          </button>
+          <button id="skipGuess" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg text-sm transition-colors">
+            Skip (+1s)
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div id="gameOverModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
+      <div class="bg-gray-800 rounded-xl p-8 max-w-md mx-4 text-center">
+        <h2 id="gameOverTitle" class="text-2xl font-bold mb-4">🎉 Congratulations!</h2>
+        <p id="gameOverMessage" class="text-lg mb-6">You guessed it correctly!</p>
+        <div class="bg-white/10 rounded-lg p-4 mb-6">
+          <p class="text-sm text-gray-300 mb-2">The answer was:</p>
+          <p id="correctAnswer" class="text-xl font-semibold text-yellow-300">Breaking Bad</p>
+        </div>
+        <div class="mb-6">
+          <p class="text-sm text-gray-300">🎵 Playing full theme song</p>
+        </div>
+        <div class="flex justify-center">
+          <button id="closeModal" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg transition-colors">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="text-center py-6 text-xs text-gray-500 border-t border-gray-800 mt-8">
+    <p class="mb-1">© 2024 Themedle. This is a fan-made game for entertainment purposes only.</p>
+    <p>All theme songs and related content are the property of their respective owners and creators.</p>
+    <p>No copyright infringement intended. This game is not affiliated with or endorsed by any of the original content creators.</p>
+  </div>
+
+  <!-- Main JS -->
+  <script src="/assets/js/main.js" defer></script>
+</body>
+</html>
