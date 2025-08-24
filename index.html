@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- NOTE: added viewport-fit=cover to ensure background fills notch/safe areas on iOS -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>DailyJamm – Daily Games Hub</title>
   <meta name="description" content="DailyJamm is your hub for daily mini-games. Play Themedle - our daily theme song guessing game and discover other daily games." />
   <link rel="canonical" href="https://dailyjamm.com/" />
@@ -10,13 +11,28 @@
   <meta property="og:title" content="DailyJamm – Daily Games Hub" />
   <meta property="og:description" content="Jump into Themedle and more bite-size daily games. New fun, every day." />
   <meta property="og:image" content="/assets/img/favicon.png" />
-  <meta name="theme-color" content="#10b981" />
+
+  <!-- THEME COLOR FIXES FOR iOS SAFARI: set to site background so overscroll/toolbar areas aren't green -->
+  <meta name="theme-color" content="#1a1a2e" />
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1a1a2e" />
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#1a1a2e" />
+  <!-- Optional for standalone/PWA on iOS; keeps status bar dark over page bg -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
     :root{
+      /* indicate dark UI to the browser (form controls, etc.) */
+      color-scheme: dark;
       --bg:#1a1a2e;--panel:#16213e;--ink:#fff;--muted:#b8b8d1;--line:#0f3460;--brand:#2ecc71;--brand2:#45b7d1
     }
-    body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+    /* Paint BOTH html and body to prevent iOS overscroll/behind-the-page flashes */
+    html{background:var(--bg);}
+    body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--bg);color:var(--ink);
+         /* use dynamic viewport height on modern iOS; fallback to 100vh */
+         min-height:100vh;min-height:100dvh;}
+
     .wrap{max-width:1200px;margin:0 auto;padding:2rem}
     header{text-align:center;margin-bottom:3rem}
     /* brand header */
