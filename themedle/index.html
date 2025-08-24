@@ -11,7 +11,36 @@
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4552090282675465" crossorigin="anonymous"></script>
 </head>
 <body class="bg-gray-900 min-h-screen text-white">
-  <div class="container mx-auto px-4 py-8 max-w-4xl">
+
+  <!-- Navigation Bar -->
+  <nav class="fixed top-0 left-0 w-full bg-gray-900/90 backdrop-blur-md z-50 border-b border-gray-800">
+    <div class="container mx-auto flex items-center justify-between px-4 py-3">
+      <a href="/index.html" class="text-xl font-bold text-green-400">DailyJamm</a>
+      <div class="space-x-6 hidden md:flex">
+        <a href="/index.html" class="hover:text-green-400 transition">Home</a>
+        <a href="/themedle.html" class="hover:text-green-400 transition">Themedle</a>
+        <a href="/othergame.html" class="hover:text-green-400 transition">Other Games</a>
+      </div>
+      <!-- Hamburger for mobile -->
+      <div class="md:hidden">
+        <button id="menu-toggle" class="focus:outline-none">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <!-- Mobile dropdown -->
+    <div id="mobile-menu" class="hidden md:hidden bg-gray-900 border-t border-gray-800">
+      <a href="/index.html" class="block px-4 py-2 hover:bg-gray-800">Home</a>
+      <a href="/themedle.html" class="block px-4 py-2 hover:bg-gray-800">Themedle</a>
+      <a href="/othergame.html" class="block px-4 py-2 hover:bg-gray-800">Other Games</a>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container mx-auto px-4 py-8 max-w-4xl pt-24">
     <!-- Header -->
     <div class="text-center mb-8">
       <h1 class="text-4xl font-bold mb-2">Themedle</h1>
@@ -154,5 +183,15 @@
 
   <!-- Main JS -->
   <script src="/assets/js/main.js" defer></script>
+  <script>
+    // Mobile nav toggle
+    const toggle = document.getElementById("menu-toggle");
+    const menu = document.getElementById("mobile-menu");
+    if(toggle && menu){
+      toggle.addEventListener("click", () => {
+        menu.classList.toggle("hidden");
+      });
+    }
+  </script>
 </body>
 </html>
