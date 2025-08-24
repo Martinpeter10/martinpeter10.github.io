@@ -5,44 +5,93 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Guess the theme song in 6 tries or less! Listen to short clips of TV theme songs and test your knowledge in this daily music guessing game.">
   <title>Themedle</title>
+
+  <!-- Favicon & Site CSS -->
   <link rel="icon" href="/assets/img/favicon.png">
   <link rel="stylesheet" href="/assets/css/styles.css">
+
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google AdSense (kept as in your original) -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4552090282675465" crossorigin="anonymous"></script>
+
+  <style>
+    :root{
+      /* Set sane defaults in case these aren't defined elsewhere */
+      --panel:#0f172a;       /* slate-900 */
+      --brand:#10b981;       /* emerald-500 */
+      --muted:#cbd5e1;       /* slate-300 */
+      --line:#1f2937;        /* slate-800 */
+    }
+
+    /* ======= HOMEPAGE HAMBURGER (exact classes/markup) ======= */
+    /* hamburger */
+    .hamburger{position:fixed;top:20px;left:20px;z-index:1000;cursor:pointer;background:transparent;border:none;padding:0;appearance:none;-webkit-appearance:none}
+    .hamburger:focus{outline:2px solid rgba(255,255,255,.25);outline-offset:4px;border-radius:10px}
+    .hamburger-box{width:30px;height:30px;display:flex;flex-direction:column;justify-content:space-around;background:transparent;border-radius:8px;padding:6px;transition:.3s}
+    .hamburger-box:hover{background:rgba(0,0,0,.3)}
+    .hamburger-line{width:100%;height:3px;background:#fff;border-radius:2px}
+    /* side menu */
+    .backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);opacity:0;visibility:hidden;transition:.3s;z-index:998}
+    .backdrop.open{opacity:1;visibility:visible}
+    .drawer{position:fixed;top:0;left:-300px;width:300px;height:100vh;background:var(--panel);border-right:2px solid var(--brand);transition:left .3s ease;z-index:999;padding:80px 20px 20px}
+    .drawer.open{left:0}
+    .menu-sec{margin-bottom:1.5rem}
+    .menu-title{font-size:1rem;font-weight:700;color:var(--brand);margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:1px solid var(--line)}
+    .menu-link{display:block;color:var(--muted);text-decoration:none;padding:.6rem 0;border-radius:5px;transition:.2s}
+    .menu-link:hover{color:#fff;background:rgba(46,204,113,.1);padding-left:.5rem}
+
+    /* IMPORTANT: place hamburger just to the left of the DailyJamm logo
+       by overriding its position when it lives inside our header row */
+    header .hamburger{position:relative;top:auto;left:auto;margin-right:.5rem;z-index:1002}
+  </style>
 </head>
 <body class="bg-gray-900 min-h-screen text-white">
-  
-  <!-- Header / Navbar -->
-  <!-- Fixed top bar with brand on the left and hamburger on the right. No inline nav links. -->
-  <header class="fixed top-0 left-0 w-full z-50 border-b border-gray-800/80 bg-gray-900/70 backdrop-blur-md">
-    <div class="container mx-auto px-4 py-3 flex items-center justify-between">
-      <a href="/index.html" class="text-2xl font-extrabold tracking-tight text-green-400 select-none">
+  <!-- =============================== -->
+  <!-- Fixed Header w/ Hamburger + Logo -->
+  <!-- =============================== -->
+  <header class="fixed top-0 left-0 w-full z-[1001] border-b border-gray-800/80 bg-gray-900/70 backdrop-blur-md">
+    <div class="container mx-auto px-4 py-3 flex items-center gap-3">
+      <!-- Hamburger (exact homepage markup, repositioned inline next to logo via CSS override above) -->
+      <button class="hamburger" aria-label="Open menu" onclick="toggleMenu()">
+        <span class="hamburger-box">
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </span>
+      </button>
+
+      <!-- Brand -->
+      <a href="/" class="text-2xl font-extrabold tracking-tight text-green-400 select-none">
         DailyJamm
       </a>
-      <button id="menu-toggle" aria-label="Open menu"
-              class="p-2 rounded-lg text-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-green-400/50">
-        <!-- Hamburger icon -->
-        <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M4 6h16"/>
-          <path d="M4 12h16"/>
-          <path d="M4 18h16"/>
-        </svg>
-      </button>
-    </div>
 
-    <!-- Mobile/Overlay Menu (hidden by default). Add links here as needed. -->
-    <nav id="mobile-menu" class="hidden">
-      <div class="mx-4 mb-3 rounded-lg overflow-hidden border border-gray-800 bg-gray-900/95">
-        <a href="/index.html" class="block px-4 py-3 hover:bg-gray-800">← Back to DailyJamm</a>
-        <!-- Example optional items you can enable later:
-        <a href="#" class="block px-4 py-3 hover:bg-gray-800">How to Play</a>
-        <a href="https://forms.gle/your-google-form" target="_blank" rel="noopener" class="block px-4 py-3 hover:bg-gray-800">Feedback</a>
-        -->
-      </div>
-    </nav>
+      <div class="flex-1"></div>
+    </div>
   </header>
 
-  <!-- Main Content -->
+  <!-- Backdrop + Drawer live OUTSIDE the header to avoid filter/transform clipping issues -->
+  <div class="backdrop" id="backdrop" onclick="closeMenu()"></div>
+  <nav id="drawer" class="drawer" aria-label="Site">
+    <a class="menu-link" href="/" style="margin-bottom:1rem;font-weight:700;color:#fff">Home</a>
+    <div class="menu-sec">
+      <div class="menu-title">Our Games</div>
+      <a class="menu-link" href="/themedle/">Themedle</a>
+    </div>
+    <div class="menu-sec">
+      <div class="menu-title">Other Daily Games</div>
+      <a class="menu-link" href="https://www.nytimes.com/games/wordle/index.html" target="_blank" rel="noopener">Wordle</a>
+      <a class="menu-link" href="https://www.nytimes.com/games/connections" target="_blank" rel="noopener">Connections</a>
+      <a class="menu-link" href="https://www.nytimes.com/puzzles/spelling-bee" target="_blank" rel="noopener">Spelling Bee</a>
+      <a class="menu-link" href="https://www.nytimes.com/crosswords/game/mini" target="_blank" rel="noopener">Mini Crossword</a>
+      <a class="menu-link" href="https://heardlewordle.io/" target="_blank" rel="noopener">Heardle</a>
+      <a class="menu-link" href="https://www.nytimes.com/games/pips" target="_blank" rel="noopener">Pips</a>
+    </div>
+  </nav>
+
+  <!-- =============================== -->
+  <!-- Main Content                   -->
+  <!-- =============================== -->
   <main class="container mx-auto px-4 py-8 max-w-4xl pt-24">
     <!-- Header -->
     <div class="text-center mb-8">
@@ -186,21 +235,33 @@
 
   <!-- Main JS -->
   <script src="/assets/js/main.js" defer></script>
+
+  <!-- Minimal JS to match homepage behavior for the hamburger -->
   <script>
-    // Mobile menu toggle with outside-click + Escape close
     (function(){
-      const toggle = document.getElementById('menu-toggle');
-      const menu = document.getElementById('mobile-menu');
-      let open = false;
+      const drawer = document.getElementById('drawer');
+      const backdrop = document.getElementById('backdrop');
 
-      function show(){ menu.classList.remove('hidden'); open = true; document.addEventListener('click', onDoc, { capture: true }); document.addEventListener('keydown', onKey); }
-      function hide(){ menu.classList.add('hidden'); open = false; document.removeEventListener('click', onDoc, { capture: true }); document.removeEventListener('keydown', onKey); }
-      function onDoc(e){ if(!menu.contains(e.target) && !toggle.contains(e.target)) hide(); }
-      function onKey(e){ if(e.key === 'Escape') hide(); }
-
-      if(toggle && menu){
-        toggle.addEventListener('click', (e)=>{ e.stopPropagation(); open ? hide() : show(); });
+      function openMenu(){
+        drawer.classList.add('open');
+        backdrop.classList.add('open');
+        document.documentElement.classList.add('overflow-hidden');
+        document.addEventListener('keydown', onKey);
       }
+      function closeMenu(){
+        drawer.classList.remove('open');
+        backdrop.classList.remove('open');
+        document.documentElement.classList.remove('overflow-hidden');
+        document.removeEventListener('keydown', onKey);
+      }
+      function toggleMenu(){
+        if(drawer.classList.contains('open')){ closeMenu(); } else { openMenu(); }
+      }
+      function onKey(e){ if(e.key === 'Escape') closeMenu(); }
+
+      // Expose globally for inline onclick="toggleMenu()"
+      window.toggleMenu = toggleMenu;
+      window.closeMenu = closeMenu;
     })();
   </script>
 </body>
