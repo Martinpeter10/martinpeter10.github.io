@@ -1,6 +1,5 @@
 # robots.txt for dailyjamm.com
-# Allow all crawlers. Disallow nothing.
 User-agent: *
-Allow: /
+Disallow:
 
 Sitemap: https://dailyjamm.com/sitemap.xml
