@@ -12,20 +12,20 @@
   <link rel="canonical" href="https://dailyjamm.com/themedle/">
 
   <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-XLRXG28EZV"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XLRXG28EZV"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);} 
+    gtag('js', new Date());
 
-  gtag('config', 'G-XLRXG28EZV');
-</script>
+    gtag('config', 'G-XLRXG28EZV');
+  </script>
 
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Google AdSense (kept as in your original) -->
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4552090282675465"
-     crossorigin="anonymous"></script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4552090282675465"
+       crossorigin="anonymous"></script>
   <style>
     :root{
       /* Set sane defaults in case these aren't defined elsewhere */
@@ -45,7 +45,7 @@
     /* side menu */
     .backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);opacity:0;visibility:hidden;transition:.3s;z-index:998}
     .backdrop.open{opacity:1;visibility:visible}
-    .drawer{position:fixed;top:0;left:-300px;width:300px;height:100vh;background:var(--panel);border-right:2px solid var(--brand);transition:left .3s ease;z-index:999;padding:80px 20px 20px}
+    .drawer{position:fixed;top:0;left:-300px;width:300px;height:100vh;background:var(--panel);border-right:2px solid var(--brand);transition:left .3s ease;z-index:999;padding:80px 20px 20px;overflow-y:auto;-webkit-overflow-scrolling:touch}
     .drawer.open{left:0}
     .menu-sec{margin-bottom:1.5rem}
     .menu-title{font-size:1rem;font-weight:700;color:var(--brand);margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:1px solid var(--line)}
@@ -91,12 +91,27 @@
     </div>
     <div class="menu-sec">
       <div class="menu-title">Other Daily Games</div>
-      <a class="menu-link" href="https://www.nytimes.com/games/wordle/index.html" target="_blank" rel="noopener">Wordle</a>
+      <!-- Alphabetical, matching homepage; Mini Crossword removed; all open in new tab -->
+      <a class="menu-link" href="https://dailyakari.com/" target="_blank" rel="noopener">Akari</a>
+      <a class="menu-link" href="https://bandle.app/" target="_blank" rel="noopener">Bandle</a>
+      <a class="menu-link" href="https://www.puzzmo.com/play/circuits/" target="_blank" rel="noopener">Circuits</a>
       <a class="menu-link" href="https://www.nytimes.com/games/connections" target="_blank" rel="noopener">Connections</a>
-      <a class="menu-link" href="https://www.nytimes.com/puzzles/spelling-bee" target="_blank" rel="noopener">Spelling Bee</a>
-      <a class="menu-link" href="https://www.nytimes.com/crosswords/game/mini" target="_blank" rel="noopener">Mini Crossword</a>
+      <a class="menu-link" href="https://contexto.me/en/" target="_blank" rel="noopener">Contexto</a>
+      <a class="menu-link" href="https://costcodle.com/" target="_blank" rel="noopener">Costcodle</a>
+      <a class="menu-link" href="https://www.puzzmo.com/play/crossword/" target="_blank" rel="noopener">Cross|word</a>
+      <a class="menu-link" href="https://dailydozentrivia.com/" target="_blank" rel="noopener">Daily Dozen</a>
+      <a class="menu-link" href="https://framed.wtf/" target="_blank" rel="noopener">Framed</a>
+      <a class="menu-link" href="https://guessthe.game/" target="_blank" rel="noopener">Guess the Game</a>
       <a class="menu-link" href="https://heardlewordle.io/" target="_blank" rel="noopener">Heardle</a>
+      <a class="menu-link" href="https://linxicon.com/" target="_blank" rel="noopener">Linxicon</a>
+      <a class="menu-link" href="https://minecraftle.zachmanson.com/" target="_blank" rel="noopener">Minecraftle</a>
       <a class="menu-link" href="https://www.nytimes.com/games/pips" target="_blank" rel="noopener">Pips</a>
+      <a class="menu-link" href="https://raddle.quest/" target="_blank" rel="noopener">Raddle</a>
+      <a class="menu-link" href="https://lessgames.com/songless" target="_blank" rel="noopener">Songless</a>
+      <a class="menu-link" href="https://spotle.io/" target="_blank" rel="noopener">Spotle</a>
+      <a class="menu-link" href="https://www.nytimes.com/puzzles/spelling-bee" target="_blank" rel="noopener">Spelling Bee</a>
+      <a class="menu-link" href="https://heardlewordle.io/taylor-swift-heardle" target="_blank" rel="noopener">Taylor Swift Heardle</a>
+      <a class="menu-link" href="https://www.nytimes.com/games/wordle/index.html" target="_blank" rel="noopener">Wordle</a>
     </div>
   </nav>
 
