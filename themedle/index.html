@@ -180,8 +180,14 @@
             ▶ Play
           </button>
           <div class="flex items-center space-x-2">
-            <span class="text-sm">🔊</span>
-            <input type="range" id="volumeSlider" class="slider w-24 h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer" min="0" max="100" value="50">
+            <!-- Speaker icon with 3 sound wave lines -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5L6 9H2v6h4l5 4V5z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 9a5 5 0 010 6" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 7a7 7 0 010 10" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 5a9 9 0 010 14" />
+            </svg>
+            <input type="range" id="volumeSlider" class="slider w-24" min="0" max="100" value="50">
             <span id="volumePercent" class="text-sm text-gray-300 min-w-[35px]">50%</span>
           </div>
         </div>
