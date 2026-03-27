@@ -55,6 +55,13 @@
     /* IMPORTANT: place hamburger just to the left of the DailyJamm logo
        by overriding its position when it lives inside our header row */
     header .hamburger{position:relative;top:auto;left:auto;margin-right:.5rem;z-index:1002}
+
+    /* Modal: scrollable on mobile with smooth iOS momentum */
+    #td-modal { align-items: flex-end; }
+    #td-modal > div { -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+    @media (min-height: 600px) {
+      #td-modal { align-items: center; }
+    }
   </style>
 </head>
 <body class="bg-gray-900 min-h-screen text-white">
