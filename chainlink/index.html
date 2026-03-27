@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Chain Link | DailyJamm</title>
+  <meta name="description" content="Play Chain Link on DailyJamm — the daily compound word chain puzzle! Find the missing words where every adjacent pair forms a compound word or phrase.">
+  <meta name="robots" content="index,follow">
+  <link rel="canonical" href="https://dailyjamm.com/chainlink/">
+  <link rel="icon" type="image/png" href="/assets/img/favicon.png">
+  <link rel="stylesheet" href="/assets/css/styles.css">
+
+  <!-- Open Graph -->
+  <meta property="og:site_name" content="DailyJamm" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://dailyjamm.com/chainlink/" />
+  <meta property="og:title" content="Chain Link | DailyJamm" />
+  <meta property="og:description" content="The daily compound word chain puzzle. Find the missing words where every adjacent pair forms a compound word or phrase." />
+  <meta property="og:image" content="/assets/img/favicon.png" />
+
+  <!-- Theme color (matches site background, fixes iOS toolbar/overscroll) -->
+  <meta name="theme-color" content="#1a1a2e" />
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1a1a2e" />
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#1a1a2e" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XLRXG28EZV"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XLRXG28EZV');
+  </script>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4552090282675465" crossorigin="anonymous"></script>
+
+  <style>
+    :root {
+      --panel: #0f172a;
+      --brand: #10b981;
+      --muted: #cbd5e1;
+      --line:  #1f2937;
+    }
+
+    /* Hamburger + drawer — identical to Themedle */
+    .hamburger{position:fixed;top:20px;left:20px;z-index:1000;cursor:pointer;background:transparent;border:none;padding:0;appearance:none;-webkit-appearance:none}
+    .hamburger:focus{outline:2px solid rgba(255,255,255,.25);outline-offset:4px;border-radius:10px}
+    .hamburger-box{width:30px;height:30px;display:flex;flex-direction:column;justify-content:space-around;background:transparent;border-radius:8px;padding:6px;transition:.3s}
+    .hamburger-box:hover{background:rgba(0,0,0,.3)}
+    .hamburger-line{width:100%;height:3px;background:#fff;border-radius:2px}
+    .backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);opacity:0;visibility:hidden;transition:.3s;z-index:998}
+    .backdrop.open{opacity:1;visibility:visible}
+    .drawer{position:fixed;top:0;left:-300px;width:300px;height:100vh;background:var(--panel);border-right:2px solid var(--brand);transition:left .3s ease;z-index:999;padding:80px 20px 20px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+    .drawer.open{left:0}
+    .menu-sec{margin-bottom:1.5rem}
+    .menu-title{font-size:1rem;font-weight:700;color:var(--brand);margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:1px solid var(--line)}
+    .menu-link{display:block;color:var(--muted);text-decoration:none;padding:.6rem 0;border-radius:5px;transition:.2s}
+    .menu-link:hover{color:#fff;background:rgba(16,185,129,.1);padding-left:.5rem}
+    header .hamburger{position:relative;top:auto;left:auto;margin-right:.5rem;z-index:1002}
+
+    /* Prevent body scroll — game fills the viewport */
+    body { overflow: hidden; }
+  </style>
+</head>
+<body class="bg-gray-900 text-white">
+
+  <!-- Fixed header -->
+  <header class="fixed top-0 left-0 w-full z-[1001] border-b border-gray-800/80 bg-gray-900/70 backdrop-blur-md">
+    <div class="container mx-auto px-4 py-3 flex items-center gap-3">
+      <button class="hamburger" aria-label="Open menu" onclick="toggleMenu()">
+        <span class="hamburger-box">
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </span>
+      </button>
+      <a href="/" class="text-2xl font-extrabold tracking-tight text-green-400 select-none">DailyJamm</a>
+      <div class="flex-1"></div>
+    </div>
+  </header>
+
+  <div class="backdrop" id="backdrop" onclick="closeMenu()"></div>
+  <nav id="drawer" class="drawer" aria-label="Site">
+    <a class="menu-link" href="/" style="margin-bottom:1rem;font-weight:700;color:#fff">Home</a>
+    <div class="menu-sec">
+      <div class="menu-title">Our Games</div>
+      <a class="menu-link" href="/themedle/">Themedle</a>
+      <a class="menu-link" href="/chainlink/">Chain Link</a>
+    </div>
+    <div class="menu-sec">
+      <div class="menu-title">Other Daily Games</div>
+      <a class="menu-link" href="https://dailyakari.com/" target="_blank" rel="noopener">Akari</a>
+      <a class="menu-link" href="https://bandle.app/" target="_blank" rel="noopener">Bandle</a>
+      <a class="menu-link" href="https://www.puzzmo.com/play/circuits/" target="_blank" rel="noopener">Circuits</a>
+      <a class="menu-link" href="https://www.nytimes.com/games/connections" target="_blank" rel="noopener">Connections</a>
+      <a class="menu-link" href="https://contexto.me/en/" target="_blank" rel="noopener">Contexto</a>
+      <a class="menu-link" href="https://costcodle.com/" target="_blank" rel="noopener">Costcodle</a>
+      <a class="menu-link" href="https://www.puzzmo.com/play/crossword/" target="_blank" rel="noopener">Cross|word</a>
+      <a class="menu-link" href="https://dailydozentrivia.com/" target="_blank" rel="noopener">Daily Dozen</a>
+      <a class="menu-link" href="https://framed.wtf/" target="_blank" rel="noopener">Framed</a>
+      <a class="menu-link" href="https://guessthe.game/" target="_blank" rel="noopener">Guess the Game</a>
+      <a class="menu-link" href="https://heardlewordle.io/" target="_blank" rel="noopener">Heardle</a>
+      <a class="menu-link" href="https://linxicon.com/" target="_blank" rel="noopener">Linxicon</a>
+      <a class="menu-link" href="https://minecraftle.zachmanson.com/" target="_blank" rel="noopener">Minecraftle</a>
+      <a class="menu-link" href="https://www.nytimes.com/games/pips" target="_blank" rel="noopener">Pips</a>
+      <a class="menu-link" href="https://raddle.quest/" target="_blank" rel="noopener">Raddle</a>
+      <a class="menu-link" href="https://lessgames.com/songless" target="_blank" rel="noopener">Songless</a>
+      <a class="menu-link" href="https://spotle.io/" target="_blank" rel="noopener">Spotle</a>
+      <a class="menu-link" href="https://www.nytimes.com/puzzles/spelling-bee" target="_blank" rel="noopener">Spelling Bee</a>
+      <a class="menu-link" href="https://heardlewordle.io/taylor-swift-heardle" target="_blank" rel="noopener">Taylor Swift Heardle</a>
+      <a class="menu-link" href="https://www.nytimes.com/games/wordle/index.html" target="_blank" rel="noopener">Wordle</a>
+    </div>
+  </nav>
+
+  <!-- ── Game area — fills viewport below header ── -->
+  <div class="cl-game-wrap">
+    <div class="cl-container">
+
+      <!-- Game header: title / meta / score / help -->
+      <div class="flex items-center justify-between flex-shrink-0 pt-1">
+        <div class="w-8"></div>
+        <div class="text-center">
+          <h1 class="text-xl font-black tracking-wide">Chain Link</h1>
+          <div id="cl-meta" class="text-xs text-gray-500 mt-0.5">#1 · 2026-03-27</div>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="flex items-baseline gap-0.5">
+            <span id="cl-score" class="text-xl font-black text-green-400 leading-none">0</span>
+            <span class="text-sm text-gray-600">/15</span>
+          </div>
+          <button id="cl-help-btn" aria-label="How to play"
+            class="w-8 h-8 rounded-full border border-gray-600 bg-transparent text-gray-400 text-sm font-bold hover:border-gray-400 hover:text-white transition-colors">
+            ?
+          </button>
+        </div>
+      </div>
+
+      <!-- Chain tiles + connectors (rendered by JS) -->
+      <div id="cl-chain" class="flex-1 min-h-0 flex flex-col items-center justify-center overflow-hidden py-1 w-full"></div>
+
+      <!-- Input area — hidden when game over -->
+      <div id="cl-input-area" class="flex-shrink-0 flex flex-col gap-2 pt-1">
+        <!-- Clue (hidden until player clicks Show Clue or guesses wrong) -->
+        <div id="cl-clue-area" class="cl-clue-box hidden">
+          <span id="cl-clue-num" class="text-xs font-black text-purple-400 flex-shrink-0 tracking-wide">1/5</span>
+          <span id="cl-clue-text" class="text-sm text-gray-200 italic leading-snug flex-1">...</span>
+        </div>
+        <!-- Input row -->
+        <div id="cl-input-row" class="flex gap-2">
+          <input
+            type="text"
+            id="cl-guess-input"
+            placeholder="Your answer..."
+            class="flex-1 px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm font-bold tracking-widest uppercase focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="characters"
+            spellcheck="false"
+          />
+          <button id="cl-submit-btn"
+            class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold rounded-lg transition-colors">
+            Enter
+          </button>
+        </div>
+        <!-- Clue button + skip -->
+        <div class="flex items-center justify-between">
+          <button id="cl-clue-btn"
+            class="px-3 py-1.5 bg-transparent border border-purple-800 rounded text-xs text-purple-400 font-semibold hover:border-purple-500 hover:text-purple-300 transition-colors">
+            Clue
+          </button>
+          <button id="cl-skip-btn"
+            class="px-3 py-1.5 bg-transparent border border-gray-700 rounded text-xs text-gray-500 font-semibold hover:border-gray-500 hover:text-gray-300 transition-colors">
+            Skip
+          </button>
+        </div>
+      </div>
+
+      <!-- Results — shown when game over -->
+      <div id="cl-results" class="flex-shrink-0 pt-1 hidden">
+        <div class="bg-gray-800/60 border border-gray-700 rounded-xl p-4 text-center flex flex-col items-center gap-2">
+          <h2 class="text-base font-black">Chain Complete!</h2>
+          <div class="flex items-baseline gap-0.5">
+            <span id="cl-final-score" class="text-3xl font-black text-green-400 leading-none">0</span>
+            <span class="text-sm text-gray-600">/15</span>
+          </div>
+          <p id="cl-result-msg" class="text-xs text-gray-400 font-semibold"></p>
+          <div id="cl-dots" class="flex gap-1.5 text-base"></div>
+          <button id="cl-share-btn"
+            class="mt-1 px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg transition-colors">
+            Share Results
+          </button>
+          <div class="mt-1 pt-2 border-t border-gray-700 w-full flex justify-center gap-6 text-xs text-gray-500">
+            <div><span id="cl-stat-streak" class="font-bold text-gray-300">0</span> streak</div>
+            <div><span id="cl-stat-best"   class="font-bold text-gray-300">0</span> best</div>
+            <div><span id="cl-stat-played" class="font-bold text-gray-300">0</span> played</div>
+          </div>
+          <p class="text-xs text-gray-500">Next chain in: <span id="cl-countdown" class="font-mono text-yellow-300 tabular-nums">--:--:--</span></p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- How to Play modal -->
+  <div id="cl-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 hidden">
+    <div class="bg-gray-900 border border-gray-700 rounded-2xl p-5 max-w-sm w-full max-h-[85vh] overflow-y-auto"
+         onclick="event.stopPropagation()">
+      <h2 class="text-xl font-black text-center mb-0.5">How to Play</h2>
+      <p class="text-xs text-gray-400 text-center mb-4">Complete the chain by finding each missing word.</p>
+
+      <div class="mb-4">
+        <p class="text-xs text-gray-300 leading-relaxed">
+          Each answer forms a compound word or phrase with the word above it —
+          then becomes the start of the next link. A clue is available if you need it.
+        </p>
+      </div>
+
+      <div class="mb-4">
+        <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">Example</h3>
+        <div id="cl-demo" class="bg-gray-800 rounded-lg p-3 flex flex-col items-center"></div>
+      </div>
+
+      <div class="mb-5">
+        <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">Scoring</h3>
+        <p class="text-xs text-gray-300 leading-relaxed">
+          Each word starts worth <strong class="text-white">3 pts</strong>.
+          Click <strong class="text-white">Clue</strong> before guessing and your max drops to
+          <strong class="text-white">2 pts</strong>.
+          Guess wrong and the clue is revealed automatically — get it right next for
+          <strong class="text-white">1 pt</strong>.
+          Guess wrong again with the clue showing and the answer is filled in for
+          <strong class="text-white">0 pts</strong>.
+          Skip any time to score 0. Solve all 5 without hints for a perfect 15!
+        </p>
+      </div>
+
+      <button id="cl-modal-close"
+        class="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-sm font-bold rounded-lg transition-colors">
+        Let's Play
+      </button>
+    </div>
+  </div>
+
+  <script src="/assets/js/chainlink.js" defer></script>
+
+  <script>
+    (function(){
+      const drawer   = document.getElementById('drawer');
+      const backdrop = document.getElementById('backdrop');
+      function openMenu(){
+        drawer.classList.add('open');
+        backdrop.classList.add('open');
+        document.documentElement.classList.add('overflow-hidden');
+        document.addEventListener('keydown', onKey);
+      }
+      function closeMenu(){
+        drawer.classList.remove('open');
+        backdrop.classList.remove('open');
+        document.documentElement.classList.remove('overflow-hidden');
+        document.removeEventListener('keydown', onKey);
+      }
+      function toggleMenu(){
+        if(drawer.classList.contains('open')){ closeMenu(); } else { openMenu(); }
+      }
+      function onKey(e){ if(e.key === 'Escape') closeMenu(); }
+      window.toggleMenu = toggleMenu;
+      window.closeMenu  = closeMenu;
+    })();
+  </script>
+</body>
+</html>

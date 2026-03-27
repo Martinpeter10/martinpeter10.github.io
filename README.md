@@ -22,6 +22,22 @@ A daily TV show theme song guessing game inspired by Wordle-style gameplay.
 
 Play it: [dailyjamm.com/themedle](https://dailyjamm.com/themedle)
 
+### Chain Link
+A daily compound word chain puzzle — find the 5 missing words that link the chain.
+
+- A starting word is given; each answer forms a compound word or phrase with the word above it
+- The answer then becomes the start of the next link in the chain
+- Each word starts worth **3 pts** — click **Clue** to reveal a hint (max 2 pts), or guess blind for full points
+- Guess wrong and the clue is revealed automatically; correct on the next try scores 1 pt
+- Guess wrong with the clue showing and the answer is filled in for 0 pts
+- Skip a word to move on (scores 0)
+- Perfect score is 15/15
+- Streak tracking and games played saved across sessions
+- All game data stored locally — no account needed
+- **30 puzzles** in `assets/data/chainlink-puzzles.json`, cycling indefinitely (one per day)
+
+Play it: [dailyjamm.com/chainlink](https://dailyjamm.com/chainlink)
+
 ---
 
 ## Other Daily Games
@@ -63,12 +79,21 @@ python3 -m http.server 8080
 Then open your browser to:
 - `http://localhost:8080` — DailyJamm home
 - `http://localhost:8080/themedle/` — Themedle game
+- `http://localhost:8080/chainlink/` — Chain Link game
 
 Press `Ctrl+C` in the terminal to stop the server.
 
 ---
 
 ## Releases
+
+### v1.2.0 — 2026-03-27
+- Launched **Chain Link** — daily compound word chain puzzle with 30 puzzles cycling indefinitely
+- Chain Link scoring overhaul: clue-based system (3 pts blind / 2 pts with clue / 1 pt after wrong guess / 0 pts auto-fill)
+- Puzzle data extracted to `assets/data/chainlink-puzzles.json` — add new puzzles without touching source code
+- Added **How to Play** modal to Chain Link (animated demo, shown once on first visit)
+- Added **How to Play** modal to Themedle (animated demo with wrong → correct guess flow, shown once on first visit)
+- Chain Link submit button renamed from "Go" to "Enter"
 
 ### v1.1.0 — 2026-03-27
 - Fixed volume slider track not updating visually when dragged (bar was stuck at 50%)

@@ -98,3 +98,178 @@ input[type=range].slider::-moz-range-thumb {
   border: none;
 }
 
+/* ── Chain Link ─────────────────────────────────── */
+@keyframes cl-shake {
+  0%,100% { transform: translateX(0); }
+  20%     { transform: translateX(-6px); }
+  40%     { transform: translateX(6px); }
+  60%     { transform: translateX(-4px); }
+  80%     { transform: translateX(4px); }
+}
+@keyframes cl-fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes cl-pulse-glow {
+  0%,100% { box-shadow: 0 0 0 0 rgba(251,191,36,0); }
+  50%     { box-shadow: 0 0 0 6px rgba(251,191,36,0.1); }
+}
+@keyframes cl-pop-in {
+  from { opacity: 0; transform: scale(0.9); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* Game layout — fills viewport below fixed header */
+.cl-game-wrap {
+  position: fixed;
+  top: 56px;
+  left: 0; right: 0; bottom: 0;
+  display: flex;
+  justify-content: center;
+  padding: 8px 16px 12px;
+  overflow: hidden;
+}
+.cl-container {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 6px;
+}
+
+/* Chain tiles */
+.cl-tile {
+  width: 100%;
+  padding: 9px 14px;
+  border-radius: 8px;
+  border: 1.5px solid #2d3748;
+  background: #1a202c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.3s ease;
+}
+.cl-tile-given  { background: rgba(139,92,246,0.08); border-color: rgba(139,92,246,0.35); }
+.cl-tile-solved { background: rgba(16,185,129,0.05);  border-color: rgba(16,185,129,0.25); }
+.cl-tile-active {
+  background: rgba(251,191,36,0.05);
+  border-color: rgba(251,191,36,0.35);
+  animation: cl-pulse-glow 2.5s ease-in-out infinite;
+}
+.cl-tile-locked { opacity: 0.22; }
+.cl-tile-text {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 3.5px;
+  flex: 1;
+  text-align: center;
+}
+.cl-tile-pts {
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+  position: absolute;
+  right: 12px;
+  opacity: 0.85;
+}
+
+/* Connectors between tiles */
+.cl-connector {
+  height: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 100%;
+}
+.cl-conn-line {
+  width: 2px;
+  flex: 1;
+  background: #2d3748;
+  transition: background 0.3s;
+}
+.cl-conn-line.done { background: rgba(16,185,129,0.3); }
+.cl-compound {
+  position: absolute;
+  font-size: 9px;
+  font-weight: 700;
+  color: rgba(16,185,129,0.5);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  background: #111827; /* matches body bg-gray-900 */
+  padding: 0 8px;
+  white-space: nowrap;
+  animation: cl-fade-up 0.3s ease;
+}
+
+/* Clue box */
+.cl-clue-box {
+  background: #1a202c;
+  border: 1.5px solid #2d3748;
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Attempt dots */
+.cl-try-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #2d3748;
+  transition: background 0.3s;
+}
+.cl-try-dot.used { background: #ef4444; }
+
+/* Animations */
+.cl-shake   { animation: cl-shake   0.4s ease; }
+.cl-fade-in { animation: cl-fade-up 0.4s ease; }
+
+/* How to Play modal — demo words */
+.cl-demo-word {
+  width: 100%;
+  padding: 6px 10px;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  border: 1.5px solid transparent;
+  transition: all 0.4s ease;
+}
+.cl-demo-given  { color: #c4b5fd; background: rgba(139,92,246,0.08); border-color: rgba(139,92,246,0.25); }
+.cl-demo-solved { color: #4ade80; background: rgba(34,197,94,0.06);  border-color: rgba(34,197,94,0.2); }
+.cl-demo-new    { color: #4ade80; background: rgba(34,197,94,0.12);  border-color: rgba(34,197,94,0.4); animation: cl-pop-in 0.35s ease; }
+.cl-demo-locked { color: #3f3f5e; border-color: #2d3748; opacity: 0.4; }
+.cl-demo-conn   { height: 16px; display: flex; align-items: center; justify-content: center; }
+.cl-demo-phrase { font-size: 8px; font-weight: 700; color: rgba(16,185,129,0.5); letter-spacing: 1.5px; text-transform: uppercase; animation: cl-fade-up 0.3s ease; }
+.cl-demo-dot    { font-size: 8px; color: #2d3748; }
+
+/* ── Themedle How to Play demo ──────────────────── */
+.td-bar {
+  width: 4px;
+  background: #10b981;
+  border-radius: 2px 2px 0 0;
+  transform-origin: bottom;
+  animation: td-bounce 0.6s ease-in-out infinite alternate;
+  animation-play-state: paused;
+}
+.td-bar.playing { animation-play-state: running; }
+.td-bar:nth-child(1) { animation-delay: 0.00s; }
+.td-bar:nth-child(2) { animation-delay: 0.10s; }
+.td-bar:nth-child(3) { animation-delay: 0.20s; }
+.td-bar:nth-child(4) { animation-delay: 0.05s; }
+.td-bar:nth-child(5) { animation-delay: 0.15s; }
+.td-bar:nth-child(6) { animation-delay: 0.25s; }
+.td-bar:nth-child(7) { animation-delay: 0.08s; }
+.td-bar:nth-child(8) { animation-delay: 0.18s; }
+@keyframes td-bounce {
+  0%   { transform: scaleY(0.15); }
+  100% { transform: scaleY(1); }
+}
+

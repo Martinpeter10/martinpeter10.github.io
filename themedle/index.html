@@ -78,6 +78,10 @@
       </a>
 
       <div class="flex-1"></div>
+      <button id="td-help-btn" aria-label="How to play"
+        class="w-8 h-8 rounded-full border border-gray-600 bg-transparent text-gray-400 text-sm font-bold hover:border-gray-400 hover:text-white transition-colors">
+        ?
+      </button>
     </div>
   </header>
 
@@ -88,6 +92,7 @@
     <div class="menu-sec">
       <div class="menu-title">Our Games</div>
       <a class="menu-link" href="/themedle/">Themedle</a>
+      <a class="menu-link" href="/chainlink/">Chain Link</a>
     </div>
     <div class="menu-sec">
       <div class="menu-title">Other Daily Games</div>
@@ -266,6 +271,92 @@
 
   
 
+  <!-- How to Play modal -->
+  <div id="td-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-[1050] p-4 hidden">
+    <div class="bg-gray-900 border border-gray-700 rounded-2xl p-5 max-w-sm w-full max-h-[85vh] overflow-y-auto"
+         onclick="event.stopPropagation()">
+      <h2 class="text-xl font-black text-center mb-0.5">How to Play</h2>
+      <p class="text-xs text-gray-400 text-center mb-4">Guess the TV theme song in up to 6 attempts.</p>
+
+      <div class="mb-4">
+        <p class="text-xs text-gray-300 leading-relaxed">
+          Listen to a short clip and guess the show title. Each wrong guess or skip
+          reveals a longer clip — use the autocomplete to find your answer.
+        </p>
+      </div>
+
+      <div class="mb-4">
+        <h3 class="text-xs font-bold text-green-400 uppercase tracking-widest mb-2">Demo</h3>
+        <div id="td-demo" class="bg-gray-800 rounded-lg p-3 flex flex-col gap-2">
+          <!-- Player row -->
+          <div class="flex items-center gap-2">
+            <div id="td-play-btn"
+              class="w-7 h-7 rounded-full bg-gray-600 flex items-center justify-center text-xs font-bold flex-shrink-0 transition-colors">
+              ▶
+            </div>
+            <div class="flex-1 bg-gray-700 rounded-full h-2 overflow-hidden">
+              <div id="td-progress" class="bg-green-500 h-2 rounded-full transition-all duration-700" style="width:0%"></div>
+            </div>
+            <span id="td-clip-label" class="text-xs text-gray-500 w-6 text-right flex-shrink-0">1s</span>
+          </div>
+          <!-- Music visualizer bars -->
+          <div class="flex items-end justify-center gap-1" style="height:28px">
+            <div class="td-bar" style="height:10px"></div>
+            <div class="td-bar" style="height:18px"></div>
+            <div class="td-bar" style="height:8px"></div>
+            <div class="td-bar" style="height:22px"></div>
+            <div class="td-bar" style="height:14px"></div>
+            <div class="td-bar" style="height:20px"></div>
+            <div class="td-bar" style="height:9px"></div>
+            <div class="td-bar" style="height:16px"></div>
+          </div>
+          <!-- Guess input -->
+          <div id="td-demo-input"
+            class="rounded-lg px-3 py-1.5 text-xs bg-gray-700 border-2 border-gray-600 text-gray-400 transition-all">
+            Search for the title...
+          </div>
+          <!-- Result slots -->
+          <div id="td-demo-result-1"
+            class="rounded-lg px-3 py-1.5 text-xs font-semibold bg-gray-700/50 border-2 border-gray-600 text-gray-500 flex items-center justify-between transition-all">
+            <span>Guess 1</span><span>1s clip</span>
+          </div>
+          <div id="td-demo-result-2"
+            class="rounded-lg px-3 py-1.5 text-xs font-semibold bg-gray-700/50 border-2 border-gray-600 text-gray-500 flex items-center justify-between transition-all">
+            <span>Guess 2</span><span>2s clip</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <h3 class="text-xs font-bold text-green-400 uppercase tracking-widest mb-2">Clip Lengths</h3>
+        <div class="grid grid-cols-6 gap-1 text-center">
+          <div class="bg-gray-800 rounded p-1.5"><div class="text-xs font-black text-white">1</div><div class="text-xs text-gray-500">1s</div></div>
+          <div class="bg-gray-800 rounded p-1.5"><div class="text-xs font-black text-white">2</div><div class="text-xs text-gray-500">2s</div></div>
+          <div class="bg-gray-800 rounded p-1.5"><div class="text-xs font-black text-white">3</div><div class="text-xs text-gray-500">3s</div></div>
+          <div class="bg-gray-800 rounded p-1.5"><div class="text-xs font-black text-white">4</div><div class="text-xs text-gray-500">5s</div></div>
+          <div class="bg-gray-800 rounded p-1.5"><div class="text-xs font-black text-white">5</div><div class="text-xs text-gray-500">10s</div></div>
+          <div class="bg-gray-800 rounded p-1.5"><div class="text-xs font-black text-white">6</div><div class="text-xs text-gray-500">15s</div></div>
+        </div>
+      </div>
+
+      <div class="mb-5">
+        <h3 class="text-xs font-bold text-green-400 uppercase tracking-widest mb-2">Scoring</h3>
+        <p class="text-xs text-gray-300 leading-relaxed">
+          Guess correctly on any attempt to keep your
+          <strong class="text-white">streak</strong> alive.
+          Wrong guesses and skips each unlock a longer clip.
+          Solve it on attempt <strong class="text-white">1</strong> for the best bragging rights —
+          but solving it at all is the goal. New song every day!
+        </p>
+      </div>
+
+      <button id="td-modal-close"
+        class="w-full py-2.5 bg-green-600 hover:bg-green-500 text-white text-sm font-bold rounded-lg transition-colors">
+        Let's Play
+      </button>
+    </div>
+  </div>
+
   <!-- Footer -->
   <footer class="text-center py-6 text-xs text-gray-500 border-t border-gray-800 mt-8">
     <p class="mb-1">© 2024 Themedle. This is a fan-made game for entertainment purposes only.</p>
@@ -278,6 +369,110 @@
 
   <!-- Minimal JS to match homepage behavior for the hamburger -->
   <script>
+    (function(){
+      // ── Themedle How to Play modal ──────────────────────────────────────
+      const tdModal     = document.getElementById('td-modal');
+      const tdHelpBtn   = document.getElementById('td-help-btn');
+      const tdCloseBtn  = document.getElementById('td-modal-close');
+
+      let tdTimer = null;
+      let tdPhase = 0;
+
+      // Five-phase demo: idle → playing clip 1 → wrong guess → playing clip 2 → correct
+      var GRAY_ROW   = 'rounded-lg px-3 py-1.5 text-xs font-semibold bg-gray-700/50 border-2 border-gray-600 text-gray-500 flex items-center justify-between transition-all';
+      var RED_ROW    = 'rounded-lg px-3 py-1.5 text-xs font-semibold bg-red-900/30 border-2 border-red-700 text-red-400 flex items-center justify-between transition-all';
+      var GREEN_ROW  = 'rounded-lg px-3 py-1.5 text-xs font-semibold bg-green-900/40 border-2 border-green-500 text-green-300 flex items-center justify-between transition-all';
+      var PLAY_ON    = 'w-7 h-7 rounded-full bg-green-500 flex items-center justify-center text-xs font-bold flex-shrink-0 transition-colors';
+      var PLAY_OFF   = 'w-7 h-7 rounded-full bg-gray-600 flex items-center justify-center text-xs font-bold flex-shrink-0 transition-colors';
+      var INPUT_IDLE = 'rounded-lg px-3 py-1.5 text-xs bg-gray-700 border-2 border-gray-600 text-gray-400 transition-all';
+      var INPUT_TYPE = 'rounded-lg px-3 py-1.5 text-xs bg-gray-700 border-2 border-yellow-500 text-white font-bold tracking-widest transition-all';
+
+      function tdSetPlay(on) {
+        var btn = document.getElementById('td-play-btn');
+        var bar = document.getElementById('td-progress');
+        var clip = document.getElementById('td-clip-label');
+        if (btn) btn.className = on ? PLAY_ON : PLAY_OFF;
+        document.querySelectorAll('.td-bar').forEach(function(b){ on ? b.classList.add('playing') : b.classList.remove('playing'); });
+        return { bar: bar, clip: clip };
+      }
+
+      const DEMO_PHASES = [
+        // 0 — idle: reset everything
+        function() {
+          var r = tdSetPlay(false);
+          if (r.bar) r.bar.style.width = '0%';
+          if (r.clip) r.clip.textContent = '1s';
+          var inp = document.getElementById('td-demo-input');
+          var r1  = document.getElementById('td-demo-result-1');
+          var r2  = document.getElementById('td-demo-result-2');
+          if (inp) { inp.textContent = 'Search for the title...'; inp.className = INPUT_IDLE; }
+          if (r1)  { r1.innerHTML = '<span>Guess 1</span><span>1s clip</span>'; r1.className = GRAY_ROW; }
+          if (r2)  { r2.innerHTML = '<span>Guess 2</span><span>2s clip</span>'; r2.className = GRAY_ROW; }
+        },
+        // 1 — playing clip 1: bars animate, progress fills to ~10%
+        function() {
+          var r = tdSetPlay(true);
+          if (r.bar) r.bar.style.width = '10%';
+          if (r.clip) r.clip.textContent = '1s';
+        },
+        // 2 — wrong guess: bars stop, input shows wrong answer, result 1 goes red
+        function() {
+          var r = tdSetPlay(false);
+          if (r.bar) r.bar.style.width = '10%';
+          var inp = document.getElementById('td-demo-input');
+          var r1  = document.getElementById('td-demo-result-1');
+          if (inp) { inp.textContent = 'Search for the title...'; inp.className = INPUT_IDLE; }
+          if (r1)  { r1.innerHTML = '<span>✗ THE FRESH PRINCE</span><span>1s</span>'; r1.className = RED_ROW; }
+        },
+        // 3 — playing clip 2: bars animate, progress extends to ~20%, clip label updates
+        function() {
+          var r = tdSetPlay(true);
+          if (r.bar) r.bar.style.width = '20%';
+          if (r.clip) r.clip.textContent = '2s';
+        },
+        // 4 — correct: input shows answer, result 2 goes green
+        function() {
+          var r = tdSetPlay(false);
+          if (r.bar) r.bar.style.width = '20%';
+          var inp = document.getElementById('td-demo-input');
+          var r2  = document.getElementById('td-demo-result-2');
+          if (inp) { inp.textContent = 'SEINFELD'; inp.className = INPUT_TYPE; }
+          if (r2)  { r2.innerHTML = '<span>✓ SEINFELD</span><span>2s</span>'; r2.className = GREEN_ROW; }
+        },
+      ];
+
+      function runDemo() {
+        DEMO_PHASES[tdPhase]();
+        tdPhase = (tdPhase + 1) % DEMO_PHASES.length;
+      }
+
+      function openTdModal() {
+        tdModal.classList.remove('hidden');
+        tdPhase = 0;
+        runDemo();
+        tdTimer = setInterval(runDemo, 1600);
+      }
+
+      function closeTdModal() {
+        tdModal.classList.add('hidden');
+        clearInterval(tdTimer);
+        tdTimer = null;
+      }
+
+      tdHelpBtn.addEventListener('click', openTdModal);
+      tdCloseBtn.addEventListener('click', closeTdModal);
+      tdModal.addEventListener('click', function(e){ if (e.target === tdModal) closeTdModal(); });
+      document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && !tdModal.classList.contains('hidden')) closeTdModal(); });
+
+      // Show modal on first visit
+      var TD_SEEN_KEY = 'td_seen_howto';
+      if (!localStorage.getItem(TD_SEEN_KEY)) {
+        localStorage.setItem(TD_SEEN_KEY, '1');
+        // Small delay so the page renders first
+        setTimeout(openTdModal, 400);
+      }
+    })();
+
     (function(){
       const drawer = document.getElementById('drawer');
       const backdrop = document.getElementById('backdrop');

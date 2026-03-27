@@ -1,0 +1,362 @@
+[
+  {
+    "id": 1,
+    "date": "2026-03-27",
+    "words": ["LINCOLN", "LOG", "CABIN", "FEVER", "DREAM", "CATCHER"],
+    "clues": [
+      "A captain keeps one at sea",
+      "A cozy retreat in the woods",
+      "A rising temperature signals this",
+      "What happens when you close your eyes at night",
+      "The position behind home plate"
+    ]
+  },
+  {
+    "id": 2,
+    "date": "2026-03-28",
+    "words": ["FIRE", "TRUCK", "STOP", "WATCH", "TOWER", "BRIDGE"],
+    "clues": [
+      "An 18-wheeler on the highway",
+      "A red octagon on the road",
+      "A timepiece worn on the wrist",
+      "Big Ben or the Eiffel, for example",
+      "A famous London landmark over the Thames"
+    ]
+  },
+  {
+    "id": 3,
+    "date": "2026-03-29",
+    "words": ["HONEY", "MOON", "LIGHT", "HOUSE", "PLANT", "BASED"],
+    "clues": [
+      "It controls the tides",
+      "Flip the switch to turn it on",
+      "Where you hang your hat",
+      "A succulent or fern, for example",
+      "Beyond Meat is this type of product"
+    ]
+  },
+  {
+    "id": 4,
+    "date": "2026-03-30",
+    "words": ["BLACK", "BIRD", "HOUSE", "HOLD", "UP", "TOWN"],
+    "clues": [
+      "Robin or eagle, for example",
+      "Where you hang your hat",
+      "Grip something tightly",
+      "The opposite of down",
+      "A small city"
+    ]
+  },
+  {
+    "id": 5,
+    "date": "2026-03-31",
+    "words": ["SNOW", "BALL", "PARK", "WAY", "SIDE", "KICK"],
+    "clues": [
+      "A round object used in sports",
+      "Where kids play on swings",
+      "A road or path",
+      "Left or right of center",
+      "Strike with your foot"
+    ]
+  },
+  {
+    "id": 6,
+    "date": "2026-04-01",
+    "words": ["SUN", "FLOWER", "BED", "ROOM", "MATE", "SHIP"],
+    "clues": [
+      "A rose or daisy, for example",
+      "Where you sleep at night",
+      "A space with four walls",
+      "A friend or companion",
+      "A vessel that sails the ocean"
+    ]
+  },
+  {
+    "id": 7,
+    "date": "2026-04-02",
+    "words": ["WATER", "FALL", "OUT", "SIDE", "LINE", "UP"],
+    "clues": [
+      "Niagara is a famous one",
+      "The result when you're eliminated",
+      "Not inside",
+      "Something you wait in",
+      "Stand and get ready"
+    ]
+  },
+  {
+    "id": 8,
+    "date": "2026-04-03",
+    "words": ["BOOK", "MARK", "DOWN", "HILL", "TOP", "NOTCH"],
+    "clues": [
+      "A stain or blemish",
+      "Feathers from a duck or goose",
+      "A raised area of land",
+      "The highest point of something",
+      "A cut or level of quality"
+    ]
+  },
+  {
+    "id": 9,
+    "date": "2026-04-04",
+    "words": ["RAIN", "BOW", "TIE", "BREAK", "FAST", "TRACK"],
+    "clues": [
+      "A curved weapon used in archery",
+      "Fasten your shoes with one",
+      "A fracture in a bone",
+      "The opposite of slow",
+      "A path for trains or runners"
+    ]
+  },
+  {
+    "id": 10,
+    "date": "2026-04-05",
+    "words": ["HAND", "SHAKE", "DOWN", "TOWN", "HALL", "WAY"],
+    "clues": [
+      "Tremble or vibrate",
+      "A direction on an elevator button",
+      "A small city",
+      "A large room for events or gatherings",
+      "A corridor in a building"
+    ]
+  },
+  {
+    "id": 11,
+    "date": "2026-04-06",
+    "words": ["BLUE", "BERRY", "FARM", "LAND", "MARK", "DOWN"],
+    "clues": [
+      "A small fruit that grows on bushes",
+      "Where crops are grown and animals raised",
+      "Solid ground beneath your feet",
+      "A visible sign or impression",
+      "Soft feathers used in pillows"
+    ]
+  },
+  {
+    "id": 12,
+    "date": "2026-04-07",
+    "words": ["STAR", "FISH", "BOWL", "CUT", "BACK", "BONE"],
+    "clues": [
+      "Salmon or tuna, for example",
+      "A deep round dish for soup",
+      "Use scissors to do this",
+      "The rear or behind",
+      "Part of your skeleton"
+    ]
+  },
+  {
+    "id": 13,
+    "date": "2026-04-08",
+    "words": ["SAND", "STORM", "CLOUD", "BURST", "OPEN", "HOUSE"],
+    "clues": [
+      "Thunder and lightning come with this",
+      "A fluffy white shape in the sky",
+      "Pop a balloon and it will do this",
+      "Unlock and push a door to do this",
+      "A building where people live"
+    ]
+  },
+  {
+    "id": 14,
+    "date": "2026-04-09",
+    "words": ["CROSS", "ROAD", "TRIP", "WIRE", "TAP", "DANCE"],
+    "clues": [
+      "A street cars drive on",
+      "Stumble and fall",
+      "A thin metal strand",
+      "Turn on a faucet to do this",
+      "Move rhythmically to music"
+    ]
+  },
+  {
+    "id": 15,
+    "date": "2026-04-10",
+    "words": ["NIGHT", "OWL", "CITY", "HALL", "MARK", "UP"],
+    "clues": [
+      "A nocturnal bird of prey",
+      "New York or London, for example",
+      "A large room for events",
+      "A visible sign or impression",
+      "The opposite of down"
+    ]
+  },
+  {
+    "id": 16,
+    "date": "2026-04-11",
+    "words": ["TOOTH", "BRUSH", "FIRE", "PLACE", "MAT", "BOARD"],
+    "clues": [
+      "A tool for painting or cleaning",
+      "Flames that burn wood",
+      "A location or spot",
+      "A flat pad you stand on",
+      "A flat piece of wood or a committee"
+    ]
+  },
+  {
+    "id": 17,
+    "date": "2026-04-12",
+    "words": ["BACK", "YARD", "STICK", "SHIFT", "KEY", "STONE"],
+    "clues": [
+      "Three feet of measurement",
+      "A long thin branch or rod",
+      "Change gears or move slightly",
+      "What unlocks a door",
+      "A rock or a Mick Jagger band"
+    ]
+  },
+  {
+    "id": 18,
+    "date": "2026-04-13",
+    "words": ["GOLD", "MINE", "FIELD", "GOAL", "POST", "CARD"],
+    "clues": [
+      "Belonging to me",
+      "Where crops or games are played",
+      "An aim or objective",
+      "Mail travels via this service",
+      "Dealt in poker or sent on birthdays"
+    ]
+  },
+  {
+    "id": 19,
+    "date": "2026-04-14",
+    "words": ["HEAD", "BAND", "STAND", "POINT", "GUARD", "RAIL"],
+    "clues": [
+      "A musical group",
+      "Rise to your feet",
+      "The tip of a pencil or a score unit",
+      "A person who protects something",
+      "Trains run on these"
+    ]
+  },
+  {
+    "id": 20,
+    "date": "2026-04-15",
+    "words": ["PLAY", "GROUND", "WORK", "SHOP", "LIFT", "OFF"],
+    "clues": [
+      "The earth beneath your feet",
+      "A job or occupation",
+      "A store or retail space",
+      "Raise something upward",
+      "The opposite of on"
+    ]
+  },
+  {
+    "id": 21,
+    "date": "2026-04-16",
+    "words": ["CAMP", "FIRE", "SIDE", "WALK", "OUT", "BREAK"],
+    "clues": [
+      "Flames that keep you warm",
+      "Left or right of center",
+      "Move on foot",
+      "Not inside",
+      "Escape or an onset of disease"
+    ]
+  },
+  {
+    "id": 22,
+    "date": "2026-04-17",
+    "words": ["DOOR", "BELL", "HOP", "SCOTCH", "TAPE", "WORM"],
+    "clues": [
+      "A chiming sound",
+      "A rabbit does this to move",
+      "A type of whisky from Scotland",
+      "Sticky adhesive on a roll",
+      "A long, squirmy creature in the soil"
+    ]
+  },
+  {
+    "id": 23,
+    "date": "2026-04-18",
+    "words": ["BASE", "BALL", "ROOM", "KEY", "BOARD", "WALK"],
+    "clues": [
+      "A round object thrown in games",
+      "A space with four walls",
+      "What unlocks a door",
+      "A flat surface you write on or a committee",
+      "Move on foot"
+    ]
+  },
+  {
+    "id": 24,
+    "date": "2026-04-19",
+    "words": ["FOOT", "NOTE", "PAD", "LOCK", "SMITH", "FIELD"],
+    "clues": [
+      "A brief written message",
+      "A cushioned surface or a tablet",
+      "A device that secures a door",
+      "A person who works with metal",
+      "An open area of grass"
+    ]
+  },
+  {
+    "id": 25,
+    "date": "2026-04-20",
+    "words": ["TIME", "LINE", "BACK", "PACK", "RAT", "RACE"],
+    "clues": [
+      "A queue or a mark on paper",
+      "Return or the rear side",
+      "A bag carried on your shoulders",
+      "A small rodent",
+      "A competition of speed"
+    ]
+  },
+  {
+    "id": 26,
+    "date": "2026-04-21",
+    "words": ["COURT", "YARD", "SALE", "PRICE", "TAG", "LINE"],
+    "clues": [
+      "Three feet of measurement",
+      "A discount event at a store",
+      "What something costs",
+      "A label attached to clothing",
+      "A fishing string or a queue"
+    ]
+  },
+  {
+    "id": 27,
+    "date": "2026-04-22",
+    "words": ["HORSE", "SHOE", "BOX", "CAR", "POOL", "SIDE"],
+    "clues": [
+      "Footwear you lace up",
+      "A container with a lid",
+      "A vehicle with four wheels",
+      "A place to swim",
+      "Left or right"
+    ]
+  },
+  {
+    "id": 28,
+    "date": "2026-04-23",
+    "words": ["WIND", "MILL", "STONE", "WALL", "PAPER", "BACK"],
+    "clues": [
+      "Where grain is ground into flour",
+      "A small rock",
+      "A vertical barrier in a building",
+      "What you write or print on",
+      "The rear side of something"
+    ]
+  },
+  {
+    "id": 29,
+    "date": "2026-04-24",
+    "words": ["LAMP", "SHADE", "TREE", "HOUSE", "WORK", "BENCH"],
+    "clues": [
+      "Darkness or a variation of color",
+      "An oak or maple, for example",
+      "A building where people live",
+      "A job or occupation",
+      "A long seat or a weight-lifting station"
+    ]
+  },
+  {
+    "id": 30,
+    "date": "2026-04-25",
+    "words": ["ROAD", "BLOCK", "CHAIN", "LINK", "FENCE", "POST"],
+    "clues": [
+      "A solid cube shape or an obstacle",
+      "A series of connected loops",
+      "One connection in a series",
+      "A barrier around a yard",
+      "A wooden pole or to publish online"
+    ]
+  }
+]
