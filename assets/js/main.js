@@ -350,12 +350,18 @@ function updateCountdown() {
 }
 
 // -------------------- Volume --------------------
+function updateSliderTrack(slider) {
+  slider.style.background = `linear-gradient(to right, var(--brand) ${slider.value}%, #4b5563 ${slider.value}%)`;
+}
+
 if (volumeSlider) {
+  updateSliderTrack(volumeSlider); // set correct track on init (default is 50, so this is a no-op visually but future-proofs it)
   volumeSlider.addEventListener('input', function () {
     const volume = this.value / 100;
     if (audioElement) audioElement.volume = volume;
     const vp = document.getElementById('volumePercent');
     if (vp) vp.textContent = this.value + '%';
+    updateSliderTrack(this);
   });
 }
 
@@ -658,7 +664,7 @@ function boot() {
     };
   });
   audioElement.src = currentSong.url;
-  audioElement.preload = 'auto';
+  audioElement.preload = 'none';
   audioElement.volume = 0.5;
 
   updateCountdown();
