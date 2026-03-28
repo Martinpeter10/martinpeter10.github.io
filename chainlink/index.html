@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Chain Link | DailyJamm</title>
-  <meta name="description" content="Play Chain Link on DailyJamm — the daily compound word chain puzzle! Find the missing words where every adjacent pair forms a compound word or phrase.">
+  <meta name="description" content="Play Chain Link on DailyJamm - the daily compound word chain puzzle! Find the missing words where every adjacent pair forms a compound word or phrase.">
   <meta name="robots" content="index,follow">
   <link rel="canonical" href="https://dailyjamm.com/chainlink/">
   <link rel="icon" type="image/png" href="/assets/img/favicon.png">
@@ -47,7 +47,7 @@
       --line:  #1f2937;
     }
 
-    /* Hamburger + drawer — identical to Themedle */
+    /* Hamburger + drawer - identical to Themedle */
     .hamburger{position:fixed;top:20px;left:20px;z-index:1000;cursor:pointer;background:transparent;border:none;padding:0;appearance:none;-webkit-appearance:none}
     .hamburger:focus{outline:2px solid rgba(255,255,255,.25);outline-offset:4px;border-radius:10px}
     .hamburger-box{width:30px;height:30px;display:flex;flex-direction:column;justify-content:space-around;background:transparent;border-radius:8px;padding:6px;transition:.3s}
@@ -63,13 +63,13 @@
     .menu-link:hover{color:#fff;background:rgba(16,185,129,.1);padding-left:.5rem}
     header .hamburger{position:relative;top:auto;left:auto;margin-right:.5rem;z-index:1002}
 
-    /* Prevent body scroll — game fills the viewport */
+    /* Prevent body scroll - game fills the viewport */
     body { overflow: hidden; }
 
     /* Prevent iOS auto-zoom on input focus (triggered when font-size < 16px) */
     #cl-guess-input { font-size: 16px; }
 
-    /* Modal — bottom-sheet on mobile, centered on taller screens */
+    /* Modal - bottom-sheet on mobile, centered on taller screens */
     #cl-modal { align-items: flex-end; padding: 0; }
     #cl-modal > div {
       border-radius: 1.25rem 1.25rem 0 0;
@@ -146,7 +146,7 @@
     </div>
   </nav>
 
-  <!-- ── Game area — fills viewport below header ── -->
+  <!-- ── Game area - fills viewport below header ── -->
   <div class="cl-game-wrap">
     <div class="cl-container">
 
@@ -172,7 +172,7 @@
       <!-- Chain tiles + connectors (rendered by JS) -->
       <div id="cl-chain" class="flex-1 min-h-0 flex flex-col items-center justify-center overflow-hidden py-1 w-full"></div>
 
-      <!-- Input area — hidden when game over -->
+      <!-- Input area - hidden when game over -->
       <div id="cl-input-area" class="flex-shrink-0 flex flex-col gap-2 pt-1">
         <!-- Clue (hidden until player clicks Show Clue or guesses wrong) -->
         <div id="cl-clue-area" class="cl-clue-box hidden">
@@ -209,7 +209,7 @@
         </div>
       </div>
 
-      <!-- Results — shown when game over -->
+      <!-- Results - shown when game over -->
       <div id="cl-results" class="flex-shrink-0 pt-1 hidden">
         <div class="bg-gray-800/60 border border-gray-700 rounded-xl p-4 text-center flex flex-col items-center gap-2">
           <h2 class="text-base font-black">Chain Complete!</h2>
@@ -244,7 +244,7 @@
 
       <div class="mb-4">
         <p class="text-xs text-gray-300 leading-relaxed">
-          Each answer forms a compound word or phrase with the word above it —
+          Each answer forms a compound word or phrase with the word above it -
           then becomes the start of the next link. A clue is available if you need it.
         </p>
       </div>
@@ -260,7 +260,7 @@
           Each word starts worth <strong class="text-white">3 pts</strong>.
           Click <strong class="text-white">Clue</strong> before guessing and your max drops to
           <strong class="text-white">2 pts</strong>.
-          Guess wrong and the clue is revealed automatically — get it right next for
+          Guess wrong and the clue is revealed automatically - get it right next for
           <strong class="text-white">1 pt</strong>.
           Guess wrong again with the clue showing and the answer is filled in for
           <strong class="text-white">0 pts</strong>.

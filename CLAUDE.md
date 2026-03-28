@@ -1,12 +1,12 @@
 # DailyJamm - Project Instructions
 
 ## What This Is
-DailyJamm (dailyjamm.com) is a daily games hub hosted on GitHub Pages. It features original custom-built games and curates links to external daily games. Dark-mode-only, mobile-first, no backend — all game state lives in localStorage.
+DailyJamm (dailyjamm.com) is a daily games hub hosted on GitHub Pages. It features original custom-built games and curates links to external daily games. Dark-mode-only, mobile-first, no backend - all game state lives in localStorage.
 
 ## Domain & Hosting
 - Domain: `dailyjamm.com` (CNAME file)
 - Hosting: GitHub Pages (static HTML, no build step)
-- No framework — vanilla HTML/CSS/JS + Tailwind CDN on game pages
+- No framework - vanilla HTML/CSS/JS + Tailwind CDN on game pages
 
 ## Branding & Theme
 - **Colors**: `--bg:#1a1a2e`, `--panel:#16213e`, `--brand:#2ecc71` (green), `--brand2:#45b7d1` (cyan), `--ink:#fff`, `--muted:#b8b8d1`
@@ -36,7 +36,7 @@ Every game page MUST include all of these in the `<head>`:
 
 <!-- SEO -->
 <title>Game Name | DailyJamm</title>
-<meta name="description" content="Play Game Name on DailyJamm — [game description].">
+<meta name="description" content="Play Game Name on DailyJamm - [game description].">
 <meta name="robots" content="index,follow">
 <link rel="canonical" href="https://dailyjamm.com/<game-slug>/">
 <link rel="icon" type="image/png" href="/assets/img/favicon.png">
@@ -57,7 +57,7 @@ Every game page MUST include all of these in the `<head>`:
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-<!-- Google Analytics (gtag.js) — REQUIRED on every page -->
+<!-- Google Analytics (gtag.js) - REQUIRED on every page -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-XLRXG28EZV"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -69,7 +69,7 @@ Every game page MUST include all of these in the `<head>`:
 <!-- Tailwind CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
 
-<!-- Google AdSense — REQUIRED on every page -->
+<!-- Google AdSense - REQUIRED on every page -->
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4552090282675465" crossorigin="anonymous"></script>
 ```
 

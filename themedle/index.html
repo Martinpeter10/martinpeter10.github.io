@@ -294,7 +294,7 @@
       <div class="mb-4">
         <p class="text-xs text-gray-300 leading-relaxed">
           Listen to a short clip and guess the show title. Each wrong guess or skip
-          reveals a longer clip — use the autocomplete to find your answer.
+          reveals a longer clip - use the autocomplete to find your answer.
         </p>
       </div>
 
@@ -358,7 +358,7 @@
           Guess correctly on any attempt to keep your
           <strong class="text-white">streak</strong> alive.
           Wrong guesses and skips each unlock a longer clip.
-          Solve it on attempt <strong class="text-white">1</strong> for the best bragging rights —
+          Solve it on attempt <strong class="text-white">1</strong> for the best bragging rights -
           but solving it at all is the goal. New song every day!
         </p>
       </div>
@@ -410,7 +410,7 @@
       }
 
       const DEMO_PHASES = [
-        // 0 — idle: reset everything
+        // 0 - idle: reset everything
         function() {
           var r = tdSetPlay(false);
           if (r.bar) r.bar.style.width = '0%';
@@ -422,13 +422,13 @@
           if (r1)  { r1.innerHTML = '<span>Guess 1</span><span>1s clip</span>'; r1.className = GRAY_ROW; }
           if (r2)  { r2.innerHTML = '<span>Guess 2</span><span>2s clip</span>'; r2.className = GRAY_ROW; }
         },
-        // 1 — playing clip 1: bars animate, progress fills to ~10%
+        // 1 - playing clip 1: bars animate, progress fills to ~10%
         function() {
           var r = tdSetPlay(true);
           if (r.bar) r.bar.style.width = '10%';
           if (r.clip) r.clip.textContent = '1s';
         },
-        // 2 — wrong guess: bars stop, input shows wrong answer, result 1 goes red
+        // 2 - wrong guess: bars stop, input shows wrong answer, result 1 goes red
         function() {
           var r = tdSetPlay(false);
           if (r.bar) r.bar.style.width = '10%';
@@ -437,13 +437,13 @@
           if (inp) { inp.textContent = 'Search for the title...'; inp.className = INPUT_IDLE; }
           if (r1)  { r1.innerHTML = '<span>✗ THE FRESH PRINCE</span><span>1s</span>'; r1.className = RED_ROW; }
         },
-        // 3 — playing clip 2: bars animate, progress extends to ~20%, clip label updates
+        // 3 - playing clip 2: bars animate, progress extends to ~20%, clip label updates
         function() {
           var r = tdSetPlay(true);
           if (r.bar) r.bar.style.width = '20%';
           if (r.clip) r.clip.textContent = '2s';
         },
-        // 4 — correct: input shows answer, result 2 goes green
+        // 4 - correct: input shows answer, result 2 goes green
         function() {
           var r = tdSetPlay(false);
           if (r.bar) r.bar.style.width = '20%';

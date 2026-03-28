@@ -2,7 +2,7 @@
   'use strict';
 
   // Puzzle data lives in /assets/data/chainlink-puzzles.json.
-  // To add new puzzles, edit that file only — no changes needed here.
+  // To add new puzzles, edit that file only - no changes needed here.
 
   // ── Date helpers (DST-safe Chicago, matching Themedle) ───────────────────
   function getTodayCST() {
@@ -16,7 +16,7 @@
 
   // ── Puzzle selection ─────────────────────────────────────────────────────
   // Exact date match first; fall back to modular cycling off the first puzzle
-  // (same spirit as Themedle's seeded rotation — no day is ever skipped).
+  // (same spirit as Themedle's seeded rotation - no day is ever skipped).
   function getPuzzle(puzzles) {
     const today = getTodayCST();
     const exact = puzzles.find(p => p.date === today);

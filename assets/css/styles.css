@@ -119,7 +119,7 @@ input[type=range].slider::-moz-range-thumb {
   to   { opacity: 1; transform: scale(1); }
 }
 
-/* Game layout — fills viewport below fixed header */
+/* Game layout - fills viewport below fixed header */
 .cl-game-wrap {
   position: fixed;
   top: 56px;
@@ -230,7 +230,7 @@ input[type=range].slider::-moz-range-thumb {
 .cl-shake   { animation: cl-shake   0.4s ease; }
 .cl-fade-in { animation: cl-fade-up 0.4s ease; }
 
-/* How to Play modal — demo words */
+/* How to Play modal - demo words */
 .cl-demo-word {
   width: 100%;
   padding: 6px 10px;
@@ -275,7 +275,7 @@ input[type=range].slider::-moz-range-thumb {
 
 /* ── BlackJackdle ──────────────────────────────────── */
 
-/* Game layout — fills viewport below fixed header */
+/* Game layout - fills viewport below fixed header */
 .bj-game-wrap {
   position: fixed;
   top: 56px;

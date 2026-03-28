@@ -1,4 +1,4 @@
-// main.js — Themedle game logic (with CSS-timed playback bar)
+// main.js - Themedle game logic (with CSS-timed playback bar)
 //
 // Expects these DOM IDs in index.html:
 // playBtn, volumeSlider, clipLength, progressBar, maxClipIndicator, guessInput,

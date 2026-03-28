@@ -1,4 +1,4 @@
-/* ── BlackJackdle — DailyJamm ────────────────────────────────────── */
+/* ── BlackJackdle - DailyJamm ────────────────────────────────────── */
 const BJGame = (function () {
   'use strict';
 
@@ -280,7 +280,7 @@ const BJGame = (function () {
       const existingSlots = Array.from(container.children);
       const before = existingSlots.map(s => s.getBoundingClientRect().left);
 
-      // Append new card — flex recenters, shifting existing cards
+      // Append new card - flex recenters, shifting existing cards
       const slot = document.createElement('div');
       slot.className = 'bj-card-slot bj-card-dealt';
       slot.innerHTML = cardHTML(card, faceDown);
@@ -639,7 +639,7 @@ const BJGame = (function () {
     const msgs = {
       blackjack: 'BLACKJACK! +' + net.toLocaleString(),
       win: 'You Win! +' + net.toLocaleString(),
-      push: 'Push — Bet Returned',
+      push: 'Push - Bet Returned',
       lose: 'Dealer Wins. ' + net.toLocaleString(),
       bust: 'Bust! ' + net.toLocaleString(),
       dealer_blackjack: 'Dealer Blackjack! ' + net.toLocaleString()
@@ -862,7 +862,7 @@ const BJGame = (function () {
     const needsBonus = !isFirstEverVisit && bonusDate !== chicagoDate();
 
     if (today && today.done) {
-      // Already finished today — show results
+      // Already finished today - show results
       handNum = today.handNum;
       chips = today.chips;
       sessionResults = today.results || [];
@@ -889,7 +889,7 @@ const BJGame = (function () {
         showBetting();
       }
     } else {
-      // New day — give daily bonus (if not first visit)
+      // New day - give daily bonus (if not first visit)
       if (isFirstEverVisit) {
         // First ever visit: give starting chips, show How to Play
         if (chips <= 0) chips = STARTING_CHIPS;
