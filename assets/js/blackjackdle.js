@@ -728,18 +728,28 @@ const BJGame = (function () {
   }
 
   /* ── Share ── */
-  function shareResults() {
+  function buildShareText() {
     const totalNet = sessionResults.reduce((s, r) => s + r.net, 0);
     const emojis = sessionResults.map(r => r.net > 0 ? '\uD83D\uDFE2' : r.net < 0 ? '\uD83D\uDD34' : '\uD83D\uDFE1').join('');
     const sign = totalNet >= 0 ? '+' : '';
-    const text = 'BlackJackdle ' + chicagoDate() + '\n' +
+    return 'BlackJackdle ' + chicagoDate() + '\n' +
       emojis + ' ' + sign + totalNet + ' chips\n' +
       'Stack: ' + chips.toLocaleString() + '\n' +
       'dailyjamm.com/blackjackdle/';
-
+  }
+  function shareResults() {
     if (navigator.clipboard) {
-      navigator.clipboard.writeText(text).then(() => {
+      navigator.clipboard.writeText(buildShareText()).then(() => {
         const btn = $('bj-share-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = 'Share Results'; }, 2000);
+      });
+    }
+  }
+  function shareBrokeResults() {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(buildShareText()).then(() => {
+        const btn = $('bj-broke-share-btn');
         btn.textContent = 'Copied!';
         setTimeout(() => { btn.textContent = 'Share Results'; }, 2000);
       });
@@ -936,5 +946,5 @@ const BJGame = (function () {
 
   document.addEventListener('DOMContentLoaded', init);
 
-  return { closeModal, showModal };
+  return { closeModal, showModal, shareResults, shareBrokeResults };
 })();
