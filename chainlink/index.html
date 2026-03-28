@@ -69,11 +69,24 @@
     /* Prevent iOS auto-zoom on input focus (triggered when font-size < 16px) */
     #cl-guess-input { font-size: 16px; }
 
-    /* Modal: scrollable on mobile with smooth iOS momentum */
-    #cl-modal { align-items: flex-end; }
-    #cl-modal > div { -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+    /* Modal — bottom-sheet on mobile, centered on taller screens */
+    #cl-modal { align-items: flex-end; padding: 0; }
+    #cl-modal > div {
+      border-radius: 1.25rem 1.25rem 0 0;
+      max-height: 92vh;
+      overflow-y: scroll;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      touch-action: pan-y;
+      padding-bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
+    }
     @media (min-height: 600px) {
-      #cl-modal { align-items: center; }
+      #cl-modal { align-items: center; padding: 1rem; }
+      #cl-modal > div {
+        border-radius: 1rem;
+        max-height: 85vh;
+        padding-bottom: 1.25rem;
+      }
     }
   </style>
 </head>
