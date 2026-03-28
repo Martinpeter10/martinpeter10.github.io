@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>About | DailyJamm</title>
+  <meta name="description" content="Learn about DailyJamm — a daily games hub featuring original games like Themedle, Chain Link, and BlackJackdle." />
+  <meta name="robots" content="index,follow">
+  <link rel="canonical" href="https://dailyjamm.com/about/" />
+  <link rel="icon" type="image/png" href="/assets/img/favicon.png">
+
+  <!-- Open Graph -->
+  <meta property="og:site_name" content="DailyJamm" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://dailyjamm.com/about/" />
+  <meta property="og:title" content="About | DailyJamm" />
+  <meta property="og:description" content="Learn about DailyJamm — a daily games hub featuring original games and a curated list of the best daily games on the web." />
+  <meta property="og:image" content="/assets/img/favicon.png" />
+
+  <meta name="theme-color" content="#1a1a2e" />
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1a1a2e" />
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#1a1a2e" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XLRXG28EZV"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XLRXG28EZV');
+  </script>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4552090282675465" crossorigin="anonymous"></script>
+
+  <style>
+    :root {
+      --panel: #0f172a;
+      --brand: #10b981;
+      --muted: #cbd5e1;
+      --line:  #1f2937;
+    }
+
+    /* Hamburger + drawer */
+    .hamburger{position:fixed;top:20px;left:20px;z-index:1000;cursor:pointer;background:transparent;border:none;padding:0;appearance:none;-webkit-appearance:none}
+    .hamburger:focus{outline:2px solid rgba(255,255,255,.25);outline-offset:4px;border-radius:10px}
+    .hamburger-box{width:30px;height:30px;display:flex;flex-direction:column;justify-content:space-around;background:transparent;border-radius:8px;padding:6px;transition:.3s}
+    .hamburger-box:hover{background:rgba(0,0,0,.3)}
+    .hamburger-line{width:100%;height:3px;background:#fff;border-radius:2px}
+    .backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);opacity:0;visibility:hidden;transition:.3s;z-index:998}
+    .backdrop.open{opacity:1;visibility:visible}
+    .drawer{position:fixed;top:0;left:-300px;width:300px;height:100vh;background:var(--panel);border-right:2px solid var(--brand);transition:left .3s ease;z-index:999;padding:80px 20px 20px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+    .drawer.open{left:0}
+    .menu-sec{margin-bottom:1.5rem}
+    .menu-title{font-size:.75rem;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem}
+    .menu-link{display:block;color:var(--muted);text-decoration:none;padding:.5rem 0;border-bottom:1px dashed rgba(255,255,255,.08)}
+    .menu-link:hover{color:#fff}
+
+    body { background: #111827; color: #f9fafb; font-family: system-ui, sans-serif; }
+    .page-wrap { max-width: 680px; margin: 0 auto; padding: 5rem 1.5rem 3rem; }
+    h1 { font-size: 2rem; font-weight: 900; margin-bottom: .5rem; }
+    h2 { font-size: 1.1rem; font-weight: 700; color: #10b981; margin: 2rem 0 .5rem; }
+    p  { color: #cbd5e1; line-height: 1.7; margin-bottom: 1rem; }
+    a  { color: #10b981; text-decoration: underline; }
+    a:hover { color: #34d399; }
+    .back { display: inline-block; margin-bottom: 2rem; font-size: .875rem; color: #6b7280; text-decoration: none; }
+    .back:hover { color: #fff; }
+    footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px dashed rgba(255,255,255,.1); color: #6b7280; text-align: center; font-size: .8rem; }
+    footer a { color: #6b7280; }
+    footer a:hover { color: #fff; }
+  </style>
+</head>
+<body>
+
+  <button class="hamburger" aria-label="Open menu" aria-controls="drawer" aria-expanded="false" onclick="toggleMenu()">
+    <span class="hamburger-box">
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+    </span>
+  </button>
+  <div id="backdrop" class="backdrop" onclick="closeMenu()"></div>
+  <nav id="drawer" class="drawer" role="navigation" aria-label="Main">
+    <a class="menu-link" href="/" onclick="closeMenu()" style="margin-bottom:1rem;font-weight:700;color:#fff">Home</a>
+    <div class="menu-sec">
+      <div class="menu-title">Our Games</div>
+      <a class="menu-link" href="/themedle/">Themedle</a>
+      <a class="menu-link" href="/chainlink/">Chain Link</a>
+      <a class="menu-link" href="/blackjackdle/">BlackJackdle</a>
+    </div>
+    <div class="menu-sec">
+      <div class="menu-title">Info</div>
+      <a class="menu-link" href="/about/">About</a>
+      <a class="menu-link" href="/privacy/">Privacy Policy</a>
+    </div>
+  </nav>
+
+  <div class="page-wrap">
+    <a class="back" href="/">← Back to DailyJamm</a>
+    <h1>About DailyJamm</h1>
+    <p>DailyJamm is a daily games hub built for people who love quick, fun daily challenges. We build our own original games and curate a collection of the best daily games on the web — all in one place.</p>
+
+    <h2>Our Games</h2>
+    <p><strong style="color:#fff">Themedle</strong> — A daily TV show theme song guessing game. Listen to a short clip and guess the show in up to 6 attempts. Each wrong guess reveals a longer clip.</p>
+    <p><strong style="color:#fff">Chain Link</strong> — A daily compound word chain puzzle. Find the 5 missing words that link the chain, with a clue available if you need it.</p>
+    <p><strong style="color:#fff">BlackJackdle</strong> — Daily blackjack with 3 hands per day. Start with 1,000 chips and a daily bonus, then beat the dealer to build your stack.</p>
+
+    <h2>Our Mission</h2>
+    <p>We believe the best daily games are simple, satisfying, and over in a few minutes. DailyJamm exists to make finding and playing them effortless — no accounts, no downloads, no friction.</p>
+
+    <h2>Contact</h2>
+    <p>Have a suggestion for a game to add to the curated list, feedback on one of our games, or just want to say hi? Reach us at <a href="mailto:pmart1233@gmail.com">pmart1233@gmail.com</a>.</p>
+
+    <footer>
+      <p>© <span id="year"></span> DailyJamm &nbsp;·&nbsp; <a href="/about/">About</a> &nbsp;·&nbsp; <a href="/privacy/">Privacy Policy</a></p>
+    </footer>
+  </div>
+
+  <script>
+    function toggleMenu() {
+      const d = document.getElementById('drawer');
+      const b = document.getElementById('backdrop');
+      const open = d.classList.toggle('open');
+      b.classList.toggle('open', open);
+      document.querySelector('.hamburger').setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    function closeMenu() {
+      document.getElementById('drawer').classList.remove('open');
+      document.getElementById('backdrop').classList.remove('open');
+      document.querySelector('.hamburger').setAttribute('aria-expanded', 'false');
+    }
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

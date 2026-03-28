@@ -16,7 +16,7 @@
     gtag('config', 'G-XLRXG28EZV');
   </script>
 
-  <meta name="description" content="DailyJamm is your hub for daily mini-games. Play Themedle and Chain Link — our original daily games — and discover other daily games we love." />
+  <meta name="description" content="DailyJamm is your hub for daily mini-games. Play Themedle, Chain Link, and BlackJackdle — our original daily games — and discover other daily games we love." />
   <meta name="robots" content="index,follow">
   <link rel="canonical" href="https://dailyjamm.com/" />
   <link rel="icon" type="image/png" href="/assets/img/favicon.png">
@@ -26,7 +26,7 @@
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://dailyjamm.com/" />
   <meta property="og:title" content="DailyJamm - Daily Games Hub" />
-  <meta property="og:description" content="DailyJamm is your hub for daily mini-games. Play Themedle and Chain Link — our original daily games — and discover other daily games we love." />
+  <meta property="og:description" content="DailyJamm is your hub for daily mini-games. Play Themedle, Chain Link, and BlackJackdle — our original daily games — and discover other daily games we love." />
   <meta property="og:image" content="/assets/img/favicon.png" />
 
   <!-- THEME COLOR FIXES FOR iOS SAFARI: set to site background so overscroll/toolbar areas aren't green -->
@@ -113,6 +113,12 @@
       <div class="menu-title">Our Games</div>
       <a class="menu-link" href="/themedle/">Themedle</a>
       <a class="menu-link" href="/chainlink/">Chain Link</a>
+      <a class="menu-link" href="/blackjackdle/">BlackJackdle</a>
+    </div>
+    <div class="menu-sec">
+      <div class="menu-title">Info</div>
+      <a class="menu-link" href="/about/">About</a>
+      <a class="menu-link" href="/privacy/">Privacy Policy</a>
     </div>
     <div class="menu-sec">
       <div class="menu-title">Other Daily Games</div>
@@ -174,6 +180,19 @@
           </div>
           <h3>Chain Link</h3>
           <p>Find the missing words to complete the compound word chain.</p>
+        </article>
+        <article class="card our" onclick="goto('/blackjackdle/')" role="button" tabindex="0" aria-label="Play BlackJackdle">
+          <span class="badge">New</span>
+          <div class="icon our">
+            <!-- Playing card icon -->
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="3" y="2" width="12" height="17" rx="2" fill="none" stroke="white" stroke-width="2"/>
+              <rect x="9" y="5" width="12" height="17" rx="2" fill="none" stroke="white" stroke-width="2"/>
+              <text x="7" y="14" font-size="8" font-weight="700" fill="white">A</text>
+            </svg>
+          </div>
+          <h3>BlackJackdle</h3>
+          <p>Daily blackjack — 3 hands per day. Beat the dealer and build your stack.</p>
         </article>
       </div>
     </section>
@@ -285,6 +304,7 @@
 
     <footer>
       <p>© <span id="year"></span> DailyJamm • New games added regularly • Have fun!</p>
+      <p style="margin-top:.5rem;font-size:.8rem"><a href="/about/" style="color:inherit;text-decoration:underline">About</a> &nbsp;·&nbsp; <a href="/privacy/" style="color:inherit;text-decoration:underline">Privacy Policy</a></p>
     </footer>
   </main>
 

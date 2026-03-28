@@ -38,6 +38,17 @@ A daily compound word chain puzzle — find the 5 missing words that link the ch
 
 Play it: [dailyjamm.com/chainlink](https://dailyjamm.com/chainlink)
 
+### BlackJackdle
+A daily blackjack game — 3 hands per day, beat the dealer and build your chip stack.
+
+- Start with 1,000 chips and receive a daily bonus (50–100 chips) each session
+- Play up to 3 hands per day — bet any amount, then Hit, Stand, Double Down, or Split
+- Dealer follows standard blackjack rules (hit on soft 16, stand on 17+)
+- Results saved locally — return tomorrow for 3 new hands
+- All game data stored locally — no account needed
+
+Play it: [dailyjamm.com/blackjackdle](https://dailyjamm.com/blackjackdle)
+
 ---
 
 ## Other Daily Games
@@ -80,12 +91,28 @@ Then open your browser to:
 - `http://localhost:8080` — DailyJamm home
 - `http://localhost:8080/themedle/` — Themedle game
 - `http://localhost:8080/chainlink/` — Chain Link game
+- `http://localhost:8080/blackjackdle/` — BlackJackdle game
+- `http://localhost:8080/about/` — About page
+- `http://localhost:8080/privacy/` — Privacy Policy
 
 Press `Ctrl+C` in the terminal to stop the server.
 
 ---
 
 ## Releases
+
+### v1.4.0 — 2026-03-28
+- Added **About** page (`/about/`) and **Privacy Policy** page (`/privacy/`) — required for Google AdSense approval
+- Footer on homepage now links to About and Privacy Policy
+- Info section added to hamburger menu on all pages
+- BlackJackdle card draw animations: hit, double down, and dealer draws now use flying card animation
+- Dealer hole card reveals with a flip animation
+- Existing cards slide smoothly (FLIP technique) when a new card is added to a hand
+- Chain Link How to Play modal redesigned as a bottom-sheet on mobile (fully scrollable, safe-area aware)
+
+### v1.3.0 — 2026-03-28
+- Launched **BlackJackdle** — daily blackjack with 3 hands per day, chip stack, and daily bonus
+- Added BlackJackdle to homepage card grid, nav menus (all games), and sitemap
 
 ### v1.2.0 — 2026-03-27
 - Launched **Chain Link** — daily compound word chain puzzle with 30 puzzles cycling indefinitely
