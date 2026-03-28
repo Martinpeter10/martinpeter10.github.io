@@ -56,9 +56,9 @@
     .drawer{position:fixed;top:0;left:-300px;width:300px;height:100vh;background:var(--panel);border-right:2px solid var(--brand);transition:left .3s ease;z-index:999;padding:80px 20px 20px;overflow-y:auto;-webkit-overflow-scrolling:touch}
     .drawer.open{left:0}
     .menu-sec{margin-bottom:1.5rem}
-    .menu-title{font-size:.75rem;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem}
-    .menu-link{display:block;color:var(--muted);text-decoration:none;padding:.5rem 0;border-bottom:1px dashed rgba(255,255,255,.08)}
-    .menu-link:hover{color:#fff}
+    .menu-title{font-size:1rem;font-weight:700;color:var(--brand);margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:1px solid var(--line)}
+    .menu-link{display:block;color:var(--muted);text-decoration:none;padding:.6rem 0;border-radius:5px;transition:.2s}
+    .menu-link:hover{color:#fff;background:rgba(16,185,129,.1);padding-left:.5rem}
 
     body { background: #111827; color: #f9fafb; font-family: system-ui, sans-serif; }
     .page-wrap { max-width: 680px; margin: 0 auto; padding: 5rem 1.5rem 3rem; }
@@ -83,9 +83,9 @@
       <span class="hamburger-line"></span>
     </span>
   </button>
-  <div id="backdrop" class="backdrop" onclick="closeMenu()"></div>
-  <nav id="drawer" class="drawer" role="navigation" aria-label="Main">
-    <a class="menu-link" href="/" onclick="closeMenu()" style="margin-bottom:1rem;font-weight:700;color:#fff">Home</a>
+  <div class="backdrop" id="backdrop" onclick="closeMenu()"></div>
+  <nav id="drawer" class="drawer" aria-label="Site">
+    <a class="menu-link" href="/" style="margin-bottom:1rem;font-weight:700;color:#fff">Home</a>
     <div class="menu-sec">
       <div class="menu-title">Our Games</div>
       <a class="menu-link" href="/themedle/">Themedle</a>
@@ -96,6 +96,29 @@
       <div class="menu-title">Info</div>
       <a class="menu-link" href="/about/">About</a>
       <a class="menu-link" href="/privacy/">Privacy Policy</a>
+    </div>
+    <div class="menu-sec">
+      <div class="menu-title">Other Daily Games</div>
+      <a class="menu-link" href="https://dailyakari.com/" target="_blank" rel="noopener">Akari</a>
+      <a class="menu-link" href="https://bandle.app/" target="_blank" rel="noopener">Bandle</a>
+      <a class="menu-link" href="https://www.puzzmo.com/play/circuits/" target="_blank" rel="noopener">Circuits</a>
+      <a class="menu-link" href="https://www.nytimes.com/games/connections" target="_blank" rel="noopener">Connections</a>
+      <a class="menu-link" href="https://contexto.me/en/" target="_blank" rel="noopener">Contexto</a>
+      <a class="menu-link" href="https://costcodle.com/" target="_blank" rel="noopener">Costcodle</a>
+      <a class="menu-link" href="https://www.puzzmo.com/play/crossword/" target="_blank" rel="noopener">Cross|word</a>
+      <a class="menu-link" href="https://dailydozentrivia.com/" target="_blank" rel="noopener">Daily Dozen</a>
+      <a class="menu-link" href="https://framed.wtf/" target="_blank" rel="noopener">Framed</a>
+      <a class="menu-link" href="https://guessthe.game/" target="_blank" rel="noopener">Guess the Game</a>
+      <a class="menu-link" href="https://heardlewordle.io/" target="_blank" rel="noopener">Heardle</a>
+      <a class="menu-link" href="https://linxicon.com/" target="_blank" rel="noopener">Linxicon</a>
+      <a class="menu-link" href="https://minecraftle.zachmanson.com/" target="_blank" rel="noopener">Minecraftle</a>
+      <a class="menu-link" href="https://www.nytimes.com/games/pips" target="_blank" rel="noopener">Pips</a>
+      <a class="menu-link" href="https://raddle.quest/" target="_blank" rel="noopener">Raddle</a>
+      <a class="menu-link" href="https://lessgames.com/songless" target="_blank" rel="noopener">Songless</a>
+      <a class="menu-link" href="https://spotle.io/" target="_blank" rel="noopener">Spotle</a>
+      <a class="menu-link" href="https://www.nytimes.com/puzzles/spelling-bee" target="_blank" rel="noopener">Spelling Bee</a>
+      <a class="menu-link" href="https://heardlewordle.io/taylor-swift-heardle" target="_blank" rel="noopener">Taylor Swift Heardle</a>
+      <a class="menu-link" href="https://www.nytimes.com/games/wordle/index.html" target="_blank" rel="noopener">Wordle</a>
     </div>
   </nav>
 
