@@ -148,7 +148,7 @@ const BJGame = (function () {
     hand.forEach((card, i) => {
       const faceDown = hideAll || (hideFirst && i === 1);
       const el = document.createElement('div');
-      el.className = 'bj-card-slot';
+      el.className = 'bj-card-slot bj-card-dealt';
       el.innerHTML = cardHTML(card, faceDown);
       el.style.animationDelay = (i * 0.08) + 's';
       container.appendChild(el);
@@ -276,37 +276,49 @@ const BJGame = (function () {
     setTimeout(() => {
       fly.remove();
 
-      // FLIP: snapshot existing card positions before appending
+      // FLIP: freeze existing slots before measuring — clears any lingering
+      // animation or transform state (e.g. from the hole-card flip) so they
+      // won't interfere with the slide.
       const existingSlots = Array.from(container.children);
+      existingSlots.forEach(s => {
+        s.style.transition = 'none';
+        s.style.transform   = 'none';
+        s.style.animation   = 'none';
+      });
+      void container.offsetHeight; // flush before measuring
+
       const before = existingSlots.map(s => s.getBoundingClientRect().left);
 
-      // Append new card - flex recenters, shifting existing cards
+      // Append new card — no entrance animation; card already arrived via fly
       const slot = document.createElement('div');
-      slot.className = 'bj-card-slot bj-card-dealt';
+      slot.className = 'bj-card-slot';
       slot.innerHTML = cardHTML(card, faceDown);
       container.appendChild(slot);
 
-      // Measure shift and instantly counteract it with transform
+      // Counteract the flex-recentering shift instantly
       existingSlots.forEach((s, i) => {
         const dx = before[i] - s.getBoundingClientRect().left;
         if (Math.abs(dx) > 0.5) {
-          s.style.transition = 'none';
           s.style.transform = `translateX(${dx}px)`;
         }
       });
 
-      // Force reflow, then animate to final positions
-      container.getBoundingClientRect();
+      // Force reflow, then slide to final position
+      void container.offsetHeight;
       existingSlots.forEach(s => {
-        s.style.transition = 'transform 0.3s ease';
-        s.style.transform = '';
+        s.style.transition = 'transform 0.25s ease-out';
+        s.style.transform   = 'none';
       });
 
-      // Clean up and fire callback after slide completes
+      // Clean up after slide completes
       setTimeout(() => {
-        existingSlots.forEach(s => { s.style.transition = ''; });
+        existingSlots.forEach(s => {
+          s.style.transition = '';
+          s.style.transform   = '';
+          s.style.animation   = '';
+        });
         if (callback) callback();
-      }, 310);
+      }, 260);
     }, 350);
   }
 

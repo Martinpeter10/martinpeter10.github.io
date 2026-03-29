@@ -356,7 +356,6 @@ input[type=range].slider::-moz-range-thumb {
 }
 .bj-card-slot {
   margin-left: -20px;
-  animation: bj-card-in 0.3s ease;
 }
 .bj-card-slot:first-child { margin-left: 0; }
 
