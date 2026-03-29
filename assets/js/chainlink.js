@@ -9,17 +9,23 @@
     return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
   }
 
-  function dateToDay(isoDate) {
-    // Noon UTC avoids any DST / timezone shift at midnight
-    return Math.floor(new Date(isoDate + 'T12:00:00Z').getTime() / 86400000);
-  }
-
   // ── Puzzle selection ─────────────────────────────────────────────────────
-  // Puzzles are played in order by ID, cycling indefinitely.
-  // Epoch is the date puzzle #1 first went live.
-  const EPOCH = '2026-01-01';
+  // Puzzle #1 plays on Jan 1 of each year. The day-of-year (1–365/366) maps
+  // directly to puzzle ID, cycling back to #1 if we run out.
   function getPuzzle(puzzles) {
-    const offset = ((dateToDay(getTodayCST()) - dateToDay(EPOCH)) % puzzles.length + puzzles.length) % puzzles.length;
+    const parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'America/Chicago',
+      year: 'numeric', month: '2-digit', day: '2-digit',
+    }).formatToParts(new Date());
+    const map = Object.fromEntries(parts.map(p => [p.type, p.value]));
+    const year  = parseInt(map.year);
+    const month = parseInt(map.month);
+    const day   = parseInt(map.day);
+    // Day of year (1-indexed), DST-safe via noon UTC
+    const jan1  = new Date(Date.UTC(year, 0, 1, 12));
+    const today = new Date(Date.UTC(year, month - 1, day, 12));
+    const dayOfYear = Math.round((today - jan1) / 86400000) + 1;
+    const offset = (dayOfYear - 1) % puzzles.length;
     return puzzles[offset];
   }
 
