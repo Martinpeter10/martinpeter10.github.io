@@ -78,6 +78,7 @@ Copy the hamburger button + backdrop + drawer nav from an existing game page. Th
 - `index.html` (home)
 - `/themedle/index.html`
 - `/chainlink/index.html`
+- `/blackjackdle/index.html`
 - The new game's own page
 - Any other existing game pages
 
@@ -202,7 +203,7 @@ Pages to update:
 ## Game Design Conventions
 - **Daily reset**: Games use Chicago timezone (`America/Chicago` via `Intl.DateTimeFormat`) for consistent daily rotation
 - **No backend**: All state in localStorage; no server, no database
-- **Puzzle cycling**: When puzzles run out, cycle modularly (e.g., `dayNumber % totalPuzzles`)
+- **Puzzle cycling**: Chain Link uses day-of-year (puzzle #1 = Jan 1, auto-resets each Jan 1). Other games cycle modularly off a fixed epoch. Prefer day-of-year for clean annual resets.
 - **Scoring**: Use emoji dots in share text (🟢 = best, 🟡 = partial, 🔴 = missed)
 - **Share format**: Copy-to-clipboard with game name, puzzle number, score, and emoji grid
 - **Streaks**: Track current streak, best streak, total games played
@@ -210,8 +211,59 @@ Pages to update:
 - **Mobile**: 16px minimum font on inputs (prevents iOS zoom), use `viewport-fit=cover` for notch support
 - **Accessibility**: ARIA labels on interactive elements, keyboard navigation (Enter activates role="button", ESC closes modals), screen-reader-only helper text via `.sr-only` class
 
+---
+
+## Game-Specific Notes
+
+### Chain Link (`/assets/js/chainlink.js`)
+
+**Puzzle selection**: Day-of-year based — puzzle #1 plays on Jan 1 of each year, puzzle #88 on March 29, etc. Resets automatically on Jan 1 every year. Logic is in `getPuzzle()` using `Intl.DateTimeFormat` to get the Chicago date, then computing day-of-year.
+
+**Puzzle data format** (`/assets/data/chainlink-puzzles.json`):
+```json
+{ "id": 1, "words": ["WORD1","WORD2","WORD3","WORD4","WORD5","WORD6"], "clues": ["clue1","clue2","clue3","clue4","clue5"] }
+```
+- **No `date` field** — dates were removed; ordering is by `id` only
+- `words`: exactly **6 uppercase strings** (start word + 5 answers)
+- `clues`: exactly **5 strings** (one phrase clue per link, matching each answer)
+- Currently **365 puzzles** (ids 1–365). To add more, append with the next sequential id.
+
+**Two-stage hint system** (per word):
+| State | How reached | Points if correct |
+|---|---|---|
+| `hidden` | Start of word | 3 pts |
+| `letter` | Press Hint OR guess wrong | 2 pts |
+| `phrase` | Press Show Clue OR guess wrong again | 1 pt |
+| auto-fill | Guess wrong with phrase showing, or Skip | 0 pts |
+
+**Perfect bonus**: All 5 words solved from `hidden` state (total 15 pts) earns +5 bonus = **20/20**. Shown as "🌟 +5 perfect bonus!" on the results screen and in share text.
+
+**clueState values**: `'hidden'` | `'letter'` | `'phrase'` — saved to localStorage via `saveTodayState()`.
+
+**Hint button states**:
+- Default: "Hint", enabled
+- After `clueState === 'letter'`: button text changes to "Show Clue" (still enabled)
+- After `clueState === 'phrase'` (no hints left): button text "No hints left", `disabled`, `opacity: 0.4`, `cursor: not-allowed` — **greyed out, not hidden**. Skip button position is unaffected.
+- `resetClueUI()` restores button to default state on each new word.
+
+**Active tile first-letter display**: When `clueState !== 'hidden'` (any hint has been used), the active chain tile shows the first letter of the target word instead of `?`. This is handled in `renderChain()`. The clue area still shows the full "Hint 1/2: First letter X" text — both update together.
+
+---
+
+### BlackJackdle (`/assets/js/blackjackdle.js`)
+
+**Two distinct game-over screens**:
+- `showFinalResults()` — all 3 hands played (normal end). Shows final chip count, session net, hand breakdown, share button, stats.
+- `showBrokeScreen()` — player runs out of chips before completing all 3 hands. Shows "Out of Chips!" panel with hand results, share button, and countdown to next day.
+- **Both screens have a Share Results button.** `shareResults()` targets `#bj-share-btn`; `shareBrokeResults()` targets `#bj-broke-share-btn`.
+
+**Public API** (exposed on `window.BJGame`): `closeModal`, `showModal`, `shareResults`, `shareBrokeResults`.
+
+---
+
 ## Common Pitfalls
 - **Curly quotes**: Always use straight quotes in JS (`'` and `"`, never `'` `'` `"` `"`). Curly quotes in onclick handlers cause silent JS failures.
 - **Nav sync**: The hamburger nav is duplicated in every page's HTML. When adding a game, you must update ALL pages' nav or they'll be out of sync.
 - **iOS safe areas**: Always include `viewport-fit=cover` and `apple-mobile-web-app-status-bar-style` metas.
 - **AdSense + Analytics**: Both scripts must be on every page. Missing them means lost revenue and tracking gaps.
+- **GitHub Pages cache mismatch**: After pushing JS + data file changes together, Pages may serve a stale JS with the new data (or vice versa), causing JS errors caught as "Failed to load puzzle." If this happens, a hard refresh or waiting a few minutes resolves it. Ensure JS and data changes are compatible in both old and new states when possible.

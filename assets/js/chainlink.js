@@ -153,7 +153,11 @@
 
       const text = document.createElement('span');
       text.className = 'cl-tile-text';
-      text.textContent = (state === 'locked' || state === 'active') ? '?' : word;
+      if (state === 'active' && clueState !== 'hidden') {
+        text.textContent = puzzle.words[currentStep + 1][0];
+      } else {
+        text.textContent = (state === 'locked' || state === 'active') ? '?' : word;
+      }
       tile.appendChild(text);
 
       if (res !== null) {
@@ -182,15 +186,20 @@
     } else {
       clueNumEl.textContent  = 'Hint 2/2 · ' + (currentStep + 1) + '/5';
       clueTextEl.textContent = puzzle.clues[currentStep];
-      clueBtnEl.classList.add('hidden');
+      clueBtnEl.textContent  = 'No hints left';
+      clueBtnEl.disabled     = true;
+      clueBtnEl.style.opacity = '0.4';
+      clueBtnEl.style.cursor  = 'not-allowed';
     }
     clueArea.classList.remove('hidden');
   }
 
   function resetClueUI() {
     clueArea.classList.add('hidden');
-    clueBtnEl.textContent = 'Hint';
-    clueBtnEl.classList.remove('hidden');
+    clueBtnEl.textContent   = 'Hint';
+    clueBtnEl.disabled      = false;
+    clueBtnEl.style.opacity = '';
+    clueBtnEl.style.cursor  = '';
   }
 
   // ── advance ──────────────────────────────────────────────────────────────
