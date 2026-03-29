@@ -1,7 +1,6 @@
 [
   {
     "id": 1,
-    "date": "2026-03-27",
     "words": [
       "LINCOLN",
       "LOG",
@@ -11,16 +10,15 @@
       "CATCHER"
     ],
     "clues": [
-      "A captain keeps one at sea",
-      "A cozy retreat in the woods",
-      "A rising temperature signals this",
-      "What happens when you close your eyes at night",
-      "The position behind home plate"
+      "What a lumberjack cuts",
+      "Log home",
+      "High temperature symptom",
+      "REM activity",
+      "Behind home plate"
     ]
   },
   {
     "id": 2,
-    "date": "2026-03-28",
     "words": [
       "FIRE",
       "TRUCK",
@@ -30,16 +28,15 @@
       "BRIDGE"
     ],
     "clues": [
-      "An 18-wheeler on the highway",
-      "A red octagon on the road",
-      "A timepiece worn on the wrist",
-      "Big Ben or the Eiffel, for example",
-      "A famous London landmark over the Thames"
+      "Big rig",
+      "Red light command",
+      "Wrist timepiece",
+      "Eiffel or Babel",
+      "What spans a river"
     ]
   },
   {
     "id": 3,
-    "date": "2026-03-29",
     "words": [
       "HONEY",
       "MOON",
@@ -50,15 +47,14 @@
     ],
     "clues": [
       "It controls the tides",
-      "Flip the switch to turn it on",
-      "Where you hang your hat",
-      "A succulent or fern, for example",
+      "Lamp output",
+      "Home sweet home",
+      "A fern or succulent",
       "Beyond Meat is this type of product"
     ]
   },
   {
     "id": 4,
-    "date": "2026-03-30",
     "words": [
       "BLACK",
       "BIRD",
@@ -68,16 +64,15 @@
       "TOWN"
     ],
     "clues": [
-      "Robin or eagle, for example",
-      "Where you hang your hat",
-      "Grip something tightly",
-      "The opposite of down",
-      "A small city"
+      "Robin or wren",
+      "Where the heart is",
+      "Don't let go",
+      "Pixar film",
+      "Small city"
     ]
   },
   {
     "id": 5,
-    "date": "2026-03-31",
     "words": [
       "SNOW",
       "BALL",
@@ -87,16 +82,15 @@
       "KICK"
     ],
     "clues": [
-      "A round object used in sports",
+      "Sphere in sports",
       "Where kids play on swings",
-      "A road or path",
-      "Left or right of center",
-      "Strike with your foot"
+      "Method or path",
+      "Pick one in a debate",
+      "What a soccer player does"
     ]
   },
   {
     "id": 6,
-    "date": "2026-04-01",
     "words": [
       "SUN",
       "FLOWER",
@@ -106,16 +100,15 @@
       "SHIP"
     ],
     "clues": [
-      "A rose or daisy, for example",
-      "Where you sleep at night",
-      "A space with four walls",
-      "A friend or companion",
-      "A vessel that sails the ocean"
+      "Rose or daisy",
+      "Where you sleep",
+      "Space to move",
+      "Partner",
+      "Vessel at sea"
     ]
   },
   {
     "id": 7,
-    "date": "2026-04-02",
     "words": [
       "WATER",
       "FALL",
@@ -125,16 +118,15 @@
       "UP"
     ],
     "clues": [
-      "Niagara is a famous one",
-      "The result when you're eliminated",
-      "Not inside",
-      "Something you wait in",
-      "Stand and get ready"
+      "Autumn",
+      "Not in",
+      "French fries, as a ___",
+      "Queue up here",
+      "Elevator direction"
     ]
   },
   {
     "id": 8,
-    "date": "2026-04-03",
     "words": [
       "BOOK",
       "MARK",
@@ -144,16 +136,15 @@
       "NOTCH"
     ],
     "clues": [
-      "A stain or blemish",
-      "Feathers from a duck or goose",
-      "A raised area of land",
-      "The highest point of something",
-      "A cut or level of quality"
+      "Target or stain",
+      "Goose jacket filler",
+      "Capitol ___",
+      "Summit",
+      "A carved groove"
     ]
   },
   {
     "id": 9,
-    "date": "2026-04-04",
     "words": [
       "RAIN",
       "BOW",
@@ -163,16 +154,15 @@
       "TRACK"
     ],
     "clues": [
-      "A curved weapon used in archery",
-      "Fasten your shoes with one",
-      "A fracture in a bone",
-      "The opposite of slow",
-      "A path for trains or runners"
+      "Ribbon decoration",
+      "Neckwear",
+      "Fracture",
+      "Speedy",
+      "Where trains run"
     ]
   },
   {
     "id": 10,
-    "date": "2026-04-05",
     "words": [
       "HAND",
       "SHAKE",
@@ -182,16 +172,15 @@
       "WAY"
     ],
     "clues": [
-      "Tremble or vibrate",
-      "A direction on an elevator button",
-      "A small city",
-      "A large room for events or gatherings",
-      "A corridor in a building"
+      "What a milkshake does",
+      "Not up",
+      "What a mayor governs",
+      "Concert venue",
+      "High- or free- type"
     ]
   },
   {
     "id": 11,
-    "date": "2026-04-06",
     "words": [
       "BLUE",
       "BERRY",
@@ -202,15 +191,14 @@
     ],
     "clues": [
       "A small fruit that grows on bushes",
-      "Where crops are grown and animals raised",
-      "Solid ground beneath your feet",
-      "A visible sign or impression",
-      "Soft feathers used in pillows"
+      "What Old MacDonald had",
+      "Dirt and soil",
+      "Leave an impression",
+      "Quarterback's call"
     ]
   },
   {
     "id": 12,
-    "date": "2026-04-07",
     "words": [
       "STAR",
       "FISH",
@@ -220,16 +208,15 @@
       "BONE"
     ],
     "clues": [
-      "Salmon or tuna, for example",
-      "A deep round dish for soup",
-      "Use scissors to do this",
-      "The rear or behind",
-      "Part of your skeleton"
+      "Fin-bearing swimmer",
+      "Super ___ (football finale)",
+      "Barber's action",
+      "Spine's side",
+      "Skeleton component"
     ]
   },
   {
     "id": 13,
-    "date": "2026-04-08",
     "words": [
       "SAND",
       "STORM",
@@ -239,16 +226,15 @@
       "HOUSE"
     ],
     "clues": [
-      "Thunder and lightning come with this",
-      "A fluffy white shape in the sky",
-      "Pop a balloon and it will do this",
-      "Unlock and push a door to do this",
-      "A building where people live"
+      "Thunder and lightning",
+      "Rain source",
+      "Sudden explosion",
+      "Not closed",
+      "Dwelling"
     ]
   },
   {
     "id": 14,
-    "date": "2026-04-09",
     "words": [
       "CROSS",
       "ROAD",
@@ -258,16 +244,15 @@
       "DANCE"
     ],
     "clues": [
-      "A street cars drive on",
-      "Stumble and fall",
-      "A thin metal strand",
-      "Turn on a faucet to do this",
-      "Move rhythmically to music"
+      "Asphalt path",
+      "Journey or vacation",
+      "What a telegram travels on",
+      "Faucet",
+      "What a ballroom is for"
     ]
   },
   {
     "id": 15,
-    "date": "2026-04-10",
     "words": [
       "NIGHT",
       "OWL",
@@ -277,16 +262,15 @@
       "UP"
     ],
     "clues": [
-      "A nocturnal bird of prey",
-      "New York or London, for example",
-      "A large room for events",
-      "A visible sign or impression",
-      "The opposite of down"
+      "Night hunter",
+      "Metropolis",
+      "School corridor",
+      "Twain's first name",
+      "What goes before and away"
     ]
   },
   {
     "id": 16,
-    "date": "2026-04-11",
     "words": [
       "TOOTH",
       "BRUSH",
@@ -296,16 +280,15 @@
       "BOARD"
     ],
     "clues": [
-      "A tool for painting or cleaning",
-      "Flames that burn wood",
-      "A location or spot",
-      "A flat pad you stand on",
-      "A flat piece of wood or a committee"
+      "What a painter uses",
+      "What a hydrant fights",
+      "Location or spot",
+      "Yoga essential",
+      "Chess surface"
     ]
   },
   {
     "id": 17,
-    "date": "2026-04-12",
     "words": [
       "BACK",
       "YARD",
@@ -315,16 +298,15 @@
       "STONE"
     ],
     "clues": [
-      "Three feet of measurement",
-      "A long thin branch or rod",
-      "Change gears or move slightly",
+      "Backyard, partly",
+      "Hockey player's tool",
+      "Work period",
       "What unlocks a door",
-      "A rock or a Mick Jagger band"
+      "Pebble's bigger cousin"
     ]
   },
   {
     "id": 18,
-    "date": "2026-04-13",
     "words": [
       "GOLD",
       "MINE",
@@ -334,16 +316,15 @@
       "CARD"
     ],
     "clues": [
-      "Belonging to me",
-      "Where crops or games are played",
-      "An aim or objective",
-      "Mail travels via this service",
-      "Dealt in poker or sent on birthdays"
+      "What a prospector digs",
+      "Where outfielders roam",
+      "Soccer score",
+      "Mailbox delivery",
+      "Dealt in a deck"
     ]
   },
   {
     "id": 19,
-    "date": "2026-04-14",
     "words": [
       "HEAD",
       "BAND",
@@ -353,16 +334,15 @@
       "RAIL"
     ],
     "clues": [
-      "A musical group",
-      "Rise to your feet",
-      "The tip of a pencil or a score unit",
-      "A person who protects something",
-      "Trains run on these"
+      "Rock group",
+      "Lemonade seller's setup",
+      "Score unit",
+      "Night watchman",
+      "Train track"
     ]
   },
   {
     "id": 20,
-    "date": "2026-04-15",
     "words": [
       "PLAY",
       "GROUND",
@@ -372,16 +352,15 @@
       "OFF"
     ],
     "clues": [
-      "The earth beneath your feet",
-      "A job or occupation",
-      "A store or retail space",
-      "Raise something upward",
-      "The opposite of on"
+      "Earth beneath your feet",
+      "9-to-5 grind",
+      "Where you browse and buy",
+      "British elevator",
+      "Opposite of on"
     ]
   },
   {
     "id": 21,
-    "date": "2026-04-16",
     "words": [
       "CAMP",
       "FIRE",
@@ -391,16 +370,15 @@
       "BREAK"
     ],
     "clues": [
-      "Flames that keep you warm",
-      "Left or right of center",
-      "Move on foot",
-      "Not inside",
-      "Escape or an onset of disease"
+      "Pink slip action",
+      "Flip ___ of a coin",
+      "Stroll or saunter",
+      "Struck ___ (baseball term)",
+      "Recess at school"
     ]
   },
   {
     "id": 22,
-    "date": "2026-04-17",
     "words": [
       "DOOR",
       "BELL",
@@ -410,16 +388,15 @@
       "WORM"
     ],
     "clues": [
-      "A chiming sound",
-      "A rabbit does this to move",
-      "A type of whisky from Scotland",
-      "Sticky adhesive on a roll",
-      "A long, squirmy creature in the soil"
+      "What a church tower rings",
+      "Bunny's move",
+      "Whisky from Scotland",
+      "Adhesive strip",
+      "Early bird's catch"
     ]
   },
   {
     "id": 23,
-    "date": "2026-04-18",
     "words": [
       "BASE",
       "BALL",
@@ -429,16 +406,15 @@
       "WALK"
     ],
     "clues": [
-      "A round object thrown in games",
-      "A space with four walls",
-      "What unlocks a door",
-      "A flat surface you write on or a committee",
-      "Move on foot"
+      "What Cinderella attended",
+      "Hotel booking",
+      "Piano or computer piece",
+      "Where Monopoly is played",
+      "What a batter earns on four balls"
     ]
   },
   {
     "id": 24,
-    "date": "2026-04-19",
     "words": [
       "FOOT",
       "NOTE",
@@ -448,16 +424,15 @@
       "FIELD"
     ],
     "clues": [
-      "A brief written message",
-      "A cushioned surface or a tablet",
-      "A device that secures a door",
-      "A person who works with metal",
-      "An open area of grass"
+      "Musical sound",
+      "Writing tablet",
+      "Key's partner",
+      "Will or Jada",
+      "Farmer's plot"
     ]
   },
   {
     "id": 25,
-    "date": "2026-04-20",
     "words": [
       "TIME",
       "LINE",
@@ -467,16 +442,15 @@
       "RACE"
     ],
     "clues": [
-      "A queue or a mark on paper",
-      "Return or the rear side",
-      "A bag carried on your shoulders",
-      "A small rodent",
-      "A competition of speed"
+      "A fishing essential",
+      "Where a pat lands",
+      "Wolf group",
+      "Rodent",
+      "Marathon or sprint"
     ]
   },
   {
     "id": 26,
-    "date": "2026-04-21",
     "words": [
       "COURT",
       "YARD",
@@ -486,16 +460,15 @@
       "LINE"
     ],
     "clues": [
-      "Three feet of measurement",
-      "A discount event at a store",
-      "What something costs",
-      "A label attached to clothing",
-      "A fishing string or a queue"
+      "36 inches",
+      "Clearance event",
+      "Cost or tag amount",
+      "Price label",
+      "What a poet writes"
     ]
   },
   {
     "id": 27,
-    "date": "2026-04-22",
     "words": [
       "HORSE",
       "SHOE",
@@ -505,16 +478,15 @@
       "SIDE"
     ],
     "clues": [
-      "Footwear you lace up",
-      "A container with a lid",
-      "A vehicle with four wheels",
-      "A place to swim",
-      "Left or right"
+      "What a cobbler mends",
+      "Amazon delivery shape",
+      "What a garage shelters",
+      "Swimming spot",
+      "Lateral"
     ]
   },
   {
     "id": 28,
-    "date": "2026-04-23",
     "words": [
       "WIND",
       "MILL",
@@ -524,16 +496,15 @@
       "BACK"
     ],
     "clues": [
-      "Where grain is ground into flour",
-      "A small rock",
-      "A vertical barrier in a building",
+      "Grain grinder",
+      "Rolling ___ gathers no moss",
+      "What Humpty sat on",
       "What you write or print on",
-      "The rear side of something"
+      "Quarterback drops ___"
     ]
   },
   {
     "id": 29,
-    "date": "2026-04-24",
     "words": [
       "LAMP",
       "SHADE",
@@ -544,15 +515,14 @@
     ],
     "clues": [
       "Darkness or a variation of color",
-      "An oak or maple, for example",
-      "A building where people live",
-      "A job or occupation",
-      "A long seat or a weight-lifting station"
+      "What a lumberjack fells",
+      "Congressional chamber",
+      "What you clock into",
+      "Park seat"
     ]
   },
   {
     "id": 30,
-    "date": "2026-04-25",
     "words": [
       "ROAD",
       "BLOCK",
@@ -563,15 +533,14 @@
     ],
     "clues": [
       "A solid cube shape or an obstacle",
-      "A series of connected loops",
-      "One connection in a series",
-      "A barrier around a yard",
-      "A wooden pole or to publish online"
+      "Link sequence",
+      "Chain connection",
+      "Yard boundary",
+      "Blog entry"
     ]
   },
   {
     "id": 31,
-    "date": "2026-04-26",
     "words": [
       "HEART",
       "BREAK",
@@ -581,16 +550,15 @@
       "TIME"
     ],
     "clues": [
-      "Shatter or fracture",
-      "A direction on an elevator",
-      "Fill a glass of water",
-      "Above or across",
-      "A clock measures this"
+      "Dawn or day starter",
+      "Feeling blue",
+      "What a pitcher does",
+      "Above",
+      "What clocks tell"
     ]
   },
   {
     "id": 32,
-    "date": "2026-04-27",
     "words": [
       "ICE",
       "CREAM",
@@ -600,16 +568,15 @@
       "WAY"
     ],
     "clues": [
-      "A sweet dairy treat",
-      "Often paired with crackers",
-      "A layered birthday dessert",
-      "Stroll at a leisurely pace",
-      "A road or path"
+      "What coffee whitens with",
+      "What a mouse craves",
+      "Birthday treat",
+      "A nature hike, casually",
+      "No ___! (disbelief)"
     ]
   },
   {
     "id": 33,
-    "date": "2026-04-28",
     "words": [
       "PINE",
       "APPLE",
@@ -619,16 +586,15 @@
       "BAR"
     ],
     "clues": [
-      "A fruit you bob for",
-      "A condiment for pasta",
-      "A cooking vessel on the stove",
-      "The part you grip",
-      "Where you might grab a drink"
+      "What a doctor keeps away",
+      "What pasta swims in",
+      "Frying vessel",
+      "What you grab",
+      "Candy or gold type"
     ]
   },
   {
     "id": 34,
-    "date": "2026-04-29",
     "words": [
       "BUTTER",
       "FLY",
@@ -638,16 +604,15 @@
       "OFF"
     ],
     "clues": [
-      "Soar through the air",
-      "A circular spinning object",
-      "Something you sit in",
-      "Raise something upward",
-      "The opposite of on"
+      "Zipper's alias on pants",
+      "Hub and spoke assembly",
+      "What a desk has",
+      "Give someone a ride",
+      "Take ___ (launch)"
     ]
   },
   {
     "id": 35,
-    "date": "2026-04-30",
     "words": [
       "GRAND",
       "STAND",
@@ -657,16 +622,15 @@
       "ZONE"
     ],
     "clues": [
-      "Rise to your feet",
-      "Motionless and quiet",
-      "The state of being alive",
-      "A clock measures this",
-      "An area sharing the same hour"
+      "Take a ___ (be firm)",
+      "Not moving",
+      "What you live",
+      "It waits for no one",
+      "Area or region"
     ]
   },
   {
     "id": 36,
-    "date": "2026-05-01",
     "words": [
       "DRIVE",
       "WAY",
@@ -676,16 +640,15 @@
       "LAND"
     ],
     "clues": [
-      "A method or path",
-      "Left or right of center",
-      "A single stair",
-      "A male parent",
-      "Soil or territory"
+      "Under ___ (in progress)",
+      "Not the main course",
+      "Staircase unit",
+      "Dad",
+      "Touch down on a runway"
     ]
   },
   {
     "id": 37,
-    "date": "2026-05-02",
     "words": [
       "EYE",
       "BROW",
@@ -695,16 +658,15 @@
       "OUT"
     ],
     "clues": [
-      "The ridge above your eye",
-      "Defeat someone decisively",
-      "A direction on an elevator",
-      "Autumn leaves do this",
-      "The result when you're eliminated"
+      "Forehead",
+      "Drum rhythm",
+      "Football play unit",
+      "What humpty dumpty did",
+      "Beyond the boundary"
     ]
   },
   {
     "id": 38,
-    "date": "2026-05-03",
     "words": [
       "AIR",
       "PORT",
@@ -714,16 +676,15 @@
       "UP"
     ],
     "clues": [
-      "Where ships dock",
-      "An opening in a wall",
+      "Harbor",
+      "Golf target",
       "Strike with your fist",
-      "A queue or mark on paper",
-      "Stand and get ready"
+      "Wait in one",
+      "___beat (positive)"
     ]
   },
   {
     "id": 39,
-    "date": "2026-05-04",
     "words": [
       "OVER",
       "LOOK",
@@ -733,16 +694,15 @@
       "LACE"
     ],
     "clues": [
-      "Gaze or observe",
-      "Not inside",
-      "Fracture or escape",
-      "The part connecting head to body",
-      "A delicate fabric with patterns"
+      "Glance or gaze",
+      "Extinguished",
+      "What a Kit Kat ad suggests",
+      "Bottle's narrow part",
+      "Shoe fastener"
     ]
   },
   {
     "id": 40,
-    "date": "2026-05-05",
     "words": [
       "UNDER",
       "COVER",
@@ -752,16 +712,15 @@
       "LINE"
     ],
     "clues": [
-      "A blanket or lid",
-      "A musical group",
-      "Rise to your feet",
-      "A tube for water or gas",
-      "A queue or mark on paper"
+      "Book's front",
+      "Wedding ring",
+      "What a mic needs",
+      "Plumber's tube",
+      "Phone connection"
     ]
   },
   {
     "id": 41,
-    "date": "2026-05-06",
     "words": [
       "SPEED",
       "BOAT",
@@ -771,16 +730,15 @@
       "MARK"
     ],
     "clues": [
-      "A vessel on the water",
-      "Where you hang your hat",
-      "A job or occupation",
-      "A long seat in a park",
-      "A standard of measurement"
+      "Row, row, row your ___",
+      "A poker hand",
+      "Opposite of play",
+      "Weight lifter's station",
+      "Bullseye"
     ]
   },
   {
     "id": 42,
-    "date": "2026-05-07",
     "words": [
       "CORN",
       "BREAD",
@@ -790,16 +748,15 @@
       "GUARD"
     ],
     "clues": [
-      "A loaf you slice",
-      "A container for carrying things",
-      "A round object used in sports",
-      "The tip of a pencil",
-      "A person who protects something"
+      "Loaf staple",
+      "What a weaver makes",
+      "Pitcher's delivery",
+      "Sharp end",
+      "Basketball position"
     ]
   },
   {
     "id": 43,
-    "date": "2026-05-08",
     "words": [
       "QUARTER",
       "BACK",
@@ -809,16 +766,15 @@
       "YARD"
     ],
     "clues": [
-      "Return or the rear side",
-      "Part of your skeleton",
-      "Not wet at all",
-      "Where ships are repaired",
-      "Three feet of measurement"
+      "Opposite of front",
+      "What a dog buries",
+      "Not wet",
+      "Where boats tie up",
+      "Three feet"
     ]
   },
   {
     "id": 44,
-    "date": "2026-05-09",
     "words": [
       "STAIR",
       "CASE",
@@ -828,16 +784,15 @@
       "SUIT"
     ],
     "clues": [
-      "A container or instance",
-      "A job or occupation",
-      "Not inside",
-      "A rule or regulation",
-      "Something you wear to the office"
+      "Suitcase, partly",
+      "Cubicle activity",
+      "Unconscious, briefly",
+      "What a lawyer practices",
+      "Jacket and pants combo"
     ]
   },
   {
     "id": 45,
-    "date": "2026-05-10",
     "words": [
       "RAIL",
       "ROAD",
@@ -847,16 +802,15 @@
       "SHARE"
     ],
     "clues": [
-      "A street cars drive on",
-      "Eliminate or defeat",
-      "Happiness or delight",
-      "Travel in a vehicle",
-      "Divide something equally"
+      "What a GPS navigates",
+      "What a thriller involves",
+      "Pure happiness",
+      "Amusement park attraction",
+      "Divide equally"
     ]
   },
   {
     "id": 46,
-    "date": "2026-05-11",
     "words": [
       "JELLY",
       "FISH",
@@ -866,16 +820,15 @@
       "DOWN"
     ],
     "clues": [
-      "Salmon or tuna, for example",
-      "A small body of still water",
-      "H2O in liquid form",
-      "A visible sign or impression",
-      "Soft feathers used in pillows"
+      "Aquarium resident",
+      "Frog's home",
+      "H2O",
+      "A grade in school",
+      "Feathery insulation"
     ]
   },
   {
     "id": 47,
-    "date": "2026-05-12",
     "words": [
       "LAND",
       "SLIDE",
@@ -885,16 +838,15 @@
       "SCHOOL"
     ],
     "clues": [
-      "A playground feature",
-      "Display for an audience",
-      "A direction on an elevator",
-      "A level or rating",
-      "Where children learn"
+      "Playground chute",
+      "TV program",
+      "What a pillowfight spreads",
+      "School mark",
+      "Where students learn"
     ]
   },
   {
     "id": 48,
-    "date": "2026-05-13",
     "words": [
       "HIGH",
       "LIGHT",
@@ -904,16 +856,15 @@
       "STICK"
     ],
     "clues": [
-      "Brightness from the sun or a bulb",
-      "Where you hang your hat",
-      "A vessel on the water",
-      "Three feet of measurement",
-      "A long thin branch or rod"
+      "Not heavy",
+      "Abode",
+      "Dinghy or dory",
+      "Where kids play outside",
+      "What gum does"
     ]
   },
   {
     "id": 49,
-    "date": "2026-05-14",
     "words": [
       "TOUCH",
       "DOWN",
@@ -923,16 +874,15 @@
       "WAY"
     ],
     "clues": [
-      "A direction on an elevator",
-      "A flowing body of water",
-      "A queue or mark on paper",
-      "Operate a vehicle",
-      "A road or path"
+      "Elevator button",
+      "Brook or creek",
+      "Actor's memorized text",
+      "Behind the wheel",
+      "Route or direction"
     ]
   },
   {
     "id": 50,
-    "date": "2026-05-15",
     "words": [
       "POWER",
       "HOUSE",
@@ -942,16 +892,15 @@
       "SUIT"
     ],
     "clues": [
-      "Where you hang your hat",
-      "Grip something tightly",
-      "Return or the rear side",
-      "A path for trains or runners",
-      "Something you wear to the office"
+      "What a mortgage buys",
+      "Grip tightly",
+      "Boomerang's trajectory",
+      "Racetrack, partly",
+      "Playing card group"
     ]
   },
   {
     "id": 51,
-    "date": "2026-05-16",
     "words": [
       "AFTER",
       "MATH",
@@ -961,16 +910,15 @@
       "HALL"
     ],
     "clues": [
-      "A subject with numbers",
-      "Pages bound together",
-      "A container or instance",
+      "Numbers class",
+      "Library checkout",
+      "Court proceeding",
       "Learn and review material",
-      "A large room for events"
+      "Fame's home"
     ]
   },
   {
     "id": 52,
-    "date": "2026-05-17",
     "words": [
       "DRAW",
       "BACK",
@@ -980,16 +928,15 @@
       "MATE"
     ],
     "clues": [
-      "Return or the rear side",
-      "A bag carried on shoulders",
-      "A large animal you can ride",
-      "Engage in fun activities",
-      "A friend or companion"
+      "Returner's direction",
+      "Rat ___ (hoarder)",
+      "What a jockey rides",
+      "What actors do on stage",
+      "Chess finale"
     ]
   },
   {
     "id": 53,
-    "date": "2026-05-18",
     "words": [
       "BED",
       "ROCK",
@@ -999,16 +946,15 @@
       "CAKE"
     ],
     "clues": [
-      "A large stone",
-      "A celebrity or shape in the sky",
-      "Tiny particles that settle on shelves",
-      "A cooking vessel on the stove",
-      "A layered birthday dessert"
+      "Genre of music",
+      "Hollywood celebrity",
+      "What a Swiffer collects",
+      "What a camera does",
+      "Piece of ___ (easy task)"
     ]
   },
   {
     "id": 54,
-    "date": "2026-05-19",
     "words": [
       "MILK",
       "SHAKE",
@@ -1018,16 +964,15 @@
       "OUT"
     ],
     "clues": [
-      "Tremble or vibrate",
-      "A direction on an elevator",
-      "Left or right of center",
-      "Flames consume fuel this way",
-      "The result when you're eliminated"
+      "Hand___ (greeting)",
+      "Comforter filling",
+      "Left or right",
+      "What fire does",
+      "What a light goes"
     ]
   },
   {
     "id": 55,
-    "date": "2026-05-20",
     "words": [
       "TAIL",
       "GATE",
@@ -1037,16 +982,15 @@
       "CHECK"
     ],
     "clues": [
-      "An entrance or door",
-      "A road or path",
-      "The tip of a pencil or a score unit",
-      "Empty or unmarked",
-      "Verify or inspect something"
+      "Airport terminal area",
+      "A corridor",
+      "Pencil's writing tip",
+      "Empty space to fill",
+      "Verify or inspect"
     ]
   },
   {
     "id": 56,
-    "date": "2026-05-21",
     "words": [
       "FORE",
       "ARM",
@@ -1056,16 +1000,15 @@
       "PUNCH"
     ],
     "clues": [
-      "A body part between elbow and hand",
-      "Something you sit in",
-      "An adult male",
-      "An opening in the ground",
-      "Strike with your fist"
+      "What a sleeve covers",
+      "A rocker or recliner",
+      "Spider or Bat prefix",
+      "Doughnut's center",
+      "Hawaiian party drink"
     ]
   },
   {
     "id": 57,
-    "date": "2026-05-22",
     "words": [
       "MATCH",
       "BOX",
@@ -1075,16 +1018,15 @@
       "LUCK"
     ],
     "clues": [
-      "A container with a lid",
-      "A vehicle with four wheels",
-      "A device for lifting heavy things",
-      "A container for cooking",
-      "Fortune or chance"
+      "What a ring comes in",
+      "Box___ (train type)",
+      "Playing card face",
+      "What a stew cooks in",
+      "Four-leaf clover's gift"
     ]
   },
   {
     "id": 58,
-    "date": "2026-05-23",
     "words": [
       "FISH",
       "HOOK",
@@ -1094,16 +1036,15 @@
       "COAT"
     ],
     "clues": [
-      "A curved piece of metal for catching",
-      "The opposite of down",
-      "A small city",
-      "Where you hang your hat",
-      "An outer layer of clothing"
+      "Captain ___'s replacement hand",
+      "Ante ___",
+      "Downtown, partly",
+      "Doctor or Full, on TV",
+      "What a closet stores"
     ]
   },
   {
     "id": 59,
-    "date": "2026-05-24",
     "words": [
       "WHEEL",
       "HOUSE",
@@ -1113,16 +1054,15 @@
       "THROAT"
     ],
     "clues": [
-      "Where you hang your hat",
-      "An insect with wings",
-      "What you write or print on",
-      "Use scissors to do this",
-      "The front of your neck"
+      "Brick or frame structure",
+      "What a bird does",
+      "News___ (daily publication)",
+      "A slice or incision",
+      "Where you swallow"
     ]
   },
   {
     "id": 60,
-    "date": "2026-05-25",
     "words": [
       "TOOL",
       "BOX",
@@ -1132,16 +1072,15 @@
       "ABOUT"
     ],
     "clues": [
-      "A container with a lid",
-      "A season of flowers and rain",
-      "A flat piece of wood",
-      "Move on foot",
-      "Approximately or roughly"
+      "Cardboard container",
+      "Coiled metal",
+      "Surf on one",
+      "What you do on a sidewalk",
+      "Roughly"
     ]
   },
   {
     "id": 61,
-    "date": "2026-05-26",
     "words": [
       "DAY",
       "BREAK",
@@ -1151,16 +1090,15 @@
       "HILL"
     ],
     "clues": [
-      "Fracture or shatter",
-      "Across to the other side",
-      "Place or set something",
-      "A direction on an elevator",
-      "A raised area of land"
+      "Pause in action",
+      "All the way",
+      "Set down",
+      "Feeling low",
+      "What Jack and Jill climbed"
     ]
   },
   {
     "id": 62,
-    "date": "2026-05-27",
     "words": [
       "FIRE",
       "PLACE",
@@ -1170,16 +1108,15 @@
       "CHART"
     ],
     "clues": [
-      "A location or spot",
-      "Grip something tightly",
-      "Return or the rear side",
-      "Turn over quickly",
-      "A visual display of data"
+      "First ___ winner",
+      "Cargo bay on a ship",
+      "What a chair supports",
+      "Pancake move",
+      "Graph or diagram"
     ]
   },
   {
     "id": 63,
-    "date": "2026-05-28",
     "words": [
       "LIFE",
       "GUARD",
@@ -1189,16 +1126,15 @@
       "FORCE"
     ],
     "clues": [
-      "A person who protects something",
-      "Trains run on these",
-      "A street cars drive on",
-      "A job or occupation",
-      "Strength or power"
+      "Protector",
+      "Banister or handrail",
+      "What a trucker travels",
+      "A Rihanna hit",
+      "Star Wars power"
     ]
   },
   {
     "id": 64,
-    "date": "2026-05-29",
     "words": [
       "CLOCK",
       "TOWER",
@@ -1208,16 +1144,15 @@
       "ROOM"
     ],
     "clues": [
-      "A tall structure",
+      "Control ___ at an airport",
       "A solid cube or obstacle",
-      "The top of your body",
-      "Relax or take a break",
-      "A space with four walls"
+      "Top of the body",
+      "Nap or pause",
+      "Where walls meet"
     ]
   },
   {
     "id": 65,
-    "date": "2026-05-30",
     "words": [
       "WILD",
       "FIRE",
@@ -1227,16 +1162,15 @@
       "STAND"
     ],
     "clues": [
-      "Flames that burn",
-      "A job or occupation",
-      "A location or spot",
-      "Strike with your foot",
-      "A support that holds something up"
+      "Campfire's essence",
+      "Office duty",
+      "What a setting provides",
+      "Field goal attempt",
+      "Witness ___ (courtroom spot)"
     ]
   },
   {
     "id": 66,
-    "date": "2026-05-31",
     "words": [
       "MASTER",
       "MIND",
@@ -1246,16 +1180,15 @@
       "SHAKE"
     ],
     "clues": [
-      "Your brain or thoughts",
-      "A group or collection",
-      "Return or the rear side",
-      "A body part with five fingers",
-      "Tremble or vibrate"
+      "Brain power",
+      "Tennis unit",
+      "Behind you",
+      "Wave with this",
+      "What an earthquake does"
     ]
   },
   {
     "id": 67,
-    "date": "2026-06-01",
     "words": [
       "FRAME",
       "WORK",
@@ -1265,16 +1198,15 @@
       "SIDE"
     ],
     "clues": [
-      "A job or occupation",
-      "A large animal you can ride",
-      "Return or the rear side",
-      "Turn over quickly",
-      "Left or right of center"
+      "Daily grind",
+      "Trojan ___",
+      "Yo-yo's return trip",
+      "What a gymnast does",
+      "Where a sidecar rides"
     ]
   },
   {
     "id": 68,
-    "date": "2026-06-02",
     "words": [
       "KEY",
       "BOARD",
@@ -1284,16 +1216,15 @@
       "PIECE"
     ],
     "clues": [
-      "A flat piece of wood",
-      "An activity with rules and a winner",
-      "Display for an audience",
-      "A clock measures this",
-      "A portion or section"
+      "Directors sit on this",
+      "Match or contest",
+      "What a curtain rises on",
+      "Half or full preceder",
+      "A slice or portion"
     ]
   },
   {
     "id": 69,
-    "date": "2026-06-03",
     "words": [
       "CHECK",
       "POINT",
@@ -1303,16 +1234,15 @@
       "BEER"
     ],
     "clues": [
-      "The tip of a pencil or a score unit",
-      "Empty or unmarked",
-      "An open empty area",
-      "A skill or trade",
-      "A brewed alcoholic drink"
+      "Make one in a debate",
+      "Draw a ___ (forget)",
+      "Outer ___ (beyond Earth)",
+      "What a potter does",
+      "A brewed beverage"
     ]
   },
   {
     "id": 70,
-    "date": "2026-06-04",
     "words": [
       "HARD",
       "BALL",
@@ -1322,16 +1252,15 @@
       "UP"
     ],
     "clues": [
-      "A round object used in sports",
-      "Where kids play on swings",
-      "Soil or territory",
-      "Make something full",
-      "The opposite of down"
+      "Gala event",
+      "Jurassic or Central",
+      "What a surveyor maps",
+      "Top off",
+      "Toward the sky"
     ]
   },
   {
     "id": 71,
-    "date": "2026-06-05",
     "words": [
       "DEAD",
       "LINE",
@@ -1341,16 +1270,15 @@
       "LOAD"
     ],
     "clues": [
-      "A queue or mark on paper",
-      "The opposite of down",
-      "Steps you climb",
-      "A container or instance",
-      "A heavy amount to carry"
+      "What a fisherman casts",
+      "Morning direction",
+      "What you climb",
+      "A detective's assignment",
+      "What a truck hauls"
     ]
   },
   {
     "id": 72,
-    "date": "2026-06-06",
     "words": [
       "GREEN",
       "LIGHT",
@@ -1360,16 +1288,15 @@
       "LIFE"
     ],
     "clues": [
-      "Brightness from a bulb",
-      "365 days",
-      "Pages bound together",
-      "A ledge for storage",
-      "The state of being alive"
+      "What a switch controls",
+      "What a calendar spans",
+      "Novel or manual",
+      "Where books sit",
+      "Board game by Hasbro"
     ]
   },
   {
     "id": 73,
-    "date": "2026-06-07",
     "words": [
       "TAIL",
       "BONE",
@@ -1379,16 +1306,15 @@
       "WORK"
     ],
     "clues": [
-      "Part of your skeleton",
-      "The top of your body",
-      "A group or collection",
-      "A portion or section",
-      "A job or occupation"
+      "Funny ___ (elbow spot)",
+      "Shoulders' neighbor",
+      "Sunset's first half",
+      "Chess figure",
+      "What homework is, partly"
     ]
   },
   {
     "id": 74,
-    "date": "2026-06-08",
     "words": [
       "STOCK",
       "PILE",
@@ -1398,16 +1324,15 @@
       "POND"
     ],
     "clues": [
-      "A heap of things",
-      "The opposite of down",
-      "Moving air",
-      "Where grain is ground into flour",
-      "A small body of still water"
+      "A stack",
+      "Rise and shine direction",
+      "A stiff breeze",
+      "Wind or saw type",
+      "Across the ___ (overseas)"
     ]
   },
   {
     "id": 75,
-    "date": "2026-06-09",
     "words": [
       "WATCH",
       "DOG",
@@ -1417,16 +1342,15 @@
       "SPAN"
     ],
     "clues": [
-      "A loyal pet",
+      "Man's best friend",
       "Where you hang your hat",
-      "A succulent or fern, for example",
-      "The state of being alive",
-      "A stretch of distance or time"
+      "Factory",
+      "Night- or wild- type",
+      "Bridge's length"
     ]
   },
   {
     "id": 76,
-    "date": "2026-06-10",
     "words": [
       "LONG",
       "SHOT",
@@ -1436,16 +1360,15 @@
       "WHEEL"
     ],
     "clues": [
-      "An attempt or try",
-      "A weapon that shoots bullets",
-      "Flames that burn",
-      "An insect with wings",
-      "A circular spinning object"
+      "Basketball attempt",
+      "Starting pistol",
+      "Ready, aim, ___!",
+      "Buzzing pest",
+      "Vanna White's prop"
     ]
   },
   {
     "id": 77,
-    "date": "2026-06-11",
     "words": [
       "LOCK",
       "JAW",
@@ -1455,16 +1378,15 @@
       "HOLE"
     ],
     "clues": [
-      "The lower part of your face",
-      "Part of your skeleton",
-      "Breakfast, lunch, or dinner",
-      "A long squirmy creature",
-      "An opening in a wall"
+      "What chomps",
+      "Trombone's suffix",
+      "Dinner or supper",
+      "Garden crawler",
+      "Rabbit's home entrance"
     ]
   },
   {
     "id": 78,
-    "date": "2026-06-12",
     "words": [
       "PASS",
       "WORD",
@@ -1474,16 +1396,15 @@
       "EDGE"
     ],
     "clues": [
-      "A unit of language",
-      "Engage in fun activities",
-      "A writing instrument",
-      "A sharp cutting tool",
+      "Dictionary entry",
+      "Fair ___",
+      "Writing instrument",
+      "A blade for cutting",
       "The border or rim of something"
     ]
   },
   {
     "id": 79,
-    "date": "2026-06-13",
     "words": [
       "BIG",
       "FOOT",
@@ -1493,16 +1414,15 @@
       "DREAM"
     ],
     "clues": [
-      "The body part in your shoe",
-      "A structure over a river",
-      "A job or occupation",
-      "The opposite of night",
-      "What happens when you close your eyes"
+      "12 inches",
+      "Card game for four",
+      "Sweat and toil",
+      "24 hours",
+      "Martin Luther King had one"
     ]
   },
   {
     "id": 80,
-    "date": "2026-06-14",
     "words": [
       "BIRD",
       "CAGE",
@@ -1512,16 +1432,15 @@
       "GAME"
     ],
     "clues": [
-      "A metal enclosure for pets",
-      "A contest between opponents",
-      "A long thin branch or rod",
-      "A round object used in sports",
-      "An activity with rules and a winner"
+      "What a bird lives in",
+      "What you light a candle with",
+      "Lip- or drum- type",
+      "Formal dance",
+      "Monopoly or chess, e.g."
     ]
   },
   {
     "id": 81,
-    "date": "2026-06-15",
     "words": [
       "BULL",
       "DOG",
@@ -1531,16 +1450,15 @@
       "BUG"
     ],
     "clues": [
-      "A loyal pet",
-      "Material from trees",
-      "Soil or territory",
-      "A woman of high status",
-      "A small insect with spotted wings"
+      "Hot ___ (ballpark snack)",
+      "Lumber",
+      "Ground underfoot",
+      "___ bug (garden insect)",
+      "Insect"
     ]
   },
   {
     "id": 82,
-    "date": "2026-06-16",
     "words": [
       "BLUE",
       "BELL",
@@ -1550,16 +1468,15 @@
       "YARD"
     ],
     "clues": [
-      "A chiming sound",
-      "A young male child",
-      "A close companion",
-      "A vessel that sails the ocean",
-      "Three feet of measurement"
+      "Taco ___ (fast food)",
+      "What a cowboy is, partly",
+      "Pal or buddy",
+      "Titanic, for one",
+      "Scotland ___"
     ]
   },
   {
     "id": 83,
-    "date": "2026-06-17",
     "words": [
       "GROUND",
       "HOG",
@@ -1569,16 +1486,15 @@
       "WORK"
     ],
     "clues": [
-      "A pig-like animal",
-      "Clean with soap and water",
-      "Not inside",
-      "An open area of grass",
-      "A job or occupation"
+      "Pig",
+      "Clean with water",
+      "Eliminated from play",
+      "Of study or dreams",
+      "Job site activity"
     ]
   },
   {
     "id": 84,
-    "date": "2026-06-18",
     "words": [
       "COPY",
       "CAT",
@@ -1588,16 +1504,15 @@
       "WEEK"
     ],
     "clues": [
-      "A feline pet",
-      "Salmon or tuna, for example",
-      "A mesh for catching things",
-      "A job or occupation",
+      "Whiskers and purrs",
+      "Scaled swimmer",
+      "What a goal has",
+      "What muscles do at the gym",
       "Seven days"
     ]
   },
   {
     "id": 85,
-    "date": "2026-06-19",
     "words": [
       "POCKET",
       "BOOK",
@@ -1607,16 +1522,15 @@
       "LIGHT"
     ],
     "clues": [
-      "Pages bound together",
-      "The final part",
-      "An activity with rules",
-      "The opposite of night",
-      "Brightness from the sun"
+      "What a reader devours",
+      "Finish line",
+      "What's afoot",
+      "Birth- or holi- type",
+      "Flash or flood type"
     ]
   },
   {
     "id": 86,
-    "date": "2026-06-20",
     "words": [
       "STONE",
       "WALL",
@@ -1626,16 +1540,15 @@
       "OFF"
     ],
     "clues": [
-      "A vertical barrier",
-      "An organ used for seeing",
-      "Fall from a height",
+      "Room divider",
+      "Sight organ",
+      "Let it fall",
       "Strike with your foot",
-      "The opposite of on"
+      "Day ___ (no work)"
     ]
   },
   {
     "id": 87,
-    "date": "2026-06-21",
     "words": [
       "WHIRL",
       "POOL",
@@ -1645,16 +1558,15 @@
       "KEEP"
     ],
     "clues": [
-      "A place to swim",
-      "A large room for events",
-      "A visible sign or impression",
-      "The opposite of down",
-      "Maintain or preserve"
+      "Car___ (shared rides)",
+      "City or town ___",
+      "Gospel writer",
+      "What prices do in inflation",
+      "Hold onto"
     ]
   },
   {
     "id": 88,
-    "date": "2026-06-22",
     "words": [
       "DAY",
       "DREAM",
@@ -1664,16 +1576,15 @@
       "MATE"
     ],
     "clues": [
-      "What happens when you close your eyes",
-      "Soil or territory",
-      "A ruler or master",
-      "A vessel that sails the ocean",
-      "A friend or companion"
+      "Day- or pipe- type",
+      "What a pilot aims to do",
+      "What a vassal serves",
+      "What a captain commands",
+      "Australian greeting"
     ]
   },
   {
     "id": 89,
-    "date": "2026-06-23",
     "words": [
       "BLOOD",
       "HOUND",
@@ -1683,16 +1594,15 @@
       "ORDER"
     ],
     "clues": [
-      "A breed of tracking dog",
-      "A loyal pet",
-      "Material from trees",
+      "Basset or blood type",
+      "Fetch player",
+      "Forest product",
       "A bird strikes this way",
-      "An arrangement or sequence"
+      "Restaurant request"
     ]
   },
   {
     "id": 90,
-    "date": "2026-06-24",
     "words": [
       "SHELL",
       "FISH",
@@ -1702,16 +1612,15 @@
       "LIGHT"
     ],
     "clues": [
-      "Salmon or tuna, for example",
-      "A layered birthday dessert",
-      "A sudden sharp sound",
-      "A celebrity or shape in the sky",
-      "Brightness from the sun"
+      "What a trawler nets",
+      "Layer or pound type",
+      "Soda, regionally",
+      "Night sky twinkler",
+      "What moths chase"
     ]
   },
   {
     "id": 91,
-    "date": "2026-06-25",
     "words": [
       "LAND",
       "MARK",
@@ -1721,16 +1630,15 @@
       "BOARD"
     ],
     "clues": [
-      "A visible sign or impression",
-      "A direction on an elevator",
-      "A heavy amount to carry",
-      "A celebrity in the sky",
-      "A flat piece of wood"
+      "Scam victim, in slang",
+      "A duck's warmth",
+      "Cargo weight",
+      "What a sheriff wears",
+      "Chairman's group"
     ]
   },
   {
     "id": 92,
-    "date": "2026-06-26",
     "words": [
       "GOLD",
       "FISH",
@@ -1740,16 +1648,15 @@
       "FORM"
     ],
     "clues": [
-      "Salmon or tuna, for example",
-      "A deep round dish for soup",
-      "An activity with rules",
-      "A strategy or design",
-      "A raised flat surface"
+      "What a lure attracts",
+      "Cereal vessel",
+      "Hunter's quarry",
+      "Blueprint",
+      "Fill out a ___ "
     ]
   },
   {
     "id": 93,
-    "date": "2026-06-27",
     "words": [
       "MOON",
       "BEAM",
@@ -1760,15 +1667,14 @@
     ],
     "clues": [
       "A ray of light",
-      "A queue or mark on paper",
-      "Return or the rear side",
-      "A platform for performers",
-      "A trainer or mentor"
+      "Something to read between",
+      "___ to the future",
+      "Theater platform",
+      "Team leader"
     ]
   },
   {
     "id": 94,
-    "date": "2026-06-28",
     "words": [
       "THUNDER",
       "STORM",
@@ -1778,16 +1684,15 @@
       "CAST"
     ],
     "clues": [
-      "A weather event with rain",
-      "Protected against damage",
-      "Look over written text",
-      "Not inside",
-      "Throw or project"
+      "Brain___ (idea session)",
+      "What a mathematician writes",
+      "What bookworms do",
+      "Away from home",
+      "Broken arm wrapper"
     ]
   },
   {
     "id": 95,
-    "date": "2026-06-29",
     "words": [
       "PAPER",
       "CLIP",
@@ -1797,16 +1702,15 @@
       "TABLE"
     ],
     "clues": [
-      "Fasten things together",
-      "A flat piece of wood",
-      "An activity with rules",
-      "A clock measures this",
-      "A piece of furniture for dining"
+      "Paper fastener",
+      "Plank of wood",
+      "A player's pursuit",
+      "What a watch displays",
+      "What dinner is served on"
     ]
   },
   {
     "id": 96,
-    "date": "2026-06-30",
     "words": [
       "TREASURE",
       "HUNT",
@@ -1816,16 +1720,15 @@
       "TRAP"
     ],
     "clues": [
-      "Search and seek",
-      "A group or organization",
-      "Where you hang your hat",
-      "An insect with wings",
-      "A device for catching"
+      "What a predator does",
+      "Golf stick",
+      "Cards can build one",
+      "Ball hit high",
+      "What a mouse walks into"
     ]
   },
   {
     "id": 97,
-    "date": "2026-07-01",
     "words": [
       "NIGHT",
       "FALL",
@@ -1835,16 +1738,15 @@
       "HILL"
     ],
     "clues": [
-      "Autumn leaves do this",
-      "Return or the rear side",
-      "An entrance to a building",
-      "A round handle",
-      "A raised area of land"
+      "Niagara ___",
+      "Reverse course",
+      "Knock on this",
+      "What you turn on a door",
+      "A small mountain"
     ]
   },
   {
     "id": 98,
-    "date": "2026-07-02",
     "words": [
       "BASKET",
       "BALL",
@@ -1854,16 +1756,15 @@
       "BOX"
     ],
     "clues": [
-      "A round object used in sports",
-      "A space with four walls",
-      "A friend or companion",
-      "A contest between opponents",
-      "A container with a lid"
+      "Bounce this",
+      "Elbow ___",
+      "Checkmate, partly",
+      "Tennis contest",
+      "Shadow or music type"
     ]
   },
   {
     "id": 99,
-    "date": "2026-07-03",
     "words": [
       "MILK",
       "WEED",
@@ -1873,16 +1774,15 @@
       "FIRE"
     ],
     "clues": [
-      "An unwanted plant in the garden",
-      "One who defeats or destroys",
-      "The largest ocean mammal",
-      "Part of your skeleton",
-      "Flames that burn"
+      "Unwanted garden plant",
+      "What a detective hunts",
+      "Ocean's largest animal",
+      "X-ray subject",
+      "What a match starts"
     ]
   },
   {
     "id": 100,
-    "date": "2026-07-04",
     "words": [
       "WRIST",
       "BAND",
@@ -1892,16 +1792,15 @@
       "CAT"
     ],
     "clues": [
-      "A musical group",
-      "A cart pulled by horses",
-      "A circular spinning object",
-      "Where you hang your hat",
-      "A feline pet"
+      "Rubber or wrist type",
+      "What pioneers rode",
+      "Steering or prayer type",
+      "What a realtor sells",
+      "Fat ___ (rich person)"
     ]
   },
   {
     "id": 101,
-    "date": "2026-07-05",
     "words": [
       "SAND",
       "CASTLE",
@@ -1911,16 +1810,15 @@
       "BOOK"
     ],
     "clues": [
-      "A fortress or palace",
-      "A large stone",
-      "A playground feature",
-      "A law or regulation",
-      "Pages bound together"
+      "Where a king lives",
+      "What a cradle does",
+      "What a trombone does",
+      "A law or guideline",
+      "Judge by its cover?"
     ]
   },
   {
     "id": 102,
-    "date": "2026-07-06",
     "words": [
       "LAMP",
       "POST",
@@ -1930,16 +1828,15 @@
       "FACE"
     ],
     "clues": [
-      "Mail travels via this service",
-      "Dealt in poker or sent on birthdays",
-      "A flat piece of wood",
-      "An activity with rules",
-      "The front of your head"
+      "Fence support",
+      "Birthday greeting",
+      "Get on the plane",
+      "Set, match preceder",
+      "Clock's front"
     ]
   },
   {
     "id": 103,
-    "date": "2026-07-07",
     "words": [
       "ROAD",
       "SIDE",
@@ -1949,16 +1846,15 @@
       "WALL"
     ],
     "clues": [
-      "Left or right of center",
-      "Strike with your foot",
-      "Return or the rear side",
-      "Flames that burn",
-      "A vertical barrier"
+      "A triangle has three",
+      "A thrill or rush",
+      "What a masseuse rubs",
+      "Alarm type",
+      "Firewall, partly"
     ]
   },
   {
     "id": 104,
-    "date": "2026-07-08",
     "words": [
       "CATCH",
       "WORD",
@@ -1969,15 +1865,14 @@
     ],
     "clues": [
       "A unit of language",
-      "A person who works with metal",
-      "An open area of grass",
-      "An aim or objective",
-      "Maintain or hold onto"
+      "Black- or lock- type",
+      "Track and ___ event",
+      "Life objective",
+      "For ___s (permanently)"
     ]
   },
   {
     "id": 105,
-    "date": "2026-07-09",
     "words": [
       "SOUND",
       "TRACK",
@@ -1987,16 +1882,15 @@
       "MARK"
     ],
     "clues": [
-      "A path for trains or runners",
-      "Something you wear to the office",
-      "A container or instance",
-      "Pages bound together",
-      "A visible sign or impression"
+      "What a GPS records",
+      "___ yourself (do as you wish)",
+      "Phone protector",
+      "Amazon bestseller",
+      "Bruise or scratch"
     ]
   },
   {
     "id": 106,
-    "date": "2026-07-10",
     "words": [
       "WORK",
       "BENCH",
@@ -2006,16 +1900,15 @@
       "MATE"
     ],
     "clues": [
-      "A long seat or station",
-      "Push down firmly",
-      "A container with a lid",
-      "A place where you do your job",
-      "A friend or companion"
+      "Judge's seat",
+      "Newspaper or media",
+      "P.O. ___ at the post office",
+      "Where desk work happens",
+      "Shipboard buddy"
     ]
   },
   {
     "id": 107,
-    "date": "2026-07-11",
     "words": [
       "FARM",
       "HOUSE",
@@ -2025,16 +1918,15 @@
       "COLD"
     ],
     "clues": [
-      "Where you hang your hat",
-      "A vessel on the water",
-      "A heavy amount to carry",
-      "A small rock",
-      "Low temperature"
+      "Haunted attraction",
+      "What a dock hosts",
+      "Heavy burden",
+      "Mick Jagger's band name",
+      "Below freezing"
     ]
   },
   {
     "id": 108,
-    "date": "2026-07-12",
     "words": [
       "BACK",
       "SLASH",
@@ -2044,16 +1936,15 @@
       "DOWN"
     ],
     "clues": [
-      "A diagonal line on a keyboard",
-      "Flames consume fuel this way",
-      "The result when you're eliminated",
-      "Place or set something",
-      "A direction on an elevator"
+      "What Zorro carves",
+      "Sun___ (beach hazard)",
+      "Revealed, as a secret",
+      "Stay ___ (don't move)",
+      "Hoedown's second half"
     ]
   },
   {
     "id": 109,
-    "date": "2026-07-13",
     "words": [
       "SNOW",
       "DRIFT",
@@ -2064,15 +1955,14 @@
     ],
     "clues": [
       "Float slowly with the current",
-      "Material from trees",
-      "A job or occupation",
-      "A store or retail space",
-      "The surface you walk on"
+      "What a carpenter works with",
+      "Employment",
+      "Workshop, partly",
+      "What carpet covers"
     ]
   },
   {
     "id": 110,
-    "date": "2026-07-14",
     "words": [
       "BOOK",
       "WORM",
@@ -2082,16 +1972,15 @@
       "LESS"
     ],
     "clues": [
-      "A long squirmy creature",
-      "An opening in a wall",
-      "A discount event at a store",
-      "The tip of a pencil",
-      "Without or lacking"
+      "Bait on a hook",
+      "Ace in the ___ ",
+      "For ___ sign",
+      "Decimal ___",
+      "Minus"
     ]
   },
   {
     "id": 111,
-    "date": "2026-07-15",
     "words": [
       "HOUSE",
       "CAT",
@@ -2101,16 +1990,15 @@
       "HOLD"
     ],
     "clues": [
-      "A feline pet",
-      "A short sleep during the day",
-      "A clock measures this",
-      "Divide something equally",
-      "Grip something tightly"
+      "What curiosity killed",
+      "Afternoon snooze",
+      "Money, to Ben Franklin",
+      "Stock unit",
+      "What a wrestler does"
     ]
   },
   {
     "id": 112,
-    "date": "2026-07-16",
     "words": [
       "EAR",
       "RING",
@@ -2120,16 +2008,15 @@
       "FALL"
     ],
     "clues": [
-      "A circular band of jewelry",
-      "Left or right of center",
-      "A body part between shoulder and hand",
-      "A hole in the ground",
-      "Autumn leaves do this"
+      "What a phone does",
+      "Bystanding position",
+      "Firearm, partly",
+      "Cherry center",
+      "Season of leaves changing"
     ]
   },
   {
     "id": 113,
-    "date": "2026-07-17",
     "words": [
       "THUNDER",
       "CLAP",
@@ -2139,16 +2026,15 @@
       "TOWN"
     ],
     "clues": [
-      "A sharp sound of approval",
-      "Return or the rear side",
-      "Part of your skeleton",
-      "A country in East Asia",
-      "A small city"
+      "Applause sound",
+      "Way to get somewhere, and return",
+      "Marrow holder",
+      "Where the Great Wall is",
+      "Cape ___ in South Africa"
     ]
   },
   {
     "id": 114,
-    "date": "2026-07-18",
     "words": [
       "NIGHT",
       "CLUB",
@@ -2158,16 +2044,15 @@
       "POUR"
     ],
     "clues": [
-      "A group or organization",
-      "The body part in your shoe",
-      "Clothing and accessories",
-      "A direction on an elevator",
-      "Fill a glass of water"
+      "Card suit",
+      "What a shoe fits",
+      "Put on clothes",
+      "Depressed",
+      "Heavy rain"
     ]
   },
   {
     "id": 115,
-    "date": "2026-07-19",
     "words": [
       "BROAD",
       "CAST",
@@ -2177,16 +2062,15 @@
       "BEAR"
     ],
     "clues": [
-      "Throw or project",
-      "A strong metal element",
-      "A job or occupation",
-      "A heavy amount to carry",
-      "A large furry animal"
+      "Fishing line toss",
+      "Press clothes with this",
+      "Labor",
+      "A washer's cycle start",
+      "Grizzly or polar"
     ]
   },
   {
     "id": 116,
-    "date": "2026-07-20",
     "words": [
       "FINGER",
       "PRINT",
@@ -2196,16 +2080,15 @@
       "WAY"
     ],
     "clues": [
-      "An image pressed onto paper",
-      "A store or retail space",
-      "Raise something upward",
-      "An entrance or door",
-      "A road or path"
+      "What a printer produces",
+      "What a keeper keeps",
+      "Raise up",
+      "Fence entrance",
+      "Pathway or approach"
     ]
   },
   {
     "id": 117,
-    "date": "2026-07-21",
     "words": [
       "SPRING",
       "BOARD",
@@ -2215,16 +2098,15 @@
       "QUIT"
     ],
     "clues": [
-      "A flat piece of wood",
-      "Move on foot",
-      "Not inside",
+      "Skateboard, minus skate",
+      "Board- or cake- ender",
+      "The umpire's call",
       "Intense anger",
-      "Leave or resign"
+      "Give up"
     ]
   },
   {
     "id": 118,
-    "date": "2026-07-22",
     "words": [
       "HOT",
       "DOG",
@@ -2234,16 +2116,15 @@
       "MINE"
     ],
     "clues": [
-      "A loyal pet",
-      "Battle or struggle",
-      "A group or organization",
-      "Soil or territory",
-      "Belonging to me"
+      "What a leash restrains",
+      "A brawl or scuffle",
+      "Night spot for dancing",
+      "What a deed represents",
+      "Gold source"
     ]
   },
   {
     "id": 119,
-    "date": "2026-07-23",
     "words": [
       "WIND",
       "SHIELD",
@@ -2254,15 +2135,14 @@
     ],
     "clues": [
       "Protection or defense",
-      "A vertical barrier",
-      "A rose or daisy, for example",
-      "Where you sleep at night",
-      "A small crawling insect"
+      "What a nail goes into",
+      "What a garden grows",
+      "Flower ___ (garden patch)",
+      "Software glitch"
     ]
   },
   {
     "id": 120,
-    "date": "2026-07-24",
     "words": [
       "STONE",
       "MASON",
@@ -2272,16 +2152,15 @@
       "WEIGHT"
     ],
     "clues": [
-      "A skilled builder",
+      "Brick layer",
       "A glass container",
-      "The top of your body",
-      "Brightness from a bulb",
-      "How heavy something is"
+      "Coin flip option",
+      "Sun's gift",
+      "What a scale measures"
     ]
   },
   {
     "id": 121,
-    "date": "2026-07-25",
     "words": [
       "CAVE",
       "MAN",
@@ -2291,16 +2170,15 @@
       "GAME"
     ],
     "clues": [
-      "An adult male",
-      "An opening in the ground",
-      "Strike with your fist",
-      "Dealt in poker or sent on birthdays",
-      "An activity with rules"
+      "Isle of ___",
+      "What a drill makes",
+      "What a boxer throws",
+      "Ace or joker",
+      "What Jeopardy! is"
     ]
   },
   {
     "id": 122,
-    "date": "2026-07-26",
     "words": [
       "WOOD",
       "CHIP",
@@ -2310,16 +2188,15 @@
       "HOUSE"
     ],
     "clues": [
-      "A small fragment or piece",
-      "An attempt or try",
-      "A transparent drinking vessel",
+      "Poker token",
+      "Espresso serving",
+      "What windows are made of",
       "Products or merchandise",
-      "Where you hang your hat"
+      "Parliament's lower ___"
     ]
   },
   {
     "id": 123,
-    "date": "2026-07-27",
     "words": [
       "RAIN",
       "DROP",
@@ -2329,16 +2206,15 @@
       "LASH"
     ],
     "clues": [
-      "Fall from a height",
-      "An attempt or try",
-      "Place or set something",
-      "Return or the rear side",
-      "A sudden angry reaction"
+      "A bead of water",
+      "Photographer's take",
+      "What a shot-putter does",
+      "Support, as a candidate",
+      "Eyelash, briefly"
     ]
   },
   {
     "id": 124,
-    "date": "2026-07-28",
     "words": [
       "SIDE",
       "SHOW",
@@ -2348,16 +2224,15 @@
       "BEE"
     ],
     "clues": [
-      "Display for an audience",
-      "A vessel on the water",
-      "Where ships are tied up",
-      "Someone employed at a job",
-      "A buzzing insect that makes honey"
+      "No-___ (absent person)",
+      "Yacht or canoe",
+      "What a phone charges in",
+      "Employee",
+      "Honey maker"
     ]
   },
   {
     "id": 125,
-    "date": "2026-07-29",
     "words": [
       "RIVER",
       "BANK",
@@ -2367,16 +2242,15 @@
       "LOG"
     ],
     "clues": [
-      "A financial institution",
-      "Move by turning over",
-      "Phone someone",
-      "Return or the rear side",
-      "A record of events"
+      "Where money is kept",
+      "What dice do",
+      "Ring someone up",
+      "The far side of a page",
+      "A captain's journal"
     ]
   },
   {
     "id": 126,
-    "date": "2026-07-30",
     "words": [
       "LIGHT",
       "BULB",
@@ -2386,16 +2260,15 @@
       "TOWN"
     ],
     "clues": [
-      "A glass sphere that glows",
-      "The top of your body",
-      "A total number",
-      "A direction on an elevator",
-      "A small city"
+      "Light source",
+      "What a hat covers",
+      "Dracula's title",
+      "Sundown's latter half",
+      "Ghost ___ (abandoned)"
     ]
   },
   {
     "id": 127,
-    "date": "2026-07-31",
     "words": [
       "ROUGH",
       "NECK",
@@ -2405,16 +2278,15 @@
       "LESS"
     ],
     "clues": [
-      "The part connecting head to body",
-      "Fasten your shoes with one",
-      "A thin pointed fastener",
-      "The tip of a pencil",
-      "Without or lacking"
+      "Where a tie knots",
+      "A draw in sports",
+      "Bowling target",
+      "What a compass has",
+      "Fewer"
     ]
   },
   {
     "id": 128,
-    "date": "2026-08-01",
     "words": [
       "BLOCK",
       "CHAIN",
@@ -2424,16 +2296,15 @@
       "DRAIN"
     ],
     "clues": [
-      "A series of connected loops",
-      "A cutting tool with teeth",
-      "Tiny particles that settle",
-      "A weather event with rain",
-      "Where water flows away"
+      "What a bicycle uses",
+      "Cutting tool",
+      "Bite the ___ (fail)",
+      "What a weatherman tracks",
+      "Where shower water goes"
     ]
   },
   {
     "id": 129,
-    "date": "2026-08-02",
     "words": [
       "TIME",
       "STAMP",
@@ -2443,16 +2314,15 @@
       "PLACE"
     ],
     "clues": [
-      "Press a seal or mark",
-      "Dealt in poker or sent on birthdays",
-      "Inventory or supply",
-      "Where goods are bought and sold",
-      "A location or spot"
+      "Postage item",
+      "Credit or debit type",
+      "Wall Street holding",
+      "Where stocks trade",
+      "Take ___ (occur)"
     ]
   },
   {
     "id": 130,
-    "date": "2026-08-03",
     "words": [
       "DOOR",
       "MAT",
@@ -2462,16 +2332,15 @@
       "OUT"
     ],
     "clues": [
-      "A flat pad you stand on",
-      "A flat piece of wood",
-      "Brief or not tall",
-      "A body part with five fingers",
-      "Not inside"
+      "Welcome ___ (doorstep item)",
+      "Chalkboard, for short",
+      "Not tall",
+      "Poker holding",
+      "Where a ball can go, in tennis"
     ]
   },
   {
     "id": 131,
-    "date": "2026-08-04",
     "words": [
       "CAR",
       "POOL",
@@ -2481,16 +2350,15 @@
       "MAN"
     ],
     "clues": [
-      "A place to swim",
-      "A piece of furniture for dining",
-      "A piece of fabric",
-      "A queue or mark on paper",
-      "An adult male"
+      "Billiards table",
+      "Turn the ___s (reverse)",
+      "Table___ (dinner linen)",
+      "Boundary marker",
+      "Best ___ at a wedding"
     ]
   },
   {
     "id": 132,
-    "date": "2026-08-05",
     "words": [
       "DRUM",
       "STICK",
@@ -2500,16 +2368,15 @@
       "CALL"
     ],
     "clues": [
-      "A long thin rod",
-      "A shape or silhouette",
-      "The top of your body",
-      "A device for talking",
-      "Ring someone up"
+      "Non-___ (Teflon)",
+      "Shape or silhouette",
+      "Leader or chief",
+      "What you answer",
+      "Bird___ (chirp)"
     ]
   },
   {
     "id": 133,
-    "date": "2026-08-06",
     "words": [
       "STORM",
       "WATER",
@@ -2519,16 +2386,15 @@
       "LESS"
     ],
     "clues": [
-      "H2O in liquid form",
-      "A hue like red or blue",
-      "Unable to see",
-      "A particular place or stain",
-      "Without or lacking"
+      "What a faucet pours",
+      "Red, blue, or green",
+      "Window covering",
+      "A location",
+      "Without, as a suffix"
     ]
   },
   {
     "id": 134,
-    "date": "2026-08-07",
     "words": [
       "CROSS",
       "BOW",
@@ -2538,16 +2404,15 @@
       "PIPE"
     ],
     "clues": [
-      "A curved weapon used in archery",
-      "A thin cord or thread",
-      "A green vegetable",
-      "A flexible container",
-      "A tube for water or gas"
+      "What an archer uses",
+      "Guitar or violin need",
+      "Coffee or string type",
+      "What groceries go in",
+      "What Sherlock smokes"
     ]
   },
   {
     "id": 135,
-    "date": "2026-08-08",
     "words": [
       "FLAG",
       "POLE",
@@ -2557,16 +2422,15 @@
       "HOP"
     ],
     "clues": [
-      "A long stick or rod",
-      "A secure room for valuables",
-      "An entrance to a building",
-      "A chiming sound",
-      "A rabbit does this to move"
+      "Flag support",
+      "Bank safe room",
+      "What a knob turns",
+      "Door chime",
+      "Hip-___ (music genre)"
     ]
   },
   {
     "id": 136,
-    "date": "2026-08-09",
     "words": [
       "HONEY",
       "BEE",
@@ -2576,16 +2440,15 @@
       "TRIP"
     ],
     "clues": [
-      "A buzzing insect that makes honey",
-      "A colony structure",
-      "Your brain or thoughts",
-      "An open area of grass",
+      "Spelling contest",
+      "Bee colony home",
+      "Never ___  (don't worry)",
+      "Strawberry ___ (Beatles)",
       "Stumble and fall"
     ]
   },
   {
     "id": 137,
-    "date": "2026-08-10",
     "words": [
       "GRAPE",
       "VINE",
@@ -2595,16 +2458,15 @@
       "ROBE"
     ],
     "clues": [
-      "A climbing plant",
-      "Three feet of measurement",
-      "A feathered flying creature",
-      "A tub for soaking",
-      "A garment you wear after a shower"
+      "What grapes grow on",
+      "Lawn area",
+      "Early ___ (morning person)",
+      "Tub soak",
+      "What a judge wears"
     ]
   },
   {
     "id": 138,
-    "date": "2026-08-11",
     "words": [
       "CHAIN",
       "MAIL",
@@ -2614,16 +2476,15 @@
       "LAPSE"
     ],
     "clues": [
-      "Letters delivered to your home",
-      "A container with a lid",
-      "A season of flowers",
-      "A clock measures this",
-      "A gap or passage of time"
+      "What a mailbox collects",
+      "What a mover packs",
+      "Season after winter",
+      "Thyme homophone",
+      "A slip or error"
     ]
   },
   {
     "id": 139,
-    "date": "2026-08-12",
     "words": [
       "RACE",
       "TRACK",
@@ -2633,16 +2494,15 @@
       "SHED"
     ],
     "clues": [
-      "A path for runners",
-      "A documented achievement",
-      "Shatter or fracture",
-      "H2O in liquid form",
-      "A small storage building"
+      "Sound ___ (music)",
+      "What a DJ spins",
+      "Snap or crack",
+      "Under ___ (submerged)",
+      "Garden outbuilding"
     ]
   },
   {
     "id": 140,
-    "date": "2026-08-13",
     "words": [
       "MOON",
       "SHINE",
@@ -2652,16 +2512,15 @@
       "BACK"
     ],
     "clues": [
-      "Brightness or glow",
-      "A person who protects",
-      "A loyal pet",
-      "Battle or struggle",
-      "Return or the rear side"
+      "What a star does",
+      "Life- or body- type",
+      "Canine",
+      "What a boxer does",
+      "What you scratch for a friend"
     ]
   },
   {
     "id": 141,
-    "date": "2026-08-14",
     "words": [
       "RAIN",
       "FALL",
@@ -2671,16 +2530,15 @@
       "WAY"
     ],
     "clues": [
-      "Autumn leaves do this",
-      "Return or the rear side",
-      "Where you sit",
-      "A strip of leather or fabric",
-      "A road or path"
+      "Trip and tumble",
+      "Defender's position",
+      "Theater chair",
+      "Waist cincher",
+      "Out of the ___"
     ]
   },
   {
     "id": 142,
-    "date": "2026-08-15",
     "words": [
       "OVER",
       "FLOW",
@@ -2690,16 +2548,15 @@
       "HOLE"
     ],
     "clues": [
-      "Move like a river",
-      "A visual display of data",
-      "The highest point",
-      "A tied loop of rope",
-      "An opening in a wall"
+      "What a river does",
+      "Top 40 ___",
+      "Crop ___ (short shirt)",
+      "What a sailor ties",
+      "Plot ___ in a story"
     ]
   },
   {
     "id": 143,
-    "date": "2026-08-16",
     "words": [
       "ARM",
       "BAND",
@@ -2709,16 +2566,15 @@
       "DOWN"
     ],
     "clues": [
-      "A musical group",
-      "A measurement of how wide",
-      "Smart or clever",
-      "A split or fracture",
-      "A direction on an elevator"
+      "What a concert features",
+      "How wide something is",
+      "Owl-like quality",
+      "What ice does under pressure",
+      "Lowered"
     ]
   },
   {
     "id": 144,
-    "date": "2026-08-17",
     "words": [
       "SUN",
       "ROOF",
@@ -2728,16 +2584,15 @@
       "THAN"
     ],
     "clues": [
-      "The upper part of a building",
-      "The highest point",
-      "Earth where plants grow",
-      "Without or lacking",
-      "A comparison word"
+      "Top of a house",
+      "Spinning toy",
+      "Garden dirt",
+      "More or ___",
+      "Comparative word"
     ]
   },
   {
     "id": 145,
-    "date": "2026-08-18",
     "words": [
       "EGG",
       "SHELL",
@@ -2747,16 +2602,15 @@
       "MASTER"
     ],
     "clues": [
-      "A hard outer covering",
-      "Flames that burn",
-      "An 18-wheeler on the highway",
-      "A heavy amount to carry",
-      "An expert or ruler"
+      "Egg or turtle outer layer",
+      "What a dragon breathes",
+      "18-wheeler",
+      "What a mule carries",
+      "Expert or ruler"
     ]
   },
   {
     "id": 146,
-    "date": "2026-08-19",
     "words": [
       "NORTH",
       "STAR",
@@ -2766,16 +2620,15 @@
       "MATE"
     ],
     "clues": [
-      "A celebrity or shape in the sky",
-      "A flat piece of wood",
-      "A space with four walls",
-      "A job or occupation",
-      "A friend or companion"
+      "Five-pointed shape",
+      "Diving platform",
+      "A chamber",
+      "What an artist displays",
+      "A soul ___"
     ]
   },
   {
     "id": 147,
-    "date": "2026-08-20",
     "words": [
       "PITCH",
       "FORK",
@@ -2785,16 +2638,15 @@
       "DOWN"
     ],
     "clues": [
-      "A pronged garden tool",
-      "Raise something upward",
-      "The opposite of on",
-      "A rhythmic pulse",
-      "A direction on an elevator"
+      "Eating utensil",
+      "What a crane does",
+      "Standoffish, partly",
+      "Beet homophone",
+      "What goes up must come ___"
     ]
   },
   {
     "id": 148,
-    "date": "2026-08-21",
     "words": [
       "SUIT",
       "CASE",
@@ -2804,16 +2656,15 @@
       "REST"
     ],
     "clues": [
-      "A container or instance",
-      "A heavy amount to carry",
-      "A large furry animal",
-      "The body part in your shoe",
-      "Relax or take a break"
+      "Upper or lower ___",
+      "Payload",
+      "Stock market pessimist",
+      "A yard's third",
+      "What a music note gets"
     ]
   },
   {
     "id": 149,
-    "date": "2026-08-22",
     "words": [
       "PLAY",
       "GROUND",
@@ -2823,16 +2674,15 @@
       "SHIP"
     ],
     "clues": [
-      "The earth beneath your feet",
-      "The surface you walk on",
-      "A strategy or design",
-      "A flat piece of wood",
-      "A vessel that sails the ocean"
+      "Coffee bean's fate",
+      "Ground level",
+      "A strategy",
+      "Cutting surface in a kitchen",
+      "USS Enterprise, e.g."
     ]
   },
   {
     "id": 150,
-    "date": "2026-08-23",
     "words": [
       "OPEN",
       "DOOR",
@@ -2842,16 +2692,15 @@
       "PACK"
     ],
     "clues": [
-      "An entrance to a building",
-      "A border or structure",
-      "A job or occupation",
-      "The opposite of night",
-      "A bag carried on shoulders"
+      "Room's entrance",
+      "Picture border",
+      "Desk duty",
+      "Carpe diem's target",
+      "Six-___ (abs or beer)"
     ]
   },
   {
     "id": 151,
-    "date": "2026-08-24",
     "words": [
       "GRASS",
       "LAND",
@@ -2861,16 +2710,15 @@
       "BACK"
     ],
     "clues": [
-      "Soil or territory",
-      "A device that secures",
-      "A container with a lid",
-      "Where you sit",
-      "Return or the rear side"
+      "What a deed covers",
+      "What a deadbolt does",
+      "Penalty ___ in hockey",
+      "County ___ (local government)",
+      "Where a backpack rides"
     ]
   },
   {
     "id": 152,
-    "date": "2026-08-25",
     "words": [
       "HOUSE",
       "HOLD",
@@ -2880,16 +2728,15 @@
       "OFFICE"
     ],
     "clues": [
-      "Grip something tightly",
-      "The opposite of down",
-      "A rhythmic pulse",
-      "A container with a lid",
-      "A place where you do your job"
+      "Music's sustained note",
+      "Not down",
+      "A cop's patrol",
+      "Cereal container",
+      "Box ___ (movie earnings)"
     ]
   },
   {
     "id": 153,
-    "date": "2026-08-26",
     "words": [
       "GUN",
       "BOAT",
@@ -2899,16 +2746,15 @@
       "STEP"
     ],
     "clues": [
-      "A vessel on the water",
-      "Three feet of measurement",
-      "A body part between shoulder and hand",
-      "A device that secures",
-      "A single stair"
+      "Harbor craft",
+      "What a fence encloses",
+      "Side ___ (sidearm)",
+      "Canal feature",
+      "Dance move"
     ]
   },
   {
     "id": 154,
-    "date": "2026-08-27",
     "words": [
       "KNEE",
       "CAP",
@@ -2918,16 +2764,15 @@
       "SLIP"
     ],
     "clues": [
-      "A hat worn on the head",
-      "A small rock",
-      "The earth beneath your feet",
-      "A blanket or lid",
-      "Slide or lose your footing"
+      "Baseball headwear",
+      "Philosopher's or kidney type",
+      "Back- or play- type",
+      "What a lid does",
+      "Sliding fall"
     ]
   },
   {
     "id": 155,
-    "date": "2026-08-28",
     "words": [
       "CAMP",
       "GROUND",
@@ -2937,16 +2782,15 @@
       "HOLD"
     ],
     "clues": [
-      "The earth beneath your feet",
-      "Rise or increase",
-      "The top of your body",
-      "Powerful and sturdy",
-      "Grip something tightly"
+      "What a pilot returns to",
+      "Ocean wave",
+      "Foam on a beer",
+      "Powerful",
+      "On ___ (waiting)"
     ]
   },
   {
     "id": 156,
-    "date": "2026-08-29",
     "words": [
       "SKY",
       "LIGHT",
@@ -2956,16 +2800,15 @@
       "LIFT"
     ],
     "clues": [
-      "Brightness from a bulb",
-      "A wooden pole",
-      "An activity with rules",
-      "The front of your head",
-      "Raise something upward"
+      "A bulb's emission",
+      "What a goalie guards",
+      "Willing to try, informally",
+      "What a mask covers",
+      "Ski resort ride"
     ]
   },
   {
     "id": 157,
-    "date": "2026-08-30",
     "words": [
       "CUP",
       "BOARD",
@@ -2975,16 +2818,15 @@
       "BONE"
     ],
     "clues": [
-      "A flat piece of wood",
-      "Move on foot",
-      "Across to the other side",
-      "Return or the rear side",
-      "Part of your skeleton"
+      "Committee of directors",
+      "Pedestrian's pace",
+      "Drive-___ (fast food lane)",
+      "Half of back-to-back",
+      "T-___  steak cut"
     ]
   },
   {
     "id": 158,
-    "date": "2026-08-31",
     "words": [
       "PIT",
       "BULL",
@@ -2994,16 +2836,15 @@
       "BOAT"
     ],
     "clues": [
-      "A strong breed of dog",
-      "A pointed projection on an animal",
-      "A tube for water or gas",
-      "What happens when you close your eyes",
-      "A vessel on the water"
+      "What a matador faces",
+      "Rhino's weapon",
+      "Bag- or drain- type",
+      "A sleeper's movie",
+      "Gravy vessel"
     ]
   },
   {
     "id": 159,
-    "date": "2026-09-01",
     "words": [
       "SCHOOL",
       "BUS",
@@ -3013,16 +2854,15 @@
       "LONG"
     ],
     "clues": [
-      "A large vehicle for passengers",
-      "Cease or halt",
-      "An opening or space between",
-      "365 days",
-      "Extended or stretched out"
+      "Public transit vehicle",
+      "What an octagon sign says",
+      "A space between",
+      "New ___'s Eve",
+      "Not short"
     ]
   },
   {
     "id": 160,
-    "date": "2026-09-02",
     "words": [
       "SPACE",
       "SHIP",
@@ -3032,16 +2872,15 @@
       "TOP"
     ],
     "clues": [
-      "A vessel that sails the ocean",
-      "A heavy amount to carry",
-      "A job or occupation",
-      "A long seat or station",
-      "The highest point"
+      "What a bottle might hold a model of",
+      "Download's second half",
+      "Commuter's destination",
+      "Where substitutes sit",
+      "What a lid covers"
     ]
   },
   {
     "id": 161,
-    "date": "2026-09-03",
     "words": [
       "RED",
       "COAT",
@@ -3051,16 +2890,15 @@
       "FAST"
     ],
     "clues": [
-      "An outer layer of clothing",
-      "The rear end of an animal",
-      "Moving air",
-      "Shatter or fracture",
-      "The opposite of slow"
+      "What a roller applies",
+      "What a dog wags",
+      "Second ___ (renewed energy)",
+      "Lucky ___ in pool",
+      "What Ramadan observes"
     ]
   },
   {
     "id": 162,
-    "date": "2026-09-04",
     "words": [
       "HAIR",
       "PIN",
@@ -3070,16 +2908,15 @@
       "BREAK"
     ],
     "clues": [
-      "A thin pointed fastener",
-      "A round object used in sports",
-      "An open area of grass",
-      "The opposite of night",
-      "Fracture or shatter"
+      "What holds a grenade",
+      "A foul ___ in baseball",
+      "Open expanse",
+      "Night's opposite",
+      "Coffee ___"
     ]
   },
   {
     "id": 163,
-    "date": "2026-09-05",
     "words": [
       "ROUND",
       "TABLE",
@@ -3089,16 +2926,15 @@
       "PACK"
     ],
     "clues": [
-      "A piece of furniture for dining",
-      "The highest point",
-      "A cut or level of quality",
-      "Return or the rear side",
-      "A bag carried on shoulders"
+      "Times ___ (math tool)",
+      "Over the ___",
+      "Top ___ (excellent)",
+      "Spinal region",
+      "What a hiker carries"
     ]
   },
   {
     "id": 164,
-    "date": "2026-09-06",
     "words": [
       "CANDLE",
       "LIGHT",
@@ -3108,16 +2944,15 @@
       "SET"
     ],
     "clues": [
-      "Brightness from a flame",
-      "Toggle on and off",
-      "A flat piece of wood",
-      "An activity with rules",
-      "A group or collection"
+      "Photon stream",
+      "Toggle on or off",
+      "What you do at a gate",
+      "Friday night activity",
+      "Ready, ___ , go!"
     ]
   },
   {
     "id": 165,
-    "date": "2026-09-07",
     "words": [
       "GOAL",
       "POST",
@@ -3127,16 +2962,15 @@
       "FALL"
     ],
     "clues": [
-      "A wooden pole or support",
-      "A visible sign or impression",
-      "A piece of fabric or paper",
-      "A large stone",
-      "Autumn leaves do this"
+      "Pre or ex follower",
+      "Former German currency",
+      "Bed linen",
+      "A boulder",
+      "Waterfall, partly"
     ]
   },
   {
     "id": 166,
-    "date": "2026-09-08",
     "words": [
       "BLOOD",
       "STREAM",
@@ -3146,16 +2980,15 @@
       "BOARD"
     ],
     "clues": [
-      "A flowing body of water",
-      "A queue or mark on paper",
-      "Move rhythmically to music",
-      "The surface you walk on",
-      "A flat piece of wood"
+      "Netflix action",
+      "Clothesline, partly",
+      "Do the tango",
+      "Dance ___ (club area)",
+      "Surfing necessity"
     ]
   },
   {
     "id": 167,
-    "date": "2026-09-09",
     "words": [
       "TRADE",
       "MARK",
@@ -3165,16 +2998,15 @@
       "HOME"
     ],
     "clues": [
-      "A visible sign or impression",
-      "The opposite of down",
+      "Scar or blemish",
+      "Thumbs ___ (approval)",
       "A range from small to large",
-      "A miniature version",
-      "Where your family lives"
+      "Runway walker",
+      "Castle or humble abode"
     ]
   },
   {
     "id": 168,
-    "date": "2026-09-10",
     "words": [
       "TRACK",
       "RECORD",
@@ -3184,16 +3016,15 @@
       "BAR"
     ],
     "clues": [
-      "A documented achievement",
-      "A tag or brand",
-      "A creator or builder",
-      "An open empty area",
-      "Where you might grab a drink"
+      "Set a new ___ (break it)",
+      "What a jar has",
+      "Creator or builder",
+      "Blank area",
+      "What a limbo dancer goes under"
     ]
   },
   {
     "id": 169,
-    "date": "2026-09-11",
     "words": [
       "RING",
       "LEADER",
@@ -3203,16 +3034,15 @@
       "POP"
     ],
     "clues": [
-      "Someone in charge",
-      "A flat piece of wood",
-      "Brief or not tall",
-      "A layered birthday dessert",
-      "A sudden sharp sound"
+      "Person in charge",
+      "Corporate council",
+      "A circuit breaker's problem",
+      "What candles top",
+      "What a balloon does"
     ]
   },
   {
     "id": 170,
-    "date": "2026-09-12",
     "words": [
       "LEAF",
       "FROG",
@@ -3222,16 +3052,15 @@
       "FOOT"
     ],
     "clues": [
-      "A small green amphibian",
-      "An adult male",
-      "Search and seek",
-      "A group or organization",
-      "The body part in your shoe"
+      "What a tadpole becomes",
+      "Iron or Super follower",
+      "Scavenger ___ (party game)",
+      "Sandwich with three slices",
+      "Big ___  (Sasquatch)"
     ]
   },
   {
     "id": 171,
-    "date": "2026-09-13",
     "words": [
       "CROW",
       "BAR",
@@ -3241,16 +3070,15 @@
       "FLY"
     ],
     "clues": [
-      "A long metal prying tool",
-      "A chiming sound",
-      "A tall structure",
-      "A machine for lifting heavy things",
-      "An insect with wings"
+      "Cocktail spot",
+      "Ding-dong maker",
+      "What Rapunzel lives in",
+      "Construction lifter",
+      "On the ___ (impromptu)"
     ]
   },
   {
     "id": 172,
-    "date": "2026-09-14",
     "words": [
       "CARPET",
       "BOMB",
@@ -3260,16 +3088,15 @@
       "DRY"
     ],
     "clues": [
-      "An explosive device",
-      "A hard outer covering",
-      "Salmon or tuna, for example",
-      "Part of your skeleton",
-      "Not wet at all"
+      "A total flop",
+      "Shot___ (firearm ammo)",
+      "Gill breather",
+      "What calcium strengthens",
+      "Bone-___ (completely)"
     ]
   },
   {
     "id": 173,
-    "date": "2026-09-15",
     "words": [
       "SEA",
       "SHELL",
@@ -3279,16 +3106,15 @@
       "WISE"
     ],
     "clues": [
-      "A hard outer covering",
-      "A sudden jarring surprise",
-      "A ripple in the ocean",
-      "A measurement of distance",
-      "Smart or clever"
+      "What a hermit crab borrows",
+      "Electric jolt",
+      "Ocean swell",
+      "How long something is",
+      "Street___ (savvy)"
     ]
   },
   {
     "id": 174,
-    "date": "2026-09-16",
     "words": [
       "MOON",
       "ROCK",
@@ -3298,16 +3124,15 @@
       "ANT"
     ],
     "clues": [
-      "A large stone",
-      "A musical group",
+      "Hard place's partner",
+      "Musical group",
       "Help or assistance",
-      "Someone employed at a job",
-      "A tiny insect that lives in colonies"
+      "What a bee is called",
+      "Tiny colony insect"
     ]
   },
   {
     "id": 175,
-    "date": "2026-09-17",
     "words": [
       "CLIP",
       "BOARD",
@@ -3317,16 +3142,15 @@
       "SAW"
     ],
     "clues": [
-      "A flat piece of wood",
-      "A space with four walls",
-      "What unlocks a door",
-      "A series of connected loops",
-      "A cutting tool with teeth"
+      "Ironing surface",
+      "Living or dining area",
+      "Florida island chain",
+      "Daisy or food type",
+      "What an eyewitness did"
     ]
   },
   {
     "id": 176,
-    "date": "2026-09-18",
     "words": [
       "CHALK",
       "LINE",
@@ -3336,16 +3160,15 @@
       "OUT"
     ],
     "clues": [
-      "A queue or mark on paper",
-      "Return or the rear side",
-      "Three feet of measurement",
-      "A job or occupation",
-      "Not inside"
+      "Pickup ___",
+      "Way to retrace steps",
+      "Football's measure",
+      "What a mechanic does under the hood",
+      "Opposite of safe, in baseball"
     ]
   },
   {
     "id": 177,
-    "date": "2026-09-19",
     "words": [
       "CHILD",
       "HOOD",
@@ -3355,16 +3178,15 @@
       "BOOK"
     ],
     "clues": [
-      "A covering for the head",
-      "Close one eye quickly",
-      "Return or the rear side",
-      "A record of events",
-      "Pages bound together"
+      "Sweatshirt feature",
+      "Quick eye close",
+      "Quarterback's cry",
+      "Yule ___ (holiday tradition)",
+      "Chapter container"
     ]
   },
   {
     "id": 178,
-    "date": "2026-09-20",
     "words": [
       "DARK",
       "ROOM",
@@ -3374,16 +3196,15 @@
       "FIT"
     ],
     "clues": [
-      "A space with four walls",
-      "Short-term or temporary",
-      "A flat dish for eating",
-      "A shape or structure",
-      "In good physical condition"
+      "What a vacancy sign promises",
+      "Short-term worker",
+      "Dinner dish",
+      "Platform or free type",
+      "In good shape"
     ]
   },
   {
     "id": 179,
-    "date": "2026-09-21",
     "words": [
       "BOOK",
       "STORE",
@@ -3393,16 +3214,15 @@
       "CARD"
     ],
     "clues": [
-      "A retail establishment",
-      "The forward-facing part",
-      "A queue or mark on paper",
-      "Move rhythmically to music",
-      "Dealt in poker or sent on birthdays"
+      "Where you shop",
+      "Battle line",
+      "Bottom or finish ___",
+      "School ___ (prom)",
+      "What a magician forces"
     ]
   },
   {
     "id": 180,
-    "date": "2026-09-22",
     "words": [
       "EARTH",
       "WORM",
@@ -3412,16 +3232,15 @@
       "WHEEL"
     ],
     "clues": [
-      "A long squirmy creature",
-      "Material from trees",
-      "Toss or throw casually",
-      "A cart pulled by horses",
-      "A circular spinning object"
+      "Glow- or book- type",
+      "Fire fuel",
+      "Toss or throw",
+      "Band___ (join the trend)",
+      "What a tire wraps"
     ]
   },
   {
     "id": 181,
-    "date": "2026-09-23",
     "words": [
       "HEAD",
       "ROOM",
@@ -3431,16 +3250,15 @@
       "LINE"
     ],
     "clues": [
-      "A space with four walls",
-      "Complete with no space left",
-      "Return or the rear side",
-      "A diagonal line on a keyboard",
-      "A queue or mark on paper"
+      "Four walls and a door",
+      "Brimming",
+      "Direction of retreat",
+      "Back___ (keyboard key)",
+      "Thin mark on paper"
     ]
   },
   {
     "id": 182,
-    "date": "2026-09-24",
     "words": [
       "BOARD",
       "SHORT",
@@ -3450,16 +3268,15 @@
       "RACK"
     ],
     "clues": [
-      "Brief or not tall",
-      "Cease or halt",
-      "Above or across",
-      "An outer layer of clothing",
-      "A frame for hanging things"
+      "Brief or concise",
+      "Bus or pit type",
+      "Game ___ (you lost)",
+      "Outerwear on a rack",
+      "Spice holder"
     ]
   },
   {
     "id": 183,
-    "date": "2026-09-25",
     "words": [
       "FIELD",
       "GOAL",
@@ -3469,16 +3286,15 @@
       "BOOK"
     ],
     "clues": [
-      "An aim or objective",
-      "Care for or look after",
-      "The body part in your shoe",
-      "A brief written message",
-      "Pages bound together"
+      "What a net catches",
+      "Look after",
+      "Flat- or bare- type",
+      "Sticky or thank-you type",
+      "Kindle content"
     ]
   },
   {
     "id": 184,
-    "date": "2026-09-26",
     "words": [
       "TOWN",
       "SHIP",
@@ -3488,16 +3304,15 @@
       "LOAD"
     ],
     "clues": [
-      "A vessel that sails the ocean",
-      "A form or outline",
-      "Move or change slightly",
-      "A job or occupation",
-      "A heavy amount to carry"
+      "Cruise transport",
+      "Circle or square",
+      "Keyboard key",
+      "Career activity",
+      "Freight"
     ]
   },
   {
     "id": 185,
-    "date": "2026-09-27",
     "words": [
       "DREAM",
       "TEAM",
@@ -3507,16 +3322,15 @@
       "HORN"
     ],
     "clues": [
-      "A group working together",
-      "A job or occupation",
-      "A large animal you can ride",
-      "Footwear you lace up",
-      "A musical instrument you blow"
+      "Group effort",
+      "Where you earn a paycheck",
+      "Sawhorse, partly",
+      "Heel and sole holder",
+      "Car honker"
     ]
   },
   {
     "id": 186,
-    "date": "2026-09-28",
     "words": [
       "COLD",
       "FRONT",
@@ -3526,16 +3340,15 @@
       "SONG"
     ],
     "clues": [
-      "The forward-facing part",
-      "An entrance to a building",
-      "An award or reward",
-      "Battle or struggle",
-      "A melody you sing"
+      "Weather ___ (storm boundary)",
+      "Hinge attachment",
+      "Award or reward",
+      "Food ___ (messy fun)",
+      "What a musician writes"
     ]
   },
   {
     "id": 187,
-    "date": "2026-09-29",
     "words": [
       "HOG",
       "WILD",
@@ -3545,16 +3358,15 @@
       "CLOCK"
     ],
     "clues": [
-      "Untamed or uncontrolled",
-      "Dealt in poker",
-      "A clever move or illusion",
-      "An attempt or try",
-      "A device that tells time"
+      "Untamed",
+      "Wild ___ (unpredictable)",
+      "Magic act",
+      "What a doctor gives",
+      "Wall timepiece"
     ]
   },
   {
     "id": 188,
-    "date": "2026-09-30",
     "words": [
       "HALF",
       "BACK",
@@ -3564,16 +3376,15 @@
       "BOAT"
     ],
     "clues": [
-      "Return or the rear side",
-      "Part of your skeleton",
-      "Three feet of measurement",
-      "A discount event",
-      "A vessel on the water"
+      "Respond in kind",
+      "Wish- or jaw- type",
+      "Gridiron unit",
+      "Garage or yard event",
+      "What a trailer can haul"
     ]
   },
   {
     "id": 189,
-    "date": "2026-10-01",
     "words": [
       "RAIN",
       "WATER",
@@ -3583,16 +3394,15 @@
       "WORK"
     ],
     "clues": [
-      "H2O in liquid form",
-      "A winter sport on snow",
-      "Raise something upward",
-      "A structure over a river",
-      "A job or occupation"
+      "What a plant needs daily",
+      "Winter slope sport",
+      "Morale booster",
+      "Golden Gate, e.g.",
+      "Task at hand"
     ]
   },
   {
     "id": 190,
-    "date": "2026-10-02",
     "words": [
       "LAND",
       "FALL",
@@ -3602,16 +3412,15 @@
       "TEXT"
     ],
     "clues": [
-      "Autumn leaves do this",
-      "A clock measures this",
-      "An explosive device",
-      "Protected against damage",
-      "Words on a page"
+      "What dominoes do",
+      "A stitch in ___ saves nine",
+      "Bath fizzer",
+      "Bullet- or water- type",
+      "SMS message"
     ]
   },
   {
     "id": 191,
-    "date": "2026-10-03",
     "words": [
       "STING",
       "RAY",
@@ -3621,16 +3430,15 @@
       "GRASS"
     ],
     "clues": [
-      "A beam of light",
-      "A weapon that shoots",
-      "A fine dry substance",
-      "A color of the sky",
-      "Green blades in a lawn"
+      "Sunbeam",
+      "Top ___ (Maverick movie)",
+      "What a skier loves fresh",
+      "Sky's color",
+      "What a lawn mower cuts"
     ]
   },
   {
     "id": 192,
-    "date": "2026-10-04",
     "words": [
       "CLOUD",
       "BURST",
@@ -3640,16 +3448,15 @@
       "GAME"
     ],
     "clues": [
-      "Pop or explode",
-      "Protected against damage",
+      "What a pipe can do",
+      "Pudding's ___ (test)",
       "Someone who reviews text",
-      "A flat piece of wood",
-      "An activity with rules"
+      "Chess or checkers need one",
+      "Sport or pastime"
     ]
   },
   {
     "id": 193,
-    "date": "2026-10-05",
     "words": [
       "DOOR",
       "PRIZE",
@@ -3659,16 +3466,15 @@
       "HAND"
     ],
     "clues": [
-      "An award or reward",
-      "One who comes in first",
+      "Nobel ___ winner",
+      "First place finisher",
       "Grab or seize",
-      "The opposite of on",
-      "A body part with five fingers"
+      "What a light switch does",
+      "Clock's pointer"
     ]
   },
   {
     "id": 194,
-    "date": "2026-10-06",
     "words": [
       "SHOE",
       "MAKER",
@@ -3678,16 +3484,15 @@
       "PAD"
     ],
     "clues": [
-      "A creator or builder",
-      "Move or change slightly",
-      "What unlocks a door",
-      "A brief written message",
-      "A cushioned surface or tablet"
+      "Match or trouble type",
+      "Gear change",
+      "Essential or crucial",
+      "What a student takes",
+      "Launch ___ (rocket site)"
     ]
   },
   {
     "id": 195,
-    "date": "2026-10-07",
     "words": [
       "CORNER",
       "STONE",
@@ -3697,16 +3502,15 @@
       "GAME"
     ],
     "clues": [
-      "A small rock",
-      "A vertical barrier",
-      "A hard-shelled dry fruit",
-      "A hard outer covering",
-      "An activity with rules"
+      "A rock",
+      "Great ___ of China",
+      "What a squirrel hoards",
+      "Sea ___ on the beach",
+      "On, as in competition"
     ]
   },
   {
     "id": 196,
-    "date": "2026-10-08",
     "words": [
       "HORSE",
       "BACK",
@@ -3716,16 +3520,15 @@
       "SHOP"
     ],
     "clues": [
-      "Return or the rear side",
-      "A body part with five fingers",
-      "A skill or trade",
-      "A job or occupation",
-      "A store or retail space"
+      "Where a tattoo might go",
+      "Round of applause maker",
+      "Air- or water- vessel",
+      "Elbow grease",
+      "Stop and ___ "
     ]
   },
   {
     "id": 197,
-    "date": "2026-10-09",
     "words": [
       "JACK",
       "HAMMER",
@@ -3735,16 +3538,15 @@
       "NAME"
     ],
     "clues": [
-      "A heavy pounding tool",
-      "The top of your body",
-      "A garment or outfit",
-      "A system of symbols",
-      "What people call you"
+      "What a nail needs",
+      "Where your brain lives",
+      "Gown or frock",
+      "Zip or area ___",
+      "What's on a birth certificate"
     ]
   },
   {
     "id": 198,
-    "date": "2026-10-10",
     "words": [
       "CLAM",
       "SHELL",
@@ -3754,16 +3556,15 @@
       "SHEET"
     ],
     "clues": [
-      "A hard outer covering",
-      "An activity with rules",
-      "A strategy or design",
-      "A visible sign or impression",
-      "A piece of fabric or paper"
+      "Gas station brand",
+      "Board or video ___",
+      "Floor ___ (layout)",
+      "What a Sharpie leaves",
+      "A piece of paper"
     ]
   },
   {
     "id": 199,
-    "date": "2026-10-11",
     "words": [
       "FLOOR",
       "BOARD",
@@ -3773,16 +3574,15 @@
       "CUT"
     ],
     "clues": [
-      "A flat piece of wood",
-      "Brief or not tall",
-      "A series of items",
-      "What something costs",
-      "Use scissors to do this"
+      "Whiteboard, partially",
+      "What a fuse can be",
+      "To-do items",
+      "What a barcode reveals",
+      "Make the ___ (qualify)"
     ]
   },
   {
     "id": 200,
-    "date": "2026-10-12",
     "words": [
       "SWEAT",
       "SHIRT",
@@ -3792,16 +3592,15 @@
       "MAN"
     ],
     "clues": [
-      "A garment you pull over your head",
-      "The rear end of something",
-      "An entrance or door",
-      "A wooden pole or support",
-      "An adult male"
+      "What a collar is on",
+      "Tails side of a quarter",
+      "Water- or scandal suffix",
+      "Social media update",
+      "A chess piece, informally"
     ]
   },
   {
     "id": 201,
-    "date": "2026-10-13",
     "words": [
       "GOLD",
       "RUSH",
@@ -3811,16 +3610,15 @@
       "POINT"
     ],
     "clues": [
-      "Hurry or move quickly",
-      "A unit of sixty minutes",
-      "A transparent material",
-      "A container or instance",
-      "The tip of a pencil"
+      "Hurry up",
+      "60 minutes",
+      "Wine vessel",
+      "Just in ___",
+      "Gun or laser aim"
     ]
   },
   {
     "id": 202,
-    "date": "2026-10-14",
     "words": [
       "NOSE",
       "DIVE",
@@ -3830,16 +3628,15 @@
       "REST"
     ],
     "clues": [
-      "Plunge downward quickly",
-      "An explosive device",
-      "Flames that burn",
-      "A body part between shoulder and hand",
-      "Relax or take a break"
+      "Jump into water",
+      "Cherry or stink type",
+      "Under ___ (attacked)",
+      "Arm of a chair",
+      "Give it a ___ (stop)"
     ]
   },
   {
     "id": 203,
-    "date": "2026-10-15",
     "words": [
       "JAW",
       "LINE",
@@ -3849,16 +3646,15 @@
       "FIELD"
     ],
     "clues": [
-      "A queue or mark on paper",
-      "Operate a vehicle",
-      "A long rod or tunnel",
+      "What forms at a register",
+      "Flash ___ (USB stick)",
+      "Elevator tunnel",
       "Belonging to me",
-      "An open area of grass"
+      "Where poppies bloom"
     ]
   },
   {
     "id": 204,
-    "date": "2026-10-16",
     "words": [
       "ROUGH",
       "CUT",
@@ -3868,16 +3664,15 @@
       "BOUND"
     ],
     "clues": [
-      "Use scissors to do this",
-      "Return or the rear side",
-      "Fall from a height",
-      "A piece of fabric",
-      "Tied or fastened"
+      "Paper ___ (minor injury)",
+      "Rearward",
+      "Name-___ (mention someone famous)",
+      "Face___ (wash rag)",
+      "Headed toward"
     ]
   },
   {
     "id": 205,
-    "date": "2026-10-17",
     "words": [
       "DRUM",
       "ROLL",
@@ -3887,16 +3682,15 @@
       "CARD"
     ],
     "clues": [
-      "Move by turning over",
-      "Phone someone",
-      "A symbol or gesture",
-      "A wooden pole or support",
-      "Dealt in poker or sent on birthdays"
+      "Rock and ___ (music genre)",
+      "What a referee makes",
+      "Billboard or poster",
+      "Wooden upright",
+      "What a dealer shuffles"
     ]
   },
   {
     "id": 206,
-    "date": "2026-10-18",
     "words": [
       "BED",
       "POST",
@@ -3906,16 +3700,15 @@
       "ABOUT"
     ],
     "clues": [
-      "A wooden pole or support",
-      "An activity with rules",
-      "A flat piece of wood",
-      "Move on foot",
-      "Approximately or roughly"
+      "Goalpost, partly",
+      "What a ref officiates",
+      "A plank",
+      "What a dog needs daily",
+      "What a U-turn is"
     ]
   },
   {
     "id": 207,
-    "date": "2026-10-19",
     "words": [
       "FREE",
       "LOAD",
@@ -3925,16 +3718,15 @@
       "WALK"
     ],
     "clues": [
-      "A heavy amount to carry",
-      "A celebrity in the sky",
-      "A vessel that sails",
-      "A flat piece of wood",
-      "Move on foot"
+      "What a forklift moves",
+      "Michelin rating unit",
+      "Relation-___ (bond type)",
+      "Snowboarding's key piece",
+      "Moon-___ (Armstrong's feat)"
     ]
   },
   {
     "id": 208,
-    "date": "2026-10-20",
     "words": [
       "STORE",
       "ROOM",
@@ -3944,16 +3736,15 @@
       "OUT"
     ],
     "clues": [
-      "A space with four walls",
-      "A friend or companion",
-      "A vessel that sails",
-      "A heavy amount to carry",
-      "Not inside"
+      "Part of a floorplan",
+      "Running or room companion",
+      "Cargo carrier",
+      "Burden to bear",
+      "Far ___"
     ]
   },
   {
     "id": 209,
-    "date": "2026-10-21",
     "words": [
       "FLASH",
       "BACK",
@@ -3963,16 +3754,15 @@
       "TIME"
     ],
     "clues": [
-      "Return or the rear side",
-      "A place for trials",
-      "A space with four walls",
-      "Complete with no space left",
-      "A clock measures this"
+      "Come ___ later",
+      "Where a judge presides",
+      "Suite component",
+      "Tank is ___",
+      "What flies when you're having fun"
     ]
   },
   {
     "id": 210,
-    "date": "2026-10-22",
     "words": [
       "WELL",
       "SPRING",
@@ -3982,16 +3772,15 @@
       "LIST"
     ],
     "clues": [
-      "A season of flowers",
-      "Free of dirt",
-      "Use scissors to do this",
-      "What something costs",
-      "A series of items"
+      "What a mattress has",
+      "Spotless",
+      "Tax or pay reduction",
+      "The right ___",
+      "What Santa checks twice"
     ]
   },
   {
     "id": 211,
-    "date": "2026-10-23",
     "words": [
       "BOW",
       "TIE",
@@ -4001,16 +3790,15 @@
       "KIND"
     ],
     "clues": [
-      "Fasten your shoes with one",
-      "Fracture or shatter",
-      "The tip of a pencil",
-      "An adult male",
-      "Generous or caring"
+      "What laces do",
+      "What waves do on shore",
+      "West or bullet type",
+      "Who a boy becomes",
+      "Type or sort"
     ]
   },
   {
     "id": 212,
-    "date": "2026-10-24",
     "words": [
       "BLUE",
       "PRINT",
@@ -4020,16 +3808,15 @@
       "OUT"
     ],
     "clues": [
-      "An image on paper",
-      "Push down firmly",
-      "A space with four walls",
-      "A device that secures",
-      "Not inside"
+      "Fine ___ (contract details)",
+      "Iron clothes",
+      "Inn offering",
+      "A strand of hair",
+      "What a candle does"
     ]
   },
   {
     "id": 213,
-    "date": "2026-10-25",
     "words": [
       "TRAIN",
       "LOAD",
@@ -4039,16 +3826,15 @@
       "WORK"
     ],
     "clues": [
-      "A heavy amount to carry",
-      "An expert or ruler",
-      "A strategy or design",
-      "A shape or structure",
-      "A job or occupation"
+      "A truckful",
+      "Grand ___ (chess title)",
+      "What a project manager makes",
+      "What a sculptor gives clay",
+      "What a contractor bids on"
     ]
   },
   {
     "id": 214,
-    "date": "2026-10-26",
     "words": [
       "SHARP",
       "SHOOT",
@@ -4059,15 +3845,14 @@
     ],
     "clues": [
       "Fire a weapon",
-      "Not inside",
-      "Arrive or approach",
-      "Return or the rear side",
-      "A street cars drive on"
+      "External",
+      "Arrive",
+      "A linebacker's drop",
+      "What asphalt covers"
     ]
   },
   {
     "id": 215,
-    "date": "2026-10-27",
     "words": [
       "VINE",
       "YARD",
@@ -4077,16 +3862,15 @@
       "ROCK"
     ],
     "clues": [
-      "Three feet of measurement",
-      "A feathered flying creature",
-      "What you plant in a garden",
-      "Where you sleep at night",
-      "A large stone"
+      "Front or back lawn",
+      "What binoculars spot",
+      "What a sunflower drops",
+      "River bottom",
+      "What a climber scales"
     ]
   },
   {
     "id": 216,
-    "date": "2026-10-28",
     "words": [
       "MEAT",
       "BALL",
@@ -4096,16 +3880,15 @@
       "LIFT"
     ],
     "clues": [
-      "A round object used in sports",
-      "A series of connected loops",
-      "One connection in a series",
-      "The opposite of down",
-      "Raise something upward"
+      "Crystal gazer's tool",
+      "What Houdini escaped",
+      "Cuff ___ (formal accessory)",
+      "What balloons do",
+      "What weights need"
     ]
   },
   {
     "id": 217,
-    "date": "2026-10-29",
     "words": [
       "DROP",
       "SHIP",
@@ -4115,16 +3898,15 @@
       "LESS"
     ],
     "clues": [
-      "A vessel that sails",
-      "Three feet of measurement",
-      "A long thin branch or rod",
-      "Move or change slightly",
-      "Without or lacking"
+      "What pirates commandeer",
+      "Ship's horizontal spar",
+      "Chop___ (utensil)",
+      "Paradigm ___",
+      "Lacking"
     ]
   },
   {
     "id": 218,
-    "date": "2026-10-30",
     "words": [
       "PEN",
       "KNIFE",
@@ -4134,16 +3916,15 @@
       "CAST"
     ],
     "clues": [
-      "A sharp cutting tool",
-      "The tip of a pencil",
-      "Shatter or fracture",
-      "Not inside",
-      "Throw or project"
+      "Swiss Army ___",
+      "Geometrical dot",
+      "Halftime, essentially",
+      "Excluded",
+      "Movie ensemble"
     ]
   },
   {
     "id": 219,
-    "date": "2026-10-31",
     "words": [
       "FALL",
       "BACK",
@@ -4153,16 +3934,15 @@
       "DOWN"
     ],
     "clues": [
-      "Return or the rear side",
-      "A flat piece of wood",
-      "An activity with rules",
-      "The front of your head",
-      "A direction on an elevator"
+      "Posterior",
+      "Climb aboard, essentially",
+      "Competition with rules",
+      "Poker ___",
+      "Clown's second half"
     ]
   },
   {
     "id": 220,
-    "date": "2026-11-01",
     "words": [
       "PACK",
       "RAT",
@@ -4172,16 +3952,15 @@
       "SHIP"
     ],
     "clues": [
-      "A small rodent",
-      "An opening in a wall",
-      "A discount event",
-      "A worker behind a counter",
-      "A vessel that sails"
+      "Lab animal",
+      "Swimming ___ (watering spot)",
+      "Black Friday event",
+      "Store cashier",
+      "A craft on the ocean"
     ]
   },
   {
     "id": 221,
-    "date": "2026-11-02",
     "words": [
       "STORM",
       "FRONT",
@@ -4191,16 +3970,15 @@
       "CARE"
     ],
     "clues": [
-      "The forward-facing part",
-      "A heavy amount to carry",
-      "A large furry animal",
-      "An outer body covering",
-      "Look after or tend to"
+      "Opposite of back",
+      "Capacity amount",
+      "Grin and ___ it",
+      "Body's outer layer",
+      "What a nurse provides"
     ]
   },
   {
     "id": 222,
-    "date": "2026-11-03",
     "words": [
       "COOK",
       "BOOK",
@@ -4210,16 +3988,15 @@
       "LINE"
     ],
     "clues": [
-      "Pages bound together",
-      "A container or instance",
-      "Someone employed at a job",
-      "A buzzing insect",
-      "A queue or mark on paper"
+      "What a librarian shelves",
+      "Sherlock's assignment",
+      "Co-___ (colleague)",
+      "What a hive shelters",
+      "Border or boundary"
     ]
   },
   {
     "id": 223,
-    "date": "2026-11-04",
     "words": [
       "DRIFT",
       "WOOD",
@@ -4229,16 +4006,15 @@
       "GUEST"
     ],
     "clues": [
-      "Material from trees",
-      "A small storage building",
-      "Brightness from a bulb",
-      "Where you hang your hat",
-      "A visitor staying over"
+      "Drift- or ply- type",
+      "What a snake does to skin",
+      "Opposite of dark",
+      "Residence",
+      "Party attendee"
     ]
   },
   {
     "id": 224,
-    "date": "2026-11-05",
     "words": [
       "NET",
       "WORK",
@@ -4248,16 +4024,15 @@
       "CARD"
     ],
     "clues": [
-      "A job or occupation",
-      "A long seat or station",
-      "A visible sign or impression",
-      "A clock measures this",
-      "Dealt in poker"
+      "A masterpiece, to an artist",
+      "Workout station",
+      "Score or grade",
+      "Bedtime, minus bed",
+      "Report ___ (school grades)"
     ]
   },
   {
     "id": 225,
-    "date": "2026-11-06",
     "words": [
       "GATE",
       "CRASH",
@@ -4267,16 +4042,15 @@
       "SHIP"
     ],
     "clues": [
-      "Collide violently",
-      "Soil or territory",
-      "A ruler or master",
-      "A city official",
-      "A vessel that sails"
+      "What a car does in a wreck",
+      "Come in for a landing",
+      "___ of the Rings",
+      "City's elected leader",
+      "Naval vessel"
     ]
   },
   {
     "id": 226,
-    "date": "2026-11-07",
     "words": [
       "GAME",
       "COCK",
@@ -4286,16 +4060,15 @@
       "OFF"
     ],
     "clues": [
-      "A male chicken or rooster",
-      "A hole in the ground",
-      "A team that works together",
-      "Use scissors to do this",
-      "The opposite of on"
+      "Rooster",
+      "Orchestra section",
+      "Ship's team",
+      "Director's cry",
+      "Rip- (scam)"
     ]
   },
   {
     "id": 227,
-    "date": "2026-11-08",
     "words": [
       "IRON",
       "CLAD",
@@ -4305,16 +4078,15 @@
       "STEP"
     ],
     "clues": [
-      "Covered in armor",
-      "A flat piece of wood",
-      "Move on foot",
-      "Left or right of center",
-      "A single stair"
+      "Dressed or covered",
+      "A flat panel",
+      "Leisurely pace",
+      "Bed or road edge",
+      "One at a time"
     ]
   },
   {
     "id": 228,
-    "date": "2026-11-09",
     "words": [
       "SHOE",
       "LACE",
@@ -4324,16 +4096,15 @@
       "BACK"
     ],
     "clues": [
-      "A delicate fabric with patterns",
-      "A job or occupation",
-      "Strength or power",
-      "Give food to someone",
-      "Return or the rear side"
+      "Delicate fabric",
+      "The daily hustle",
+      "Air ___ One",
+      "What a farmer does to animals",
+      "What you lean against"
     ]
   },
   {
     "id": 229,
-    "date": "2026-11-10",
     "words": [
       "SUN",
       "RISE",
@@ -4343,16 +4114,15 @@
       "TAP"
     ],
     "clues": [
-      "Go upward or increase",
-      "Autumn leaves do this",
-      "A man or fellow",
-      "A thin metal strand",
-      "Turn on a faucet"
+      "What the sun does",
+      "Free ___ (skydiving term)",
+      "A fellow",
+      "Barbed or copper type",
+      "Beer on ___"
     ]
   },
   {
     "id": 230,
-    "date": "2026-11-11",
     "words": [
       "ROOT",
       "BEER",
@@ -4362,16 +4132,15 @@
       "TOP"
     ],
     "clues": [
-      "A brewed beverage",
-      "A plot where plants grow",
-      "A vertical barrier",
-      "Climb or attach to a surface",
-      "The highest point"
+      "Root ___ (non-alcoholic)",
+      "Where vegetables grow",
+      "Vertical barrier",
+      "Horse up!",
+      "Mountain's peak"
     ]
   },
   {
     "id": 231,
-    "date": "2026-11-12",
     "words": [
       "HOME",
       "SICK",
@@ -4381,16 +4150,15 @@
       "METAL"
     ],
     "clues": [
-      "Ill or unwell",
-      "Where you sleep at night",
-      "Extend across a surface",
-      "A piece of fabric or paper",
-      "A hard shiny material"
+      "Under the weather",
+      "Water or bunk type",
+      "What butter does",
+      "Spreadsheet, partly",
+      "Gold or iron"
     ]
   },
   {
     "id": 232,
-    "date": "2026-11-13",
     "words": [
       "HOT",
       "SHOT",
@@ -4400,16 +4168,15 @@
       "STONE"
     ],
     "clues": [
-      "An attempt or try",
-      "A device that tells time",
-      "A tall structure",
-      "The top of your body",
-      "A small rock"
+      "A chance or attempt",
+      "What a punch card uses",
+      "Ivory ___ (academia)",
+      "A nail's flat end",
+      "Stepping or corner type"
     ]
   },
   {
     "id": 233,
-    "date": "2026-11-14",
     "words": [
       "BOX",
       "SCORE",
@@ -4419,16 +4186,15 @@
       "LANE"
     ],
     "clues": [
-      "A tally or result",
-      "Dealt in poker",
-      "Grip something tightly",
-      "The opposite of slow",
-      "A division of a road"
+      "Game tally",
+      "Playing ___ (poker essential)",
+      "What a phone caller does",
+      "Hold ___ (grip tight)",
+      "Bowling alley path"
     ]
   },
   {
     "id": 234,
-    "date": "2026-11-15",
     "words": [
       "FLAT",
       "IRON",
@@ -4438,16 +4204,15 @@
       "CUP"
     ],
     "clues": [
-      "A strong metal element",
-      "An entrance or door",
-      "Maintain or hold onto",
-      "A reason or purpose",
-      "A drinking vessel"
+      "What spinach provides",
+      "Starting ___ (racetrack)",
+      "What a castle has",
+      "For goodness' ___",
+      "Coffee vessel"
     ]
   },
   {
     "id": 235,
-    "date": "2026-11-16",
     "words": [
       "HAND",
       "BAG",
@@ -4457,16 +4222,15 @@
       "CAR"
     ],
     "clues": [
-      "A flexible container",
-      "A tube for water or gas",
-      "An explosive device",
+      "A tote or sack",
+      "Organ component",
+      "What a fuse leads to",
       "A team or unit",
-      "A vehicle with four wheels"
+      "What a key starts"
     ]
   },
   {
     "id": 236,
-    "date": "2026-11-17",
     "words": [
       "ARM",
       "CHAIR",
@@ -4476,16 +4240,15 @@
       "RAIL"
     ],
     "clues": [
-      "Something you sit in",
-      "Return or the rear side",
-      "A platform for performers",
-      "A body part with five fingers",
-      "A bar you hold onto"
+      "Meeting leader",
+      "Direction of a refund",
+      "What a rocket sheds",
+      "What a glove fits",
+      "Mono- or guard- type"
     ]
   },
   {
     "id": 237,
-    "date": "2026-11-18",
     "words": [
       "POLE",
       "STAR",
@@ -4495,16 +4258,15 @@
       "LESS"
     ],
     "clues": [
-      "A celebrity or shape in the sky",
-      "A flat piece of wood",
-      "A vessel that sails",
-      "A friend or companion",
-      "Without or lacking"
+      "Rock ___",
+      "Bulletin ___",
+      "Friend-___ (bond)",
+      "What a queen bee seeks",
+      "Not as much"
     ]
   },
   {
     "id": 238,
-    "date": "2026-11-19",
     "words": [
       "COAST",
       "LINE",
@@ -4514,16 +4276,15 @@
       "ROOM"
     ],
     "clues": [
-      "A queue or mark on paper",
-      "Return or the rear side",
-      "A long seat or station",
-      "Push down firmly",
-      "A space with four walls"
+      "A phone connection",
+      "Rewind button's effect",
+      "Press this at the gym",
+      "Bench ___ (gym lift)",
+      "Where meetings happen"
     ]
   },
   {
     "id": 239,
-    "date": "2026-11-20",
     "words": [
       "NECK",
       "BAND",
@@ -4533,16 +4294,15 @@
       "BALL"
     ],
     "clues": [
-      "A musical group",
-      "Someone in charge",
-      "A vessel that sails",
-      "Destroy or ruin",
-      "A round object used in sports"
+      "Elastic strip",
+      "What a team captain is",
+      "What a harbor shelters",
+      "Ship___ (sunken vessel)",
+      "Tennis or basket starter"
     ]
   },
   {
     "id": 240,
-    "date": "2026-11-21",
     "words": [
       "OAK",
       "WOOD",
@@ -4552,16 +4312,15 @@
       "MINE"
     ],
     "clues": [
-      "Material from trees",
-      "A heap of things",
-      "Operate a vehicle",
-      "A long rod or tunnel",
-      "Belonging to me"
+      "Knock on ___",
+      "What laundry becomes",
+      "What motivation provides",
+      "Mine passage",
+      "Land___ (explosive)"
     ]
   },
   {
     "id": 241,
-    "date": "2026-11-22",
     "words": [
       "LOOP",
       "HOLE",
@@ -4571,16 +4330,15 @@
       "HAND"
     ],
     "clues": [
-      "An opening or gap",
-      "A discount event",
-      "A vessel on the water",
-      "Where ships are tied up",
-      "A body part with five fingers"
+      "Opening in the ground",
+      "What a cashier rings up",
+      "Small watercraft",
+      "What a paycheck can be",
+      "Dealt cards"
     ]
   },
   {
     "id": 242,
-    "date": "2026-11-23",
     "words": [
       "TREE",
       "FORT",
@@ -4590,16 +4348,15 @@
       "STAND"
     ],
     "clues": [
-      "A stronghold or castle",
-      "The dark hours after sunset",
-      "A timepiece worn on the wrist",
-      "A musical group",
-      "Rise to your feet"
+      "Military stronghold",
+      "After sunset",
+      "Night ___ (patrol)",
+      "Marching or garage type",
+      "Bleacher or night type"
     ]
   },
   {
     "id": 243,
-    "date": "2026-11-24",
     "words": [
       "BRAIN",
       "CHILD",
@@ -4609,16 +4366,15 @@
       "BEAT"
     ],
     "clues": [
-      "A young person",
-      "Protected against damage",
-      "A visible sign or impression",
-      "A direction on an elevator",
-      "A rhythmic pulse"
+      "A kid",
+      "Evidence in court",
+      "Benchmark, partly",
+      "Toward the ground",
+      "Heart's rhythm"
     ]
   },
   {
     "id": 244,
-    "date": "2026-11-25",
     "words": [
       "SHEEP",
       "DOG",
@@ -4628,16 +4384,15 @@
       "SHOT"
     ],
     "clues": [
-      "A loyal pet",
-      "Where you hang your hat",
-      "A succulent or fern",
-      "A container for cooking",
-      "An attempt or try"
+      "Under___ (secret agent)",
+      "What the Three Little Pigs built",
+      "What a gardener tends",
+      "Jack___ (big prize)",
+      "Calling the ___s"
     ]
   },
   {
     "id": 245,
-    "date": "2026-11-26",
     "words": [
       "SQUARE",
       "DANCE",
@@ -4647,16 +4402,15 @@
       "WINE"
     ],
     "clues": [
-      "Move rhythmically to music",
-      "A large room for events",
-      "Go by or move beyond",
-      "Where ships dock",
-      "An alcoholic beverage from grapes"
+      "What Fred Astaire did best",
+      "What an echo bounces through",
+      "Mountain crossing",
+      "Left side of a ship",
+      "What grapes become"
     ]
   },
   {
     "id": 246,
-    "date": "2026-11-27",
     "words": [
       "GRAVE",
       "STONE",
@@ -4666,16 +4420,15 @@
       "LAMP"
     ],
     "clues": [
-      "A small rock",
-      "Low temperature",
-      "The forward-facing part",
-      "A table for work",
-      "A light source on a table"
+      "Fruit's pit",
+      "Common illness",
+      "Store___ (facade)",
+      "Office workspace",
+      "Desk light"
     ]
   },
   {
     "id": 247,
-    "date": "2026-11-28",
     "words": [
       "SCARE",
       "CROW",
@@ -4685,16 +4438,15 @@
       "PLAY"
     ],
     "clues": [
-      "A large black bird",
-      "Where you might grab a drink",
-      "A system of symbols",
-      "A unit of language",
-      "Engage in fun activities"
+      "Caw-cawing bird",
+      "Legal profession (passed the ___)",
+      "What a programmer writes",
+      "My ___! (I promise)",
+      "What kids do at recess"
     ]
   },
   {
     "id": 248,
-    "date": "2026-11-29",
     "words": [
       "BELL",
       "BOY",
@@ -4704,16 +4456,15 @@
       "PLAY"
     ],
     "clues": [
-      "A young male child",
-      "An outdoor youth group",
-      "An expert or ruler",
-      "A single smooth movement",
-      "Engage in fun activities"
+      "Old ___ (former student)",
+      "Boy or Girl ___ member",
+      "What a servant serves",
+      "Swimming technique",
+      "Shakespeare wrote many"
     ]
   },
   {
     "id": 249,
-    "date": "2026-11-30",
     "words": [
       "MOUSE",
       "TRAP",
@@ -4723,16 +4474,15 @@
       "SIDE"
     ],
     "clues": [
-      "A device for catching",
-      "An entrance to a building",
-      "A round handle",
-      "A raised area of land",
-      "Left or right of center"
+      "Speed ___ (radar)",
+      "What a doorbell sits beside",
+      "Dial on a stove",
+      "Ant___ (insect home)",
+      "One of a polygon's edges"
     ]
   },
   {
     "id": 250,
-    "date": "2026-12-01",
     "words": [
       "SAIL",
       "BOAT",
@@ -4742,16 +4492,15 @@
       "HOUND"
     ],
     "clues": [
-      "A vessel on the water",
-      "The part connecting head to body",
-      "Clothing or accessories",
-      "A wild canine",
-      "A breed of tracking dog"
+      "Vessel for fishing",
+      "Red___ (rural stereotype)",
+      "What erosion does",
+      "What Red Riding Hood met",
+      "What a detective does"
     ]
   },
   {
     "id": 251,
-    "date": "2026-12-02",
     "words": [
       "BARN",
       "YARD",
@@ -4761,16 +4510,15 @@
       "PLAY"
     ],
     "clues": [
-      "Three feet of measurement",
-      "A discount event",
-      "What something costs",
-      "A contest between opponents",
-      "Engage in fun activities"
+      "Garden space",
+      "Bargain event",
+      "Half ___ (discount)",
+      "Made in heaven",
+      "Press ___ on a remote"
     ]
   },
   {
     "id": 252,
-    "date": "2026-12-03",
     "words": [
       "FOOT",
       "HOLD",
@@ -4780,16 +4528,15 @@
       "GRADE"
     ],
     "clues": [
-      "Grip something tightly",
-      "Not inside",
-      "Move quickly on foot",
-      "A direction on an elevator",
-      "A level or rating"
+      "Keep possession of",
+      "Available, as a book",
+      "Jog or sprint",
+      "Duvet stuffing",
+      "Uphill slope"
     ]
   },
   {
     "id": 253,
-    "date": "2026-12-04",
     "words": [
       "PAINT",
       "BRUSH",
@@ -4799,16 +4546,15 @@
       "DOWN"
     ],
     "clues": [
-      "A tool for painting",
-      "Return or the rear side",
-      "A path for runners",
-      "A visible sign or impression",
-      "A direction on an elevator"
+      "Hair grooming tool",
+      "Where shoulder blades live",
+      "Keep ___ of (monitor)",
+      "Impression left behind",
+      "First and ten need four of these"
     ]
   },
   {
     "id": 254,
-    "date": "2026-12-05",
     "words": [
       "SLAB",
       "ROCK",
@@ -4818,16 +4564,15 @@
       "BOARD"
     ],
     "clues": [
-      "A large stone",
-      "A mineral used on food",
-      "A large body of water",
-      "Left or right of center",
-      "A flat piece of wood"
+      "Plymouth ___",
+      "Table seasoning",
+      "Freshwater body",
+      "Order of fries, say",
+      "What a landlord provides with room"
     ]
   },
   {
     "id": 255,
-    "date": "2026-12-06",
     "words": [
       "ROOF",
       "DECK",
@@ -4837,16 +4582,15 @@
       "BACK"
     ],
     "clues": [
-      "An outdoor platform",
-      "A body part with five fingers",
-      "A season of flowers",
-      "Move by turning over",
-      "Return or the rear side"
+      "Ship's floor",
+      "Palm and fingers",
+      "Hot ___ (geothermal pool)",
+      "Bread type",
+      "Kind of flip or fire"
     ]
   },
   {
     "id": 256,
-    "date": "2026-12-07",
     "words": [
       "STEP",
       "CHILD",
@@ -4856,16 +4600,15 @@
       "BEAR"
     ],
     "clues": [
-      "A young person",
-      "Look after or tend to",
-      "Without cost or restriction",
-      "A heavy amount to carry",
-      "A large furry animal"
+      "Brain___ (creation)",
+      "Handle with ___",
+      "No cost",
+      "What a washing machine takes",
+      "What a tree does with fruit"
     ]
   },
   {
     "id": 257,
-    "date": "2026-12-08",
     "words": [
       "FISH",
       "POND",
@@ -4875,16 +4618,15 @@
       "TIE"
     ],
     "clues": [
-      "A small body of still water",
-      "The state of being alive",
-      "A vessel on the water",
-      "The part connecting head to body",
-      "Fasten your shoes with one"
+      "A small still body of water",
+      "Time of your ___",
+      "A kayak or skiff",
+      "Giraffe's claim to fame",
+      "Black ___ event (formal)"
     ]
   },
   {
     "id": 258,
-    "date": "2026-12-09",
     "words": [
       "FEATHER",
       "WEIGHT",
@@ -4894,16 +4636,15 @@
       "BACK"
     ],
     "clues": [
-      "How heavy something is",
-      "A space with four walls",
-      "Complete with no space left",
-      "Make something full",
-      "Return or the rear side"
+      "Dead ___ (heavy load)",
+      "Ballroom, minus ball",
+      "Meaning___ (significant)",
+      "What a dentist does to a cavity",
+      "The return half of a round trip"
     ]
   },
   {
     "id": 259,
-    "date": "2026-12-10",
     "words": [
       "STAGE",
       "DOOR",
@@ -4913,16 +4654,15 @@
       "BOARD"
     ],
     "clues": [
-      "An entrance to a building",
-      "A wooden pole or support",
-      "An activity with rules",
-      "A strategy or design",
-      "A flat piece of wood"
+      "Entry point",
+      "Job or trading ___",
+      "The name of the ___",
+      "Scheme or design",
+      "Emery or dart surface"
     ]
   },
   {
     "id": 260,
-    "date": "2026-12-11",
     "words": [
       "VINE",
       "YARD",
@@ -4932,16 +4672,15 @@
       "LOAD"
     ],
     "clues": [
-      "Three feet of measurement",
-      "A body part between shoulder and hand",
-      "A device that secures",
-      "A direction on an elevator",
-      "A heavy amount to carry"
+      "Where a dog runs",
+      "What you twist, figuratively",
+      "Goldilocks, partly",
+      "Soft plumage",
+      "Ship's cargo"
     ]
   },
   {
     "id": 261,
-    "date": "2026-12-12",
     "words": [
       "TRAP",
       "DOOR",
@@ -4951,16 +4690,15 @@
       "SHIP"
     ],
     "clues": [
-      "An entrance to a building",
-      "A border or structure",
-      "A job or occupation",
-      "A friend or companion",
-      "A vessel that sails"
+      "A revolving ___",
+      "What glasses have",
+      "Office or manual labor",
+      "Spouse",
+      "Ocean liner"
     ]
   },
   {
     "id": 262,
-    "date": "2026-12-13",
     "words": [
       "HEART",
       "LAND",
@@ -4970,16 +4708,15 @@
       "TRIP"
     ],
     "clues": [
-      "Soil or territory",
-      "Make something full",
-      "Earth or soil",
-      "A street cars drive on",
-      "Stumble and fall"
+      "Property or acreage",
+      "Land___ (waste site)",
+      "Soil",
+      "What a map shows",
+      "Road ___ (driving adventure)"
     ]
   },
   {
     "id": 263,
-    "date": "2026-12-14",
     "words": [
       "RAIN",
       "PROOF",
@@ -4989,16 +4726,15 @@
       "HOUSE"
     ],
     "clues": [
-      "Protected against damage",
-      "Words on a page",
-      "Pages bound together",
-      "A group or organization",
-      "Where you hang your hat"
+      "Alcohol content measure",
+      "What a student highlights",
+      "Reserve a table",
+      "What a caveman carries",
+      "Domestic structure"
     ]
   },
   {
     "id": 264,
-    "date": "2026-12-15",
     "words": [
       "MATCH",
       "POINT",
@@ -5008,16 +4744,15 @@
       "DECK"
     ],
     "clues": [
-      "The tip of a pencil",
-      "A person who protects",
-      "Where you hang your hat",
-      "The highest point",
-      "An outdoor platform"
+      "A scorer's unit",
+      "Sentry",
+      "A type of music genre",
+      "Laptop or table type",
+      "A patio or porch"
     ]
   },
   {
     "id": 265,
-    "date": "2026-12-16",
     "words": [
       "BARN",
       "OWL",
@@ -5027,16 +4762,15 @@
       "GIN"
     ],
     "clues": [
-      "A nocturnal bird of prey",
-      "A home for birds",
-      "An oval shell from a chicken",
-      "A holiday beverage",
-      "A clear spirit"
+      "Who? asker",
+      "Where a bird lays eggs",
+      "Breakfast staple",
+      "Egg___ (holiday drink)",
+      "Tonic's partner"
     ]
   },
   {
     "id": 266,
-    "date": "2026-12-17",
     "words": [
       "WARM",
       "BLOOD",
@@ -5046,16 +4780,15 @@
       "STOCK"
     ],
     "clues": [
-      "A red fluid in your veins",
-      "A financial institution",
-      "A brief written message",
-      "Dealt in poker",
-      "Inventory or supply"
+      "What veins carry",
+      "River's edge",
+      "A short letter",
+      "Business ___ exchange",
+      "Broth base"
     ]
   },
   {
     "id": 267,
-    "date": "2026-12-18",
     "words": [
       "SHARP",
       "POINT",
@@ -5065,16 +4798,15 @@
       "PIN"
     ],
     "clues": [
-      "The tip of a pencil",
-      "Without or lacking",
-      "A comparison word",
-      "A royal ruler",
-      "A thin pointed fastener"
+      "What arrows have",
+      "Subtracted amount",
+      "Greater ___ (math symbol)",
+      "Chess's most important piece",
+      "Lapel decoration"
     ]
   },
   {
     "id": 268,
-    "date": "2026-12-19",
     "words": [
       "ROSE",
       "BUD",
@@ -5085,15 +4817,14 @@
     ],
     "clues": [
       "A flower before it blooms",
-      "Brightness from a bulb",
-      "How fast something moves",
-      "A vessel on the water",
-      "A competition of speed"
+      "Featherweight descriptor",
+      "How fast you go",
+      "Motor or sail preceder",
+      "Rat ___ (daily grind)"
     ]
   },
   {
     "id": 269,
-    "date": "2026-12-20",
     "words": [
       "JUNK",
       "YARD",
@@ -5103,16 +4834,15 @@
       "CASE"
     ],
     "clues": [
-      "Three feet of measurement",
-      "A feathered flying creature",
-      "A melody you sing",
-      "Pages bound together",
-      "A container or instance"
+      "A stretch of green",
+      "Larry of basketball fame",
+      "Swan ___ (final act)",
+      "Facebook's original suffix",
+      "Staircase, partly"
     ]
   },
   {
     "id": 270,
-    "date": "2026-12-21",
     "words": [
       "TEA",
       "CUP",
@@ -5122,16 +4852,15 @@
       "BOMB"
     ],
     "clues": [
-      "A drinking vessel",
-      "A layered birthday dessert",
-      "Rise to your feet",
-      "A tube for water or gas",
-      "An explosive device"
+      "Stanley ___ (hockey prize)",
+      "Let them eat ___",
+      "Plant holder",
+      "Water conduit",
+      "Box office disaster"
     ]
   },
   {
     "id": 271,
-    "date": "2026-12-22",
     "words": [
       "LIME",
       "STONE",
@@ -5141,16 +4870,15 @@
       "DEER"
     ],
     "clues": [
-      "A small rock",
-      "Low temperature",
-      "A bag carried on shoulders",
-      "A stubborn work animal",
-      "A woodland creature with antlers"
+      "What Medusa turned people to",
+      "What a scarf fights",
+      "Bundle for travel",
+      "Stubborn animal",
+      "Bambi, for one"
     ]
   },
   {
     "id": 272,
-    "date": "2026-12-23",
     "words": [
       "WATER",
       "PROOF",
@@ -5160,16 +4888,15 @@
       "TOP"
     ],
     "clues": [
-      "Protected against damage",
-      "Look over written text",
-      "Return or the rear side",
-      "A long seat or station",
-      "The highest point"
+      "What a proofreader checks",
+      "Well-___ (knowledgeable)",
+      "Where the catcher crouches",
+      "Where reserves wait",
+      "Highest ranking"
     ]
   },
   {
     "id": 273,
-    "date": "2026-12-24",
     "words": [
       "SPIN",
       "DOCTOR",
@@ -5179,16 +4906,15 @@
       "CAST"
     ],
     "clues": [
-      "A medical professional",
-      "Salmon or tuna",
-      "A curved piece of metal",
-      "A long squirmy creature",
-      "Throw or project"
+      "MD",
+      "Catch of the day",
+      "What a fish bites",
+      "What compost contains",
+      "What a fisherman does"
     ]
   },
   {
     "id": 274,
-    "date": "2026-12-25",
     "words": [
       "DRESS",
       "CODE",
@@ -5198,16 +4924,15 @@
       "YEAR"
     ],
     "clues": [
-      "A system of symbols",
-      "A unit of language",
-      "Look for something",
-      "Brightness from a bulb",
-      "365 days"
+      "Cheat ___ (game hack)",
+      "Cross___ (puzzle type)",
+      "What Google does",
+      "What a prism splits",
+      "Fiscal ___ (budget period)"
     ]
   },
   {
     "id": 275,
-    "date": "2026-12-26",
     "words": [
       "WISH",
       "BONE",
@@ -5217,16 +4942,15 @@
       "SMITH"
     ],
     "clues": [
-      "Part of your skeleton",
-      "Breakfast, lunch, or dinner",
-      "A clock measures this",
-      "A device that secures",
-      "A person who works with metal"
+      "A rib, for example",
+      "A square ___ (proper food)",
+      "Magazine title",
+      "Security device",
+      "A common surname"
     ]
   },
   {
     "id": 276,
-    "date": "2026-12-27",
     "words": [
       "THUMB",
       "NAIL",
@@ -5236,16 +4960,15 @@
       "ROOM"
     ],
     "clues": [
-      "A small piece of metal",
-      "A weapon that shoots",
-      "A vessel that sails",
-      "A flat piece of wood",
-      "A space with four walls"
+      "What a hammer hits",
+      "Squirt or glue type",
+      "What a figurehead adorns",
+      "What passengers do at the gate",
+      "What a house has many of"
     ]
   },
   {
     "id": 277,
-    "date": "2026-12-28",
     "words": [
       "BEAN",
       "STALK",
@@ -5255,16 +4978,15 @@
       "BOY"
     ],
     "clues": [
-      "A plant stem that grows tall",
-      "A large animal you can ride",
-      "An insect with wings",
-      "A round object used in sports",
-      "A young male child"
+      "Celery piece",
+      "Stallion or mare",
+      "Bar ___ (cocktail pest)",
+      "Rolling object",
+      "A lad"
     ]
   },
   {
     "id": 278,
-    "date": "2026-12-29",
     "words": [
       "ICE",
       "CAP",
@@ -5274,16 +4996,15 @@
       "GUARD"
     ],
     "clues": [
-      "A hat worn on the head",
-      "A measurement of how big",
-      "Capable or skilled",
-      "A physical form",
-      "A person who protects"
+      "Knee___ (leg protector)",
+      "Measurement",
+      "Capable",
+      "Torso and limbs",
+      "What a shield provides"
     ]
   },
   {
     "id": 279,
-    "date": "2026-12-30",
     "words": [
       "PIG",
       "TAIL",
@@ -5293,16 +5014,15 @@
       "BOARD"
     ],
     "clues": [
-      "The rear end of an animal",
-      "An outer layer of clothing",
-      "Verify or inspect",
-      "A friend or companion",
-      "A flat piece of wood"
+      "Fairy ___ (bedtime story)",
+      "A parka or peacoat",
+      "Rain ___ (postponement)",
+      "Teammate, partly",
+      "Group that governs"
     ]
   },
   {
     "id": 280,
-    "date": "2026-12-31",
     "words": [
       "SAND",
       "BAG",
@@ -5312,16 +5032,15 @@
       "SIGN"
     ],
     "clues": [
-      "A flexible container",
-      "A woman of high status",
-      "A feathered flying creature",
-      "Phone someone",
-      "A symbol or gesture"
+      "Bean or sand type",
+      "First ___ (president's spouse)",
+      "A tweet's source, naturally",
+      "Close ___ (narrow escape)",
+      "Zodiac symbol"
     ]
   },
   {
     "id": 281,
-    "date": "2027-01-01",
     "words": [
       "CUP",
       "BOARD",
@@ -5331,16 +5050,15 @@
       "HAND"
     ],
     "clues": [
-      "A flat piece of wood",
-      "Brief or not tall",
-      "Autumn leaves do this",
-      "Return or the rear side",
-      "A body part with five fingers"
+      "Flat timber",
+      "Selling ___ (stock strategy)",
+      "Downfall, partly",
+      "Opposite of forth",
+      "Second ___ (used)"
     ]
   },
   {
     "id": 282,
-    "date": "2027-01-02",
     "words": [
       "COURT",
       "SHIP",
@@ -5350,16 +5068,15 @@
       "WORD"
     ],
     "clues": [
-      "A vessel that sails",
-      "A heavy amount to carry",
-      "An expert or ruler",
-      "What unlocks a door",
-      "A unit of language"
+      "Flagship, partially",
+      "What you bear",
+      "Class or quiz prefix",
+      "Musical scale",
+      "What a definition defines"
     ]
   },
   {
     "id": 283,
-    "date": "2027-01-03",
     "words": [
       "PATH",
       "WAY",
@@ -5369,16 +5086,15 @@
       "GUN"
     ],
     "clues": [
-      "A road or path",
-      "The tip of a pencil",
-      "A person who protects",
-      "Trains run on these",
-      "A weapon that shoots"
+      "Milky ___ (our galaxy)",
+      "Fingertip gesture",
+      "Buckingham Palace figure",
+      "What a train runs on",
+      "What a holster holds"
     ]
   },
   {
     "id": 284,
-    "date": "2027-01-04",
     "words": [
       "QUICK",
       "SAND",
@@ -5388,16 +5104,15 @@
       "WALK"
     ],
     "clues": [
-      "Granules on a beach",
-      "What you write on",
-      "Fasten things together",
-      "A flat piece of wood",
-      "Move on foot"
+      "Beach material",
+      "Rock-___-scissors choice",
+      "Video excerpt",
+      "On ___ (aboard)",
+      "What a jaywalker does"
     ]
   },
   {
     "id": 285,
-    "date": "2027-01-05",
     "words": [
       "BAND",
       "WAGON",
@@ -5407,16 +5122,15 @@
       "GATE"
     ],
     "clues": [
-      "A cart pulled by horses",
-      "A circular spinning object",
-      "Something you sit in",
-      "Raise something upward",
-      "An entrance or door"
+      "Red ___ (childhood toy)",
+      "Fortune's spinner",
+      "What you pull up to a table",
+      "Chair ___ at a ski resort",
+      "What a latch opens"
     ]
   },
   {
     "id": 286,
-    "date": "2027-01-06",
     "words": [
       "CAVE",
       "WALL",
@@ -5426,16 +5140,15 @@
       "STAR"
     ],
     "clues": [
-      "A vertical barrier",
-      "What you write or print on",
-      "A path through the woods",
-      "A bright flame",
-      "A celebrity or shape in the sky"
+      "Street named for finance",
+      "What a printer feeds",
+      "Hiking path",
+      "Raging fire",
+      "What a supernova becomes"
     ]
   },
   {
     "id": 287,
-    "date": "2027-01-07",
     "words": [
       "PUNCH",
       "CARD",
@@ -5445,16 +5158,15 @@
       "GUARD"
     ],
     "clues": [
-      "Dealt in poker",
-      "An activity with rules",
-      "One who watches over",
-      "Protected from harm",
-      "A person who protects"
+      "What you swipe at checkout",
+      "Ticket-worthy event",
+      "Goal___ (soccer defender)",
+      "Vault for valuables",
+      "On one's ___ (alert)"
     ]
   },
   {
     "id": 288,
-    "date": "2027-01-08",
     "words": [
       "TEAM",
       "MATE",
@@ -5464,16 +5176,15 @@
       "PARK"
     ],
     "clues": [
-      "A friend or companion",
-      "A contest between opponents",
-      "A long thin branch or rod",
-      "A round object used in sports",
-      "Where kids play on swings"
+      "First ___  on a ship",
+      "What a striker sparks",
+      "What a dog fetches",
+      "What a juggler uses",
+      "What you do with a car"
     ]
   },
   {
     "id": 289,
-    "date": "2027-01-09",
     "words": [
       "NET",
       "BALL",
@@ -5483,16 +5194,15 @@
       "YARD"
     ],
     "clues": [
-      "A round object in sports",
-      "An activity with rules",
-      "A flat piece of wood",
-      "A vessel that sails",
-      "Three feet of measurement"
+      "Base, basket, or foot follower",
+      "Stadium event",
+      "Corkboard or cardboard ender",
+      "Maritime craft",
+      "Junkyard, partly"
     ]
   },
   {
     "id": 290,
-    "date": "2027-01-10",
     "words": [
       "BREAD",
       "FRUIT",
@@ -5502,16 +5212,15 @@
       "GUN"
     ],
     "clues": [
-      "A tropical food",
-      "A layered birthday dessert",
-      "An opening in a wall",
-      "An attempt or try",
-      "A weapon that shoots"
+      "Apple or banana",
+      "A baker's creation",
+      "Black ___ in space",
+      "Moon- or gun- type",
+      "Smoking ___ (damning evidence)"
     ]
   },
   {
     "id": 291,
-    "date": "2027-01-11",
     "words": [
       "FLASH",
       "POINT",
@@ -5521,16 +5230,15 @@
       "STAR"
     ],
     "clues": [
-      "The tip of a pencil",
-      "Without or lacking",
-      "A job or occupation",
-      "A heavy amount to carry",
-      "A celebrity in the sky"
+      "Turning or focal ___",
+      "Diminished",
+      "What deadlines demand",
+      "Haul",
+      "North or shooting type"
     ]
   },
   {
     "id": 292,
-    "date": "2027-01-12",
     "words": [
       "COLD",
       "SNAP",
@@ -5540,16 +5248,15 @@
       "GAME"
     ],
     "clues": [
-      "Break suddenly",
-      "Talk casually",
-      "A space with four walls",
-      "A flat piece of wood",
-      "An activity with rules"
+      "Quick photo",
+      "Casual conversation",
+      "Chat ___ (online space)",
+      "Game night essential",
+      "Fair or foul caller's domain"
     ]
   },
   {
     "id": 293,
-    "date": "2027-01-13",
     "words": [
       "GUM",
       "DROP",
@@ -5559,16 +5266,15 @@
       "BLANK"
     ],
     "clues": [
-      "Fall from a height",
-      "Strike with your foot",
-      "A support that holds up",
-      "The tip of a pencil",
-      "Empty or unmarked"
+      "What a mic does at a show",
+      "Penalty ___ in soccer",
+      "One-night ___ ",
+      "The crux of a matter",
+      "Point-___ (close range)"
     ]
   },
   {
     "id": 294,
-    "date": "2027-01-14",
     "words": [
       "HOUSE",
       "WIFE",
@@ -5578,16 +5284,15 @@
       "TEAM"
     ],
     "clues": [
-      "A married woman",
-      "A person who protects",
-      "A loyal pet",
-      "A label attached to clothing",
-      "A group working together"
+      "Better half",
+      "A sentinel",
+      "Snoopy, for one",
+      "Playground game",
+      "Dream ___ (all-stars)"
     ]
   },
   {
     "id": 295,
-    "date": "2027-01-15",
     "words": [
       "LIGHT",
       "SHIP",
@@ -5597,16 +5302,15 @@
       "MATE"
     ],
     "clues": [
-      "A vessel that sails",
-      "A form or outline",
-      "Move or change slightly",
-      "A job or occupation",
-      "A friend or companion"
+      "Galleon or frigate",
+      "What clay takes",
+      "Night or day at work",
+      "Fuel for a paycheck",
+      "Companion at sea"
     ]
   },
   {
     "id": 296,
-    "date": "2027-01-16",
     "words": [
       "BRIDGE",
       "WORK",
@@ -5616,16 +5320,15 @@
       "WALL"
     ],
     "clues": [
-      "A job or occupation",
-      "Strength or power",
-      "An open area of grass",
-      "A small rock",
-      "A vertical barrier"
+      "What an engine does",
+      "What gravity is",
+      "Baseball diamond area",
+      "Mile- or grave- ender",
+      "What ivy climbs"
     ]
   },
   {
     "id": 297,
-    "date": "2027-01-17",
     "words": [
       "CLOCK",
       "WISE",
@@ -5635,16 +5338,15 @@
       "LIFE"
     ],
     "clues": [
-      "Smart or clever",
-      "A split or fracture",
-      "A container for cooking",
-      "A succulent or fern",
-      "The state of being alive"
+      "Other___ (alternatively)",
+      "Dawn's first light",
+      "Coffee or tea vessel",
+      "Power ___ (energy source)",
+      "What a biography chronicles"
     ]
   },
   {
     "id": 298,
-    "date": "2027-01-18",
     "words": [
       "WALL",
       "MOUNT",
@@ -5654,16 +5356,15 @@
       "REST"
     ],
     "clues": [
-      "Climb or attach to a surface",
-      "A flat piece of wood",
-      "Move on foot",
-      "Return or the rear side",
-      "Relax or take a break"
+      "What a frame does to a photo",
+      "Meeting room council",
+      "Board or side follower",
+      "What you turn on someone",
+      "What the weary seek"
     ]
   },
   {
     "id": 299,
-    "date": "2027-01-19",
     "words": [
       "DOOR",
       "LOCK",
@@ -5673,16 +5374,15 @@
       "BACK"
     ],
     "clues": [
-      "A device that secures",
-      "The lower part of your face",
-      "Fall from a height",
-      "A piece of fabric",
-      "Return or the rear side"
+      "Combination or pad- type",
+      "Part of the skull",
+      "Rain or tear shape",
+      "A piece of woven fabric",
+      "Yard or seat preceder"
     ]
   },
   {
     "id": 300,
-    "date": "2027-01-20",
     "words": [
       "HIGH",
       "BALL",
@@ -5692,16 +5392,15 @@
       "BACK"
     ],
     "clues": [
-      "A round object used in sports",
-      "An open area of grass",
-      "An aim or objective",
-      "A queue or mark on paper",
-      "Return or the rear side"
+      "Wrecking or medicine type",
+      "A meadow",
+      "Ambition or aim",
+      "Chorus part",
+      "Part of a book's binding"
     ]
   },
   {
     "id": 301,
-    "date": "2027-01-21",
     "words": [
       "HEAD",
       "LOCK",
@@ -5711,16 +5410,15 @@
       "SNAP"
     ],
     "clues": [
-      "A device that secures",
-      "A single stair",
-      "A small rock",
-      "Low temperature",
-      "Break suddenly"
+      "What a locker has",
+      "What a ladder has",
+      "What David threw at Goliath",
+      "___ shoulder (snub)",
+      "What fingers do"
     ]
   },
   {
     "id": 302,
-    "date": "2027-01-22",
     "words": [
       "RAIN",
       "COAT",
@@ -5730,16 +5428,15 @@
       "DOOR"
     ],
     "clues": [
-      "An outer layer of clothing",
-      "A curved piece of metal",
-      "A queue or mark on paper",
-      "Return or the rear side",
-      "An entrance to a building"
+      "Layer of paint",
+      "Left ___ (boxing punch)",
+      "Something you toe or cross",
+      "Tennis court's baseline area",
+      "Next ___ neighbor"
     ]
   },
   {
     "id": 303,
-    "date": "2027-01-23",
     "words": [
       "KING",
       "FISH",
@@ -5749,16 +5446,15 @@
       "PILE"
     ],
     "clues": [
-      "Salmon or tuna",
-      "A curved piece of metal",
-      "A long squirmy creature",
-      "Material from trees",
-      "A heap of things"
+      "What a reel brings in",
+      "What a coat hangs on",
+      "Robin's meal",
+      "Tiger's surname",
+      "What leaves form in fall"
     ]
   },
   {
     "id": 304,
-    "date": "2027-01-24",
     "words": [
       "CORN",
       "STARCH",
@@ -5768,16 +5464,15 @@
       "MASK"
     ],
     "clues": [
-      "A thickening powder",
-      "A flat piece of wood",
-      "An activity with rules",
-      "The front of your head",
-      "A covering for the face"
+      "What makes shirts stiff",
+      "Piece of lumber",
+      "Arcade offering",
+      "Cliff or mountain ___",
+      "Face covering"
     ]
   },
   {
     "id": 305,
-    "date": "2027-01-25",
     "words": [
       "MOON",
       "WALK",
@@ -5787,16 +5482,15 @@
       "SHELF"
     ],
     "clues": [
-      "Move on foot",
-      "Approximately or roughly",
-      "The front of your head",
-      "Pages bound together",
-      "A ledge for storage"
+      "How you cross a crosswalk",
+      "Concerning",
+      "Interface, partly",
+      "A tome",
+      "What a library has rows of"
     ]
   },
   {
     "id": 306,
-    "date": "2027-01-26",
     "words": [
       "SLOW",
       "POKE",
@@ -5806,16 +5500,15 @@
       "MAN"
     ],
     "clues": [
-      "Prod or jab gently",
-      "A round object used in sports",
-      "A series of connected loops",
-      "Letters delivered to your home",
-      "An adult male"
+      "A prod or jab",
+      "Gown-worthy event",
+      "A jewelry necklace",
+      "E-___ (electronic message)",
+      "Pac-___ (arcade classic)"
     ]
   },
   {
     "id": 307,
-    "date": "2027-01-27",
     "words": [
       "STEAM",
       "SHIP",
@@ -5825,16 +5518,15 @@
       "HORSE"
     ],
     "clues": [
-      "A vessel that sails",
-      "A friend or companion",
-      "Without or lacking",
-      "A job or occupation",
-      "A large animal you can ride"
+      "What a port services",
+      "What check leads to, in chess",
+      "Reduced",
+      "A body of art",
+      "Dark ___ (underdog)"
     ]
   },
   {
     "id": 308,
-    "date": "2027-01-28",
     "words": [
       "CORN",
       "FIELD",
@@ -5844,16 +5536,15 @@
       "BELT"
     ],
     "clues": [
-      "An open area of grass",
-      "A job or occupation",
-      "A long seat or station",
-      "Where you sit",
-      "A strip of leather or fabric"
+      "Research area",
+      "Clockwork, partly",
+      "Tool- or work- surface",
+      "What a cushion covers",
+      "Asteroid or Bible type"
     ]
   },
   {
     "id": 309,
-    "date": "2027-01-29",
     "words": [
       "BANK",
       "NOTE",
@@ -5863,16 +5554,15 @@
       "HOG"
     ],
     "clues": [
-      "A brief written message",
-      "Pages bound together",
-      "A festival or carnival",
-      "The earth beneath your feet",
-      "A pig-like animal"
+      "Currency bill",
+      "Good read",
+      "County carnival",
+      "Common or stomping ___",
+      "Road ___ (selfish driver)"
     ]
   },
   {
     "id": 310,
-    "date": "2027-01-30",
     "words": [
       "CROW",
       "FOOT",
@@ -5882,16 +5572,15 @@
       "BOOK"
     ],
     "clues": [
-      "The body part in your shoe",
-      "A single stair",
-      "Return or the rear side",
-      "A body part with five fingers",
-      "Pages bound together"
+      "___ note (page bottom text)",
+      "First ___ (beginning)",
+      "How boomerangs travel",
+      "Shake on it",
+      "Paperback or hardcover"
     ]
   },
   {
     "id": 311,
-    "date": "2027-01-31",
     "words": [
       "BACK",
       "GROUND",
@@ -5901,16 +5590,15 @@
       "BOX"
     ],
     "clues": [
-      "The earth beneath your feet",
-      "The surface you walk on",
-      "A light source",
-      "A wooden pole or support",
-      "A container with a lid"
+      "Where seeds are planted",
+      "What dropped jaws hit",
+      "Aladdin rubbed one",
+      "What a soldier is assigned to",
+      "Juice container"
     ]
   },
   {
     "id": 312,
-    "date": "2027-02-01",
     "words": [
       "SNOW",
       "SHOE",
@@ -5920,16 +5608,15 @@
       "MATE"
     ],
     "clues": [
-      "Footwear you lace up",
-      "A thin cord or thread",
-      "A flat piece of wood",
-      "A space with four walls",
-      "A friend or companion"
+      "What Cinderella lost",
+      "What a kite needs",
+      "Wooden slab",
+      "Mushroom's latter half",
+      "British pal"
     ]
   },
   {
     "id": 313,
-    "date": "2027-02-02",
     "words": [
       "SUN",
       "BURN",
@@ -5939,16 +5626,15 @@
       "BOAT"
     ],
     "clues": [
-      "Flames consume fuel this way",
-      "Not inside",
-      "An open area of grass",
-      "Where you hang your hat",
-      "A vessel on the water"
+      "Slow ___ (gradual process)",
+      "What secrets come",
+      "What a scarecrow overlooks",
+      "Under one's roof",
+      "Lake transport"
     ]
   },
   {
     "id": 314,
-    "date": "2027-02-03",
     "words": [
       "RAIN",
       "CHECK",
@@ -5958,16 +5644,15 @@
       "LIFT"
     ],
     "clues": [
-      "Verify or inspect",
-      "The tip of a pencil",
-      "Empty or unmarked",
-      "The front of your head",
-      "Raise something upward"
+      "What a waiter brings",
+      "What a needle has",
+      "What a fresh canvas is",
+      "About ___! (military turn)",
+      "Shoplifter's action, partly"
     ]
   },
   {
     "id": 315,
-    "date": "2027-02-04",
     "words": [
       "PLAY",
       "BACK",
@@ -5977,16 +5662,15 @@
       "FORT"
     ],
     "clues": [
-      "Return or the rear side",
-      "A diagonal line",
-      "A small round mark",
-      "Short for commercial",
-      "A stronghold or castle"
+      "Way to undo a move",
+      "A diagonal stroke",
+      "Period on a page",
+      "Dot ___ (web domain)",
+      "What kids build with blankets"
     ]
   },
   {
     "id": 316,
-    "date": "2027-02-05",
     "words": [
       "GRASS",
       "ROOT",
@@ -5996,16 +5680,15 @@
       "FLY"
     ],
     "clues": [
-      "The base or origin",
-      "A waterway or channel",
-      "A vessel on the water",
-      "Where you hang your hat",
-      "An insect with wings"
+      "What a tree has underground",
+      "Panama or Erie",
+      "What oars propel",
+      "Estate or manor",
+      "What a kite does"
     ]
   },
   {
     "id": 317,
-    "date": "2027-02-06",
     "words": [
       "BULL",
       "RUSH",
@@ -6015,16 +5698,15 @@
       "MAN"
     ],
     "clues": [
-      "Hurry or move quickly",
-      "A unit of sixty minutes",
-      "A body part with five fingers",
-      "A flexible container",
-      "An adult male"
+      "Gold ___ (1849 event)",
+      "Happy ___ (bar special)",
+      "Ranch worker",
+      "What Santa carries",
+      "Right-hand ___"
     ]
   },
   {
     "id": 318,
-    "date": "2027-02-07",
     "words": [
       "HEAD",
       "FIRST",
@@ -6034,16 +5716,15 @@
       "LIFE"
     ],
     "clues": [
-      "Before all others",
-      "A body part with five fingers",
-      "Rise to your feet",
-      "Motionless and quiet",
-      "The state of being alive"
+      "Number one",
+      "Helping ___ (assistance)",
+      "What a statue does",
+      "A distillery apparatus",
+      "Real ___ (not fictional)"
     ]
   },
   {
     "id": 319,
-    "date": "2027-02-08",
     "words": [
       "GOLD",
       "SMITH",
@@ -6053,16 +5734,15 @@
       "GAME"
     ],
     "clues": [
-      "A person who works with metal",
-      "An open area of grass",
-      "An aim or objective",
-      "A wooden pole or support",
-      "An activity with rules"
+      "What a forge employs",
+      "Grassy expanse",
+      "Field ___ (football score)",
+      "Sign ___ (wooden pole)",
+      "A plucky attitude, slangily"
     ]
   },
   {
     "id": 320,
-    "date": "2027-02-09",
     "words": [
       "BOARD",
       "GAME",
@@ -6072,16 +5752,15 @@
       "CAKE"
     ],
     "clues": [
-      "An activity with rules",
-      "A strategy or design",
-      "A visible sign or impression",
-      "A piece of fabric or paper",
-      "A layered birthday dessert"
+      "Playoff event",
+      "Action ___ (to-do list)",
+      "Skid ___",
+      "Cheat ___ (study aid)",
+      "Wedding tier"
     ]
   },
   {
     "id": 321,
-    "date": "2027-02-10",
     "words": [
       "TAIL",
       "LIGHT",
@@ -6091,16 +5770,15 @@
       "FLIP"
     ],
     "clues": [
-      "Brightness from a bulb",
-      "How heavy something is",
-      "Raise something upward",
-      "Return or the rear side",
-      "Turn over quickly"
+      "Traffic signal",
+      "What a barbell has",
+      "Heave upward",
+      "Seat support",
+      "Back___ (reversal)"
     ]
   },
   {
     "id": 322,
-    "date": "2027-02-11",
     "words": [
       "NIGHT",
       "SHIFT",
@@ -6110,16 +5788,15 @@
       "BLOCK"
     ],
     "clues": [
-      "A period of work",
-      "What unlocks a door",
-      "A circular band of jewelry",
-      "A street cars drive on",
+      "Change position",
+      "Answer ___",
+      "Boxing arena",
+      "On the ___ (traveling)",
       "An obstacle or cube"
     ]
   },
   {
     "id": 323,
-    "date": "2027-02-12",
     "words": [
       "HOME",
       "BASE",
@@ -6129,16 +5806,15 @@
       "ROOM"
     ],
     "clues": [
-      "A starting point or foundation",
-      "A round object in sports",
-      "An activity with rules",
-      "A flat piece of wood",
-      "A space with four walls"
+      "Foundation",
+      "Bouncy plaything",
+      "Console offering",
+      "Waxed for surfing",
+      "A compartment"
     ]
   },
   {
     "id": 324,
-    "date": "2027-02-13",
     "words": [
       "THUMB",
       "PRINT",
@@ -6148,16 +5824,15 @@
       "STAGE"
     ],
     "clues": [
-      "An image pressed onto paper",
-      "A display for viewing",
-      "Engage in fun activities",
-      "Return or the rear side",
-      "A platform for performers"
+      "Finger___ (unique ID)",
+      "What a movie plays on",
+      "A theatrical production",
+      "Lumber region",
+      "Life ___ (age period)"
     ]
   },
   {
     "id": 325,
-    "date": "2027-02-14",
     "words": [
       "DAY",
       "PACK",
@@ -6167,16 +5842,15 @@
       "BILL"
     ],
     "clues": [
-      "A bag carried on shoulders",
-      "A large animal you can ride",
-      "Footwear you lace up",
-      "A pointed projection on an animal",
-      "A paper note of money"
+      "Jet ___ (flying device)",
+      "What a blacksmith shoes",
+      "Sneaker or loafer",
+      "French ___ (orchestra brass)",
+      "Restaurant check"
     ]
   },
   {
     "id": 326,
-    "date": "2027-02-15",
     "words": [
       "STAR",
       "STRUCK",
@@ -6186,16 +5860,15 @@
       "WORK"
     ],
     "clues": [
-      "Hit or impacted",
-      "A precious metal",
-      "Belonging to me",
-      "A skill or trade",
-      "A job or occupation"
+      "What lightning does",
+      "Olympic first-place metal",
+      "Coal or data type",
+      "Beer or cheese descriptor",
+      "Professional effort"
     ]
   },
   {
     "id": 327,
-    "date": "2027-02-16",
     "words": [
       "SNOW",
       "CAP",
@@ -6205,16 +5878,15 @@
       "AWAY"
     ],
     "clues": [
-      "A hat worn on the head",
-      "A weapon that shoots",
-      "The tip of a pencil",
-      "Fracture or shatter",
-      "Not here"
+      "Bottle stopper",
+      "Jump the ___ (act early)",
+      "Vantage or starting ___",
+      "A clean ___",
+      "Distant"
     ]
   },
   {
     "id": 328,
-    "date": "2027-02-17",
     "words": [
       "TRAIN",
       "WRECK",
@@ -6224,16 +5896,15 @@
       "BOMB"
     ],
     "clues": [
-      "Destroy or ruin",
-      "A round object in sports",
-      "An activity with rules",
-      "A clock measures this",
-      "An explosive device"
+      "Train ___ (disaster)",
+      "Round toy",
+      "What athletes play",
+      "Overtime, partly",
+      "What an explosive squad disarms"
     ]
   },
   {
     "id": 329,
-    "date": "2027-02-18",
     "words": [
       "STORM",
       "CLOUD",
@@ -6243,16 +5914,15 @@
       "BOWL"
     ],
     "clues": [
-      "A fluffy shape in the sky",
-      "A blanket or lid",
-      "A harvest or yield",
-      "Tiny particles that settle",
-      "A deep round dish"
+      "What data lives on, digitally",
+      "Under ___ (disguised)",
+      "Harvest yield",
+      "Gold ___ (prospector's find)",
+      "What a lane leads to, in bowling"
     ]
   },
   {
     "id": 330,
-    "date": "2027-02-19",
     "words": [
       "CHAIR",
       "BACK",
@@ -6262,16 +5932,15 @@
       "MAT"
     ],
     "clues": [
-      "Return or the rear side",
-      "A place for trials",
-      "Left or right of center",
-      "An entrance to a building",
-      "A flat pad you stand on"
+      "Not the front row",
+      "Basketball surface",
+      "Which team you root for",
+      "What a welcome mat fronts",
+      "What a wrestler falls on"
     ]
   },
   {
     "id": 331,
-    "date": "2027-02-20",
     "words": [
       "LOCK",
       "STEP",
@@ -6281,16 +5950,15 @@
       "BREAK"
     ],
     "clues": [
-      "A single stair",
-      "A young person",
-      "Coming into the world",
-      "The opposite of night",
-      "Fracture or shatter"
+      "Two-___ (dance)",
+      "What a parent raises",
+      "What a hospital celebrates",
+      "What a calendar squares off",
+      "Rest period"
     ]
   },
   {
     "id": 332,
-    "date": "2027-02-21",
     "words": [
       "WIND",
       "PIPE",
@@ -6300,16 +5968,15 @@
       "PLACE"
     ],
     "clues": [
-      "A tube for breathing",
-      "What happens when you close your eyes",
-      "Soil or territory",
-      "A visible sign or impression",
-      "A location or spot"
+      "Peace ___ (Native American)",
+      "What an aspiration is",
+      "Terra firma",
+      "Ready, set, go starter",
+      "Fire___ (hearth)"
     ]
   },
   {
     "id": 333,
-    "date": "2027-02-22",
     "words": [
       "BELL",
       "CURVE",
@@ -6319,16 +5986,15 @@
       "WORK"
     ],
     "clues": [
-      "A smooth bend",
-      "A round object in sports",
-      "The tip of a pencil",
-      "Without or lacking",
-      "A job or occupation"
+      "Road bend",
+      "What a batter watches",
+      "Basis of an argument",
+      "Worth-___ (no value)",
+      "What a team produces"
     ]
   },
   {
     "id": 334,
-    "date": "2027-02-23",
     "words": [
       "GRAPE",
       "SEED",
@@ -6338,16 +6004,15 @@
       "BOARD"
     ],
     "clues": [
-      "What you plant in a garden",
-      "A cereal grain",
-      "Breakfast, lunch, or dinner",
-      "An agreement or bargain",
-      "A flat piece of wood"
+      "Bird___ (feeder filling)",
+      "What a kernel is",
+      "What a menu offers",
+      "Bargain",
+      "School chalk surface"
     ]
   },
   {
     "id": 335,
-    "date": "2027-02-24",
     "words": [
       "DUST",
       "BIN",
@@ -6357,16 +6022,15 @@
       "WORK"
     ],
     "clues": [
-      "A trash container",
-      "A flexible container",
-      "A tube for water or gas",
-      "A queue or mark on paper",
-      "A job or occupation"
+      "Recycling container",
+      "Sleeping or punching type",
+      "___ dream (fantasy)",
+      "Straight as an arrow",
+      "Job action"
     ]
   },
   {
     "id": 336,
-    "date": "2027-02-25",
     "words": [
       "CAKE",
       "POP",
@@ -6376,16 +6040,15 @@
       "ROOM"
     ],
     "clues": [
-      "A sudden sharp sound",
-      "A celebrity in the sky",
-      "Tiny particles that settle",
-      "An outer layer of clothing",
-      "A space with four walls"
+      "Dad, informally",
+      "What a reviewer gives",
+      "What settles on a shelf",
+      "What a hanger holds",
+      "Interior space"
     ]
   },
   {
     "id": 337,
-    "date": "2027-02-26",
     "words": [
       "HAND",
       "RAIL",
@@ -6395,16 +6058,15 @@
       "GUEST"
     ],
     "clues": [
-      "Trains run on these",
-      "A feathered flying creature",
-      "A tub for soaking",
-      "Where you hang your hat",
-      "A visitor staying over"
+      "Fence top bar",
+      "Jail___ (slang for convict)",
+      "Bird___ (garden feature)",
+      "Steak ___ (restaurant type)",
+      "Hotel visitor"
     ]
   },
   {
     "id": 338,
-    "date": "2027-02-27",
     "words": [
       "LIGHT",
       "POST",
@@ -6414,16 +6076,15 @@
       "BOX"
     ],
     "clues": [
-      "A wooden pole or support",
-      "A visible sign or impression",
-      "A direction on an elevator",
-      "A rhythmic pulse",
-      "A container with a lid"
+      "Send via mail",
+      "A con artist's target",
+      "Opposite of up on an elevator",
+      "Dead___ (exhausted)",
+      "What movers stack"
     ]
   },
   {
     "id": 339,
-    "date": "2027-02-28",
     "words": [
       "DOOR",
       "STOP",
@@ -6433,16 +6094,15 @@
       "MAN"
     ],
     "clues": [
-      "Cease or halt",
-      "Brightness from a bulb",
-      "A glass sphere that glows",
-      "A small green amphibian",
-      "An adult male"
+      "Halt!",
+      "Green means go on this",
+      "What a tulip grows from",
+      "Lily pad sitter",
+      "The old ___"
     ]
   },
   {
     "id": 340,
-    "date": "2027-03-01",
     "words": [
       "CARD",
       "BOARD",
@@ -6452,16 +6112,15 @@
       "YARD"
     ],
     "clues": [
-      "A flat piece of wood",
-      "An activity with rules",
-      "Display for an audience",
-      "A vessel on the water",
-      "Three feet of measurement"
+      "Panel of advisors",
+      "Wild ___",
+      "Steal the ___ (upstage)",
+      "Marina resident",
+      "What a lawnmower crosses"
     ]
   },
   {
     "id": 341,
-    "date": "2027-03-02",
     "words": [
       "LAND",
       "MINE",
@@ -6471,16 +6130,15 @@
       "SHIP"
     ],
     "clues": [
-      "Belonging to me",
-      "A long tunnel or rod",
-      "A job or occupation",
-      "A friend or companion",
-      "A vessel that sails"
+      "Shaft underground",
+      "Arrow's handle",
+      "What a bee does all day",
+      "A lifelong partner",
+      "Scholar-___ (academic funding)"
     ]
   },
   {
     "id": 342,
-    "date": "2027-03-03",
     "words": [
       "DOWN",
       "TOWN",
@@ -6490,16 +6148,15 @@
       "ROCK"
     ],
     "clues": [
-      "A small city",
-      "A large room for events",
-      "A visible sign or impression",
-      "A piece of fabric or paper",
-      "A large stone"
+      "Going to ___  (having fun)",
+      "Carnegie ___ in NYC",
+      "Exclamation or question follower",
+      "What rain comes down in",
+      "Alcatraz, slangily"
     ]
   },
   {
     "id": 343,
-    "date": "2027-03-04",
     "words": [
       "FIRE",
       "WOOD",
@@ -6509,16 +6166,15 @@
       "SIDE"
     ],
     "clues": [
-      "Material from trees",
-      "A small fragment or piece",
-      "A flat piece of wood",
-      "Move on foot",
-      "Left or right of center"
+      "What a saw cuts through",
+      "Micro___ (tiny processor)",
+      "Monopoly mat",
+      "Amble",
+      "A facet"
     ]
   },
   {
     "id": 344,
-    "date": "2027-03-05",
     "words": [
       "ROCK",
       "SLIDE",
@@ -6528,16 +6184,15 @@
       "BREAK"
     ],
     "clues": [
-      "A playground feature",
-      "Display for an audience",
-      "A container or instance",
-      "The tip of a pencil",
-      "Fracture or shatter"
+      "Power Point page",
+      "Game or talk type",
+      "A grammatical form",
+      "Dot on a map",
+      "What news does"
     ]
   },
   {
     "id": 345,
-    "date": "2027-03-06",
     "words": [
       "SILK",
       "WORM",
@@ -6547,16 +6202,15 @@
       "LOAD"
     ],
     "clues": [
-      "A long squirmy creature",
-      "An opening in a wall",
-      "A discount event",
-      "A vessel on the water",
-      "A heavy amount to carry"
+      "Can of ___ (trouble)",
+      "Where a peg fits",
+      "Going-out-of-business ___",
+      "Tugboat, partly",
+      "Overload, minus over"
     ]
   },
   {
     "id": 346,
-    "date": "2027-03-07",
     "words": [
       "RIVER",
       "SIDE",
@@ -6566,16 +6220,15 @@
       "HEAD"
     ],
     "clues": [
-      "Left or right of center",
-      "A single stair",
-      "Return or the rear side",
-      "Part of your skeleton",
-      "The top of your body"
+      "Beside the main event",
+      "Watch your ___",
+      "Where a cape hangs",
+      "Skeletal unit",
+      "Bed or figure ___"
     ]
   },
   {
     "id": 347,
-    "date": "2027-03-08",
     "words": [
       "DARK",
       "HORSE",
@@ -6585,16 +6238,15 @@
       "ROAD"
     ],
     "clues": [
-      "A large animal you can ride",
-      "Return or the rear side",
-      "A body part with five fingers",
-      "Trains run on these",
-      "A street cars drive on"
+      "Seahorse, partly",
+      "Direction after \"hold\"",
+      "Upper ___ (advantage)",
+      "Third ___ (electric)",
+      "Highway or street"
     ]
   },
   {
     "id": 348,
-    "date": "2027-03-09",
     "words": [
       "FISH",
       "TAIL",
@@ -6604,16 +6256,15 @@
       "WIRE"
     ],
     "clues": [
-      "The rear end of something",
-      "Return or the rear side",
-      "An open area of grass",
-      "Stumble and fall",
-      "A thin metal strand"
+      "A comet's trailing streak",
+      "Part of pushback",
+      "Where crops grow",
+      "What a circuit breaker does",
+      "What an electrician runs"
     ]
   },
   {
     "id": 349,
-    "date": "2027-03-10",
     "words": [
       "COURT",
       "HOUSE",
@@ -6623,16 +6274,15 @@
       "SAKE"
     ],
     "clues": [
-      "Where you hang your hat",
-      "A job or occupation",
-      "A store or retail space",
-      "Maintain or hold onto",
-      "A reason or purpose"
+      "What a roof covers",
+      "Output",
+      "Coffee or gift type",
+      "What a secret needs",
+      "Japanese rice wine"
     ]
   },
   {
     "id": 350,
-    "date": "2027-03-11",
     "words": [
       "GAME",
       "COCK",
@@ -6642,16 +6292,15 @@
       "BOARD"
     ],
     "clues": [
-      "A male rooster",
-      "The rear end of something",
-      "An outer layer of clothing",
-      "A space with four walls",
-      "A flat piece of wood"
+      "Weather___ (wind vane)",
+      "Pony- or cock- type",
+      "Winter jacket",
+      "What a hotel rents",
+      "Plywood piece"
     ]
   },
   {
     "id": 351,
-    "date": "2027-03-12",
     "words": [
       "DUST",
       "BOWL",
@@ -6661,16 +6310,15 @@
       "BELL"
     ],
     "clues": [
-      "A deep round dish",
-      "Use scissors to do this",
-      "Return or the rear side",
-      "An entrance to a building",
-      "A chiming sound"
+      "Soup holder",
+      "Short ___ (quicker route)",
+      "Mirror's opposite side",
+      "Trap or cellar type",
+      "Liberty or cow type"
     ]
   },
   {
     "id": 352,
-    "date": "2027-03-13",
     "words": [
       "TRADE",
       "WIND",
@@ -6680,16 +6328,15 @@
       "BACK"
     ],
     "clues": [
-      "Moving air",
-      "Autumn leaves do this",
-      "Not inside",
-      "Gaze or observe",
-      "Return or the rear side"
+      "What a clock needs",
+      "What rain does",
+      "Absent from the office",
+      "What an outlook provides",
+      "Where a jersey number goes"
     ]
   },
   {
     "id": 353,
-    "date": "2027-03-14",
     "words": [
       "HARD",
       "WOOD",
@@ -6699,16 +6346,15 @@
       "GOAL"
     ],
     "clues": [
-      "Material from trees",
-      "A job or occupation",
-      "Strength or power",
-      "An open area of grass",
-      "An aim or objective"
+      "Morning or dead ender",
+      "What a recipe requires",
+      "Brute strength",
+      "Playing surface",
+      "End ___"
     ]
   },
   {
     "id": 354,
-    "date": "2027-03-15",
     "words": [
       "SIDE",
       "KICK",
@@ -6718,16 +6364,15 @@
       "FORM"
     ],
     "clues": [
-      "Strike with your foot",
-      "A flat piece of wood",
-      "An activity with rules",
-      "A strategy or design",
-      "A shape or structure"
+      "What a Rockette does",
+      "Draft or dart preceder",
+      "What hunters pursue",
+      "Game ___ (strategy)",
+      "Shape or structure"
     ]
   },
   {
     "id": 355,
-    "date": "2027-03-16",
     "words": [
       "GEAR",
       "SHIFT",
@@ -6737,16 +6382,15 @@
       "OUT"
     ],
     "clues": [
-      "Move or change position",
-      "What unlocks a door",
-      "A flat piece of wood",
-      "Move on foot",
-      "Not inside"
+      "What tectonic plates do",
+      "What a locksmith makes",
+      "What you walk across a gangplank to do",
+      "Base on balls",
+      "Published or released"
     ]
   },
   {
     "id": 356,
-    "date": "2027-03-17",
     "words": [
       "PINE",
       "CONE",
@@ -6756,16 +6400,15 @@
       "LOAD"
     ],
     "clues": [
-      "A seed-bearing shape from a tree",
-      "The top of your body",
-      "A musical group",
-      "A cart pulled by horses",
-      "A heavy amount to carry"
+      "Ice cream holder",
+      "Arrow-___ (type of point)",
+      "A ring or stripe",
+      "Station ___ (old car type)",
+      "What a donkey schlepps"
     ]
   },
   {
     "id": 357,
-    "date": "2027-03-18",
     "words": [
       "FARM",
       "LAND",
@@ -6775,16 +6418,15 @@
       "STORE"
     ],
     "clues": [
-      "Soil or territory",
-      "A playground feature",
-      "A law or regulation",
-      "Pages bound together",
-      "A retail establishment"
+      "What a plane does",
+      "Water park feature",
+      "Slide ___ (old calculator)",
+      "What a bookmark saves your place in",
+      "What a squirrel does"
     ]
   },
   {
     "id": 358,
-    "date": "2027-03-19",
     "words": [
       "POP",
       "SEED",
@@ -6794,16 +6436,15 @@
       "CARD"
     ],
     "clues": [
-      "What you plant in a garden",
-      "Where you sleep at night",
-      "A large stone",
-      "The front of your head",
-      "Dealt in poker or sent on birthdays"
+      "What an apple has at its core",
+      "Hot ___ of activity",
+      "A geologist's study",
+      "What a mirror reflects",
+      "Flash ___ (study aid)"
     ]
   },
   {
     "id": 359,
-    "date": "2027-03-20",
     "words": [
       "STRONG",
       "HOLD",
@@ -6813,16 +6454,15 @@
       "DRESS"
     ],
     "clues": [
-      "Grip something tightly",
-      "Return or the rear side",
-      "Part of your skeleton",
-      "The top of your body",
-      "A garment or outfit"
+      "Withhold, partly",
+      "Kickback direction",
+      "Dry as a ___",
+      "Ship's restroom",
+      "What a salad gets"
     ]
   },
   {
     "id": 360,
-    "date": "2027-03-21",
     "words": [
       "FORE",
       "HAND",
@@ -6832,16 +6472,15 @@
       "WALL"
     ],
     "clues": [
-      "A body part with five fingers",
-      "A skill or trade",
-      "A brewed alcoholic drink",
-      "A plot where plants grow",
-      "A vertical barrier"
+      "What a puppeteer uses",
+      "Artisan's skill",
+      "What a keg holds",
+      "Madison Square ___",
+      "A mason's work"
     ]
   },
   {
     "id": 361,
-    "date": "2027-03-22",
     "words": [
       "WARM",
       "FRONT",
@@ -6851,16 +6490,15 @@
       "DOG"
     ],
     "clues": [
-      "The forward-facing part",
-      "An entrance to a building",
-      "Cease or halt",
-      "A timepiece worn on the wrist",
-      "A loyal pet"
+      "Up ___ (in advance)",
+      "Exit or entrance",
+      "Full ___ (period)",
+      "What a birdwatcher does",
+      "Prairie or corn type"
     ]
   },
   {
     "id": 362,
-    "date": "2027-03-23",
     "words": [
       "POOL",
       "SIDE",
@@ -6870,16 +6508,15 @@
       "BOX"
     ],
     "clues": [
-      "Left or right of center",
-      "Display for an audience",
-      "A space with four walls",
-      "A device that secures",
-      "A container with a lid"
+      "Margin or edge",
+      "What a magician puts on",
+      "Classroom, minus class",
+      "Wrestler's hold",
+      "Batter's ___ in baseball"
     ]
   },
   {
     "id": 363,
-    "date": "2027-03-24",
     "words": [
       "GROUND",
       "WORK",
@@ -6889,16 +6526,15 @@
       "GAME"
     ],
     "clues": [
-      "A job or occupation",
-      "A long seat or station",
-      "Push down firmly",
-      "A flat piece of wood",
-      "An activity with rules"
+      "Craft or trade",
+      "A courtroom's front",
+      "What a button gets",
+      "A committee, at a company",
+      "What a coach strategizes for"
     ]
   },
   {
     "id": 364,
-    "date": "2027-03-25",
     "words": [
       "SHOE",
       "BOX",
@@ -6908,16 +6544,15 @@
       "TRAIL"
     ],
     "clues": [
-      "A container with a lid",
-      "Where you sit",
-      "Return or the rear side",
-      "A bag carried on shoulders",
-      "A path through the woods"
+      "Gift wrapper's starting point",
+      "A spot to sit",
+      "Rebound direction",
+      "A deck of cards, essentially",
+      "Paper ___ (clues)"
     ]
   },
   {
     "id": 365,
-    "date": "2027-03-26",
     "words": [
       "SPRING",
       "FIELD",
@@ -6927,11 +6562,11 @@
       "ROOM"
     ],
     "clues": [
-      "An open area of grass",
-      "An aim or objective",
-      "Strike with your foot",
-      "A round object used in sports",
-      "A space with four walls"
+      "Outfield area",
+      "What a striker scores",
+      "Karate move",
+      "Soccer essential",
+      "An enclosed area"
     ]
   }
 ]

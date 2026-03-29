@@ -200,7 +200,7 @@
         <div class="flex items-center justify-between">
           <button id="cl-clue-btn"
             class="px-3 py-1.5 bg-transparent border border-purple-800 rounded text-xs text-purple-400 font-semibold hover:border-purple-500 hover:text-purple-300 transition-colors">
-            Clue
+            Hint
           </button>
           <button id="cl-skip-btn"
             class="px-3 py-1.5 bg-transparent border border-gray-700 rounded text-xs text-gray-500 font-semibold hover:border-gray-500 hover:text-gray-300 transition-colors">
@@ -215,9 +215,10 @@
           <h2 class="text-base font-black">Chain Complete!</h2>
           <div class="flex items-baseline gap-0.5">
             <span id="cl-final-score" class="text-3xl font-black text-green-400 leading-none">0</span>
-            <span class="text-sm text-gray-600">/15</span>
+            <span id="cl-score-max" class="text-sm text-gray-600">/15</span>
           </div>
           <p id="cl-result-msg" class="text-xs text-gray-400 font-semibold"></p>
+          <p id="cl-bonus-msg" class="text-xs text-yellow-300 font-bold hidden">🌟 +5 perfect bonus!</p>
           <div id="cl-dots" class="flex gap-1.5 text-base"></div>
           <button id="cl-share-btn"
             class="mt-1 px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg transition-colors">
@@ -257,14 +258,12 @@
       <div class="mb-5">
         <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">Scoring</h3>
         <p class="text-xs text-gray-300 leading-relaxed">
-          Each word starts worth <strong class="text-white">3 pts</strong>.
-          Click <strong class="text-white">Clue</strong> before guessing and your max drops to
-          <strong class="text-white">2 pts</strong>.
-          Guess wrong and the clue is revealed automatically - get it right next for
-          <strong class="text-white">1 pt</strong>.
-          Guess wrong again with the clue showing and the answer is filled in for
-          <strong class="text-white">0 pts</strong>.
-          Skip any time to score 0. Solve all 5 without hints for a perfect 15!
+          Each word is worth up to <strong class="text-white">3 pts</strong>.
+          Guess correctly with no hints for <strong class="text-white">3 pts</strong>.
+          Press <strong class="text-white">Hint</strong> (or guess wrong) to reveal the first letter — guess right for <strong class="text-white">2 pts</strong>.
+          Press <strong class="text-white">Show Clue</strong> (or guess wrong again) to reveal the phrase clue — guess right for <strong class="text-white">1 pt</strong>.
+          Guess wrong with the clue showing or skip at any time to score <strong class="text-white">0 pts</strong>.
+          Solve all 5 without any hints or wrong guesses for a perfect 15 + 5 bonus = <strong class="text-white">20!</strong> 🌟
         </p>
       </div>
 

@@ -15,14 +15,11 @@
   }
 
   // ── Puzzle selection ─────────────────────────────────────────────────────
-  // Exact date match first; fall back to modular cycling off the first puzzle
-  // (same spirit as Themedle's seeded rotation - no day is ever skipped).
+  // Puzzles are played in order by ID, cycling indefinitely.
+  // Epoch is the date puzzle #1 first went live.
+  const EPOCH = '2026-01-01';
   function getPuzzle(puzzles) {
-    const today = getTodayCST();
-    const exact = puzzles.find(p => p.date === today);
-    if (exact) return exact;
-    const epoch  = dateToDay(puzzles[0].date);
-    const offset = ((dateToDay(today) - epoch) % puzzles.length + puzzles.length) % puzzles.length;
+    const offset = ((dateToDay(getTodayCST()) - dateToDay(EPOCH)) % puzzles.length + puzzles.length) % puzzles.length;
     return puzzles[offset];
   }
 
@@ -32,9 +29,9 @@
   let currentStep = 0;
   let results     = [];   // { points: number }[]
   let gameOver    = false;
-  // 'hidden' = clue not yet seen (worth 3 pts)
-  // 'clicked' = player voluntarily revealed clue (worth 2 pts)
-  // 'auto' = clue revealed after a wrong guess (worth 1 pt)
+  // 'hidden' = no hints seen (worth 3 pts if correct)
+  // 'letter' = first letter revealed (worth 2 pts if correct)
+  // 'phrase' = phrase clue revealed (worth 1 pt if correct, 0 if wrong/skip)
   let clueState   = 'hidden';
 
   // ── localStorage (keyed by today's Chicago date, matching Themedle) ──────
@@ -91,6 +88,10 @@
     return results.reduce((s, r) => s + r.points, 0);
   }
 
+  function isPerfect() {
+    return results.length === 5 && results.every(r => r.points === 3);
+  }
+
   // ── DOM refs ─────────────────────────────────────────────────────────────
   const chainEl    = document.getElementById('cl-chain');
   const inputArea  = document.getElementById('cl-input-area');
@@ -104,7 +105,9 @@
   const inputEl    = document.getElementById('cl-guess-input');
   const inputRow   = document.getElementById('cl-input-row');
   const finalScEl  = document.getElementById('cl-final-score');
+  const scoreMaxEl = document.getElementById('cl-score-max');
   const resultMsg  = document.getElementById('cl-result-msg');
+  const bonusMsgEl = document.getElementById('cl-bonus-msg');
   const dotsEl     = document.getElementById('cl-dots');
   const shareBtn   = document.getElementById('cl-share-btn');
   const statStreak = document.getElementById('cl-stat-streak');
@@ -163,16 +166,24 @@
     scoreEl.textContent = totalScore();
   }
 
-  // ── showClue / hideClue ───────────────────────────────────────────────────
+  // ── showClue / resetClueUI ───────────────────────────────────────────────
   function showClue() {
-    clueNumEl.textContent  = (currentStep + 1) + '/5';
-    clueTextEl.textContent = puzzle.clues[currentStep];
+    if (clueState === 'letter') {
+      clueNumEl.textContent  = 'Hint 1/2';
+      clueTextEl.textContent = 'First letter: ' + puzzle.words[currentStep + 1][0];
+      clueBtnEl.textContent  = 'Show Clue';
+      clueBtnEl.classList.remove('hidden');
+    } else {
+      clueNumEl.textContent  = 'Hint 2/2 · ' + (currentStep + 1) + '/5';
+      clueTextEl.textContent = puzzle.clues[currentStep];
+      clueBtnEl.classList.add('hidden');
+    }
     clueArea.classList.remove('hidden');
-    clueBtnEl.classList.add('hidden');
   }
 
   function resetClueUI() {
     clueArea.classList.add('hidden');
+    clueBtnEl.textContent = 'Hint';
     clueBtnEl.classList.remove('hidden');
   }
 
@@ -202,7 +213,7 @@
     if (!val) return;
     const correct = val === puzzle.words[currentStep + 1];
     if (correct) {
-      const pts = clueState === 'hidden' ? 3 : clueState === 'clicked' ? 2 : 1;
+      const pts = clueState === 'hidden' ? 3 : clueState === 'letter' ? 2 : 1;
       advance(pts);
     } else {
       inputRow.classList.remove('cl-shake');
@@ -210,12 +221,17 @@
       inputRow.classList.add('cl-shake');
       setTimeout(() => inputRow.classList.remove('cl-shake'), 400);
       inputEl.value = '';
-      if (clueState !== 'hidden') {
-        // Clue already visible + wrong → auto-fill, 0 pts
+      if (clueState === 'phrase') {
+        // Phrase already visible + wrong → auto-fill, 0 pts
         advance(0);
+      } else if (clueState === 'letter') {
+        // Had first-letter hint + wrong → reveal phrase clue
+        clueState = 'phrase';
+        showClue();
+        saveTodayState();
       } else {
-        // First wrong guess → reveal clue automatically
-        clueState = 'auto';
+        // No hints yet + wrong → reveal first letter (same as pressing Hint once)
+        clueState = 'letter';
         showClue();
         saveTodayState();
       }
@@ -229,7 +245,7 @@
 
   // ── handleClueBtn ─────────────────────────────────────────────────────────
   function handleClueBtn() {
-    clueState = 'clicked';
+    clueState = clueState === 'hidden' ? 'letter' : 'phrase';
     showClue();
     saveTodayState();
   }
@@ -240,14 +256,18 @@
     resultsEl.classList.remove('hidden');
     resultsEl.classList.add('cl-fade-in');
 
-    const score = totalScore();
-    const stats = isRestore ? loadStats() : saveStats(score);
+    const score   = totalScore();
+    const perfect = isPerfect();
+    const display = perfect ? score + 5 : score;
+    const stats   = isRestore ? loadStats() : saveStats(display);
 
-    finalScEl.textContent = score;
+    finalScEl.textContent  = display;
+    scoreMaxEl.textContent = perfect ? '/20' : '/15';
+    bonusMsgEl.classList.toggle('hidden', !perfect);
     resultMsg.textContent =
-      score === 15 ? 'Perfect chain!' :
-      score >= 12  ? 'Excellent!'     :
-      score >= 8   ? 'Nice work!'     : 'Keep practicing!';
+      perfect      ? 'Perfect chain!'  :
+      score >= 12  ? 'Excellent!'      :
+      score >= 8   ? 'Nice work!'      : 'Keep practicing!';
 
     dotsEl.innerHTML = results
       .map(r => `<span>${r.points === 3 ? '🟢' : r.points > 0 ? '🟡' : '🔴'}</span>`)
@@ -282,8 +302,12 @@
 
   // ── handleShare ──────────────────────────────────────────────────────────
   function handleShare() {
-    const icons = results.map(r => r.points === 3 ? '🟢' : r.points > 0 ? '🟡' : '🔴').join('');
-    const text  = `Chain Link #${puzzle.id}\n${icons} ${totalScore()}/15\nhttps://dailyjamm.com/chainlink/`;
+    const icons   = results.map(r => r.points === 3 ? '🟢' : r.points > 0 ? '🟡' : '🔴').join('');
+    const perfect = isPerfect();
+    const score   = perfect ? totalScore() + 5 : totalScore();
+    const max     = perfect ? 20 : 15;
+    const suffix  = perfect ? ' 🌟' : '';
+    const text  = `Chain Link #${puzzle.id}\n${icons} ${score}/${max}${suffix}\nhttps://dailyjamm.com/chainlink/`;
     navigator.clipboard.writeText(text).then(() => {
       shareBtn.textContent = 'Copied!';
       setTimeout(() => { shareBtn.textContent = 'Share Results'; }, 2000);
@@ -356,7 +380,7 @@
 
   // ── Init (runs after puzzle data is loaded) ───────────────────────────────
   function init() {
-    metaEl.textContent = '#' + puzzle.id + ' · ' + puzzle.date;
+    metaEl.textContent = 'Puzzle #' + puzzle.id;
 
     const saved = loadTodayState();
     if (saved) {

@@ -27,11 +27,12 @@ A daily compound word chain puzzle - find the 5 missing words that link the chai
 
 - A starting word is given; each answer forms a compound word or phrase with the word above it
 - The answer then becomes the start of the next link in the chain
-- Each word starts worth **3 pts** - click **Clue** to reveal a hint (max 2 pts), or guess blind for full points
-- Guess wrong and the clue is revealed automatically; correct on the next try scores 1 pt
-- Guess wrong with the clue showing and the answer is filled in for 0 pts
-- Skip a word to move on (scores 0)
-- Perfect score is 15/15
+- Two-stage hint system per word:
+  - Guess with no hints for **3 pts**
+  - Press **Hint** (or guess wrong) to reveal the first letter — correct now scores **2 pts**
+  - Press **Show Clue** (or guess wrong again) to reveal the phrase clue — correct now scores **1 pt**
+  - Guess wrong with the phrase clue showing, or skip at any time, for **0 pts**
+- Solve all 5 words with no hints or wrong guesses for a **+5 perfect bonus** (20/20)
 - Streak tracking and games played saved across sessions
 - All game data stored locally - no account needed
 - **30 puzzles** in `assets/data/chainlink-puzzles.json`, cycling indefinitely (one per day)
@@ -100,6 +101,13 @@ Press `Ctrl+C` in the terminal to stop the server.
 ---
 
 ## Releases
+
+### v1.5.0 - 2026-03-29
+- Chain Link scoring overhaul: two-stage hint system (first letter → phrase clue) replaces single-clue system
+- Guessing correctly without any hints: 3 pts; after first-letter hint: 2 pts; after phrase clue: 1 pt; wrong/skip with phrase showing: 0 pts
+- Wrong guess with no hints now reveals the first letter (same as pressing Hint once) instead of jumping straight to the phrase clue
+- Added **+5 perfect bonus** for solving all 5 words with no hints or wrong guesses (max score 20)
+- BlackJackdle: "Out of chips" game-over screen now includes a Share Results button
 
 ### v1.4.0 - 2026-03-28
 - Added **About** page (`/about/`) and **Privacy Policy** page (`/privacy/`) - required for Google AdSense approval
