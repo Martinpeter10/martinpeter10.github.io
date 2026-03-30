@@ -1,3 +1,6 @@
+/* Accessibility */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
 /* Pulse animation */
 @keyframes pulse {
   0%, 100% { opacity: 1; }
@@ -121,9 +124,9 @@ input[type=range].slider::-moz-range-thumb {
 
 /* Game layout - fills viewport below fixed header */
 .cl-game-wrap {
-  position: fixed;
-  top: 56px;
-  left: 0; right: 0; bottom: 0;
+  margin-top: 56px;
+  height: calc(100vh - 56px);
+  height: calc(100dvh - 56px);
   display: flex;
   justify-content: center;
   padding: 8px 16px 12px;
@@ -653,7 +656,7 @@ input[type=range].slider::-moz-range-thumb {
   to   { transform: translate(var(--fly-x), var(--fly-y)) scale(1); opacity: 1; }
 }
 .bj-fly-anim {
-  animation: bj-fly 0.35s ease forwards;
+  animation: bj-fly 0.35s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
 }
 
 /* Hole card flip */
@@ -665,8 +668,8 @@ input[type=range].slider::-moz-range-thumb {
   from { transform: scaleX(0); }
   to   { transform: scaleX(1); }
 }
-.bj-flip-out { animation: bj-flip-out 0.15s ease forwards; }
-.bj-flip-in  { animation: bj-flip-in  0.15s ease forwards; }
+.bj-flip-out { animation: bj-flip-out 0.2s ease-in forwards; }
+.bj-flip-in  { animation: bj-flip-in  0.2s ease-out forwards; }
 
 /* General fade */
 @keyframes bj-fade-in {

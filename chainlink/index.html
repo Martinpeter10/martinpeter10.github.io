@@ -16,7 +16,7 @@
   <meta property="og:url" content="https://dailyjamm.com/chainlink/" />
   <meta property="og:title" content="Chain Link | DailyJamm" />
   <meta property="og:description" content="The daily compound word chain puzzle. Find the missing words where every adjacent pair forms a compound word or phrase." />
-  <meta property="og:image" content="/assets/img/favicon.png" />
+  <meta property="og:image" content="https://dailyjamm.com/assets/img/favicon.png" />
 
   <!-- Theme color (matches site background, fixes iOS toolbar/overscroll) -->
   <meta name="theme-color" content="#1a1a2e" />
@@ -89,6 +89,19 @@
       }
     }
   </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Chain Link",
+    "url": "https://dailyjamm.com/chainlink/",
+    "applicationCategory": "GameApplication",
+    "operatingSystem": "Web",
+    "description": "A daily compound-word chain puzzle. Find the missing words where every adjacent pair forms a compound word or phrase.",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "author": { "@type": "Organization", "name": "DailyJamm", "url": "https://dailyjamm.com" }
+  }
+  </script>
 </head>
 <body class="bg-gray-900 text-white">
 
@@ -197,13 +210,13 @@
           </button>
         </div>
         <!-- Clue button + skip -->
-        <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between gap-3">
           <button id="cl-clue-btn"
-            class="px-3 py-1.5 bg-transparent border border-purple-800 rounded text-xs text-purple-400 font-semibold hover:border-purple-500 hover:text-purple-300 transition-colors">
+            class="flex-1 px-4 py-2.5 bg-purple-900/40 border border-purple-600 rounded-lg text-sm text-purple-300 font-bold hover:bg-purple-800/50 hover:border-purple-400 hover:text-purple-200 transition-colors">
             Hint
           </button>
           <button id="cl-skip-btn"
-            class="px-3 py-1.5 bg-transparent border border-gray-700 rounded text-xs text-gray-500 font-semibold hover:border-gray-500 hover:text-gray-300 transition-colors">
+            class="flex-1 px-4 py-2.5 bg-gray-800/60 border border-gray-600 rounded-lg text-sm text-gray-400 font-bold hover:bg-gray-700/60 hover:border-gray-500 hover:text-gray-200 transition-colors">
             Skip
           </button>
         </div>

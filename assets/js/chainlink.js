@@ -179,12 +179,12 @@
   // ── showClue / resetClueUI ───────────────────────────────────────────────
   function showClue() {
     if (clueState === 'letter') {
-      clueNumEl.textContent  = 'Hint 1/2';
+      clueNumEl.textContent  = 'Hint 1 of 2';
       clueTextEl.textContent = 'First letter: ' + puzzle.words[currentStep + 1][0];
       clueBtnEl.textContent  = 'Show Clue';
       clueBtnEl.classList.remove('hidden');
     } else {
-      clueNumEl.textContent  = 'Hint 2/2 · ' + (currentStep + 1) + '/5';
+      clueNumEl.textContent  = 'Hint 2 of 2 · ' + (currentStep + 1) + '/5';
       clueTextEl.textContent = puzzle.clues[currentStep];
       clueBtnEl.textContent  = 'No hints left';
       clueBtnEl.disabled     = true;

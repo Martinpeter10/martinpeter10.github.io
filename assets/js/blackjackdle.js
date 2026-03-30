@@ -188,10 +188,13 @@ const BJGame = (function () {
     const deckEl = $('bj-deck');
     deckEl.classList.add('bj-dealing');
 
-    // Deal 4 cards sequentially: player, dealer, player, dealer
+    els.dealerCards.innerHTML = '';
+    els.playerCards.innerHTML = '';
+    els.dealerScore.classList.add('hidden');
+    els.playerScore.classList.add('hidden');
+
     const order = ['player', 'dealer', 'player', 'dealer'];
-    let i = 0;
-    let pIdx = 0, dIdx = 0;
+    let i = 0, pIdx = 0, dIdx = 0;
 
     function dealNext() {
       if (i >= order.length) {
@@ -199,39 +202,36 @@ const BJGame = (function () {
         if (callback) callback();
         return;
       }
-      const target = order[i];
+      const target    = order[i];
       const container = target === 'player' ? els.playerCards : els.dealerCards;
-      const hand = target === 'player' ? playerHand : dealerHand;
-      const idx = target === 'player' ? pIdx++ : dIdx++;
-      const faceDown = target === 'dealer' && idx === 1;
+      const hand      = target === 'player' ? playerHand : dealerHand;
+      const idx       = target === 'player' ? pIdx++ : dIdx++;
+      const faceDown  = target === 'dealer' && idx === 1;
 
-      // Create flying card
-      const fly = document.createElement('div');
-      fly.className = 'bj-card-fly';
-      fly.innerHTML = cardHTML(hand[idx], faceDown);
-      deckEl.appendChild(fly);
-
-      // Get target position
       const deckRect = deckEl.getBoundingClientRect();
-      const contRect = container.getBoundingClientRect();
-      const slotWidth = 70;
-      const existingCards = container.children.length;
-      const targetX = contRect.left + (existingCards * (slotWidth * 0.45)) - deckRect.left;
-      const targetY = contRect.top - deckRect.top;
 
-      fly.style.setProperty('--fly-x', targetX + 'px');
-      fly.style.setProperty('--fly-y', targetY + 'px');
-      fly.classList.add('bj-fly-anim');
+      // Append real slot immediately — freeze it at deck position via transform.
+      const slot = document.createElement('div');
+      slot.className    = 'bj-card-slot';
+      slot.innerHTML    = cardHTML(hand[idx], faceDown);
+      slot.style.animation  = 'none';
+      slot.style.transition = 'none';
+      container.appendChild(slot);
+
+      const slotRect = slot.getBoundingClientRect();
+      const startDx  = deckRect.left - slotRect.left;
+      const startDy  = deckRect.top  - slotRect.top;
+      slot.style.transform = 'translate(' + startDx + 'px,' + startDy + 'px)';
+
+      void slot.offsetHeight;
+
+      slot.style.transition = 'transform 0.32s ease-out';
+      slot.style.transform  = '';
 
       setTimeout(() => {
-        fly.remove();
-        // Add card to the actual container
-        const slot = document.createElement('div');
-        slot.className = 'bj-card-slot bj-card-dealt';
-        slot.innerHTML = cardHTML(hand[idx], faceDown);
-        container.appendChild(slot);
+        slot.style.transition = '';
+        slot.style.animation  = '';
 
-        // Update scores
         if (target === 'player') {
           els.playerScore.textContent = handValue(playerHand.slice(0, pIdx));
           els.playerScore.classList.remove('hidden');
@@ -242,84 +242,80 @@ const BJGame = (function () {
 
         i++;
         setTimeout(dealNext, DEAL_DELAY);
-      }, 350);
+      }, 340);
     }
-
-    // Clear card areas
-    els.dealerCards.innerHTML = '';
-    els.playerCards.innerHTML = '';
-    els.dealerScore.classList.add('hidden');
-    els.playerScore.classList.add('hidden');
 
     setTimeout(dealNext, 200);
   }
 
   /* ── Single card animation (hit / double / dealer draw) ── */
   function animateSingleCard(card, container, faceDown, callback) {
-    const deckEl = $('bj-deck');
-    const fly = document.createElement('div');
-    fly.className = 'bj-card-fly';
-    fly.innerHTML = cardHTML(card, faceDown);
-    deckEl.appendChild(fly);
-
+    const deckEl  = $('bj-deck');
     const deckRect = deckEl.getBoundingClientRect();
-    const contRect = container.getBoundingClientRect();
-    const slotWidth = 70;
-    const existingCards = container.children.length;
-    const targetX = contRect.left + (existingCards * (slotWidth * 0.45)) - deckRect.left;
-    const targetY = contRect.top - deckRect.top;
 
-    fly.style.setProperty('--fly-x', targetX + 'px');
-    fly.style.setProperty('--fly-y', targetY + 'px');
-    fly.classList.add('bj-fly-anim');
+    // Snapshot existing card positions before the new slot shifts the flex layout.
+    const existingSlots = Array.from(container.children);
+    const beforeLeft = existingSlots.map(s => s.getBoundingClientRect().left);
 
+    // Strip animation classes from existing cards so cleanup can't re-trigger them.
+    existingSlots.forEach(s => {
+      s.classList.remove('bj-card-dealt', 'bj-flip-out', 'bj-flip-in');
+      s.style.animation  = 'none';
+      s.style.transition = 'none';
+    });
+
+    // Append the real card slot — always visible, no invisible placeholder.
+    // Using the card itself as the animated element eliminates any swap gap.
+    const slot = document.createElement('div');
+    slot.className    = 'bj-card-slot';
+    slot.innerHTML    = cardHTML(card, faceDown);
+    slot.style.animation  = 'none';
+    slot.style.transition = 'none';
+    container.appendChild(slot);
+
+    // Measure all final positions now that flex has settled.
+    const slotRect   = slot.getBoundingClientRect();
+    const afterLeft  = existingSlots.map(s => s.getBoundingClientRect().left);
+
+    // INVERT: push existing cards back to their pre-append positions via transform.
+    existingSlots.forEach((s, i) => {
+      const dx = beforeLeft[i] - afterLeft[i];
+      s.style.transform = dx ? 'translateX(' + dx + 'px)' : '';
+    });
+
+    // Start the new card at the deck's position so it appears to fly from there.
+    const startDx = deckRect.left - slotRect.left;
+    const startDy = deckRect.top  - slotRect.top;
+    slot.style.transform = 'translate(' + startDx + 'px,' + startDy + 'px)';
+
+    // Force a reflow so the browser registers the starting transforms.
+    void container.offsetHeight;
+
+    // PLAY: animate all cards to their natural flex positions.
+    const easing = 'transform 0.32s ease-out';
+    existingSlots.forEach(s => {
+      s.style.transition = easing;
+      s.style.transform  = '';
+    });
+    slot.style.transition = easing;
+    slot.style.transform  = '';
+
+    // Clean up after the animation — clear transform/transition on all slots.
+    // Only clear the animation override if the slot has no active flip class,
+    // to avoid disturbing the revealed hole card.
     setTimeout(() => {
-      fly.remove();
-
-      // FLIP: freeze existing slots before measuring — clears any lingering
-      // animation or transform state (e.g. from the hole-card flip) so they
-      // won't interfere with the slide.
-      const existingSlots = Array.from(container.children);
       existingSlots.forEach(s => {
-        s.style.transition = 'none';
-        s.style.transform   = 'none';
-        s.style.animation   = 'none';
-      });
-      void container.offsetHeight; // flush before measuring
-
-      const before = existingSlots.map(s => s.getBoundingClientRect().left);
-
-      // Append new card — no entrance animation; card already arrived via fly
-      const slot = document.createElement('div');
-      slot.className = 'bj-card-slot';
-      slot.innerHTML = cardHTML(card, faceDown);
-      container.appendChild(slot);
-
-      // Counteract the flex-recentering shift instantly
-      existingSlots.forEach((s, i) => {
-        const dx = before[i] - s.getBoundingClientRect().left;
-        if (Math.abs(dx) > 0.5) {
-          s.style.transform = `translateX(${dx}px)`;
+        s.style.transition = '';
+        s.style.transform  = '';
+        if (!s.classList.contains('bj-flip-out') && !s.classList.contains('bj-flip-in')) {
+          s.style.animation = '';
         }
       });
-
-      // Force reflow, then slide to final position
-      void container.offsetHeight;
-      existingSlots.forEach(s => {
-        s.style.transition = 'transform 0.25s ease-out';
-        s.style.transform   = 'none';
-      });
-
-      // Clean up after slide completes
-      setTimeout(() => {
-        existingSlots.forEach(s => {
-          s.style.transition = '';
-          s.style.transform   = '';
-          s.style.animation   = '';
-        });
-        if (callback) callback();
-      }, 260);
-    }, 350);
+      slot.style.transition = '';
+      slot.style.transform  = '';
+      slot.style.animation  = '';
+      if (callback) callback();
+    }, 340);
   }
 
   /* ── Hole card flip (dealer reveal) ── */
@@ -327,6 +323,9 @@ const BJGame = (function () {
     const slots = els.dealerCards.querySelectorAll('.bj-card-slot');
     if (slots.length < 2) { if (callback) callback(); return; }
     const holeSlot = slots[1];
+    // If hole card is already face-up (e.g. dealerPlay already revealed it),
+    // skip the flip and fire callback immediately.
+    if (holeSlot.querySelector('.bj-card-front')) { if (callback) callback(); return; }
     holeSlot.classList.add('bj-flip-out');
     setTimeout(() => {
       holeSlot.innerHTML = cardHTML(dealerHand[1], false);
@@ -336,8 +335,8 @@ const BJGame = (function () {
       setTimeout(() => {
         holeSlot.classList.remove('bj-flip-in');
         if (callback) callback();
-      }, 150);
-    }, 150);
+      }, 210);
+    }, 210);
   }
 
   /* ── Chip display ── */

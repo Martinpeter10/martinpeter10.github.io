@@ -2,14 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="Play Themedle on DailyJamm - the daily theme song guessing game! Listen to short clips of TV theme songs and test your knowledge in this daily music guessing game.">
   <title>Themedle | DailyJamm</title>
 
-  <!-- Favicon & Site CSS -->
-  <link rel="icon" href="/assets/img/favicon.png">
-  <link rel="stylesheet" href="/assets/css/styles.css">
+  <meta name="robots" content="index,follow">
   <link rel="canonical" href="https://dailyjamm.com/themedle/">
+  <link rel="icon" type="image/png" href="/assets/img/favicon.png">
+  <link rel="stylesheet" href="/assets/css/styles.css">
+
+  <!-- Open Graph -->
+  <meta property="og:site_name" content="DailyJamm" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://dailyjamm.com/themedle/" />
+  <meta property="og:title" content="Themedle | DailyJamm" />
+  <meta property="og:description" content="The daily theme song guessing game. Listen to short clips of TV theme songs and guess the show." />
+  <meta property="og:image" content="https://dailyjamm.com/assets/img/favicon.png" />
+
+  <!-- iOS / Theme -->
+  <meta name="theme-color" content="#1a1a2e" />
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1a1a2e" />
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#1a1a2e" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XLRXG28EZV"></script>
@@ -63,6 +78,19 @@
       #td-modal { align-items: center; }
     }
   </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Themedle",
+    "url": "https://dailyjamm.com/themedle/",
+    "applicationCategory": "GameApplication",
+    "operatingSystem": "Web",
+    "description": "A daily theme song guessing game. Listen to short clips and guess the TV show.",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "author": { "@type": "Organization", "name": "DailyJamm", "url": "https://dailyjamm.com" }
+  }
+  </script>
 </head>
 <body class="bg-gray-900 min-h-screen text-white">
   <!-- =============================== -->
