@@ -453,6 +453,14 @@ input[type=range].slider::-moz-range-thumb {
   z-index: 1;
 }
 
+/* Player row: contains main hand + optional split hand */
+.bj-player-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+}
+
 /* Split area */
 .bj-split-area {
   display: flex;
@@ -461,10 +469,32 @@ input[type=range].slider::-moz-range-thumb {
   gap: 4px;
   z-index: 1;
 }
-.bj-hand-active {
-  outline: 2px solid rgba(251,191,36,0.5);
-  outline-offset: 4px;
-  border-radius: 8px;
+
+/* Side-by-side layout when split is active */
+.bj-player-row.bj-split-active {
+  gap: 10px;
+}
+.bj-player-row.bj-split-active .bj-player-area,
+.bj-player-row.bj-split-active .bj-split-area {
+  flex: 1;
+  min-width: 0;
+}
+/* Smaller cards in split mode */
+.bj-split-active .bj-card {
+  width: 50px;
+  height: 72px;
+}
+.bj-split-active .bj-cards {
+  min-height: 72px;
+}
+.bj-split-active .bj-card-slot {
+  margin-left: -15px;
+}
+.bj-split-active .bj-card-center { font-size: 20px; }
+.bj-split-active .bj-card-rank { font-size: 11px; }
+
+.bj-hand-active .bj-cards {
+  filter: drop-shadow(0 0 8px rgba(251,191,36,0.6));
 }
 
 /* Chip bar (below table) */
@@ -568,6 +598,7 @@ input[type=range].slider::-moz-range-thumb {
 /* Action buttons */
 .bj-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   padding: 8px 16px 16px;
   justify-content: center;
@@ -606,6 +637,37 @@ input[type=range].slider::-moz-range-thumb {
 .bj-result-win { background: rgba(16,185,129,0.15); color: #34d399; border: 1.5px solid rgba(16,185,129,0.3); }
 .bj-result-lose { background: rgba(239,68,68,0.15); color: #f87171; border: 1.5px solid rgba(239,68,68,0.3); }
 .bj-result-push { background: rgba(251,191,36,0.15); color: #fbbf24; border: 1.5px solid rgba(251,191,36,0.3); }
+
+/* Split result: two-panel banner */
+.bj-split-result-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.bj-split-result-half {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 5px 8px;
+  border-radius: 8px;
+}
+.bj-split-result-label {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+}
+.bj-split-result-chips {
+  font-size: 15px;
+  font-weight: 800;
+}
+.bj-split-result-sep {
+  font-size: 20px;
+  font-weight: 300;
+  color: rgba(255,255,255,0.3);
+  flex-shrink: 0;
+}
 
 /* Final results panel */
 .bj-results {

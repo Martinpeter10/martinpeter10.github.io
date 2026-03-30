@@ -165,17 +165,21 @@
           <span id="bj-hand-num">Hand 1</span> of 3
         </div>
 
-        <!-- Player area -->
-        <div class="bj-player-area">
-          <div id="bj-player-cards" class="bj-cards"></div>
-          <div id="bj-player-score" class="bj-hand-score hidden">0</div>
-          <div class="bj-label">YOU</div>
-        </div>
+        <!-- Player row: holds main hand + split hand side by side -->
+        <div id="bj-player-row" class="bj-player-row">
+          <!-- Main hand -->
+          <div class="bj-player-area">
+            <div id="bj-player-cards" class="bj-cards"></div>
+            <div id="bj-player-score" class="bj-hand-score hidden">0</div>
+            <div class="bj-label">YOU</div>
+          </div>
 
-        <!-- Split: second hand (hidden unless splitting) -->
-        <div id="bj-split-area" class="bj-split-area hidden">
-          <div id="bj-split-cards" class="bj-cards"></div>
-          <div id="bj-split-score" class="bj-hand-score hidden">0</div>
+          <!-- Split: second hand (hidden unless splitting) -->
+          <div id="bj-split-area" class="bj-split-area hidden">
+            <div id="bj-split-cards" class="bj-cards"></div>
+            <div id="bj-split-score" class="bj-hand-score hidden">0</div>
+            <div class="bj-label">SPLIT</div>
+          </div>
         </div>
       </div>
 

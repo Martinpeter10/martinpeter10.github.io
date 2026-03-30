@@ -25,7 +25,7 @@ const BJGame = (function () {
   let playerHand = [];
   let splitHand = null;       // null unless splitting
   let activeSplitHand = 0;   // 0 = main hand, 1 = split hand
-  let handOver = false;
+  let splitBets = null;       // [mainBet, splitBet] when splitting, null otherwise
   let sessionResults = [];    // [{result, net}]
   let dailyDone = false;
 
@@ -122,11 +122,11 @@ const BJGame = (function () {
     return hand.length === 2 && handValue(hand) === 21;
   }
   function isBust(hand) { return handValue(hand) > 21; }
-  function canSplit(hand) {
+  function isPair(hand) {
     if (hand.length !== 2 || splitHand !== null) return false;
     const v1 = hand[0].rank === 'A' ? 11 : (['K','Q','J'].includes(hand[0].rank) ? 10 : parseInt(hand[0].rank));
     const v2 = hand[1].rank === 'A' ? 11 : (['K','Q','J'].includes(hand[1].rank) ? 10 : parseInt(hand[1].rank));
-    return v1 === v2 && chips >= currentBet;
+    return v1 === v2;
   }
 
   /* ── Card rendering ── */
@@ -155,15 +155,6 @@ const BJGame = (function () {
     });
   }
 
-  function renderDealer(hideHole) {
-    renderHand(els.dealerCards, dealerHand, hideHole, false);
-    if (hideHole) {
-      els.dealerScore.textContent = handValue([dealerHand[0]]);
-    } else {
-      els.dealerScore.textContent = handValue(dealerHand);
-    }
-    els.dealerScore.classList.remove('hidden');
-  }
 
   function renderPlayer() {
     renderHand(els.playerCards, playerHand, false, false);
@@ -362,6 +353,7 @@ const BJGame = (function () {
     els.dealerScore.classList.add('hidden');
     els.playerScore.classList.add('hidden');
     els.splitArea.classList.add('hidden');
+    els.playerRow.classList.remove('bj-split-active');
   }
 
   function updateBetDisplay() {
@@ -406,11 +398,13 @@ const BJGame = (function () {
     els.handResult.classList.add('hidden');
     splitHand = null;
     activeSplitHand = 0;
+    splitBets = null;
     els.splitArea.classList.add('hidden');
-    handOver = false;
+    els.playerRow.classList.remove('bj-split-active');
 
     // Deduct bet from chips upfront
     chips -= currentBet;
+    $('bj-current-bet').textContent = currentBet.toLocaleString();
     updateChipDisplay();
 
     // Fresh deck each hand
@@ -441,14 +435,17 @@ const BJGame = (function () {
     $('bj-btn-hit').disabled = false;
     $('bj-btn-stay').disabled = false;
 
-    // Double: only on first two cards, must have enough chips
+    // Double: only on first two cards; in split mode each hand has its own bet
     const activeHand = activeSplitHand === 0 ? playerHand : splitHand;
-    const canDouble = activeHand.length === 2 && chips >= currentBet;
-    $('bj-btn-double').classList.toggle('hidden', !canDouble);
+    const activeBet = splitBets ? splitBets[activeSplitHand] : currentBet;
+    const isTwoCards = activeHand.length === 2;
+    $('bj-btn-double').classList.toggle('hidden', !isTwoCards);
+    $('bj-btn-double').disabled = isTwoCards && chips < activeBet;
 
-    // Split: only on initial hand, matching values, enough chips
-    const showSplit = canSplit(playerHand) && activeSplitHand === 0;
+    // Split: show for any pair on initial hand; disable (grey out) if can't afford
+    const showSplit = isPair(playerHand) && activeSplitHand === 0;
     $('bj-btn-split').classList.toggle('hidden', !showSplit);
+    $('bj-btn-split').disabled = showSplit && chips < currentBet;
   }
 
   function playerHit() {
@@ -465,9 +462,7 @@ const BJGame = (function () {
 
       if (isBust(hand)) {
         if (splitHand && activeSplitHand === 0) {
-          activeSplitHand = 1;
-          renderSplit();
-          showActions();
+          switchToSplitHand();
         } else if (splitHand && activeSplitHand === 1) {
           resolveSplit();
         } else {
@@ -485,9 +480,7 @@ const BJGame = (function () {
 
   function playerStay() {
     if (splitHand && activeSplitHand === 0) {
-      activeSplitHand = 1;
-      renderSplit();
-      showActions();
+      switchToSplitHand();
       return;
     }
     if (splitHand && activeSplitHand === 1) {
@@ -506,8 +499,15 @@ const BJGame = (function () {
   }
 
   function playerDouble() {
-    chips -= currentBet;
-    currentBet *= 2;
+    if (splitBets) {
+      chips -= splitBets[activeSplitHand];
+      splitBets[activeSplitHand] *= 2;
+      $('bj-current-bet').textContent = (splitBets[0] + splitBets[1]).toLocaleString();
+    } else {
+      chips -= currentBet;
+      currentBet *= 2;
+      $('bj-current-bet').textContent = currentBet.toLocaleString();
+    }
     updateChipDisplay();
 
     const hand = activeSplitHand === 0 ? playerHand : splitHand;
@@ -523,9 +523,7 @@ const BJGame = (function () {
 
       if (isBust(hand)) {
         if (splitHand && activeSplitHand === 0) {
-          activeSplitHand = 1;
-          renderSplit();
-          showActions();
+          switchToSplitHand();
         } else if (splitHand && activeSplitHand === 1) {
           resolveSplit();
         } else {
@@ -538,17 +536,40 @@ const BJGame = (function () {
   }
 
   function playerSplit() {
+    if (chips < currentBet) return;
     chips -= currentBet;
     updateChipDisplay();
 
+    // Each hand starts with just 1 card — new cards are dealt via animation
     splitHand = [playerHand.pop()];
-    playerHand.push(drawCard());
-    splitHand.push(drawCard());
-
+    splitBets = [currentBet, currentBet];
     activeSplitHand = 0;
+    $('bj-current-bet').textContent = (currentBet * 2).toLocaleString();
+
+    // Activate side-by-side layout
+    els.playerRow.classList.add('bj-split-active');
     renderPlayer();
     renderSplit();
-    showActions();
+
+    // Animate the starting card for the main hand, then let player act
+    const card = drawCard();
+    playerHand.push(card);
+    animateSingleCard(card, els.playerCards, false, () => {
+      els.playerScore.textContent = handValue(playerHand);
+      showActions();
+    });
+  }
+
+  // Called when main hand finishes — deals starting card to split hand then lets player act
+  function switchToSplitHand() {
+    activeSplitHand = 1;
+    renderSplit(); // updates active-hand highlight
+    const card = drawCard();
+    splitHand.push(card);
+    animateSingleCard(card, els.splitCards, false, () => {
+      els.splitScore.textContent = handValue(splitHand);
+      showActions();
+    });
   }
 
   /* ── Dealer logic: hits soft 17 ── */
@@ -580,12 +601,11 @@ const BJGame = (function () {
     dealerPlay(() => {
       const dv = handValue(dealerHand);
       const db = isBust(dealerHand);
-      let totalNet = 0;
 
       // Resolve main hand
       const pv = handValue(playerHand);
       const pb = isBust(playerHand);
-      let r1, r2;
+      let r1;
       if (pb) r1 = 'lose';
       else if (db) r1 = 'win';
       else if (dv > pv) r1 = 'lose';
@@ -595,28 +615,47 @@ const BJGame = (function () {
       // Resolve split hand
       const sv = handValue(splitHand);
       const sb = isBust(splitHand);
+      let r2;
       if (sb) r2 = 'lose';
       else if (db) r2 = 'win';
       else if (dv > sv) r2 = 'lose';
       else if (sv > dv) r2 = 'win';
       else r2 = 'push';
 
-      // Calculate net (each hand has currentBet/2 effectively, but we bet full on each)
-      const halfBet = currentBet / 2;
-      if (r1 === 'win') totalNet += halfBet;
-      else if (r1 === 'lose') totalNet -= halfBet;
-      if (r2 === 'win') totalNet += halfBet;
-      else if (r2 === 'lose') totalNet -= halfBet;
+      // Use per-hand bets (may differ if one hand was doubled)
+      const bet1 = splitBets ? splitBets[0] : currentBet;
+      const bet2 = splitBets ? splitBets[1] : currentBet;
+      const net1 = r1 === 'win' ? bet1 : r1 === 'lose' ? -bet1 : 0;
+      const net2 = r2 === 'win' ? bet2 : r2 === 'lose' ? -bet2 : 0;
+      const totalNet = net1 + net2;
 
-      chips += currentBet + totalNet;
+      // Return both bets (already deducted) plus net winnings
+      chips += bet1 + bet2 + totalNet;
+
       const result = totalNet > 0 ? 'win' : totalNet < 0 ? 'lose' : 'push';
-      finishHand(result, totalNet);
+
+      // Build two-panel split result banner
+      const colorClass = { win: 'bj-result-win', lose: 'bj-result-lose', push: 'bj-result-push' };
+      const fmtNet = n => (n >= 0 ? '+' : '') + n.toLocaleString();
+      const bannerHTML =
+        '<div class="bj-split-result-wrap">' +
+          '<div class="bj-split-result-half ' + colorClass[r1] + '">' +
+            '<span class="bj-split-result-label">' + r1.toUpperCase() + '</span>' +
+            '<span class="bj-split-result-chips">' + fmtNet(net1) + '</span>' +
+          '</div>' +
+          '<div class="bj-split-result-sep">/</div>' +
+          '<div class="bj-split-result-half ' + colorClass[r2] + '">' +
+            '<span class="bj-split-result-label">' + r2.toUpperCase() + '</span>' +
+            '<span class="bj-split-result-chips">' + fmtNet(net2) + '</span>' +
+          '</div>' +
+        '</div>';
+
+      finishHand(result, totalNet, bannerHTML);
     });
   }
 
   /* ── End hand ── */
   function endHand(result) {
-    handOver = true;
     els.actions.classList.add('hidden');
 
     let net = 0;
@@ -638,8 +677,7 @@ const BJGame = (function () {
     flipHoleCard(() => finishHand(result, net));
   }
 
-  function finishHand(result, net) {
-    handOver = true;
+  function finishHand(result, net, bannerHTML) {
     els.betDisplay.classList.add('hidden');
     updateChipDisplay();
     saveChips();
@@ -647,25 +685,29 @@ const BJGame = (function () {
     sessionResults.push({ result, net });
 
     // Show result banner
-    const msgs = {
-      blackjack: 'BLACKJACK! +' + net.toLocaleString(),
-      win: 'You Win! +' + net.toLocaleString(),
-      push: 'Push - Bet Returned',
-      lose: 'Dealer Wins. ' + net.toLocaleString(),
-      bust: 'Bust! ' + net.toLocaleString(),
-      dealer_blackjack: 'Dealer Blackjack! ' + net.toLocaleString()
-    };
-    const colors = {
-      blackjack: 'bj-result-win',
-      win: 'bj-result-win',
-      push: 'bj-result-push',
-      lose: 'bj-result-lose',
-      bust: 'bj-result-lose',
-      dealer_blackjack: 'bj-result-lose'
-    };
-
-    els.handResult.textContent = msgs[result] || result;
-    els.handResult.className = 'bj-hand-result ' + (colors[result] || '');
+    if (bannerHTML) {
+      els.handResult.innerHTML = bannerHTML;
+      els.handResult.className = 'bj-hand-result';
+    } else {
+      const msgs = {
+        blackjack: 'BLACKJACK! +' + net.toLocaleString(),
+        win: 'You Win! +' + net.toLocaleString(),
+        push: 'Push - Bet Returned',
+        lose: 'Dealer Wins. ' + net.toLocaleString(),
+        bust: 'Bust! ' + net.toLocaleString(),
+        dealer_blackjack: 'Dealer Blackjack! ' + net.toLocaleString()
+      };
+      const colors = {
+        blackjack: 'bj-result-win',
+        win: 'bj-result-win',
+        push: 'bj-result-push',
+        lose: 'bj-result-lose',
+        bust: 'bj-result-lose',
+        dealer_blackjack: 'bj-result-lose'
+      };
+      els.handResult.textContent = msgs[result] || result;
+      els.handResult.className = 'bj-hand-result ' + (colors[result] || '');
+    }
     els.handResult.classList.remove('hidden');
 
     handNum++;
@@ -859,6 +901,7 @@ const BJGame = (function () {
       dealerScore: $('bj-dealer-score'),
       playerCards: $('bj-player-cards'),
       playerScore: $('bj-player-score'),
+      playerRow: $('bj-player-row'),
       splitArea: $('bj-split-area'),
       splitCards: $('bj-split-cards'),
       splitScore: $('bj-split-score'),
