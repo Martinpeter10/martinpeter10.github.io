@@ -784,18 +784,18 @@ input[type=range].slider::-moz-range-thumb {
   -webkit-overflow-scrolling: touch;
 }
 
-/* Inner min-width keeps columns readable on small screens */
+/* Inner — lets the grid define its own width on mobile */
 .spd-inner {
-  min-width: 580px;
+  min-width: max-content;
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
-/* Column header row */
+/* Column header row — fixed px columns on mobile so fr units don't collapse */
 .spd-col-labels {
   display: grid;
-  grid-template-columns: 100px repeat(9, 1fr);
+  grid-template-columns: 100px repeat(9, 56px);
   gap: 3px;
   flex-shrink: 0;
   font-size: 0.6rem;
@@ -855,10 +855,10 @@ input[type=range].slider::-moz-range-thumb {
   gap: 3px;
 }
 
-/* Guess row */
+/* Guess row — fixed px columns on mobile so fr units don't collapse */
 .spd-row {
   display: grid;
-  grid-template-columns: 100px repeat(9, 1fr);
+  grid-template-columns: 100px repeat(9, 56px);
   gap: 3px;
   align-items: start;
 }
@@ -1084,4 +1084,11 @@ input[type=range].slider::-moz-range-thumb {
     max-height: 85vh;
     padding-bottom: 1.25rem;
   }
+}
+
+/* On wider screens, switch to fluid 1fr columns and disable horizontal scroll */
+@media (min-width: 620px) {
+  .spd-inner { min-width: 0; }
+  .spd-col-labels { grid-template-columns: 100px repeat(9, 1fr); }
+  .spd-row        { grid-template-columns: 100px repeat(9, 1fr); }
 }
