@@ -775,10 +775,27 @@ input[type=range].slider::-moz-range-thumb {
   overflow: visible;
 }
 
+/* Horizontal scroll wrapper — scrolls col-labels + board together */
+.spd-scroll-area {
+  flex: 1;
+  min-height: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Inner min-width keeps columns readable on small screens */
+.spd-inner {
+  min-width: 580px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 /* Column header row */
 .spd-col-labels {
   display: grid;
-  grid-template-columns: 110px repeat(9, 1fr);
+  grid-template-columns: 100px repeat(9, 1fr);
   gap: 3px;
   flex-shrink: 0;
   font-size: 0.6rem;
@@ -793,6 +810,10 @@ input[type=range].slider::-moz-range-thumb {
 .spd-col-name {
   text-align: left;
   padding-left: 4px;
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  background: #111827;
 }
 
 /* Column header tooltips */
@@ -837,7 +858,7 @@ input[type=range].slider::-moz-range-thumb {
 /* Guess row */
 .spd-row {
   display: grid;
-  grid-template-columns: 110px repeat(9, 1fr);
+  grid-template-columns: 100px repeat(9, 1fr);
   gap: 3px;
   align-items: start;
 }
@@ -865,13 +886,17 @@ input[type=range].slider::-moz-range-thumb {
   text-align: left;
   align-items: flex-start;
   padding: 4px 6px;
-  background: rgba(30, 41, 59, 0.6);
+  background: #1e293b;
   border: 1px solid #374151;
   color: #e2e8f0;
   overflow: hidden;
   word-break: break-word;
   line-height: 1.2;
   justify-content: center;
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  box-shadow: 2px 0 6px rgba(0,0,0,0.4);
 }
 
 /* Tile states */
@@ -903,8 +928,11 @@ input[type=range].slider::-moz-range-thumb {
 }
 
 .spd-empty-cell {
-  background: rgba(30, 41, 59, 0.3);
+  background: #131e2e;
   border-color: #1f2937;
+  position: sticky;
+  left: 0;
+  z-index: 2;
 }
 
 /* Tile inner elements */

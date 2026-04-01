@@ -178,22 +178,27 @@
         </button>
       </div>
 
-      <!-- Column header labels -->
-      <div class="spd-col-labels flex-shrink-0">
-        <div class="spd-col-name">Spell</div>
-        <div data-tip="Spell level: Cantrip (0) through 9th. 🟡 = within ±2 levels, arrow shows direction.">Lvl</div>
-        <div data-tip="School of magic: Abjuration, Conjuration, Divination, Enchantment, Evocation, Illusion, Necromancy, or Transmutation.">School</div>
-        <div data-tip="Casting time: Action, Bonus Action, or Reaction.">Cast</div>
-        <div data-tip="Spell range tier. 🟡 = adjacent tier (Self→Touch→30ft→60-120ft→150+ft→Special). Arrow shows direction.">Range</div>
-        <div data-tip="Required components - V (Verbal), S (Somatic), M (Material). 🟡 = at least one component in common.">Comp.</div>
-        <div data-tip="Does the spell require Concentration to maintain?">Conc.</div>
-        <div data-tip="Can the spell be cast as a Ritual?">Ritual</div>
-        <div data-tip="How long the spell lasts. 🟡 = adjacent tier, arrow shows direction.">Duration</div>
-        <div data-tip="Which D&D 5E classes can cast this spell. 🟡 = at least one class in common.">Class</div>
-      </div>
+      <!-- Horizontal scroll wrapper (col labels + board scroll together) -->
+      <div class="spd-scroll-area">
+        <div class="spd-inner">
+          <!-- Column header labels -->
+          <div class="spd-col-labels flex-shrink-0">
+            <div class="spd-col-name">Spell</div>
+            <div data-tip="Spell level: Cantrip (0) through 9th. 🟡 = within ±2 levels, arrow shows direction.">Lvl</div>
+            <div data-tip="School of magic: Abjuration, Conjuration, Divination, Enchantment, Evocation, Illusion, Necromancy, or Transmutation.">School</div>
+            <div data-tip="Casting time: Action, Bonus Action, or Reaction.">Cast</div>
+            <div data-tip="Spell range tier. 🟡 = adjacent tier (Self→Touch→30ft→60-120ft→150+ft→Special). Arrow shows direction.">Range</div>
+            <div data-tip="Required components - V (Verbal), S (Somatic), M (Material). 🟡 = at least one component in common.">Comp.</div>
+            <div data-tip="Does the spell require Concentration to maintain?">Conc.</div>
+            <div data-tip="Can the spell be cast as a Ritual?">Ritual</div>
+            <div data-tip="How long the spell lasts. 🟡 = adjacent tier, arrow shows direction.">Duration</div>
+            <div data-tip="Which D&D 5E classes can cast this spell. 🟡 = at least one class in common.">Class</div>
+          </div>
 
-      <!-- Board -->
-      <div id="spd-board" class="spd-board flex-1 min-h-0 overflow-y-auto"></div>
+          <!-- Board -->
+          <div id="spd-board" class="spd-board"></div>
+        </div>
+      </div>
 
       <!-- Input area -->
       <div id="spd-input-area" class="flex-shrink-0 pt-2">
