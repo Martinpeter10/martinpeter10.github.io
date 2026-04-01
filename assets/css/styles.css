@@ -775,25 +775,57 @@ input[type=range].slider::-moz-range-thumb {
   overflow: visible;
 }
 
-/* Horizontal scroll wrapper — handles both axes so sticky left works on name cells */
-.spd-scroll-area {
+/* Two-panel layout: frozen name col + scrollable attrs */
+.spd-panels {
   flex: 1;
   min-height: 0;
-  overflow: auto;
+  display: flex;
+  overflow: hidden;
+}
+
+/* Frozen left column */
+.spd-frozen-col {
+  flex-shrink: 0;
+  width: 100px;
+  display: flex;
+  flex-direction: column;
+  background: #111827;
+  z-index: 5;
+  box-shadow: 3px 0 10px rgba(0,0,0,0.5);
+}
+
+.spd-frozen-header {
+  display: flex;
+  align-items: center;
+  padding: 2px 0 2px 4px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6b7280;
+  flex-shrink: 0;
+}
+
+.spd-names-col {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  overflow-y: hidden; /* scrollTop synced via JS */
+}
+
+/* Scrollable right panel */
+.spd-attr-scroll {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
 
-/* Inner — lets the grid define its own width on mobile */
-.spd-inner {
-  min-width: max-content;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Column header row — fixed px columns on mobile so fr units don't collapse */
+/* Column header row — 9 attribute cols only, fixed px on mobile */
 .spd-col-labels {
   display: grid;
-  grid-template-columns: 100px repeat(9, 56px);
+  grid-template-columns: repeat(9, 56px);
   gap: 3px;
   flex-shrink: 0;
   font-size: 0.6rem;
@@ -803,15 +835,6 @@ input[type=range].slider::-moz-range-thumb {
   color: #6b7280;
   text-align: center;
   padding: 2px 0;
-}
-
-.spd-col-name {
-  text-align: left;
-  padding-left: 4px;
-  position: sticky;
-  left: 0;
-  z-index: 3;
-  background: #111827;
 }
 
 /* Column header tooltips */
@@ -850,10 +873,10 @@ input[type=range].slider::-moz-range-thumb {
   gap: 3px;
 }
 
-/* Guess row — fixed px columns on mobile so fr units don't collapse */
+/* Guess row — 9 attribute cols only, fixed px on mobile */
 .spd-row {
   display: grid;
-  grid-template-columns: 100px repeat(9, 56px);
+  grid-template-columns: repeat(9, 56px);
   gap: 3px;
   align-items: start;
 }
@@ -888,10 +911,6 @@ input[type=range].slider::-moz-range-thumb {
   word-break: break-word;
   line-height: 1.2;
   justify-content: center;
-  position: sticky;
-  left: 0;
-  z-index: 2;
-  box-shadow: 2px 0 6px rgba(0,0,0,0.4);
 }
 
 /* Tile states */
@@ -925,9 +944,6 @@ input[type=range].slider::-moz-range-thumb {
 .spd-empty-cell {
   background: #131e2e;
   border-color: #1f2937;
-  position: sticky;
-  left: 0;
-  z-index: 2;
 }
 
 /* Tile inner elements */
@@ -1081,9 +1097,8 @@ input[type=range].slider::-moz-range-thumb {
   }
 }
 
-/* On wider screens, switch to fluid 1fr columns and disable horizontal scroll */
-@media (min-width: 620px) {
-  .spd-inner { min-width: 0; }
-  .spd-col-labels { grid-template-columns: 100px repeat(9, 1fr); }
-  .spd-row        { grid-template-columns: 100px repeat(9, 1fr); }
+/* On wider screens, switch to fluid 1fr columns */
+@media (min-width: 580px) {
+  .spd-col-labels { grid-template-columns: repeat(9, 1fr); }
+  .spd-row        { grid-template-columns: repeat(9, 1fr); }
 }

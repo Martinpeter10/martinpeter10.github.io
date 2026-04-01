@@ -281,20 +281,22 @@
 
   // ── Board rendering ──────────────────────────────────────────────────────
   function renderBoard(animateLastRow) {
-    var board = document.getElementById('spd-board');
-    board.innerHTML = '';
+    var board     = document.getElementById('spd-board');
+    var namesCol  = document.getElementById('spd-names');
+    board.innerHTML    = '';
+    namesCol.innerHTML = '';
 
     guesses.forEach(function (guess, rowIndex) {
-      var row = document.createElement('div');
-      row.className = 'spd-row';
-
-      // Spell name cell
+      // Name cell in frozen left column
       var nameCell = document.createElement('div');
       nameCell.className = 'spd-cell spd-name-cell';
       nameCell.textContent = guess.spellName;
-      row.appendChild(nameCell);
+      namesCol.appendChild(nameCell);
 
-      // Attribute cells
+      // Attribute row in scrollable right panel
+      var row = document.createElement('div');
+      row.className = 'spd-row';
+
       guess.results.forEach(function (r, colIndex) {
         var cell = document.createElement('div');
         cell.className = 'spd-cell spd-tile spd-' + r.status;
@@ -324,11 +326,12 @@
     // Empty rows for remaining guesses
     var remaining = MAX_GUESSES - guesses.length;
     for (var i = 0; i < remaining; i++) {
+      var emptyName = document.createElement('div');
+      emptyName.className = 'spd-cell spd-name-cell spd-empty-cell';
+      namesCol.appendChild(emptyName);
+
       var row = document.createElement('div');
       row.className = 'spd-row spd-row-empty';
-      var nameCell = document.createElement('div');
-      nameCell.className = 'spd-cell spd-name-cell spd-empty-cell';
-      row.appendChild(nameCell);
       for (var j = 0; j < 9; j++) {
         var cell = document.createElement('div');
         cell.className = 'spd-cell spd-tile spd-empty';
@@ -339,9 +342,11 @@
 
     updateGuessCounter();
 
-    // Scroll board to show latest row
+    // Scroll attr panel to show latest row; sync name column
     if (animateLastRow) {
-      board.scrollTop = board.scrollHeight;
+      var attrScroll = document.getElementById('spd-attr-scroll');
+      attrScroll.scrollTop = attrScroll.scrollHeight;
+      namesCol.scrollTop   = attrScroll.scrollTop;
     }
   }
 
@@ -577,6 +582,12 @@
     input.addEventListener('blur', function () {
       // Delay hide so mousedown on dropdown fires first
       setTimeout(hideDropdown, 150);
+    });
+
+    // Sync name column vertical scroll with attr panel
+    var attrScroll = document.getElementById('spd-attr-scroll');
+    attrScroll.addEventListener('scroll', function () {
+      document.getElementById('spd-names').scrollTop = attrScroll.scrollTop;
     });
 
     submitBtn.addEventListener('click', submitGuess);
