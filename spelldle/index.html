@@ -3,29 +3,29 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Chain Link | DailyJamm</title>
-  <meta name="description" content="Play Chain Link on DailyJamm - the daily compound word chain puzzle! Find the missing words where every adjacent pair forms a compound word or phrase.">
+  <title>Spelldle | DailyJamm</title>
+  <meta name="description" content="Guess the daily D&D 5E spell in up to 8 tries! Spelldle is a daily spell guessing game with hints on level, school, range, and more.">
   <meta name="robots" content="index,follow">
-  <link rel="canonical" href="https://dailyjamm.com/chainlink/">
+  <link rel="canonical" href="https://dailyjamm.com/spelldle/">
   <link rel="icon" type="image/png" href="/assets/img/favicon.png">
   <link rel="stylesheet" href="/assets/css/styles.css">
 
   <!-- Open Graph -->
   <meta property="og:site_name" content="DailyJamm" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://dailyjamm.com/chainlink/" />
-  <meta property="og:title" content="Chain Link | DailyJamm" />
-  <meta property="og:description" content="The daily compound word chain puzzle. Find the missing words where every adjacent pair forms a compound word or phrase." />
+  <meta property="og:url" content="https://dailyjamm.com/spelldle/" />
+  <meta property="og:title" content="Spelldle | DailyJamm" />
+  <meta property="og:description" content="Guess the daily D&D 5E spell in up to 8 tries! Get hints on level, school, range, components, and more." />
   <meta property="og:image" content="https://dailyjamm.com/assets/img/favicon.png" />
 
-  <!-- Theme color (matches site background, fixes iOS toolbar/overscroll) -->
+  <!-- Theme color -->
   <meta name="theme-color" content="#1a1a2e" />
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1a1a2e" />
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="#1a1a2e" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-  <!-- Google tag (gtag.js) -->
+  <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XLRXG28EZV"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -34,8 +34,9 @@
     gtag('config', 'G-XLRXG28EZV');
   </script>
 
-  <!-- Tailwind -->
+  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+
   <!-- Google AdSense -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4552090282675465" crossorigin="anonymous"></script>
 
@@ -47,7 +48,7 @@
       --line:  #1f2937;
     }
 
-    /* Hamburger + drawer - identical to Themedle */
+    /* Hamburger + drawer */
     .hamburger{position:fixed;top:20px;left:20px;z-index:1000;cursor:pointer;background:transparent;border:none;padding:0;appearance:none;-webkit-appearance:none}
     .hamburger:focus{outline:2px solid rgba(255,255,255,.25);outline-offset:4px;border-radius:10px}
     .hamburger-box{width:30px;height:30px;display:flex;flex-direction:column;justify-content:space-around;background:transparent;border-radius:8px;padding:6px;transition:.3s}
@@ -63,15 +64,14 @@
     .menu-link:hover{color:#fff;background:rgba(16,185,129,.1);padding-left:.5rem}
     header .hamburger{position:relative;top:auto;left:auto;margin-right:.5rem;z-index:1002}
 
-    /* Prevent body scroll - game fills the viewport */
     body { overflow: hidden; }
 
-    /* Prevent iOS auto-zoom on input focus (triggered when font-size < 16px) */
-    #cl-guess-input { font-size: 16px; }
+    /* Prevent iOS zoom */
+    #spd-input { font-size: 16px; }
 
-    /* Modal - bottom-sheet on mobile, centered on taller screens */
-    #cl-modal { align-items: flex-end; padding: 0; }
-    #cl-modal > div {
+    /* Modal */
+    #spd-modal { align-items: flex-end; padding: 0; }
+    #spd-modal > div {
       border-radius: 1.25rem 1.25rem 0 0;
       max-height: 92vh;
       overflow-y: scroll;
@@ -81,23 +81,24 @@
       padding-bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
     }
     @media (min-height: 600px) {
-      #cl-modal { align-items: center; padding: 1rem; }
-      #cl-modal > div {
+      #spd-modal { align-items: center; padding: 1rem; }
+      #spd-modal > div {
         border-radius: 1rem;
         max-height: 85vh;
         padding-bottom: 1.25rem;
       }
     }
   </style>
+
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    "name": "Chain Link",
-    "url": "https://dailyjamm.com/chainlink/",
+    "name": "Spelldle",
+    "url": "https://dailyjamm.com/spelldle/",
     "applicationCategory": "GameApplication",
     "operatingSystem": "Web",
-    "description": "A daily compound-word chain puzzle. Find the missing words where every adjacent pair forms a compound word or phrase.",
+    "description": "A daily D&D 5E spell guessing game. Guess the spell in up to 8 tries using attribute hints.",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
     "author": { "@type": "Organization", "name": "DailyJamm", "url": "https://dailyjamm.com" }
   }
@@ -160,140 +161,142 @@
     </div>
   </nav>
 
-  <!-- ── Game area - fills viewport below header ── -->
-  <div class="cl-game-wrap">
-    <div class="cl-container">
+  <!-- ── Game area ── -->
+  <div class="spd-game-wrap">
+    <div class="spd-container">
 
-      <!-- Game header: title / meta / score / help -->
+      <!-- Title / meta / help -->
       <div class="flex items-center justify-between flex-shrink-0 pt-1">
         <div class="w-8"></div>
         <div class="text-center">
-          <h1 class="text-xl font-black tracking-wide">Chain Link</h1>
-          <div id="cl-meta" class="text-xs text-gray-500 mt-0.5">#1 · 2026-03-27</div>
+          <h1 class="text-xl font-black tracking-wide">Spelldle</h1>
+          <div id="spd-meta" class="text-xs text-gray-500 mt-0.5">Daily Spelldle #1</div>
         </div>
-        <div class="flex items-center gap-2">
-          <div class="flex items-baseline gap-0.5">
-            <span id="cl-score" class="text-xl font-black text-green-400 leading-none">0</span>
-            <span class="text-sm text-gray-600">/15</span>
+        <button id="spd-help-btn" aria-label="How to play"
+          class="w-8 h-8 rounded-full border border-gray-600 bg-transparent text-gray-400 text-sm font-bold hover:border-gray-400 hover:text-white transition-colors">
+          ?
+        </button>
+      </div>
+
+      <!-- Column header labels -->
+      <div class="spd-col-labels flex-shrink-0">
+        <div class="spd-col-name">Spell</div>
+        <div data-tip="Spell level: Cantrip (0) through 9th. 🟡 = within ±2 levels, arrow shows direction.">Lvl</div>
+        <div data-tip="School of magic: Abjuration, Conjuration, Divination, Enchantment, Evocation, Illusion, Necromancy, or Transmutation.">School</div>
+        <div data-tip="Casting time: Action, Bonus Action, or Reaction.">Cast</div>
+        <div data-tip="Spell range tier. 🟡 = adjacent tier (Self→Touch→30ft→60-120ft→150+ft→Special). Arrow shows direction.">Range</div>
+        <div data-tip="Required components - V (Verbal), S (Somatic), M (Material). 🟡 = at least one component in common.">Comp.</div>
+        <div data-tip="Does the spell require Concentration to maintain?">Conc.</div>
+        <div data-tip="Can the spell be cast as a Ritual?">Ritual</div>
+        <div data-tip="How long the spell lasts. 🟡 = adjacent tier, arrow shows direction.">Duration</div>
+        <div data-tip="Which D&D 5E classes can cast this spell. 🟡 = at least one class in common.">Class</div>
+      </div>
+
+      <!-- Board -->
+      <div id="spd-board" class="spd-board flex-1 min-h-0 overflow-y-auto"></div>
+
+      <!-- Input area -->
+      <div id="spd-input-area" class="flex-shrink-0 pt-2">
+        <div class="spd-autocomplete-wrap">
+          <div id="spd-input-row" class="flex gap-2">
+            <input
+              type="text"
+              id="spd-input"
+              placeholder="Type a spell name..."
+              class="flex-1 px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white font-semibold focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500"
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="words"
+              spellcheck="false"
+            />
+            <button id="spd-submit-btn"
+              class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold rounded-lg transition-colors">
+              Guess
+            </button>
           </div>
-          <button id="cl-help-btn" aria-label="How to play"
-            class="w-8 h-8 rounded-full border border-gray-600 bg-transparent text-gray-400 text-sm font-bold hover:border-gray-400 hover:text-white transition-colors">
-            ?
-          </button>
+          <ul id="spd-dropdown" class="spd-dropdown hidden" role="listbox" aria-label="Spell suggestions"></ul>
+        </div>
+        <div class="flex justify-center mt-1">
+          <span id="spd-guess-count" class="text-xs text-gray-500">0 / 8</span>
         </div>
       </div>
 
-      <!-- Chain tiles + connectors (rendered by JS) -->
-      <div id="cl-chain" class="flex-1 min-h-0 flex flex-col items-center justify-center overflow-hidden py-1 w-full"></div>
-
-      <!-- Input area - hidden when game over -->
-      <div id="cl-input-area" class="flex-shrink-0 flex flex-col gap-2 pt-1">
-        <!-- Clue (hidden until player clicks Show Clue or guesses wrong) -->
-        <div id="cl-clue-area" class="cl-clue-box hidden">
-          <span id="cl-clue-num" class="text-xs font-black text-purple-400 flex-shrink-0 tracking-wide">1/5</span>
-          <span id="cl-clue-text" class="text-sm text-gray-200 italic leading-snug flex-1">...</span>
-        </div>
-        <!-- Input row -->
-        <div id="cl-input-row" class="flex gap-2">
-          <input
-            type="text"
-            id="cl-guess-input"
-            placeholder="Your answer..."
-            class="flex-1 px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm font-bold tracking-widest uppercase focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500"
-            autocomplete="off"
-            autocorrect="off"
-            autocapitalize="characters"
-            spellcheck="false"
-          />
-          <button id="cl-submit-btn"
-            class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold rounded-lg transition-colors">
-            Enter
-          </button>
-        </div>
-        <!-- Clue button + skip -->
-        <div class="flex items-center justify-between gap-3">
-          <button id="cl-clue-btn"
-            class="flex-1 px-4 py-2.5 bg-purple-900/40 border border-purple-600 rounded-lg text-sm text-purple-300 font-bold hover:bg-purple-800/50 hover:border-purple-400 hover:text-purple-200 transition-colors">
-            Hint
-          </button>
-          <button id="cl-skip-btn"
-            class="flex-1 px-4 py-2.5 bg-gray-800/60 border border-gray-600 rounded-lg text-sm text-gray-400 font-bold hover:bg-gray-700/60 hover:border-gray-500 hover:text-gray-200 transition-colors">
-            Skip
-          </button>
-        </div>
-      </div>
-
-      <!-- Results - shown when game over -->
-      <div id="cl-results" class="flex-shrink-0 pt-1 hidden">
+      <!-- Results panel -->
+      <div id="spd-results" class="flex-shrink-0 pt-2 hidden">
         <div class="bg-gray-800/60 border border-gray-700 rounded-xl p-4 text-center flex flex-col items-center gap-2">
-          <h2 class="text-base font-black">Chain Complete!</h2>
-          <div class="flex items-baseline gap-0.5">
-            <span id="cl-final-score" class="text-3xl font-black text-green-400 leading-none">0</span>
-            <span id="cl-score-max" class="text-sm text-gray-600">/15</span>
-          </div>
-          <p id="cl-result-msg" class="text-xs text-gray-400 font-semibold"></p>
-          <p id="cl-bonus-msg" class="text-xs text-yellow-300 font-bold hidden">🌟 +5 perfect bonus!</p>
-          <div id="cl-dots" class="flex gap-1.5 text-base"></div>
-          <button id="cl-share-btn"
+          <h2 id="spd-result-heading" class="text-base font-black">Spell identified!</h2>
+          <p id="spd-result-sub" class="text-xs text-gray-400"></p>
+          <p id="spd-answer-reveal" class="hidden text-sm font-bold text-purple-300"></p>
+          <button id="spd-share-btn"
             class="mt-1 px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg transition-colors">
             Share Results
           </button>
           <div class="mt-1 pt-2 border-t border-gray-700 w-full flex justify-center gap-6 text-xs text-gray-500">
-            <div><span id="cl-stat-streak" class="font-bold text-gray-300">0</span> streak</div>
-            <div><span id="cl-stat-best"   class="font-bold text-gray-300">0</span> best</div>
-            <div><span id="cl-stat-played" class="font-bold text-gray-300">0</span> played</div>
+            <div><span id="spd-stat-streak" class="font-bold text-gray-300">0</span> streak</div>
+            <div><span id="spd-stat-best"   class="font-bold text-gray-300">0</span> best</div>
+            <div><span id="spd-stat-played" class="font-bold text-gray-300">0</span> played</div>
           </div>
-          <p class="text-xs text-gray-500">Next chain in: <span id="cl-countdown" class="font-mono text-yellow-300 tabular-nums">--:--:--</span></p>
+          <p class="text-xs text-gray-500">Next spell in: <span id="spd-countdown" class="font-mono text-yellow-300 tabular-nums">--:--:--</span></p>
         </div>
       </div>
 
     </div>
   </div>
 
+  <!-- Toast -->
+  <div id="spd-toast" class="spd-toast hidden"></div>
+
   <!-- How to Play modal -->
-  <div id="cl-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 hidden">
-    <div class="bg-gray-900 border border-gray-700 rounded-2xl p-5 max-w-sm w-full max-h-[85vh] overflow-y-auto"
+  <div id="spd-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 hidden">
+    <div class="bg-gray-900 border border-gray-700 rounded-2xl p-5 max-w-sm w-full"
          onclick="event.stopPropagation()">
       <h2 class="text-xl font-black text-center mb-0.5">How to Play</h2>
-      <p class="text-xs text-gray-400 text-center mb-4">Complete the chain by finding each missing word.</p>
+      <p class="text-xs text-gray-400 text-center mb-4">Guess the daily D&amp;D 5E spell in up to 8 tries.</p>
 
-      <div class="mb-4">
-        <p class="text-xs text-gray-300 leading-relaxed">
-          Each answer forms a compound word or phrase with the word above it -
-          then becomes the start of the next link. A clue is available if you need it.
-        </p>
+      <div class="mb-4 text-xs text-gray-300 leading-relaxed space-y-2">
+        <p>Type a spell name and press <strong class="text-white">Guess</strong>. After each guess, each attribute tile will reveal how close you are:</p>
+        <div class="flex items-center gap-3 mt-2">
+          <span class="spd-demo-tile spd-green">3rd</span>
+          <span><strong class="text-white">Green</strong> — exact match</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="spd-demo-tile spd-yellow">2nd ↑</span>
+          <span><strong class="text-white">Yellow</strong> — close (level within ±2, range/duration adjacent tier). Arrow shows which direction the answer is.</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="spd-demo-tile spd-red">Illusion</span>
+          <span><strong class="text-white">Gray</strong> — not a match</span>
+        </div>
       </div>
 
-      <div class="mb-4">
-        <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">Example</h3>
-        <div id="cl-demo" class="bg-gray-800 rounded-lg p-3 flex flex-col items-center"></div>
+      <div class="mb-5 text-xs text-gray-300 leading-relaxed">
+        <p class="font-bold text-gray-200 mb-1">The 9 attributes:</p>
+        <ul class="space-y-0.5 text-gray-400">
+          <li><strong class="text-gray-200">Level</strong> — Cantrip through 9th</li>
+          <li><strong class="text-gray-200">School</strong> — e.g. Evocation, Illusion</li>
+          <li><strong class="text-gray-200">Casting Time</strong> — Action, Bonus, Reaction</li>
+          <li><strong class="text-gray-200">Range</strong> — Self / Touch / 30 ft / 60–120 ft / 150+ ft / Special</li>
+          <li><strong class="text-gray-200">Components</strong> — V, S, M or combinations</li>
+          <li><strong class="text-gray-200">Concentration</strong> — Yes or No</li>
+          <li><strong class="text-gray-200">Ritual</strong> — Yes or No</li>
+          <li><strong class="text-gray-200">Duration</strong> — from Instant to Permanent</li>
+          <li><strong class="text-gray-200">Class</strong> — which D&amp;D classes can cast it</li>
+        </ul>
       </div>
 
-      <div class="mb-5">
-        <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">Scoring</h3>
-        <p class="text-xs text-gray-300 leading-relaxed">
-          Each word is worth up to <strong class="text-white">3 pts</strong>.
-          Guess correctly with no hints for <strong class="text-white">3 pts</strong>.
-          Press <strong class="text-white">Hint</strong> (or guess wrong) to reveal the first letter — guess right for <strong class="text-white">2 pts</strong>.
-          Press <strong class="text-white">Show Clue</strong> (or guess wrong again) to reveal the phrase clue — guess right for <strong class="text-white">1 pt</strong>.
-          Guess wrong with the clue showing or skip at any time to score <strong class="text-white">0 pts</strong>.
-          Solve all 5 without any hints or wrong guesses for a perfect 15 + 5 bonus = <strong class="text-white">20!</strong> 🌟
-        </p>
-      </div>
-
-      <button id="cl-modal-close"
+      <button id="spd-modal-close"
         class="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-sm font-bold rounded-lg transition-colors">
         Let's Play
       </button>
     </div>
   </div>
 
-  <script src="/assets/js/chainlink.js" defer></script>
+  <script src="/assets/js/spelldle.js" defer></script>
 
   <script>
     (function(){
-      const drawer   = document.getElementById('drawer');
-      const backdrop = document.getElementById('backdrop');
+      var drawer   = document.getElementById('drawer');
+      var backdrop = document.getElementById('backdrop');
       function openMenu(){
         drawer.classList.add('open');
         backdrop.classList.add('open');

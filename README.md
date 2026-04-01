@@ -50,6 +50,26 @@ A daily blackjack game - 3 hands per day, beat the dealer and build your chip st
 
 Play it: [dailyjamm.com/blackjackdle](https://dailyjamm.com/blackjackdle)
 
+### Spelldle
+A daily D&D 5E spell guessing game - identify the spell from its attributes in up to 8 tries.
+
+- Guess any spell from a library of **339 D&D 5E spells** (SRD 5.2)
+- After each guess, 9 attribute tiles reveal how close you are:
+  - **Level** - exact match is green; within ±2 is yellow with arrow showing direction
+  - **School** - exact match only (Abjuration, Conjuration, Divination, etc.)
+  - **Casting Time** - Action, Bonus Action, or Reaction
+  - **Range** - proximity-based tiers (Self → Touch → 30 ft → 60-120 ft → 150+ ft → Special)
+  - **Components** - V, S, M or combinations; yellow if at least one component matches
+  - **Concentration** - Yes or No
+  - **Ritual** - Yes or No
+  - **Duration** - proximity-based tiers (Instant through Permanent)
+  - **Class** - which D&D classes can cast it; yellow if at least one class matches
+- Hover tooltips on each column header explain the D&D rules for that attribute
+- Spell data in `assets/data/spelldle-spells.json` - 339 unique spells cycle day-of-year before any repeat
+- Streak tracking, share-to-clipboard emoji grid, countdown to next spell
+
+Play it: [dailyjamm.com/spelldle](https://dailyjamm.com/spelldle)
+
 ---
 
 ## Other Daily Games
@@ -93,6 +113,7 @@ Then open your browser to:
 - `http://localhost:8080/themedle/` - Themedle game
 - `http://localhost:8080/chainlink/` - Chain Link game
 - `http://localhost:8080/blackjackdle/` - BlackJackdle game
+- `http://localhost:8080/spelldle/` - Spelldle game
 - `http://localhost:8080/about/` - About page
 - `http://localhost:8080/privacy/` - Privacy Policy
 
@@ -101,6 +122,13 @@ Press `Ctrl+C` in the terminal to stop the server.
 ---
 
 ## Releases
+
+### v1.6.0 - 2026-03-30
+- Launched **Spelldle** - daily D&D 5E spell guessing game with 9 attribute columns
+- Spell library sourced from SRD 5.2: 339 unique spells cycling day-of-year before any repeat
+- Attributes: Level (proximity ±2), School, Casting Time, Range (tier), Components (partial match), Concentration, Ritual, Duration (tier), Class (partial match)
+- Hover tooltips on all column headers with D&D rules descriptions
+- Added Spelldle to homepage card grid, nav menus, and sitemap
 
 ### v1.5.0 - 2026-03-29
 - Chain Link scoring overhaul: two-stage hint system (first letter → phrase clue) replaces single-clue system

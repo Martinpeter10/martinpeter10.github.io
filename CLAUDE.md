@@ -122,15 +122,21 @@ Add a new `<url>` entry:
 </url>
 ```
 
-### 6. Update Home Page Meta Description
+### 6. Update the About Page (`/about/index.html`)
+Add a description paragraph in the "Our Games" section, following the same pattern:
+```html
+<p><strong style="color:#fff">Game Name</strong> - One sentence describing the game and what makes it fun to play.</p>
+```
+
+### 7. Update Home Page Meta Description
 If the new game is notable, update the `<meta name="description">` and `og:description` on `index.html` to mention it.
 
-### 7. Game-Specific CSS
+### 8. Game-Specific CSS
 - Add game-specific styles to `/assets/css/styles.css` under a clearly commented section (e.g., `/* ── New Game ── */`)
 - Use existing CSS variable names for colors
 - Follow existing animation patterns (shake for errors, fade-up for entrances, pulse-glow for active states)
 
-### 8. Game-Specific JavaScript
+### 9. Game-Specific JavaScript
 - Place game JS in `/assets/js/<game-slug>.js`
 - Use `America/Chicago` timezone for daily puzzle rotation (DST-safe)
 - Store game state in localStorage with a unique prefix (e.g., `ng_stats`, `ng_today`)
@@ -258,6 +264,43 @@ Pages to update:
 - **Both screens have a Share Results button.** `shareResults()` targets `#bj-share-btn`; `shareBrokeResults()` targets `#bj-broke-share-btn`.
 
 **Public API** (exposed on `window.BJGame`): `closeModal`, `showModal`, `shareResults`, `shareBrokeResults`.
+
+---
+
+### Spelldle (`/assets/js/spelldle.js`)
+
+**Spell data** (`/assets/data/spelldle-spells.json`):
+```json
+{ "id": 1, "name": "Acid Splash", "level": 0, "school": "Evocation", "castingTime": "action", "range": "medium", "components": "VS", "concentration": false, "ritual": false, "duration": "instant", "classes": ["sorcerer", "wizard"] }
+```
+- **339 spells** (SRD 5.2), ids 1–339. Append new spells with the next sequential id.
+- `school`: Title Case (e.g. `"Evocation"`)
+- `castingTime`: `"action"` | `"bonus"` | `"reaction"`
+- `range`: tier string — `"self"` | `"touch"` | `"short"` | `"medium"` | `"long"` | `"special"`
+- `components`: uppercase concatenated string — `"V"` | `"S"` | `"VS"` | `"VSM"` etc.
+- `duration`: tier string — `"instant"` | `"round"` | `"minute"` | `"10min"` | `"hour"` | `"8hours"` | `"day"` | `"permanent"`
+- `classes`: array of lowercase class names — `["bard","cleric","druid","paladin","ranger","sorcerer","warlock","wizard"]`
+
+**Puzzle cycling**: Day-of-year based (same as Chain Link). `(dayIndex - 1) % 339` — 339 unique spells per cycle, no repeats for the first 339 days of the year.
+
+**9 attributes** compared per guess:
+| Attribute | Green | Yellow | Red |
+|---|---|---|---|
+| Level | Exact | Within ±2 (arrow) | >2 off (arrow) |
+| School | Exact | — | Wrong |
+| Casting Time | Exact | — | Wrong |
+| Range | Exact tier | Adjacent tier (arrow) | >1 tier off (arrow) |
+| Components | Exact | ≥1 letter in common | No overlap |
+| Concentration | Exact | — | Wrong |
+| Ritual | Exact | — | Wrong |
+| Duration | Exact tier | Adjacent tier (arrow) | >1 tier off (arrow) |
+| Class | Exact same set | ≥1 class in common | No overlap |
+
+**Column tooltips**: Each column header uses a `data-tip` attribute. CSS `::after` pseudo-element shows a styled tooltip on desktop hover. Tooltip container requires `overflow: visible` on `.spd-container` (do not revert to `overflow: hidden`).
+
+**Class abbreviations** (defined in `CLASS_ABBREVS` constant): Brd/Clr/Drd/Pal/Rgr/Sor/Wlk/Wiz
+
+**localStorage keys**: `spd_stats`, `spd_today`, `spd_seen_howto`
 
 ---
 
