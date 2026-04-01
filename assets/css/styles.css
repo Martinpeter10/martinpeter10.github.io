@@ -775,19 +775,17 @@ input[type=range].slider::-moz-range-thumb {
   overflow: visible;
 }
 
-/* Horizontal scroll wrapper — scrolls col-labels + board together */
+/* Horizontal scroll wrapper — handles both axes so sticky left works on name cells */
 .spd-scroll-area {
   flex: 1;
   min-height: 0;
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow: auto;
   -webkit-overflow-scrolling: touch;
 }
 
 /* Inner — lets the grid define its own width on mobile */
 .spd-inner {
   min-width: max-content;
-  height: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -847,9 +845,6 @@ input[type=range].slider::-moz-range-thumb {
 
 /* Board */
 .spd-board {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 3px;
