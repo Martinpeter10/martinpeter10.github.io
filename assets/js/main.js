@@ -140,7 +140,46 @@ const themeSongs = [
   { title: "Xiaolin Showdown", url: "/assets/audio/xiaolinshowdown.mp3" },
   { title: "Yu Gi Oh", url: "/assets/audio/yugioh.mp3" },
   { title: "Zoboomafoo", url: "/assets/audio/zoboomafoo.mp3" },
-  { title: "Zoe 101", url: "/assets/audio/zoe101.mp3" }
+  { title: "Zoe 101", url: "/assets/audio/zoe101.mp3" },
+  { title: "Baywatch", url: "/assets/audio/baywatch.mp3" },
+  { title: "Boy Meets World", url: "/assets/audio/boymeetsworld.mp3" },
+  { title: "Buffy The Vampire Slayer", url: "/assets/audio/buffythevampireslayer.mp3" },
+  { title: "Cheers", url: "/assets/audio/cheers.mp3" },
+  { title: "Chip 'n Dale Rescue Rangers", url: "/assets/audio/chipndalerescuerangers.mp3" },
+  { title: "DuckTales", url: "/assets/audio/ducktales.mp3" },
+  { title: "Everybody Hates Chris", url: "/assets/audio/everybodyhateschris.mp3" },
+  { title: "Family Guy", url: "/assets/audio/familyguy.mp3" },
+  { title: "Family Matters", url: "/assets/audio/familymatters.mp3" },
+  { title: "Friends", url: "/assets/audio/friends.mp3" },
+  { title: "Futurama", url: "/assets/audio/futurama.mp3" },
+  { title: "Game of Thrones", url: "/assets/audio/gameofthrones.mp3" },
+  { title: "George Lopez", url: "/assets/audio/georgelopez.mp3" },
+  { title: "Gilligan's Island", url: "/assets/audio/gilligansisland.mp3" },
+  { title: "Gilmore Girls", url: "/assets/audio/gilmoregirls.mp3" },
+  { title: "Gravity Falls", url: "/assets/audio/gravityfalls.mp3" },
+  { title: "Happy Days", url: "/assets/audio/happydays.mp3" },
+  { title: "Hawaii Five-0", url: "/assets/audio/hawaiifive0.mp3" },
+  { title: "Home Improvement", url: "/assets/audio/homeimprovement.mp3" },
+  { title: "Inspector Gadget", url: "/assets/audio/inspectorgadget.mp3" },
+  { title: "King of the Hill", url: "/assets/audio/kingofthehill.mp3" },
+  { title: "Law and Order SVU", url: "/assets/audio/lawandordersvu.mp3" },
+  { title: "Naruto", url: "/assets/audio/naruto.mp3" },
+  { title: "Saved By The Bell", url: "/assets/audio/savedbythebell.mp3" },
+  { title: "Seinfeld", url: "/assets/audio/seinfeld.mp3" },
+  { title: "South Park", url: "/assets/audio/southpark.mp3" },
+  { title: "Steven Universe", url: "/assets/audio/stevenuniverse.mp3" },
+  { title: "Stranger Things", url: "/assets/audio/strangerthings.mp3" },
+  { title: "That 70s Show", url: "/assets/audio/that70sshow.mp3" },
+  { title: "The Big Bang Theory", url: "/assets/audio/thebigbangtheory.mp3" },
+  { title: "The Brady Bunch", url: "/assets/audio/thebradybunch.mp3" },
+  { title: "The Flintstones", url: "/assets/audio/theflintstones.mp3" },
+  { title: "The Jeffersons", url: "/assets/audio/thejeffersons.mp3" },
+  { title: "The Jetsons", url: "/assets/audio/thejetsons.mp3" },
+  { title: "The Simpsons", url: "/assets/audio/thesimpsons.mp3" },
+  { title: "The X-Files", url: "/assets/audio/thexfiles.mp3" },
+  { title: "Twilight Zone", url: "/assets/audio/twilightzone.mp3" },
+  { title: "Walker Texas Ranger", url: "/assets/audio/walkertexasranger.mp3" },
+  { title: "X-Men", url: "/assets/audio/xmen.mp3" }
 ];
 
 // Time increments: 1, 2, 3, 5, 10, 15 seconds
@@ -676,6 +715,13 @@ function boot() {
   audioElement.src = currentSong.url;
   audioElement.preload = 'none';
   audioElement.volume = 0.5;
+
+  // Hard cap: never play more than 15 seconds regardless of game state
+  audioElement.addEventListener('timeupdate', function () {
+    if (audioElement.currentTime >= 15) {
+      stopPlayback(true);
+    }
+  });
 
   updateCountdown();
   setInterval(updateCountdown, 1000);

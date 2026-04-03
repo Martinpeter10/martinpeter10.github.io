@@ -18,7 +18,7 @@ A daily TV show theme song guessing game inspired by Wordle-style gameplay.
 - Streak tracking and best streak saved across sessions
 - Countdown timer to the next daily challenge
 - All game data stored locally - no account needed
-- Library of **117 TV theme songs** spanning cartoons, kids shows, and live-action series from the 80s through 2010s
+- Library of **156 TV theme songs** spanning cartoons, kids shows, and live-action series from the 80s through 2010s
 
 Play it: [dailyjamm.com/themedle](https://dailyjamm.com/themedle)
 
@@ -122,6 +122,10 @@ Press `Ctrl+C` in the terminal to stop the server.
 ---
 
 ## Releases
+
+### v1.7.0 - 2026-04-03
+- Expanded Themedle song library from **117 to 156 songs** (+39 new shows)
+- New additions include: Baywatch, Boy Meets World, Buffy The Vampire Slayer, Cheers, Chip 'n Dale Rescue Rangers, DuckTales, Everybody Hates Chris, Family Guy, Family Matters, Friends, Futurama, Game of Thrones, George Lopez, Gilligan's Island, Gilmore Girls, Gravity Falls, Happy Days, Hawaii Five-0, Home Improvement, Inspector Gadget, King of the Hill, Law and Order SVU, Naruto, Saved By The Bell, Seinfeld, South Park, Steven Universe, Stranger Things, That 70s Show, The Big Bang Theory, The Brady Bunch, The Flintstones, The Jeffersons, The Jetsons, The Simpsons, The X-Files, Twilight Zone, Walker Texas Ranger, X-Men
 
 ### v1.6.0 - 2026-03-30
 - Launched **Spelldle** - daily D&D 5E spell guessing game with 9 attribute columns
