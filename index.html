@@ -361,9 +361,9 @@
   </script>
 
   <!-- Cookie consent (required for AdSense) -->
-  <div id="dj-cookie-bar" style="display:none">
-    <span>We use cookies for analytics and advertising. <a href="/privacy/">Privacy Policy</a></span>
-    <button onclick="document.getElementById('dj-cookie-bar').style.display='none';localStorage.setItem('dj_cookie_ok','1')">Got it</button>
+  <div id="dj-cookie-bar" style="display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(15,23,42,0.97);border-top:1px solid #1e293b;padding:10px 16px;align-items:center;justify-content:center;gap:12px;font-size:0.75rem;color:#94a3b8;z-index:9000;flex-wrap:wrap;text-align:center">
+    <span>We use cookies for analytics and advertising. <a href="/privacy/" style="color:#2ecc71;text-decoration:underline">Privacy Policy</a></span>
+    <button onclick="document.getElementById('dj-cookie-bar').style.display='none';localStorage.setItem('dj_cookie_ok','1')" style="background:#2ecc71;color:#111;border:none;padding:4px 14px;border-radius:4px;font-size:0.75rem;font-weight:700;cursor:pointer;flex-shrink:0">Got it</button>
   </div>
   <script>if(!localStorage.getItem('dj_cookie_ok'))document.getElementById('dj-cookie-bar').style.display='flex';</script>
 </body>
