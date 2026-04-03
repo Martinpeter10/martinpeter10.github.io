@@ -6,6 +6,16 @@
 // correctAnswer, currentStreak, bestStreak, gamesPlayed, countdown, answerDisplay, displayedAnswer,
 // closeModal, plus guessSlot-1 .. guessSlot-6
 
+// -------------------- Security helpers --------------------
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 // -------------------- Game State --------------------
 let currentGuess = 1;
 let gameOver = false;
@@ -290,10 +300,10 @@ function restoreGameState() {
     guessSlot.classList.remove('border-gray-600');
     if (guess.type === 'correct') {
       guessSlot.classList.add('border-green-500', 'bg-green-900/30');
-      guessSlot.innerHTML = `<span class="text-green-300 font-semibold">${guess.text}</span><span class="text-sm text-green-400">${guess.clipLength}s</span>`;
+      guessSlot.innerHTML = `<span class="text-green-300 font-semibold">${escHtml(guess.text)}</span><span class="text-sm text-green-400">${escHtml(String(guess.clipLength))}s</span>`;
     } else if (guess.type === 'wrong') {
       guessSlot.classList.add('border-red-500', 'bg-red-900/30');
-      guessSlot.innerHTML = `<span class="text-red-300">${guess.text}</span><span class="text-sm text-red-400">${guess.clipLength}s</span>`;
+      guessSlot.innerHTML = `<span class="text-red-300">${escHtml(guess.text)}</span><span class="text-sm text-red-400">${escHtml(String(guess.clipLength))}s</span>`;
     } else if (guess.type === 'skipped') {
       guessSlot.classList.add('border-yellow-500', 'bg-yellow-900/30');
       guessSlot.innerHTML = `<span class="text-yellow-300">Skipped</span><span class="text-sm text-yellow-400">${guess.clipLength}s</span>`;
@@ -458,7 +468,7 @@ if (submitBtn) {
       if (guessSlot) {
         guessSlot.classList.remove('border-gray-600');
         guessSlot.classList.add('border-green-500', 'bg-green-900/30');
-        guessSlot.innerHTML = `<span class="text-green-300 font-semibold">${guessInput.value}</span><span class="text-sm text-green-400">${currentClipLength}s</span>`;
+        guessSlot.innerHTML = `<span class="text-green-300 font-semibold">${escHtml(guessInput.value)}</span><span class="text-sm text-green-400">${currentClipLength}s</span>`;
       }
       dailyGameState.guesses.push({ type: 'correct', text: guessInput.value, clipLength: currentClipLength });
       dailyGameState.completed = true;
@@ -486,7 +496,7 @@ if (submitBtn) {
       if (guessSlot) {
         guessSlot.classList.remove('border-gray-600');
         guessSlot.classList.add('border-red-500', 'bg-red-900/30');
-        guessSlot.innerHTML = `<span class="text-red-300">${guessInput.value}</span><span class="text-sm text-red-400">${currentClipLength}s</span>`;
+        guessSlot.innerHTML = `<span class="text-red-300">${escHtml(guessInput.value)}</span><span class="text-sm text-red-400">${currentClipLength}s</span>`;
       }
       dailyGameState.guesses.push({ type: 'wrong', text: guessInput.value, clipLength: currentClipLength });
       currentGuess++;
