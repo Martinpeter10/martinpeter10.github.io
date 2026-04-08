@@ -92,7 +92,36 @@ The nav structure:
 </div>
 ```
 
-### 4. Add to Home Page (`index.html`)
+### 4. Header Buttons — Stats & Instructions (REQUIRED on every game page)
+
+Every game page **must** have two icon buttons in the **top-right of the fixed header**, to the left of the hamburger menu area. The standard order is: **Stats button** (bar-chart icon) → **? button** (How to Play), both sitting after the `<div class="flex-1"></div>` spacer.
+
+```html
+<!-- Place these immediately after <div class="flex-1"></div> inside the header -->
+<button id="XX-stats-btn" aria-label="Stats"
+  class="w-8 h-8 rounded-full border border-gray-600 bg-transparent text-gray-400 hover:border-gray-400 hover:text-white transition-colors flex items-center justify-center mr-1">
+  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <line x1="18" y1="20" x2="18" y2="10"/>
+    <line x1="12" y1="20" x2="12" y2="4"/>
+    <line x1="6"  y1="20" x2="6"  y2="14"/>
+  </svg>
+</button>
+<button id="XX-help-btn" aria-label="How to play"
+  class="w-8 h-8 rounded-full border border-gray-600 bg-transparent text-gray-400 text-sm font-bold hover:border-gray-400 hover:text-white transition-colors">
+  ?
+</button>
+```
+
+**Stats modal** — slides up from bottom (same pattern as How to Play). Shows game-specific lifetime stats:
+- All games: Games Played, Win Rate (or equivalent), Current Streak, Best Streak
+- Chip-based games (Roulettedle, BlackJackdle): also show Current Stack, Best/Worst single round, All-Time Net
+- Score-based games (Chain Link): also show Average Score, Perfect Games count
+
+**Stats tracking** — store all-time stats in a dedicated localStorage key (`XX_alltime` or as extra fields on the existing stats key). Update on every game completion. Do **not** rely solely on today's session data.
+
+**Rule:** Never put these buttons inside the game container or content area. They always live in the fixed header, top-right, on every game page.
+
+### 6. Add to Home Page (`index.html`)
 Add a card in the "Our Games" section grid. Follow the existing card pattern:
 
 ```html
@@ -112,7 +141,7 @@ Add a card in the "Our Games" section grid. Follow the existing card pattern:
 - The flagship/oldest game gets `<span class="badge">Featured</span>`
 - After a newer game is added, change the previous "New" badge to nothing or "Featured" as appropriate
 
-### 5. Update the Sitemap (`sitemap.xml`)
+### 7. Update the Sitemap (`sitemap.xml`)
 Add a new `<url>` entry:
 ```xml
 <url>
@@ -122,21 +151,21 @@ Add a new `<url>` entry:
 </url>
 ```
 
-### 6. Update the About Page (`/about/index.html`)
+### 8. Update the About Page (`/about/index.html`)
 Add a description paragraph in the "Our Games" section, following the same pattern:
 ```html
 <p><strong style="color:#fff">Game Name</strong> - One sentence describing the game and what makes it fun to play.</p>
 ```
 
-### 7. Update Home Page Meta Description
+### 9. Update Home Page Meta Description
 If the new game is notable, update the `<meta name="description">` and `og:description` on `index.html` to mention it.
 
-### 8. Game-Specific CSS
+### 10. Game-Specific CSS
 - Add game-specific styles to `/assets/css/styles.css` under a clearly commented section (e.g., `/* ── New Game ── */`)
 - Use existing CSS variable names for colors
 - Follow existing animation patterns (shake for errors, fade-up for entrances, pulse-glow for active states)
 
-### 9. Game-Specific JavaScript
+### 11. Game-Specific JavaScript
 - Place game JS in `/assets/js/<game-slug>.js`
 - Use `America/Chicago` timezone for daily puzzle rotation (DST-safe)
 - Store game state in localStorage with a unique prefix (e.g., `ng_stats`, `ng_today`)

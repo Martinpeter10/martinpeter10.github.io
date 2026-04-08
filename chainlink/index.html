@@ -117,6 +117,18 @@
       </button>
       <a href="/" class="text-2xl font-extrabold tracking-tight text-green-400 select-none">DailyJamm</a>
       <div class="flex-1"></div>
+      <button id="cl-stats-btn" aria-label="Stats"
+        class="w-8 h-8 rounded-full border border-gray-600 bg-transparent text-gray-400 hover:border-gray-400 hover:text-white transition-colors flex items-center justify-center mr-1">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="18" y1="20" x2="18" y2="10"/>
+          <line x1="12" y1="20" x2="12" y2="4"/>
+          <line x1="6"  y1="20" x2="6"  y2="14"/>
+        </svg>
+      </button>
+      <button id="cl-help-btn" aria-label="How to play"
+        class="w-8 h-8 rounded-full border border-gray-600 bg-transparent text-gray-400 text-sm font-bold hover:border-gray-400 hover:text-white transition-colors">
+        ?
+      </button>
     </div>
   </header>
 
@@ -129,6 +141,7 @@
       <a class="menu-link" href="/chainlink/">Chain Link</a>
       <a class="menu-link" href="/blackjackdle/">BlackJackdle</a>
       <a class="menu-link" href="/spelldle/">Spelldle</a>
+      <a class="menu-link" href="/roulettedle/">Roulettedle</a>
     </div>
     <div class="menu-sec">
       <div class="menu-title">Info</div>
@@ -172,15 +185,9 @@
           <h1 class="text-xl font-black tracking-wide">Chain Link</h1>
           <div id="cl-meta" class="text-xs text-gray-500 mt-0.5">#1 · 2026-03-27</div>
         </div>
-        <div class="flex items-center gap-2">
-          <div class="flex items-baseline gap-0.5">
-            <span id="cl-score" class="text-xl font-black text-green-400 leading-none">0</span>
-            <span class="text-sm text-gray-600">/15</span>
-          </div>
-          <button id="cl-help-btn" aria-label="How to play"
-            class="w-8 h-8 rounded-full border border-gray-600 bg-transparent text-gray-400 text-sm font-bold hover:border-gray-400 hover:text-white transition-colors">
-            ?
-          </button>
+        <div class="flex items-baseline gap-0.5">
+          <span id="cl-score" class="text-xl font-black text-green-400 leading-none">0</span>
+          <span class="text-sm text-gray-600">/15</span>
         </div>
       </div>
 
@@ -248,6 +255,20 @@
         </div>
       </div>
 
+    </div>
+  </div>
+
+  <!-- Stats modal -->
+  <div id="cl-stats-modal" class="fixed inset-0 bg-black/80 flex items-end justify-center z-50 hidden">
+    <div class="bg-gray-900 border border-gray-700 rounded-t-2xl p-5 max-w-sm w-full max-h-[80vh] overflow-y-auto"
+         onclick="event.stopPropagation()"
+         style="-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:calc(1.25rem + env(safe-area-inset-bottom,0px))">
+      <h2 class="text-xl font-black text-center mb-4">My Stats</h2>
+      <div id="cl-stats-content"></div>
+      <button id="cl-stats-close"
+        class="w-full mt-4 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-sm font-bold rounded-lg transition-colors">
+        Close
+      </button>
     </div>
   </div>
 

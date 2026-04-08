@@ -28,6 +28,7 @@ let gameStats = {
   currentStreak: 0,
   bestStreak: 0,
   gamesPlayed: 0,
+  wins: 0,
   lastPlayedDate: null
 };
 
@@ -520,6 +521,7 @@ if (submitBtn) {
       if (gameStats.lastPlayedDate !== today) {
         gameStats.currentStreak++;
         gameStats.gamesPlayed++;
+        gameStats.wins = (gameStats.wins || 0) + 1;
         gameStats.lastPlayedDate = today;
         if (gameStats.currentStreak > gameStats.bestStreak) gameStats.bestStreak = gameStats.currentStreak;
         saveStats();
@@ -660,6 +662,37 @@ if (guessInput) {
   });
 }
 
+// -------------------- Stats Modal --------------------
+function showStatsModal() {
+  const s = gameStats;
+  const played = s.gamesPlayed || 0;
+  const wins   = s.wins || 0;
+  const winPct = played > 0 ? Math.round(wins / played * 100) : 0;
+
+  function statRow(label, value, color) {
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1f2937">' +
+      '<span style="color:#9ca3af;font-size:13px">' + label + '</span>' +
+      '<span style="font-weight:800;font-size:15px;color:' + (color || '#fff') + '">' + value + '</span>' +
+    '</div>';
+  }
+
+  const el = document.getElementById('td-stats-content');
+  if (el) {
+    el.innerHTML =
+      statRow('Games Played', played) +
+      statRow('Wins', wins, '#4ade80') +
+      statRow('Win Rate', winPct + '%', winPct >= 50 ? '#4ade80' : '#f87171') +
+      statRow('Current Streak', s.currentStreak, '#facc15') +
+      statRow('Best Streak', s.bestStreak, '#a78bfa');
+  }
+  const modal = document.getElementById('td-stats-modal');
+  if (modal) modal.classList.remove('hidden');
+}
+function closeStatsModal() {
+  const modal = document.getElementById('td-stats-modal');
+  if (modal) modal.classList.add('hidden');
+}
+
 // -------------------- Modal --------------------
 function showGameOverModal(won) {
   const modal = document.getElementById('gameOverModal');
@@ -695,6 +728,9 @@ if (closeModalBtn) {
     modal.classList.add('hidden');
   });
 }
+
+const tdStatsBtn = document.getElementById('td-stats-btn');
+if (tdStatsBtn) tdStatsBtn.addEventListener('click', showStatsModal);
 
 // -------------------- Boot --------------------
 function boot() {

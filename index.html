@@ -74,6 +74,9 @@
     .section h2{font-size:1.5rem;margin-bottom:1rem;text-align:center;background:linear-gradient(135deg,var(--brand2),var(--brand));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 
     .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.25rem}
+    .grid-centered{display:flex;flex-wrap:wrap;gap:1.25rem;justify-content:center}
+    .grid-centered>*{flex:1 1 240px;max-width:260px}
+    @media(max-width:560px){.grid-centered>*{max-width:100%}}
     .card{background:linear-gradient(180deg,#111a33,#0f1b2d);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:18px;box-shadow:0 10px 25px rgba(0,0,0,.25);cursor:pointer;position:relative}
     .card:hover{transform:translateY(-2px);transition:transform .15s ease;border-color:var(--brand);box-shadow:0 10px 25px rgba(0,0,0,.35),0 0 0 2px rgba(46,204,113,.25) inset}
     .card:hover .icon{background:linear-gradient(135deg,var(--brand2),var(--brand))}
@@ -125,6 +128,7 @@
       <a class="menu-link" href="/chainlink/">Chain Link</a>
       <a class="menu-link" href="/blackjackdle/">BlackJackdle</a>
       <a class="menu-link" href="/spelldle/">Spelldle</a>
+      <a class="menu-link" href="/roulettedle/">Roulettedle</a>
     </div>
     <div class="menu-sec">
       <div class="menu-title">Info</div>
@@ -162,12 +166,12 @@
       <div class="brandmark">
         <h1>DailyJamm</h1>
       </div>
-      <p class="tag">DailyJamm is your dose of daily games. Play <strong>Themedle</strong>, <strong>Chain Link</strong>, <strong>BlackJackdle</strong>, and <strong>Spelldle</strong> - our original daily games - plus a curated collection of our favorite daily games!</p>
+      <p class="tag">DailyJamm is your dose of daily games. Play <strong>Themedle</strong>, <strong>Chain Link</strong>, <strong>BlackJackdle</strong>, <strong>Spelldle</strong>, and <strong>Roulettedle</strong> - our original daily games - plus a curated collection of our favorite daily games!</p>
     </header>
 
     <section class="section">
       <h2 class="accent">Our Games</h2>
-      <div class="grid">
+      <div class="grid-centered">
         <article class="card our" onclick="goto('/themedle/')" role="button" tabindex="0" aria-label="Play Themedle">
           <span class="badge">Featured</span>
           <div class="icon our">
@@ -204,7 +208,6 @@
           <p>Daily Black Jack - 3 hands per day. Beat the dealer and build your stack.</p>
         </article>
         <article class="card our" onclick="goto('/spelldle/')" role="button" tabindex="0" aria-label="Play Spelldle">
-          <span class="badge">New</span>
           <div class="icon our">
             <!-- Spell/wand icon -->
             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -225,6 +228,25 @@
           </div>
           <h3>Spelldle</h3>
           <p>Guess the daily D&amp;D 5E spell. Hints on level, school, range &amp; more.</p>
+        </article>
+        <article class="card our" onclick="goto('/roulettedle/')" role="button" tabindex="0" aria-label="Play Roulettedle">
+          <span class="badge">New</span>
+          <div class="icon our">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" fill="none" stroke="white" stroke-width="2"/>
+              <circle cx="12" cy="12" r="4" fill="none" stroke="white" stroke-width="1.5"/>
+              <line x1="12" y1="2" x2="12" y2="8" stroke="white" stroke-width="1.5"/>
+              <line x1="12" y1="16" x2="12" y2="22" stroke="white" stroke-width="1.5"/>
+              <line x1="2" y1="12" x2="8" y2="12" stroke="white" stroke-width="1.5"/>
+              <line x1="16" y1="12" x2="22" y2="12" stroke="white" stroke-width="1.5"/>
+              <line x1="4.9" y1="4.9" x2="9.2" y2="9.2" stroke="white" stroke-width="1.5"/>
+              <line x1="14.8" y1="14.8" x2="19.1" y2="19.1" stroke="white" stroke-width="1.5"/>
+              <line x1="19.1" y1="4.9" x2="14.8" y2="9.2" stroke="white" stroke-width="1.5"/>
+              <line x1="9.2" y1="14.8" x2="4.9" y2="19.1" stroke="white" stroke-width="1.5"/>
+            </svg>
+          </div>
+          <h3>Roulettedle</h3>
+          <p>Daily roulette - 3 spins per day. Place your bets and spin the wheel!</p>
         </article>
       </div>
     </section>

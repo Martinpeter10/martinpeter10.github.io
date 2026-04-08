@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>BlackJackdle | DailyJamm</title>
-  <meta name="description" content="Play BlackJackdle on DailyJamm - daily blackjack with 3 hands per day! Beat the dealer, build your chip stack, and share your results.">
+  <title>Roulettedle | DailyJamm</title>
+  <meta name="description" content="Play Roulettedle on DailyJamm - daily roulette with 3 spins per day! Place your bets, spin the wheel, and share your results.">
   <meta name="robots" content="index,follow">
-  <link rel="canonical" href="https://dailyjamm.com/blackjackdle/">
+  <link rel="canonical" href="https://dailyjamm.com/roulettedle/">
   <link rel="icon" type="image/png" href="/assets/img/favicon.png">
   <link rel="stylesheet" href="/assets/css/styles.css">
 
   <!-- Open Graph -->
   <meta property="og:site_name" content="DailyJamm" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://dailyjamm.com/blackjackdle/" />
-  <meta property="og:title" content="BlackJackdle | DailyJamm" />
-  <meta property="og:description" content="Daily blackjack - 3 hands per day. Beat the dealer, build your chip stack, and share your results." />
+  <meta property="og:url" content="https://dailyjamm.com/roulettedle/" />
+  <meta property="og:title" content="Roulettedle | DailyJamm" />
+  <meta property="og:description" content="Daily roulette - 3 spins per day. Place your bets, spin the wheel, and share your results." />
   <meta property="og:image" content="https://dailyjamm.com/assets/img/favicon.png" />
 
   <!-- Theme color -->
@@ -62,17 +62,17 @@
     .menu-link:hover{color:#fff;background:rgba(16,185,129,.1);padding-left:.5rem}
     header .hamburger{position:relative;top:auto;left:auto;margin-right:.5rem;z-index:1002}
 
-    body { overflow: hidden; }
+    body { }
   </style>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    "name": "BlackJackdle",
-    "url": "https://dailyjamm.com/blackjackdle/",
+    "name": "Roulettedle",
+    "url": "https://dailyjamm.com/roulettedle/",
     "applicationCategory": "GameApplication",
     "operatingSystem": "Web",
-    "description": "Daily blackjack with 3 hands per day. Beat the dealer, build your chip stack, and share your results.",
+    "description": "Daily roulette with 3 spins per day. Place your bets, spin the wheel, and share your results.",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
     "author": { "@type": "Organization", "name": "DailyJamm", "url": "https://dailyjamm.com" }
   }
@@ -91,9 +91,9 @@
         </span>
       </button>
       <a href="/" class="text-2xl font-extrabold tracking-tight text-green-400 select-none">DailyJamm</a>
-      <h1 class="sr-only">BlackJackdle</h1>
+      <h1 class="sr-only">Roulettedle</h1>
       <div class="flex-1"></div>
-      <button id="bj-stats-btn" aria-label="Stats"
+      <button id="rl-history-btn" aria-label="Spin history"
         class="w-8 h-8 rounded-full border border-gray-600 bg-transparent text-gray-400 hover:border-gray-400 hover:text-white transition-colors flex items-center justify-center mr-1">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <line x1="18" y1="20" x2="18" y2="10"/>
@@ -101,7 +101,7 @@
           <line x1="6"  y1="20" x2="6"  y2="14"/>
         </svg>
       </button>
-      <button id="bj-help-btn" aria-label="How to play"
+      <button id="rl-help-btn" aria-label="How to play"
         class="w-8 h-8 rounded-full border border-gray-600 bg-transparent text-gray-400 text-sm font-bold hover:border-gray-400 hover:text-white transition-colors">
         ?
       </button>
@@ -150,192 +150,248 @@
     </div>
   </nav>
 
-  <!-- Game area - fills viewport below header -->
-  <div class="bj-game-wrap">
-    <div class="bj-container">
+  <!-- Game area -->
+  <div class="rl-game-wrap">
+    <div class="rl-container">
 
-      <!-- Table felt background -->
-      <div class="bj-table">
-        <!-- Dealer area -->
-        <div class="bj-dealer-area">
-          <div class="bj-label">DEALER</div>
-          <div id="bj-dealer-score" class="bj-hand-score hidden">?</div>
-          <div id="bj-dealer-cards" class="bj-cards"></div>
-        </div>
-
-        <!-- Deck (card stack for deal animation) -->
-        <div id="bj-deck" class="bj-deck">
-          <div class="bj-deck-card"></div>
-          <div class="bj-deck-card"></div>
-          <div class="bj-deck-card"></div>
-        </div>
-
-        <!-- Hand indicator -->
-        <div id="bj-hand-indicator" class="bj-hand-indicator">
-          <span id="bj-hand-num">Hand 1</span> of 3
-        </div>
-
-        <!-- Player row: holds main hand + split hand side by side -->
-        <div id="bj-player-row" class="bj-player-row">
-          <!-- Main hand -->
-          <div class="bj-player-area">
-            <div id="bj-player-cards" class="bj-cards"></div>
-            <div id="bj-player-score" class="bj-hand-score hidden">0</div>
-            <div class="bj-label">YOU</div>
+      <!-- Wheel + chip bar -->
+      <div class="rl-wheel-section">
+        <div class="rl-wheel-wrap">
+          <div id="rl-wheel-rotor" class="rl-wheel-rotor">
+            <!-- SVG wheel inserted by JS -->
           </div>
-
-          <!-- Split: second hand (hidden unless splitting) -->
-          <div id="bj-split-area" class="bj-split-area hidden">
-            <div id="bj-split-cards" class="bj-cards"></div>
-            <div id="bj-split-score" class="bj-hand-score hidden">0</div>
-            <div class="bj-label">SPLIT</div>
+          <!-- Ball overlay (not inside rotor so it doesn't spin with the wheel) -->
+          <svg id="rl-ball-svg" viewBox="0 0 120 120"
+               style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3"
+               aria-hidden="true">
+            <circle id="rl-ball" cx="60" cy="5" r="4"
+                    fill="white" stroke="rgba(0,0,0,0.55)" stroke-width="0.8"
+                    visibility="hidden"/>
+          </svg>
+          <div id="rl-result-badge" class="rl-result-badge">
+            <span id="rl-result-num">?</span>
           </div>
         </div>
-      </div>
 
-      <!-- Chips display -->
-      <div class="bj-chip-bar">
-        <div class="bj-chip-stack">
-          <svg class="bj-chip-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="#10b981" stroke-width="2"/><circle cx="12" cy="12" r="6" fill="none" stroke="#10b981" stroke-width="1.5"/><text x="12" y="16" text-anchor="middle" fill="#10b981" font-size="10" font-weight="700">$</text></svg>
-          <span id="bj-chips" class="bj-chip-count">1000</span>
-        </div>
-        <div id="bj-bet-display" class="bj-bet-display hidden">
-          Bet: <span id="bj-current-bet">0</span>
+        <div class="rl-wheel-info">
+          <div class="rl-chip-stack">
+            <svg class="rl-chip-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="#10b981" stroke-width="2"/><circle cx="12" cy="12" r="6" fill="none" stroke="#10b981" stroke-width="1.5"/><text x="12" y="16" text-anchor="middle" fill="#10b981" font-size="10" font-weight="700">$</text></svg>
+            <span id="rl-chips" class="rl-chip-count">1000</span>
+          </div>
+          <div id="rl-spin-indicator" class="rl-spin-indicator">Spin 1 of 3</div>
         </div>
       </div>
 
-      <!-- Betting UI (shown before each hand) -->
-      <div id="bj-bet-area" class="bj-bet-area">
-        <div class="bj-bet-title">Place Your Bet</div>
-        <div class="bj-bet-chips">
-          <button class="bj-bet-chip" data-amount="10">10</button>
-          <button class="bj-bet-chip" data-amount="25">25</button>
-          <button class="bj-bet-chip" data-amount="50">50</button>
-          <button class="bj-bet-chip" data-amount="100">100</button>
-          <button class="bj-bet-chip bj-bet-allin" data-amount="all">ALL IN</button>
-        </div>
-        <div class="bj-bet-selected">
-          Bet: <span id="bj-bet-amount">0</span>
-        </div>
-        <div class="bj-bet-actions">
-          <button id="bj-bet-clear" class="bj-btn bj-btn-muted">Clear</button>
-          <button id="bj-bet-deal" class="bj-btn bj-btn-primary" disabled>Deal</button>
-        </div>
-      </div>
+      <!-- Bet area (hidden when done) -->
+      <div id="rl-bet-area" class="rl-bet-area">
 
-      <!-- Action buttons (shown during play) -->
-      <div id="bj-actions" class="bj-actions hidden">
-        <button id="bj-btn-hit" class="bj-btn bj-btn-primary">Hit</button>
-        <button id="bj-btn-stay" class="bj-btn bj-btn-secondary">Stay</button>
-        <button id="bj-btn-double" class="bj-btn bj-btn-accent">Double</button>
-        <button id="bj-btn-split" class="bj-btn bj-btn-accent hidden">Split</button>
-      </div>
+        <!-- Chip denomination selector -->
+        <div class="rl-denom-row">
+          <button class="rl-denom-chip" data-denom="10">10</button>
+          <button class="rl-denom-chip" data-denom="25">25</button>
+          <button class="rl-denom-chip" data-denom="50">50</button>
+          <button class="rl-denom-chip" data-denom="100">100</button>
+          <button class="rl-denom-chip rl-denom-allin" data-denom="all">ALL IN</button>
+        </div>
 
-      <!-- Hand result banner -->
-      <div id="bj-hand-result" class="bj-hand-result hidden"></div>
+        <!-- Roulette board -->
+        <div class="rl-board-wrap">
+          <!-- Number section: zeros | number rows | column bets -->
+          <div class="rl-num-section">
+            <div class="rl-zero-col">
+              <button class="rl-num rl-green" data-bet="num-0">0</button>
+              <button class="rl-num rl-green" data-bet="num-00">00</button>
+              <div class="rl-zero-spacer"></div>
+            </div>
+            <div class="rl-num-rows">
+              <div class="rl-num-row" id="rl-row-1"></div>
+              <div class="rl-num-row" id="rl-row-2"></div>
+              <div class="rl-num-row" id="rl-row-3"></div>
+            </div>
+            <div class="rl-col-col">
+              <button class="rl-col-btn" data-bet="c3">2:1</button>
+              <button class="rl-col-btn" data-bet="c2">2:1</button>
+              <button class="rl-col-btn" data-bet="c1">2:1</button>
+            </div>
+          </div>
 
-      <!-- Results panel (shown after all 3 hands) -->
-      <div id="bj-results" class="bj-results hidden">
-        <div class="bj-results-inner">
-          <h2 class="text-base font-black">BlackJackdle Complete for the Day!</h2>
+          <!-- Dozens row -->
+          <div class="rl-dozens-row">
+            <button class="rl-outside-btn" data-bet="d1">1st 12</button>
+            <button class="rl-outside-btn" data-bet="d2">2nd 12</button>
+            <button class="rl-outside-btn" data-bet="d3">3rd 12</button>
+          </div>
+
+          <!-- Outside bets row -->
+          <div class="rl-outside-row">
+            <button class="rl-outside-btn" data-bet="low">1-18</button>
+            <button class="rl-outside-btn" data-bet="even">Even</button>
+            <button class="rl-outside-btn rl-red-outside" data-bet="red">Red</button>
+            <button class="rl-outside-btn rl-blk-outside" data-bet="black">Black</button>
+            <button class="rl-outside-btn" data-bet="odd">Odd</button>
+            <button class="rl-outside-btn" data-bet="high">19-36</button>
+          </div>
+        </div>
+
+        <!-- Bet footer -->
+        <div class="rl-bet-footer">
+          <div class="rl-total-bet-display">
+            Bet: <span id="rl-total-bet">0</span>
+          </div>
+          <div class="rl-bet-actions">
+            <button id="rl-clear-bets" class="rl-btn rl-btn-muted">Clear</button>
+            <button id="rl-spin-btn" class="rl-btn rl-btn-spin" disabled>Spin</button>
+          </div>
+        </div>
+
+      </div><!-- /rl-bet-area -->
+
+      <!-- Spin result banner -->
+      <div id="rl-spin-result" class="rl-spin-result hidden"></div>
+
+      <!-- Final results panel -->
+      <div id="rl-results" class="rl-results hidden">
+        <div class="rl-results-inner">
+          <h2 class="text-base font-black">Roulettedle Complete for the Day!</h2>
           <div class="flex items-baseline gap-1 justify-center mt-1">
-            <svg class="bj-chip-icon-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="#10b981" stroke-width="2"/><circle cx="12" cy="12" r="6" fill="none" stroke="#10b981" stroke-width="1.5"/><text x="12" y="16" text-anchor="middle" fill="#10b981" font-size="10" font-weight="700">$</text></svg>
-            <span id="bj-final-chips" class="text-3xl font-black text-green-400 leading-none">1000</span>
+            <svg class="rl-chip-icon-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="#10b981" stroke-width="2"/><circle cx="12" cy="12" r="6" fill="none" stroke="#10b981" stroke-width="1.5"/><text x="12" y="16" text-anchor="middle" fill="#10b981" font-size="10" font-weight="700">$</text></svg>
+            <span id="rl-final-chips" class="text-3xl font-black text-green-400 leading-none">1000</span>
           </div>
-          <div id="bj-session-net" class="text-sm font-bold mt-1"></div>
-          <div id="bj-hand-results-row" class="flex gap-2 mt-2 text-xs"></div>
-          <button id="bj-share-btn"
+          <div id="rl-session-net" class="text-sm font-bold mt-1"></div>
+          <div id="rl-spin-results-row" class="flex gap-2 mt-2 text-xs flex-wrap justify-center"></div>
+          <button id="rl-share-btn"
             class="mt-2 px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg transition-colors">
             Share Results
           </button>
           <div class="mt-2 pt-2 border-t border-gray-700 w-full flex justify-center gap-6 text-xs text-gray-500">
-            <div><span id="bj-stat-streak" class="font-bold text-gray-300">0</span> streak</div>
-            <div><span id="bj-stat-best" class="font-bold text-gray-300">0</span> best</div>
-            <div><span id="bj-stat-played" class="font-bold text-gray-300">0</span> played</div>
+            <div><span id="rl-stat-streak" class="font-bold text-gray-300">0</span> streak</div>
+            <div><span id="rl-stat-best" class="font-bold text-gray-300">0</span> best</div>
+            <div><span id="rl-stat-played" class="font-bold text-gray-300">0</span> played</div>
           </div>
-          <p class="text-xs text-gray-500 mt-1">Next hands in: <span id="bj-countdown" class="font-mono text-yellow-300 tabular-nums">--:--:--</span></p>
+          <p class="text-xs text-gray-500 mt-1">Next spins in: <span id="rl-countdown" class="font-mono text-yellow-300 tabular-nums">--:--:--</span></p>
         </div>
       </div>
 
-      <!-- Out of chips overlay (shown when player runs out mid-session) -->
-      <div id="bj-broke" class="bj-results hidden">
-        <div class="bj-results-inner">
+      <!-- Out of chips overlay -->
+      <div id="rl-broke" class="rl-results hidden">
+        <div class="rl-results-inner">
           <h2 class="text-lg font-black">Out of Chips!</h2>
           <p class="text-sm text-gray-400 mt-1">You've run out of chips for today.</p>
-          <p class="text-sm text-gray-400 mt-1">Come back tomorrow to receive more chips and play again.</p>
+          <p class="text-sm text-gray-400 mt-1">Come back tomorrow to receive more chips and spin again.</p>
           <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-2 mt-3">
             <p class="text-xs text-yellow-200/70">This is a free daily game for entertainment only. No real money is wagered or won. Must be 18+ to play.</p>
           </div>
-          <div id="bj-broke-hands" class="flex gap-2 mt-3 text-xs"></div>
-          <button id="bj-broke-share-btn" onclick="BJGame.shareBrokeResults()"
+          <div id="rl-broke-spins" class="flex gap-2 mt-3 text-xs flex-wrap justify-center"></div>
+          <button id="rl-broke-share-btn" onclick="RLGame.shareBrokeResults()"
             class="mt-2 px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg transition-colors">
             Share Results
           </button>
-          <p class="text-xs text-gray-500 mt-2">Next hands in: <span id="bj-broke-countdown" class="font-mono text-yellow-300 tabular-nums">--:--:--</span></p>
+          <p class="text-xs text-gray-500 mt-2">Next spins in: <span id="rl-broke-countdown" class="font-mono text-yellow-300 tabular-nums">--:--:--</span></p>
         </div>
       </div>
 
     </div>
   </div>
 
-  <!-- Stats modal -->
-  <div id="bj-stats-modal" class="fixed inset-0 bg-black/80 flex items-end justify-center z-50 hidden" onclick="BJGame.closeStats()">
+  <!-- Spin History modal -->
+  <div id="rl-history-modal" class="fixed inset-0 bg-black/80 flex items-end justify-center z-50 hidden" onclick="RLGame.closeHistory()">
     <div class="bg-gray-900 border border-gray-700 rounded-t-2xl p-5 max-w-sm w-full max-h-[80vh] overflow-y-auto"
          onclick="event.stopPropagation()"
          style="-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:calc(1.25rem + env(safe-area-inset-bottom,0px))">
-      <h2 class="text-xl font-black text-center mb-4">My Stats</h2>
-      <div id="bj-stats-content"></div>
-      <button onclick="BJGame.closeStats()"
-        class="w-full mt-4 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-sm font-bold rounded-lg transition-colors">
+      <h2 class="text-xl font-black text-center mb-4">Spin History</h2>
+
+      <!-- Last 10 spins -->
+      <div class="mb-5">
+        <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-3">Last 10 Spins</h3>
+        <div id="rl-hist-spins" class="flex flex-wrap gap-2 justify-center"></div>
+      </div>
+
+      <!-- Red / Black split bar -->
+      <div class="mb-4">
+        <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">Red / Black</h3>
+        <div id="rl-hist-rb"></div>
+      </div>
+
+      <!-- Odd / Even split bar -->
+      <div class="mb-4">
+        <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">Odd / Even</h3>
+        <div id="rl-hist-oe"></div>
+        <p style="font-size:10px;color:#4b5563;margin-top:5px">0 and 00 excluded.</p>
+      </div>
+
+      <!-- Spins since zeros -->
+      <div class="mb-5">
+        <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-3">Last Green</h3>
+        <div id="rl-hist-zeros"></div>
+      </div>
+
+      <!-- All-time stats -->
+      <div class="mb-5">
+        <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-3">All-Time</h3>
+        <div id="rl-hist-alltime"></div>
+      </div>
+
+      <button onclick="RLGame.closeHistory()"
+        class="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-sm font-bold rounded-lg transition-colors">
         Close
       </button>
     </div>
   </div>
 
   <!-- How to Play modal -->
-  <div id="bj-modal" class="fixed inset-0 bg-black/80 flex items-end justify-center z-50 hidden" onclick="BJGame.closeModal()">
+  <div id="rl-modal" class="fixed inset-0 bg-black/80 flex items-end justify-center z-50 hidden" onclick="RLGame.closeModal()">
     <div class="bg-gray-900 border border-gray-700 rounded-t-2xl p-5 max-w-sm w-full max-h-[92vh] overflow-y-auto"
          onclick="event.stopPropagation()"
          style="-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:calc(1.25rem + env(safe-area-inset-bottom,0px))">
       <h2 class="text-xl font-black text-center mb-0.5">How to Play</h2>
-      <p class="text-xs text-gray-400 text-center mb-3">Beat the dealer in 3 daily hands of blackjack.</p>
+      <p class="text-xs text-gray-400 text-center mb-3">Place your bets and spin the wheel - 3 times per day!</p>
 
-      <!-- Disclaimer - prominent at top -->
+      <!-- Disclaimer -->
       <div class="mb-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3 text-center">
         <p class="text-sm font-bold text-yellow-300">For Entertainment Only</p>
         <p class="text-xs text-yellow-200/70 mt-0.5">This is a free daily game. No real money is wagered, won, or lost. Must be 18+ to play.</p>
       </div>
 
       <div class="mb-4">
-        <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">Rules</h3>
+        <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">How to Bet</h3>
         <ul class="text-xs text-gray-300 leading-relaxed space-y-1.5 list-disc pl-4">
-          <li>You get <strong class="text-white">3 hands per day</strong> with a standard 52-card deck (reshuffled each hand).</li>
-          <li>Start with <strong class="text-white">1,000 chips</strong> (or your cumulative total). Place a bet before each hand.</li>
-          <li><strong class="text-white">Hit</strong> to draw a card, <strong class="text-white">Stay</strong> to hold.</li>
-          <li><strong class="text-white">Double Down</strong> doubles your bet and draws exactly one more card.</li>
-          <li><strong class="text-white">Split</strong> when dealt a pair - play two separate hands (bet is matched on the second).</li>
-          <li>Dealer hits on 16 and below, stays on 17 and above (hits soft 17).</li>
-          <li><strong class="text-white">Blackjack</strong> (21 on first two cards) pays <strong class="text-white">3:2</strong>.</li>
+          <li>Select a chip denomination (<strong class="text-white">10, 25, 50, 100, or ALL IN</strong>), then tap any bet on the board.</li>
+          <li>You can place <strong class="text-white">multiple bets</strong> at once across different areas - they all ride the same spin.</li>
+          <li>Tap a bet area again to add more chips to it. Tap <strong class="text-white">Clear</strong> to remove all bets.</li>
+          <li>Hit <strong class="text-white">Spin</strong> when you're ready!</li>
+          <li>Tap the <strong class="text-white">bar chart button</strong> (next to ?) at any time to view your spin history, red/black &amp; odd/even breakdowns, and how long it's been since a green.</li>
         </ul>
       </div>
 
+      <div class="mb-4">
+        <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">Bet Types &amp; Payouts</h3>
+        <div class="text-xs text-gray-300 space-y-1">
+          <div class="flex justify-between py-1 border-b border-gray-800"><span>Single number (Straight)</span><span class="font-bold text-white">35:1</span></div>
+          <div class="flex justify-between py-1 border-b border-gray-800"><span>Red / Black</span><span class="font-bold text-white">1:1</span></div>
+          <div class="flex justify-between py-1 border-b border-gray-800"><span>Odd / Even</span><span class="font-bold text-white">1:1</span></div>
+          <div class="flex justify-between py-1 border-b border-gray-800"><span>Low (1-18) / High (19-36)</span><span class="font-bold text-white">1:1</span></div>
+          <div class="flex justify-between py-1 border-b border-gray-800"><span>Dozen (1st / 2nd / 3rd 12)</span><span class="font-bold text-white">2:1</span></div>
+          <div class="flex justify-between py-1"><span>Column (2:1 buttons)</span><span class="font-bold text-white">2:1</span></div>
+        </div>
+        <p class="text-xs text-gray-500 mt-2">0 and 00 (green) lose all outside bets. Only straight-up bets on 0/00 pay out.</p>
+      </div>
+
       <div class="mb-5">
-        <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">Scoring</h3>
+        <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">Chips</h3>
         <p class="text-xs text-gray-300 leading-relaxed">
-          Your chip total carries over between days. You receive bonus chips each day to keep playing.
-          Try to build the biggest stack!
+          You start with <strong class="text-white">1,000 chips</strong>. Your stack carries over between days and you receive a daily bonus to keep the action going. Try to build the biggest stack!
         </p>
       </div>
 
-      <button onclick="BJGame.closeModal()"
+      <button onclick="RLGame.closeModal()"
         class="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-sm font-bold rounded-lg transition-colors">
-        Let's Play
+        Let's Spin!
       </button>
     </div>
   </div>
 
-  <!-- Daily welcome modal (shows each new day with bonus chips) -->
-  <div id="bj-daily-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 hidden">
+  <!-- Daily welcome modal -->
+  <div id="rl-daily-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 hidden">
     <div class="bg-gray-900 border border-gray-700 rounded-2xl p-6 max-w-xs w-full text-center"
          onclick="event.stopPropagation()">
       <h2 class="text-xl font-black mb-1">Welcome Back!</h2>
@@ -345,19 +401,19 @@
       <div class="mb-3">
         <p class="text-sm text-gray-400">Your daily bonus:</p>
         <div class="flex items-center justify-center gap-2 mt-1">
-          <svg class="bj-chip-icon-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="#10b981" stroke-width="2"/><circle cx="12" cy="12" r="6" fill="none" stroke="#10b981" stroke-width="1.5"/><text x="12" y="16" text-anchor="middle" fill="#10b981" font-size="10" font-weight="700">$</text></svg>
-          <span id="bj-bonus-amount" class="text-3xl font-black text-green-400">+75</span>
+          <svg class="rl-chip-icon-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="#10b981" stroke-width="2"/><circle cx="12" cy="12" r="6" fill="none" stroke="#10b981" stroke-width="1.5"/><text x="12" y="16" text-anchor="middle" fill="#10b981" font-size="10" font-weight="700">$</text></svg>
+          <span id="rl-bonus-amount" class="text-3xl font-black text-green-400">+75</span>
         </div>
       </div>
-      <p class="text-xs text-gray-500 mb-4">New stack: <span id="bj-new-stack" class="font-bold text-gray-300">1,075</span></p>
-      <button id="bj-daily-close"
+      <p class="text-xs text-gray-500 mb-4">New stack: <span id="rl-new-stack" class="font-bold text-gray-300">1,075</span></p>
+      <button id="rl-daily-close"
         class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold rounded-lg transition-colors">
-        Let's Play
+        Let's Spin!
       </button>
     </div>
   </div>
 
-  <script src="/assets/js/blackjackdle.js" defer></script>
+  <script src="/assets/js/roulettedle.js" defer></script>
 
   <script>
     (function(){

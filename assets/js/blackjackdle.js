@@ -81,6 +81,18 @@ const BJGame = (function () {
   }
   function saveChips() { localStorage.setItem('bj_chips', JSON.stringify(chips)); }
 
+  function loadAllTime() {
+    try { return JSON.parse(localStorage.getItem('bj_alltime')) || { biggestWin: 0, biggestLoss: 0, totalNet: 0 }; }
+    catch { return { biggestWin: 0, biggestLoss: 0, totalNet: 0 }; }
+  }
+  function updateAllTime(net) {
+    const a = loadAllTime();
+    if (net > 0 && net > a.biggestWin)  a.biggestWin  = net;
+    if (net < 0 && net < a.biggestLoss) a.biggestLoss = net;
+    a.totalNet += net;
+    localStorage.setItem('bj_alltime', JSON.stringify(a));
+  }
+
   /* ── Deck ── */
   function createDeck() {
     const d = [];
@@ -683,6 +695,7 @@ const BJGame = (function () {
     saveChips();
 
     sessionResults.push({ result, net });
+    updateAllTime(net);
 
     // Show result banner
     if (bannerHTML) {
@@ -988,17 +1001,53 @@ const BJGame = (function () {
     $('bj-btn-split').addEventListener('click', playerSplit);
     $('bj-share-btn').addEventListener('click', shareResults);
     $('bj-help-btn').addEventListener('click', showModal);
+    const bjStatsBtn = $('bj-stats-btn');
+    if (bjStatsBtn) bjStatsBtn.addEventListener('click', showStats);
 
     // ESC closes modals
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         closeModal();
+        closeStats();
         $('bj-daily-modal').classList.add('hidden');
       }
     });
   }
 
+  function showStats() {
+    const s  = loadStats();
+    const at = loadAllTime();
+    const atSign  = at.totalNet >= 0 ? '+' : '';
+    const atColor = at.totalNet >= 0 ? '#4ade80' : '#f87171';
+
+    function row(label, value, color) {
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1f2937">' +
+        '<span style="color:#9ca3af;font-size:13px">' + label + '</span>' +
+        '<span style="font-weight:800;font-size:15px;color:' + (color || '#fff') + '">' + value + '</span>' +
+      '</div>';
+    }
+
+    const el = $('bj-stats-content');
+    if (el) {
+      el.innerHTML =
+        row('Current Stack', chips.toLocaleString() + ' chips', '#4ade80') +
+        row('Games Played', s.played || 0) +
+        row('Current Streak', s.streak, '#facc15') +
+        row('Best Streak', s.best, '#a78bfa') +
+        row('Best Single Hand', '+' + at.biggestWin.toLocaleString(), '#4ade80') +
+        row('Worst Single Hand', at.biggestLoss.toLocaleString(), '#f87171') +
+        row('All-Time Net', atSign + at.totalNet.toLocaleString(), atColor);
+    }
+    const modal = $('bj-stats-modal');
+    if (modal) modal.classList.remove('hidden');
+  }
+
+  function closeStats() {
+    const modal = $('bj-stats-modal');
+    if (modal) modal.classList.add('hidden');
+  }
+
   document.addEventListener('DOMContentLoaded', init);
 
-  return { closeModal, showModal, shareResults, shareBrokeResults };
+  return { closeModal, showModal, shareResults, shareBrokeResults, showStats, closeStats };
 })();

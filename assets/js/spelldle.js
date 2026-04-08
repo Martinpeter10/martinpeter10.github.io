@@ -55,15 +55,18 @@
 
   // ── localStorage ─────────────────────────────────────────────────────────
   function loadStats() {
-    try { return JSON.parse(localStorage.getItem(STATS_KEY)) || { streak: 0, best: 0, played: 0 }; }
-    catch (e) { return { streak: 0, best: 0, played: 0 }; }
+    try { return JSON.parse(localStorage.getItem(STATS_KEY)) || { streak: 0, best: 0, played: 0, wins: 0 }; }
+    catch (e) { return { streak: 0, best: 0, played: 0, wins: 0 }; }
   }
 
   function saveStats(won) {
     var s = loadStats();
     s.played++;
-    if (won) { s.streak++; if (s.streak > s.best) s.best = s.streak; }
-    else { s.streak = 0; }
+    if (won) {
+      s.wins = (s.wins || 0) + 1;
+      s.streak++;
+      if (s.streak > s.best) s.best = s.streak;
+    } else { s.streak = 0; }
     localStorage.setItem(STATS_KEY, JSON.stringify(s));
     return s;
   }
@@ -596,10 +599,51 @@
     document.getElementById('spd-modal-close').addEventListener('click', closeModal);
     modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
 
+    var statsBtn   = document.getElementById('spd-stats-btn');
+    var statsModal = document.getElementById('spd-stats-modal');
+    if (statsBtn)   statsBtn.addEventListener('click', showStats);
+    if (statsModal) statsModal.addEventListener('click', function (e) { if (e.target === statsModal) closeStats(); });
+    var statsClose = document.getElementById('spd-stats-close');
+    if (statsClose) statsClose.addEventListener('click', closeStats);
+
     // ESC closes the modal (per site convention)
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeModal();
+      if (e.key === 'Escape') {
+        if (!modal.classList.contains('hidden')) closeModal();
+        closeStats();
+      }
     });
+  }
+
+  function showStats() {
+    var s      = loadStats();
+    var played = s.played || 0;
+    var wins   = s.wins   || 0;
+    var winPct = played > 0 ? Math.round(wins / played * 100) : 0;
+
+    function row(label, value, color) {
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1f2937">' +
+        '<span style="color:#9ca3af;font-size:13px">' + label + '</span>' +
+        '<span style="font-weight:800;font-size:15px;color:' + (color || '#fff') + '">' + value + '</span>' +
+      '</div>';
+    }
+
+    var el = document.getElementById('spd-stats-content');
+    if (el) {
+      el.innerHTML =
+        row('Games Played', played) +
+        row('Wins', wins, '#4ade80') +
+        row('Win Rate', winPct + '%', winPct >= 50 ? '#4ade80' : '#f87171') +
+        row('Current Streak', s.streak, '#facc15') +
+        row('Best Streak', s.best, '#a78bfa');
+    }
+    var statsModal = document.getElementById('spd-stats-modal');
+    if (statsModal) statsModal.classList.remove('hidden');
+  }
+
+  function closeStats() {
+    var statsModal = document.getElementById('spd-stats-modal');
+    if (statsModal) statsModal.classList.add('hidden');
   }
 
   // ── Boot ─────────────────────────────────────────────────────────────────

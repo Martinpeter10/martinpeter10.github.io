@@ -46,13 +46,15 @@
   const SEEN_KEY  = 'cl_seen_howto';
 
   function loadStats() {
-    try { return JSON.parse(localStorage.getItem(STATS_KEY)) || { streak: 0, best: 0, played: 0 }; }
-    catch { return { streak: 0, best: 0, played: 0 }; }
+    try { return JSON.parse(localStorage.getItem(STATS_KEY)) || { streak: 0, best: 0, played: 0, totalScore: 0, perfectGames: 0 }; }
+    catch { return { streak: 0, best: 0, played: 0, totalScore: 0, perfectGames: 0 }; }
   }
 
   function saveStats(score) {
     const s = loadStats();
     s.played++;
+    s.totalScore  = (s.totalScore  || 0) + score;
+    if (score >= 20) s.perfectGames = (s.perfectGames || 0) + 1;
     if (score > 0) {
       s.streak++;
       if (s.streak > s.best) s.best = s.streak;
@@ -434,6 +436,43 @@
     modalClose.addEventListener('click', closeModal);
     modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
     inputEl.addEventListener('keydown', e => { if (e.key === 'Enter') handleGuess(); });
+
+    const clStatsBtn = document.getElementById('cl-stats-btn');
+    if (clStatsBtn) clStatsBtn.addEventListener('click', showStats);
+    const clStatsClose = document.getElementById('cl-stats-close');
+    if (clStatsClose) clStatsClose.addEventListener('click', closeStats);
+    const clStatsModal = document.getElementById('cl-stats-modal');
+    if (clStatsModal) clStatsModal.addEventListener('click', e => { if (e.target === clStatsModal) closeStats(); });
+  }
+
+  function showStats() {
+    const s      = loadStats();
+    const played = s.played || 0;
+    const avg    = played > 0 ? (((s.totalScore || 0) / played)).toFixed(1) : '—';
+
+    function row(label, value, color) {
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1f2937">' +
+        '<span style="color:#9ca3af;font-size:13px">' + label + '</span>' +
+        '<span style="font-weight:800;font-size:15px;color:' + (color || '#fff') + '">' + value + '</span>' +
+      '</div>';
+    }
+
+    const el = document.getElementById('cl-stats-content');
+    if (el) {
+      el.innerHTML =
+        row('Games Played', played) +
+        row('Average Score', avg + ' / 20', '#facc15') +
+        row('Perfect Games (20/20)', s.perfectGames || 0, '#4ade80') +
+        row('Current Streak', s.streak, '#facc15') +
+        row('Best Streak', s.best, '#a78bfa');
+    }
+    const modal = document.getElementById('cl-stats-modal');
+    if (modal) modal.classList.remove('hidden');
+  }
+
+  function closeStats() {
+    const modal = document.getElementById('cl-stats-modal');
+    if (modal) modal.classList.add('hidden');
   }
 
   // ── Boot: fetch puzzles, then init ────────────────────────────────────────

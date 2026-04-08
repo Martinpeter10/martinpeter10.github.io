@@ -70,6 +70,18 @@ A daily D&D 5E spell guessing game - identify the spell from its attributes in u
 
 Play it: [dailyjamm.com/spelldle](https://dailyjamm.com/spelldle)
 
+### Roulettedle
+A daily American roulette game - 3 spins per day, place your bets and watch the wheel.
+
+- Full animated roulette wheel with a rolling ball that orbits the rim and drops into the winning pocket
+- Bet on straight numbers (35:1), red/black, odd/even, low/high (1:1), dozens and columns (2:1)
+- Start with 1,000 chips; persistent stack carries over between days with a daily bonus of 50–100 chips
+- Spin history modal: last 10 spins, red/black and odd/even split bars, spins since last 0/00, all-time net
+- Share results with emoji summary after all 3 spins
+- All game data stored locally - no account needed
+
+Play it: [dailyjamm.com/roulettedle](https://dailyjamm.com/roulettedle)
+
 ---
 
 ## Other Daily Games
@@ -114,6 +126,7 @@ Then open your browser to:
 - `http://localhost:8080/chainlink/` - Chain Link game
 - `http://localhost:8080/blackjackdle/` - BlackJackdle game
 - `http://localhost:8080/spelldle/` - Spelldle game
+- `http://localhost:8080/roulettedle/` - Roulettedle game
 - `http://localhost:8080/about/` - About page
 - `http://localhost:8080/privacy/` - Privacy Policy
 
@@ -122,6 +135,17 @@ Press `Ctrl+C` in the terminal to stop the server.
 ---
 
 ## Releases
+
+### v1.8.0 - 2026-04-03
+- Launched **Roulettedle** - daily American roulette with 3 spins per day
+- Full animated wheel with ball physics: ball orbits the outer rim counter-clockwise then drops into the winning pocket
+- Place bets on numbers (35:1), red/black, odd/even, low/high, dozens, and columns before each spin
+- Persistent chip stack carries over between days; daily bonus of 50–100 chips each session
+- Share results with emoji summary after completing all 3 spins
+- Added stats button (bar chart icon) to all game pages — shows lifetime stats modal (streaks, win rate, score averages, and chip history for chip-based games)
+- Standardized header layout: stats button and ? (How to Play) button always appear top-right in the fixed header on every game page
+- BlackJackdle: improved active hand glow during split (brighter two-layer drop-shadow)
+- Roulettedle spin history modal: last 10 spins, red/black and odd/even split bars, spins since last 0/00, and all-time net/best/worst spin
 
 ### v1.7.0 - 2026-04-03
 - Expanded Themedle song library from **117 to 156 songs** (+39 new shows)
