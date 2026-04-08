@@ -30,19 +30,49 @@
     return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
   }
 
-  // ── Puzzle selection (day-of-year, same as Chain Link) ───────────────────
+  // ── Puzzle selection (days since epoch, shuffled per cycle) ─────────────
+  // Epoch = Jan 1 2026. Each cycle of N spells uses a seeded Fisher-Yates
+  // shuffle so the order is random but deterministic (same spell for all
+  // players on the same day) and every spell appears once before repeating.
+  var SPELL_EPOCH = new Date('2026-01-01T12:00:00Z');
+
   function getPuzzleIndex() {
     const parts = new Intl.DateTimeFormat('en-CA', {
       timeZone: 'America/Chicago',
       year: 'numeric', month: '2-digit', day: '2-digit',
     }).formatToParts(new Date());
-    const map  = Object.fromEntries(parts.map(function (p) { return [p.type, p.value]; }));
+    const map   = Object.fromEntries(parts.map(function (p) { return [p.type, p.value]; }));
     const year  = parseInt(map.year);
     const month = parseInt(map.month);
     const day   = parseInt(map.day);
-    const jan1  = new Date(Date.UTC(year, 0, 1, 12));
-    const today = new Date(Date.UTC(year, month - 1, day, 12));
-    return Math.round((today - jan1) / 86400000) + 1; // 1-indexed day of year
+    const local = new Date(Date.UTC(year, month - 1, day, 12));
+    return Math.round((local - SPELL_EPOCH) / 86400000) + 1; // 1-indexed days since epoch
+  }
+
+  // Mulberry32 seeded RNG — deterministic, fast, good distribution
+  function mulberry32(seed) {
+    var a = seed >>> 0;
+    return function () {
+      a = (a + 0x6D2B79F5) >>> 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) | 0;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  // Returns the spell array index for a given 1-indexed puzzle day
+  function getShuffledSpellIndex(dayIndex, count) {
+    var cycle      = Math.floor((dayIndex - 1) / count);
+    var posInCycle = (dayIndex - 1) % count;
+    var seed       = (0xABCD1234 + cycle * 0x9E3779B9) >>> 0;
+    var rng        = mulberry32(seed);
+    var arr        = [];
+    for (var i = 0; i < count; i++) arr[i] = i;
+    for (var i = count - 1; i > 0; i--) {
+      var j   = Math.floor(rng() * (i + 1));
+      var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+    }
+    return arr[posInCycle];
   }
 
   // ── State ────────────────────────────────────────────────────────────────
@@ -522,7 +552,7 @@
   function init() {
     var dayIndex = getPuzzleIndex();
     puzzleNum    = dayIndex;
-    answer       = spells[(dayIndex - 1) % spells.length];
+    answer       = spells[getShuffledSpellIndex(dayIndex, spells.length)];
 
     document.getElementById('spd-meta').textContent = 'Daily Spelldle #' + puzzleNum;
 
