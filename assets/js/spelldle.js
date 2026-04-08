@@ -302,7 +302,7 @@
     var input = document.getElementById('spd-input');
     input.value = spell.name;
     hideDropdown();
-    submitGuess();
+    input.focus();
   }
 
   function highlightDropdownItem(index) {
