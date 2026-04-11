@@ -969,21 +969,18 @@ const BJGame = (function () {
       // New day - give daily bonus (if not first visit)
       if (isFirstEverVisit) {
         // First ever visit: give starting chips, show How to Play
-        if (chips <= 0) chips = STARTING_CHIPS;
         localStorage.setItem('bj_bonus_date', chicagoDate());
         updateChipDisplay();
         showBetting();
         showModal();
       } else if (needsBonus) {
-        // Returning player, new day: reset if broke, then give bonus
-        if (chips <= 0) chips = STARTING_CHIPS;
+        // Returning player, new day: give daily bonus on top of current stack
         updateChipDisplay();
         showDailyWelcome(() => {
           showBetting();
         });
       } else {
         // Same day, no saved state (shouldn't happen often)
-        if (chips <= 0) chips = STARTING_CHIPS;
         updateChipDisplay();
         showBetting();
       }

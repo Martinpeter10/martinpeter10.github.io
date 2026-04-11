@@ -781,18 +781,15 @@ const RLGame = (function () {
     } else {
       // Fresh start for the day
       if (isFirstVisit) {
-        if (chips <= 0) chips = STARTING_CHIPS;
         localStorage.setItem('rl_bonus_date', chicagoDate());
         updateChipDisplay();
         updateSpinIndicator();
         showModal();
       } else if (needsBonus) {
-        if (chips <= 0) chips = STARTING_CHIPS;
         updateChipDisplay();
         updateSpinIndicator();
         showDailyWelcome(() => {});
       } else {
-        if (chips <= 0) chips = STARTING_CHIPS;
         updateChipDisplay();
         updateSpinIndicator();
       }
