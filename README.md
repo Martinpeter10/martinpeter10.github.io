@@ -18,9 +18,63 @@ A daily TV show theme song guessing game inspired by Wordle-style gameplay.
 - Streak tracking and best streak saved across sessions
 - Countdown timer to the next daily challenge
 - All game data stored locally - no account needed
-- Library of **156 TV theme songs** spanning cartoons, kids shows, and live-action series from the 80s through 2010s
+- Library of **138 TV theme songs** spanning cartoons, kids shows, and live-action series from the 80s through 2010s
 
 Play it: [dailyjamm.com/themedle](https://dailyjamm.com/themedle)
+
+<details>
+<summary>View full theme song library (138 songs)</summary>
+
+| | | |
+|---|---|---|
+| Adventure Time | All Grown Up | Arthur |
+| As Told by Ginger | Avatar: The Last Airbender | Back at the Barnyard |
+| Barney | Baywatch | Bear in the Big Blue House |
+| Ben 10 | Between the Lions | Blue's Clues |
+| Bob the Builder | Boy Meets World | Buffy the Vampire Slayer |
+| Caillou | Camp Lazlo | CatDog |
+| Catscratch | Charlie and Lola | Cheers |
+| Chip 'n Dale Rescue Rangers | Chowder | Clifford the Big Red Dog |
+| Code Lyoko | Codename: Kids Next Door | Cory in the House |
+| Courage the Cowardly Dog | Cyberchase | Danny Phantom |
+| Degrassi | Dexter's Laboratory | Dora the Explorer |
+| Doug | Dragon Tales | Drake & Josh |
+| DuckTales | Ed, Edd n Eddy | El Tigre |
+| Even Stevens | Everybody Hates Chris | Family Guy |
+| Family Matters | Flapjack | Foster's Home for Imaginary Friends |
+| Franklin | Friends | Full House |
+| Futurama | Game of Thrones | George Lopez |
+| Gilligan's Island | Gilmore Girls | Go, Diego, Go! |
+| Gravity Falls | Grim Adventures of Billy & Mandy | Hannah Montana |
+| Happy Days | Hawaii Five-0 | Hey Arnold! |
+| Home Improvement | iCarly | Inspector Gadget |
+| Jay Jay the Jet Plane | Jessie | Johnny Bravo |
+| Johnny Test | Kim Possible | King of the Hill |
+| Law & Order: SVU | Lilo & Stitch: The Series | Little Einsteins |
+| Madeline | Malcolm in the Middle | Max & Ruby |
+| Mister Rogers' Neighborhood | My Life as a Teenage Robot | Naruto |
+| Ned's Declassified School Survival Guide | Phil of the Future | Phineas and Ferb |
+| Pokémon | Power Rangers | Recess |
+| Rocket Power | Rolie Polie Olie | Rugrats |
+| Samurai Jack | Saved by the Bell | Scooby-Doo |
+| Seinfeld | Sesame Street | South Park |
+| SpongeBob SquarePants | Steven Universe | Stranger Things |
+| Teen Titans | Teletubbies | That '70s Show |
+| That's So Raven | The Amazing World of Gumball | The Amanda Show |
+| The Angry Beavers | The Backyardigans | The Berenstain Bears |
+| The Big Bang Theory | The Big Comfy Couch | The Brady Bunch |
+| The Fairly OddParents | The Flintstones | The Fresh Prince of Bel-Air |
+| The Jeffersons | The Jetsons | The Magic School Bus |
+| The Mighty B! | The Penguins of Madagascar | The Powerpuff Girls |
+| The Proud Family | The Simpsons | The Suite Life of Zack & Cody |
+| The Suite Life on Deck | The Wiggles | The Wild Thornberrys |
+| The X-Files | The Xs | Total Drama Island |
+| Totally Spies! | Twilight Zone | Unfabulous |
+| VeggieTales | Victorious | Walker, Texas Ranger |
+| Wizards of Waverly Place | Xiaolin Showdown | X-Men |
+| Yu-Gi-Oh! | Zoboomafoo | Zoë 101 |
+
+</details>
 
 ### Chain Link
 A daily compound word chain puzzle - find the 5 missing words that link the chain.
