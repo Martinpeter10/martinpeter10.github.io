@@ -266,9 +266,15 @@ function showSuggestions(query) {
     suggestionsDiv.classList.add('hidden');
     return;
   }
-  suggestionsDiv.innerHTML = matches.map((song, index) => 
-    `<div class="suggestion-item px-4 py-2 hover:bg-gray-700 cursor-pointer text-white" data-title="${song.title}" data-index="${index}">${song.title}</div>`
-  ).join('');
+  suggestionsDiv.textContent = '';
+  matches.forEach(function (song, index) {
+    const div = document.createElement('div');
+    div.className = 'suggestion-item px-4 py-2 hover:bg-gray-700 cursor-pointer text-white';
+    div.dataset.title = song.title;
+    div.dataset.index = String(index);
+    div.textContent = song.title;
+    suggestionsDiv.appendChild(div);
+  });
   suggestionsDiv.classList.remove('hidden');
   selectedSuggestionIndex = -1;
 }
@@ -670,22 +676,13 @@ function showStatsModal() {
   const wins   = s.wins || 0;
   const winPct = played > 0 ? Math.round(wins / played * 100) : 0;
 
-  function statRow(label, value, color) {
-    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1f2937">' +
-      '<span style="color:#9ca3af;font-size:13px">' + label + '</span>' +
-      '<span style="font-weight:800;font-size:15px;color:' + (color || '#fff') + '">' + value + '</span>' +
-    '</div>';
-  }
-
-  const el = document.getElementById('td-stats-content');
-  if (el) {
-    el.innerHTML =
-      statRow('Games Played', played) +
-      statRow('Wins', wins, '#4ade80') +
-      statRow('Win Rate', winPct + '%', winPct >= 50 ? '#4ade80' : '#f87171') +
-      statRow('Current Streak', s.currentStreak, '#facc15') +
-      statRow('Best Streak', s.bestStreak, '#a78bfa');
-  }
+  DJUtils.setStatRows('td-stats-content', [
+    { label: 'Games Played', value: played },
+    { label: 'Wins', value: wins, color: '#4ade80' },
+    { label: 'Win Rate', value: winPct + '%', color: winPct >= 50 ? '#4ade80' : '#f87171' },
+    { label: 'Current Streak', value: s.currentStreak, color: '#facc15' },
+    { label: 'Best Streak', value: s.bestStreak, color: '#a78bfa' },
+  ]);
   const modal = document.getElementById('td-stats-modal');
   if (modal) modal.classList.remove('hidden');
 }

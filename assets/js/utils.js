@@ -41,5 +41,29 @@ window.DJUtils = (function () {
     });
   }
 
-  return { getChicagoDate, getChicagoMidnight, loadJSON, saveJSON, clipboardShare };
+  /**
+   * Safely render a list of stat rows into a container using DOM methods.
+   * Each row: { label: string, value: string|number, color?: string }
+   * Avoids innerHTML with user-derived data.
+   */
+  function setStatRows(containerId, rows) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    el.textContent = '';
+    rows.forEach(function (r) {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1f2937';
+      const lbl = document.createElement('span');
+      lbl.style.cssText = 'color:#9ca3af;font-size:13px';
+      lbl.textContent = r.label;
+      const val = document.createElement('span');
+      val.style.cssText = 'font-weight:800;font-size:15px;color:' + (r.color || '#fff');
+      val.textContent = String(r.value);
+      row.appendChild(lbl);
+      row.appendChild(val);
+      el.appendChild(row);
+    });
+  }
+
+  return { getChicagoDate, getChicagoMidnight, loadJSON, saveJSON, clipboardShare, setStatRows };
 })();

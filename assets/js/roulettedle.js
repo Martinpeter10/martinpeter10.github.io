@@ -482,18 +482,19 @@ const RLGame = (function () {
       : 'text-sm font-bold mt-1 text-red-400';
 
     const row = $('rl-spin-results-row');
-    row.innerHTML = '';
+    row.textContent = '';
     sessionResults.forEach((r, i) => {
       const dot   = document.createElement('div');
       dot.className = 'rl-result-dot';
       const emoji = r.net > 0 ? '\uD83D\uDFE2' : r.net < 0 ? '\uD83D\uDD34' : '\uD83D\uDFE1';
       const label = r.net > 0 ? '+' + r.net : r.net === 0 ? 'Even' : String(r.net);
       const c     = pocketColor(r.pocket);
-      const pStyle = c === 'red' ? 'color:#ef4444' : c === 'green' ? 'color:#22c55e' : 'color:#9ca3af';
-      dot.innerHTML = '<span class="text-lg">' + emoji + '</span>' +
-        '<span>Spin ' + (i + 1) + '</span>' +
-        '<span style="' + pStyle + ';font-weight:700">' + r.pocket + '</span>' +
-        '<span class="font-bold">' + label + '</span>';
+      const pocketColor2 = c === 'red' ? '#ef4444' : c === 'green' ? '#22c55e' : '#9ca3af';
+      const s1 = document.createElement('span'); s1.className = 'text-lg'; s1.textContent = emoji;
+      const s2 = document.createElement('span'); s2.textContent = 'Spin ' + (i + 1);
+      const s3 = document.createElement('span'); s3.style.cssText = 'color:' + pocketColor2 + ';font-weight:700'; s3.textContent = String(r.pocket);
+      const s4 = document.createElement('span'); s4.className = 'font-bold'; s4.textContent = label;
+      dot.appendChild(s1); dot.appendChild(s2); dot.appendChild(s3); dot.appendChild(s4);
       row.appendChild(dot);
     });
 
@@ -557,15 +558,16 @@ const RLGame = (function () {
     saveStats(stats);
 
     const row = $('rl-broke-spins');
-    row.innerHTML = '';
+    row.textContent = '';
     sessionResults.forEach((r, i) => {
       const dot   = document.createElement('div');
       dot.className = 'rl-result-dot';
       const emoji = r.net > 0 ? '\uD83D\uDFE2' : r.net < 0 ? '\uD83D\uDD34' : '\uD83D\uDFE1';
       const label = r.net > 0 ? '+' + r.net : r.net === 0 ? 'Even' : String(r.net);
-      dot.innerHTML = '<span class="text-lg">' + emoji + '</span>' +
-        '<span>Spin ' + (i + 1) + '</span>' +
-        '<span class="font-bold">' + label + '</span>';
+      const s1 = document.createElement('span'); s1.className = 'text-lg'; s1.textContent = emoji;
+      const s2 = document.createElement('span'); s2.textContent = 'Spin ' + (i + 1);
+      const s3 = document.createElement('span'); s3.className = 'font-bold'; s3.textContent = label;
+      dot.appendChild(s1); dot.appendChild(s2); dot.appendChild(s3);
       row.appendChild(dot);
     });
 
@@ -607,9 +609,12 @@ const RLGame = (function () {
 
     // Last 10 spins as colored chips
     const spinsEl = $('rl-hist-spins');
-    spinsEl.innerHTML = '';
+    spinsEl.textContent = '';
     if (history.length === 0) {
-      spinsEl.innerHTML = '<span style="color:#6b7280;font-size:12px">No spins yet.</span>';
+      const empty = document.createElement('span');
+      empty.style.cssText = 'color:#6b7280;font-size:12px';
+      empty.textContent = 'No spins yet.';
+      spinsEl.appendChild(empty);
     } else {
       history.slice(0, 10).forEach(pocket => {
         const color = pocketColor(pocket);
@@ -631,24 +636,35 @@ const RLGame = (function () {
     const odds   = filtered.filter(p => typeof p === 'number' && p % 2 === 1).length;
     const evens  = filtered.filter(p => typeof p === 'number' && p % 2 === 0).length;
 
-    function splitBar(leftLabel, leftCount, rightLabel, rightCount, leftColor, rightColor) {
+    function renderSplitBar(containerId, leftLabel, leftCount, rightLabel, rightCount, leftColor, rightColor) {
       const total    = leftCount + rightCount;
       const leftPct  = total > 0 ? Math.round(leftCount  / total * 100) : 50;
       const rightPct = 100 - leftPct;
-      return '<div>' +
-        '<div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;margin-bottom:5px">' +
-          '<span style="color:' + leftColor  + '">' + leftLabel  + ' · ' + leftPct  + '% (' + leftCount  + ')</span>' +
-          '<span style="color:' + rightColor + '">' + rightPct + '% (' + rightCount + ') · ' + rightLabel + '</span>' +
-        '</div>' +
-        '<div style="height:10px;border-radius:5px;overflow:hidden;display:flex">' +
-          '<div style="width:' + leftPct  + '%;background:' + leftColor  + ';transition:width .4s"></div>' +
-          '<div style="width:' + rightPct + '%;background:' + rightColor + ';transition:width .4s"></div>' +
-        '</div>' +
-      '</div>';
+      const wrap = document.createElement('div');
+      const labels = document.createElement('div');
+      labels.style.cssText = 'display:flex;justify-content:space-between;font-size:11px;font-weight:700;margin-bottom:5px';
+      const lSpan = document.createElement('span');
+      lSpan.style.color = leftColor;
+      lSpan.textContent = leftLabel + ' \u00b7 ' + leftPct + '% (' + leftCount + ')';
+      const rSpan = document.createElement('span');
+      rSpan.style.color = rightColor;
+      rSpan.textContent = rightPct + '% (' + rightCount + ') \u00b7 ' + rightLabel;
+      labels.appendChild(lSpan); labels.appendChild(rSpan);
+      const bar = document.createElement('div');
+      bar.style.cssText = 'height:10px;border-radius:5px;overflow:hidden;display:flex';
+      const lBar = document.createElement('div');
+      lBar.style.cssText = 'width:' + leftPct + '%;background:' + leftColor + ';transition:width .4s';
+      const rBar = document.createElement('div');
+      rBar.style.cssText = 'width:' + rightPct + '%;background:' + rightColor + ';transition:width .4s';
+      bar.appendChild(lBar); bar.appendChild(rBar);
+      wrap.appendChild(labels); wrap.appendChild(bar);
+      const el = $(containerId);
+      el.textContent = '';
+      el.appendChild(wrap);
     }
 
-    $('rl-hist-rb').innerHTML = splitBar('Red', reds, 'Black', blacks, '#ef4444', '#6b7280');
-    $('rl-hist-oe').innerHTML = splitBar('Odd', odds, 'Even', evens, '#a78bfa', '#60a5fa');
+    renderSplitBar('rl-hist-rb', 'Red', reds, 'Black', blacks, '#ef4444', '#6b7280');
+    renderSplitBar('rl-hist-oe', 'Odd', odds, 'Even', evens, '#a78bfa', '#60a5fa');
 
     // Spins since last 0 / 00
     function spinsSince(pocket) {
@@ -657,37 +673,75 @@ const RLGame = (function () {
       if (idx === -1) return String(history.length);
       return String(idx);
     }
-    $('rl-hist-zeros').innerHTML =
-      '<div style="display:flex;gap:24px;justify-content:center">' +
-        '<div style="text-align:center">' +
-          '<div style="font-size:26px;font-weight:900;color:#22c55e;line-height:1">' + spinsSince(0) + '</div>' +
-          '<div style="font-size:10px;color:#6b7280;margin-top:3px">spins since <span style="color:#22c55e;font-weight:700">0</span></div>' +
-        '</div>' +
-        '<div style="text-align:center">' +
-          '<div style="font-size:26px;font-weight:900;color:#22c55e;line-height:1">' + spinsSince('00') + '</div>' +
-          '<div style="font-size:10px;color:#6b7280;margin-top:3px">spins since <span style="color:#22c55e;font-weight:700">00</span></div>' +
-        '</div>' +
-      '</div>';
+    function makeZeroStat(containerId, since, label) {
+      const el = $(containerId);
+      el.textContent = '';
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'display:flex;gap:24px;justify-content:center';
+      const cell = document.createElement('div');
+      cell.style.textAlign = 'center';
+      const num = document.createElement('div');
+      num.style.cssText = 'font-size:26px;font-weight:900;color:#22c55e;line-height:1';
+      num.textContent = since;
+      const lbl = document.createElement('div');
+      lbl.style.cssText = 'font-size:10px;color:#6b7280;margin-top:3px';
+      lbl.textContent = 'spins since ';
+      const lbl2 = document.createElement('span');
+      lbl2.style.cssText = 'color:#22c55e;font-weight:700';
+      lbl2.textContent = label;
+      lbl.appendChild(lbl2);
+      cell.appendChild(num); cell.appendChild(lbl);
+      wrap.appendChild(cell);
+      el.appendChild(wrap);
+    }
+
+    const zerosEl = $('rl-hist-zeros');
+    zerosEl.textContent = '';
+    const zerosWrap = document.createElement('div');
+    zerosWrap.style.cssText = 'display:flex;gap:24px;justify-content:center';
+    [{ pocket: 0, lbl: '0' }, { pocket: '00', lbl: '00' }].forEach(function (z) {
+      const cell = document.createElement('div');
+      cell.style.textAlign = 'center';
+      const num = document.createElement('div');
+      num.style.cssText = 'font-size:26px;font-weight:900;color:#22c55e;line-height:1';
+      num.textContent = spinsSince(z.pocket);
+      const lbl = document.createElement('div');
+      lbl.style.cssText = 'font-size:10px;color:#6b7280;margin-top:3px';
+      lbl.textContent = 'spins since ';
+      const lbl2 = document.createElement('span');
+      lbl2.style.cssText = 'color:#22c55e;font-weight:700';
+      lbl2.textContent = z.lbl;
+      lbl.appendChild(lbl2);
+      cell.appendChild(num); cell.appendChild(lbl);
+      zerosWrap.appendChild(cell);
+    });
+    zerosEl.appendChild(zerosWrap);
 
     // All-time stats
     const at = loadAllTime();
     const atSign  = at.totalNet >= 0 ? '+' : '';
     const atColor = at.totalNet >= 0 ? '#4ade80' : '#f87171';
-    $('rl-hist-alltime').innerHTML =
-      '<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">' +
-        '<div style="text-align:center;min-width:70px">' +
-          '<div style="font-size:20px;font-weight:900;color:#4ade80;line-height:1">+' + at.biggestWin.toLocaleString() + '</div>' +
-          '<div style="font-size:10px;color:#6b7280;margin-top:3px">best single spin</div>' +
-        '</div>' +
-        '<div style="text-align:center;min-width:70px">' +
-          '<div style="font-size:20px;font-weight:900;color:#f87171;line-height:1">' + at.biggestLoss.toLocaleString() + '</div>' +
-          '<div style="font-size:10px;color:#6b7280;margin-top:3px">worst single spin</div>' +
-        '</div>' +
-        '<div style="text-align:center;min-width:70px">' +
-          '<div style="font-size:20px;font-weight:900;color:' + atColor + ';line-height:1">' + atSign + at.totalNet.toLocaleString() + '</div>' +
-          '<div style="font-size:10px;color:#6b7280;margin-top:3px">all-time net</div>' +
-        '</div>' +
-      '</div>';
+    const alltimeEl = $('rl-hist-alltime');
+    alltimeEl.textContent = '';
+    const atWrap = document.createElement('div');
+    atWrap.style.cssText = 'display:flex;gap:12px;justify-content:center;flex-wrap:wrap';
+    [
+      { val: '+' + at.biggestWin.toLocaleString(), color: '#4ade80', lbl: 'best single spin' },
+      { val: at.biggestLoss.toLocaleString(),      color: '#f87171', lbl: 'worst single spin' },
+      { val: atSign + at.totalNet.toLocaleString(), color: atColor,  lbl: 'all-time net' },
+    ].forEach(function (item) {
+      const cell = document.createElement('div');
+      cell.style.cssText = 'text-align:center;min-width:70px';
+      const num = document.createElement('div');
+      num.style.cssText = 'font-size:20px;font-weight:900;color:' + item.color + ';line-height:1';
+      num.textContent = item.val;
+      const lbl = document.createElement('div');
+      lbl.style.cssText = 'font-size:10px;color:#6b7280;margin-top:3px';
+      lbl.textContent = item.lbl;
+      cell.appendChild(num); cell.appendChild(lbl);
+      atWrap.appendChild(cell);
+    });
+    alltimeEl.appendChild(atWrap);
 
     $('rl-history-modal').classList.remove('hidden');
   }

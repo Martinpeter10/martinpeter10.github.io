@@ -649,22 +649,13 @@
     const wins   = s.wins   || 0;
     const winPct = played > 0 ? Math.round(wins / played * 100) : 0;
 
-    function row(label, value, color) {
-      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1f2937">' +
-        '<span style="color:#9ca3af;font-size:13px">' + label + '</span>' +
-        '<span style="font-weight:800;font-size:15px;color:' + (color || '#fff') + '">' + value + '</span>' +
-      '</div>';
-    }
-
-    const el = document.getElementById('spd-stats-content');
-    if (el) {
-      el.innerHTML =
-        row('Games Played', played) +
-        row('Wins', wins, '#4ade80') +
-        row('Win Rate', winPct + '%', winPct >= 50 ? '#4ade80' : '#f87171') +
-        row('Current Streak', s.streak, '#facc15') +
-        row('Best Streak', s.best, '#a78bfa');
-    }
+    DJUtils.setStatRows('spd-stats-content', [
+      { label: 'Games Played', value: played },
+      { label: 'Wins', value: wins, color: '#4ade80' },
+      { label: 'Win Rate', value: winPct + '%', color: winPct >= 50 ? '#4ade80' : '#f87171' },
+      { label: 'Current Streak', value: s.streak, color: '#facc15' },
+      { label: 'Best Streak', value: s.best, color: '#a78bfa' },
+    ]);
     const statsModal = document.getElementById('spd-stats-modal');
     if (statsModal) statsModal.classList.remove('hidden');
   }

@@ -444,22 +444,13 @@
     const played = s.played || 0;
     const avg    = played > 0 ? (((s.totalScore || 0) / played)).toFixed(1) : '—';
 
-    function row(label, value, color) {
-      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1f2937">' +
-        '<span style="color:#9ca3af;font-size:13px">' + label + '</span>' +
-        '<span style="font-weight:800;font-size:15px;color:' + (color || '#fff') + '">' + value + '</span>' +
-      '</div>';
-    }
-
-    const el = document.getElementById('cl-stats-content');
-    if (el) {
-      el.innerHTML =
-        row('Games Played', played) +
-        row('Average Score', avg + ' / 20', '#facc15') +
-        row('Perfect Games (20/20)', s.perfectGames || 0, '#4ade80') +
-        row('Current Streak', s.streak, '#facc15') +
-        row('Best Streak', s.best, '#a78bfa');
-    }
+    DJUtils.setStatRows('cl-stats-content', [
+      { label: 'Games Played', value: played },
+      { label: 'Average Score', value: avg + ' / 20', color: '#facc15' },
+      { label: 'Perfect Games (20/20)', value: s.perfectGames || 0, color: '#4ade80' },
+      { label: 'Current Streak', value: s.streak, color: '#facc15' },
+      { label: 'Best Streak', value: s.best, color: '#a78bfa' },
+    ]);
     const modal = document.getElementById('cl-stats-modal');
     if (modal) modal.classList.remove('hidden');
   }

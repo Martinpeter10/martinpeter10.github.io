@@ -57,19 +57,26 @@ Every game page MUST include all of these in the `<head>`:
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
+<!-- Security headers -->
+<meta name="referrer" content="strict-origin-when-cross-origin" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; img-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com; font-src 'self' https://cdn.tailwindcss.com;" />
+
 <!-- Google Analytics (gtag.js) - REQUIRED on every page -->
+<!-- gtag('config') is gated on cookie consent (dj_cookie_ok in localStorage) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-XLRXG28EZV"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-  gtag('config', 'G-XLRXG28EZV');
+  if (localStorage.getItem('dj_cookie_ok')) { gtag('config', 'G-XLRXG28EZV'); }
 </script>
 
 <!-- Tailwind CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
 
 ```
+
+> **Note on Themedle** (`media-src`): Themedle loads audio files from `/assets/audio/` so its CSP also needs `media-src 'self';` appended.
 
 ### 3. Hamburger Nav (must be on every page)
 Copy the hamburger button + backdrop + drawer nav from an existing game page. Then **add the new game** to the "Our Games" section of the drawer on ALL pages:
@@ -329,8 +336,43 @@ Pages to update:
 
 ---
 
+## Security Practices
+
+### No Advertising (AdSense removed)
+DailyJamm does **not** use Google AdSense or any other ad network. The only third-party script is Google Analytics (`G-XLRXG28EZV`). Do not add ad scripts.
+
+### Cookie Consent & Analytics Gating
+- The cookie consent bar (`dj-cookie-bar`) is shown on first visit via `index.html`.
+- GA's `gtag('config', ...)` call is **gated** on `localStorage.getItem('dj_cookie_ok')` on every page.
+- When the user clicks "Got it", the bar stores `dj_cookie_ok=1` and immediately fires `gtag('config', 'G-XLRXG28EZV')` for the current session.
+- The cookie bar text says "analytics" only — do not add "advertising" back since AdSense is removed.
+
+### DOM Safety — No `innerHTML` with User/External Data
+- **Never** assign `innerHTML` with values derived from user input, localStorage strings, or external data fetches.
+- For stat rows, use `DJUtils.setStatRows(containerId, rows)` — defined in `/assets/js/utils.js`.
+- For suggestion dropdowns and result dots, use `document.createElement` + `textContent`.
+- `innerHTML` is acceptable only for clearing a container (`el.innerHTML = ''` → prefer `el.textContent = ''`) or static strings with no variable interpolation.
+- The existing `escHtml()` utility in `main.js` is available for Themedle-specific escaping needs.
+
+### Content Security Policy
+All pages include a `<meta http-equiv="Content-Security-Policy">` tag. The CSP allows:
+- Scripts only from `'self'`, `googletagmanager.com`, and `cdn.tailwindcss.com`
+- Inline scripts (required for GA init) via `'unsafe-inline'`
+- Images from `'self'`, `data:`, and any `https:` source
+- Fetch/XHR only to `'self'`, `google-analytics.com`, and `googletagmanager.com`
+
+**Themedle** additionally needs `media-src 'self'` for audio files.
+
+If you add a new external script or font source, update the CSP on the relevant page(s).
+
+### Referrer Policy
+All pages include `<meta name="referrer" content="strict-origin-when-cross-origin" />` to prevent leaking full URLs to third-party sites via the `Referer` header.
+
+---
+
 ## Common Pitfalls
 - **Curly quotes**: Always use straight quotes in JS (`'` and `"`, never `'` `'` `"` `"`). Curly quotes in onclick handlers cause silent JS failures.
 - **Nav sync**: The hamburger nav is duplicated in every page's HTML. When adding a game, you must update ALL pages' nav or they'll be out of sync.
 - **iOS safe areas**: Always include `viewport-fit=cover` and `apple-mobile-web-app-status-bar-style` metas.
 - **GitHub Pages cache mismatch**: After pushing JS + data file changes together, Pages may serve a stale JS with the new data (or vice versa), causing JS errors caught as "Failed to load puzzle." If this happens, a hard refresh or waiting a few minutes resolves it. Ensure JS and data changes are compatible in both old and new states when possible.
+- **New external resources**: If you add a new CDN, font, or API endpoint, update the CSP meta on every affected page. Forgetting this will silently block the resource in supporting browsers.

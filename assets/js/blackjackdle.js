@@ -760,13 +760,16 @@ const BJGame = (function () {
 
     // Hand result dots
     const row = $('bj-hand-results-row');
-    row.innerHTML = '';
+    row.textContent = '';
     sessionResults.forEach((r, i) => {
       const dot = document.createElement('div');
       dot.className = 'bj-result-dot';
       const emoji = r.net > 0 ? '\uD83D\uDFE2' : r.net < 0 ? '\uD83D\uDD34' : '\uD83D\uDFE1';
       const label = r.net > 0 ? '+' + r.net : r.net === 0 ? 'Even' : '' + r.net;
-      dot.innerHTML = '<span class="text-lg">' + emoji + '</span><span>Hand ' + (i + 1) + '</span><span class="font-bold">' + label + '</span>';
+      const s1 = document.createElement('span'); s1.className = 'text-lg'; s1.textContent = emoji;
+      const s2 = document.createElement('span'); s2.textContent = 'Hand ' + (i + 1);
+      const s3 = document.createElement('span'); s3.className = 'font-bold'; s3.textContent = label;
+      dot.appendChild(s1); dot.appendChild(s2); dot.appendChild(s3);
       row.appendChild(dot);
     });
 
@@ -831,13 +834,16 @@ const BJGame = (function () {
 
     // Show hand results in broke panel
     const row = $('bj-broke-hands');
-    row.innerHTML = '';
+    row.textContent = '';
     sessionResults.forEach((r, i) => {
       const dot = document.createElement('div');
       dot.className = 'bj-result-dot';
       const emoji = r.net > 0 ? '\uD83D\uDFE2' : r.net < 0 ? '\uD83D\uDD34' : '\uD83D\uDFE1';
       const label = r.net > 0 ? '+' + r.net : r.net === 0 ? 'Even' : '' + r.net;
-      dot.innerHTML = '<span class="text-lg">' + emoji + '</span><span>Hand ' + (i + 1) + '</span><span class="font-bold">' + label + '</span>';
+      const s1 = document.createElement('span'); s1.className = 'text-lg'; s1.textContent = emoji;
+      const s2 = document.createElement('span'); s2.textContent = 'Hand ' + (i + 1);
+      const s3 = document.createElement('span'); s3.className = 'font-bold'; s3.textContent = label;
+      dot.appendChild(s1); dot.appendChild(s2); dot.appendChild(s3);
       row.appendChild(dot);
     });
 
@@ -997,24 +1003,15 @@ const BJGame = (function () {
     const atSign  = at.totalNet >= 0 ? '+' : '';
     const atColor = at.totalNet >= 0 ? '#4ade80' : '#f87171';
 
-    function row(label, value, color) {
-      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1f2937">' +
-        '<span style="color:#9ca3af;font-size:13px">' + label + '</span>' +
-        '<span style="font-weight:800;font-size:15px;color:' + (color || '#fff') + '">' + value + '</span>' +
-      '</div>';
-    }
-
-    const el = $('bj-stats-content');
-    if (el) {
-      el.innerHTML =
-        row('Current Stack', chips.toLocaleString() + ' chips', '#4ade80') +
-        row('Games Played', s.played || 0) +
-        row('Current Streak', s.streak, '#facc15') +
-        row('Best Streak', s.best, '#a78bfa') +
-        row('Best Single Hand', '+' + at.biggestWin.toLocaleString(), '#4ade80') +
-        row('Worst Single Hand', at.biggestLoss.toLocaleString(), '#f87171') +
-        row('All-Time Net', atSign + at.totalNet.toLocaleString(), atColor);
-    }
+    DJUtils.setStatRows('bj-stats-content', [
+      { label: 'Current Stack', value: chips.toLocaleString() + ' chips', color: '#4ade80' },
+      { label: 'Games Played', value: s.played || 0 },
+      { label: 'Current Streak', value: s.streak, color: '#facc15' },
+      { label: 'Best Streak', value: s.best, color: '#a78bfa' },
+      { label: 'Best Single Hand', value: '+' + at.biggestWin.toLocaleString(), color: '#4ade80' },
+      { label: 'Worst Single Hand', value: at.biggestLoss.toLocaleString(), color: '#f87171' },
+      { label: 'All-Time Net', value: atSign + at.totalNet.toLocaleString(), color: atColor },
+    ]);
     const modal = $('bj-stats-modal');
     if (modal) modal.classList.remove('hidden');
   }
