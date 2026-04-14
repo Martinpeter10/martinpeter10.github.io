@@ -1,4 +1,9 @@
 // main.js - Themedle game logic (with CSS-timed playback bar)
+(function () {
+'use strict';
+
+const SECONDS_PER_DAY  = 86400;
+const SECONDS_PER_HOUR = 3600;
 //
 // Expects these DOM IDs in index.html:
 // playBtn, volumeSlider, clipLength, progressBar, maxClipIndicator, guessInput,
@@ -198,9 +203,6 @@ const submitBtn = document.getElementById('submitGuess');
 const skipBtn = document.getElementById('skipGuess');
 
 // -------------------- Date Helpers (DST-safe Chicago) --------------------
-function getTodayCST() {
-  return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
-}
 function getChicagoYear() {
   return parseInt(new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Chicago', year: 'numeric' }).format(new Date()), 10);
 }
@@ -238,7 +240,7 @@ function getDayIndexFromISO(dateISO) {
   return Math.floor(new Date(dateISO).getTime() / 86400000);
 }
 function getDailySongIndex() {
-  const todayISO = getTodayCST();
+  const todayISO = DJUtils.getChicagoDate();
   const order = getPermutation(themeSongs.length);
   const dayIndex = getDayIndexFromISO(todayISO);
   const idx = order[dayIndex % themeSongs.length];
@@ -292,7 +294,7 @@ function loadStats() {
   }
 }
 function saveStats() {
-  localStorage.setItem('themedleStats', JSON.stringify(gameStats));
+  DJUtils.saveJSON('themedleStats', gameStats);
 }
 function updateStatsDisplay() {
   const cur = document.getElementById('currentStreak');
@@ -306,7 +308,7 @@ function updateStatsDisplay() {
 // -------------------- Daily State --------------------
 function loadDailyGameState() {
   const saved = localStorage.getItem('themedleDailyState');
-  const today = getTodayCST();
+  const today = DJUtils.getChicagoDate();
   if (saved) {
     const savedState = JSON.parse(saved);
     if (savedState.date === today) {
@@ -326,7 +328,7 @@ function loadDailyGameState() {
   return false;
 }
 function saveDailyGameState() {
-  localStorage.setItem('themedleDailyState', JSON.stringify(dailyGameState));
+  DJUtils.saveJSON('themedleDailyState', dailyGameState);
 }
 
 // -------------------- UI Helpers --------------------
@@ -388,12 +390,11 @@ function updateCountdown() {
   const h = parseInt(map.hour, 10);
   const m = parseInt(map.minute, 10);
   const s = parseInt(map.second, 10);
-  const secsToday = h * 3600 + m * 60 + s;
-  const secsInDay = 24 * 3600;
-  let remaining = secsInDay - secsToday;
+  const secsToday = h * SECONDS_PER_HOUR + m * 60 + s;
+  let remaining = SECONDS_PER_DAY - secsToday;
   if (remaining < 0) remaining = 0;
-  const hours = Math.floor(remaining / 3600);
-  const minutes = Math.floor((remaining % 3600) / 60);
+  const hours = Math.floor(remaining / SECONDS_PER_HOUR);
+  const minutes = Math.floor((remaining % SECONDS_PER_HOUR) / 60);
   const seconds = remaining % 60;
   const el = document.getElementById('countdown');
   if (el) el.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
@@ -517,7 +518,7 @@ if (submitBtn) {
       saveDailyGameState();
       gameOver = true;
 
-      const today = getTodayCST();
+      const today = DJUtils.getChicagoDate();
       if (gameStats.lastPlayedDate !== today) {
         gameStats.currentStreak++;
         gameStats.gamesPlayed++;
@@ -548,7 +549,7 @@ if (submitBtn) {
         dailyGameState.won = false;
         saveDailyGameState();
         gameOver = true;
-        const today = getTodayCST();
+        const today = DJUtils.getChicagoDate();
         if (gameStats.lastPlayedDate !== today) {
           gameStats.currentStreak = 0;
           gameStats.gamesPlayed++;
@@ -593,7 +594,7 @@ if (skipBtn) {
         dailyGameState.won = false;
         saveDailyGameState();
         gameOver = true;
-        const today = getTodayCST();
+        const today = DJUtils.getChicagoDate();
         if (gameStats.lastPlayedDate !== today) {
           gameStats.currentStreak = 0;
           gameStats.gamesPlayed++;
@@ -782,3 +783,7 @@ function boot() {
 }
 
 document.addEventListener('DOMContentLoaded', boot);
+
+// Expose functions called from HTML onclick handlers
+window.closeStatsModal = closeStatsModal;
+})();

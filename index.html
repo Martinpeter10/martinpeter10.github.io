@@ -5,8 +5,6 @@
   <!-- NOTE: added viewport-fit=cover to ensure background fills notch/safe areas on iOS -->
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>DailyJamm - Daily Games Hub</title>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4552090282675465"
-     crossorigin="anonymous"></script>
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XLRXG28EZV"></script>
   <script>
@@ -109,6 +107,7 @@
     "author": { "@type": "Organization", "name": "DailyJamm", "url": "https://dailyjamm.com" }
   }
   </script>
+  <script src="/assets/js/menu.js" defer></script>
 </head>
 <body>
   <!-- Hamburger button (persists in place; open and close) -->
@@ -363,26 +362,13 @@
   </main>
 
   <script>
-    function toggleMenu(){
-      const d=document.getElementById('drawer');
-      const b=document.getElementById('backdrop');
-      const btn=document.querySelector('.hamburger');
-      const open=d.classList.toggle('open');
-      b.classList.toggle('open',open);
-      btn.setAttribute('aria-expanded',open?'true':'false');
-    }
-    function closeMenu(){
-      document.getElementById('drawer').classList.remove('open');
-      document.getElementById('backdrop').classList.remove('open');
-      document.querySelector('.hamburger').setAttribute('aria-expanded','false');
-    }
     function openExternal(url){window.open(url,'_blank','noopener,noreferrer')}
     function goto(path){window.location.href=path}
     document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.activeElement&&document.activeElement.getAttribute('role')==='button'){document.activeElement.click()}})
     document.getElementById('year').textContent=new Date().getFullYear();
   </script>
 
-  <!-- Cookie consent (required for AdSense) -->
+  <!-- Cookie consent -->
   <div id="dj-cookie-bar" style="display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(15,23,42,0.97);border-top:1px solid #1e293b;padding:10px 16px;align-items:center;justify-content:center;gap:12px;font-size:0.75rem;color:#94a3b8;z-index:9000;flex-wrap:wrap;text-align:center">
     <span>We use cookies for analytics and advertising. <a href="/privacy/" style="color:#2ecc71;text-decoration:underline">Privacy Policy</a></span>
     <button onclick="document.getElementById('dj-cookie-bar').style.display='none';localStorage.setItem('dj_cookie_ok','1')" style="background:#2ecc71;color:#111;border:none;padding:4px 14px;border-radius:4px;font-size:0.75rem;font-weight:700;cursor:pointer;flex-shrink:0">Got it</button>

@@ -3,6 +3,10 @@ const RLGame = (function () {
   'use strict';
 
   /* ── Constants ── */
+  const MS_PER_HOUR = 3600000;
+  const MS_PER_MIN  = 60000;
+  const MS_PER_SEC  = 1000;
+
   const SPINS_PER_DAY   = 3;
   const STARTING_CHIPS  = 1000;
   const DAILY_BONUS_MIN = 50;
@@ -35,25 +39,15 @@ const RLGame = (function () {
   /* ── DOM helper ── */
   const $ = (id) => document.getElementById(id);
 
-  /* ── Chicago date helpers (DST-safe) ── */
-  function chicagoDate() {
-    return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
-  }
-  function chicagoMidnight() {
-    const now = new Date();
-    const chi = new Date(now.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
-    const tomorrow = new Date(chi);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(0, 0, 0, 0);
-    return Date.now() + (tomorrow - chi);
-  }
+  /* ── Chicago date helpers (via shared DJUtils) ── */
+  const chicagoDate     = () => DJUtils.getChicagoDate();
+  const chicagoMidnight = () => DJUtils.getChicagoMidnight();
 
   /* ── LocalStorage ── */
   function loadStats() {
-    try { return JSON.parse(localStorage.getItem('rl_stats')) || { streak: 0, best: 0, played: 0 }; }
-    catch { return { streak: 0, best: 0, played: 0 }; }
+    return DJUtils.loadJSON('rl_stats', { streak: 0, best: 0, played: 0 });
   }
-  function saveStats(s) { localStorage.setItem('rl_stats', JSON.stringify(s)); }
+  function saveStats(s) { DJUtils.saveJSON('rl_stats', s); }
 
   function loadToday() {
     try {
@@ -529,23 +523,11 @@ const RLGame = (function () {
   }
 
   function shareResults() {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(buildShareText()).then(() => {
-        const btn = $('rl-share-btn');
-        btn.textContent = 'Copied!';
-        setTimeout(() => { btn.textContent = 'Share Results'; }, 2000);
-      });
-    }
+    DJUtils.clipboardShare(buildShareText(), $('rl-share-btn'), 'Share Results');
   }
 
   function shareBrokeResults() {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(buildShareText()).then(() => {
-        const btn = $('rl-broke-share-btn');
-        btn.textContent = 'Copied!';
-        setTimeout(() => { btn.textContent = 'Share Results'; }, 2000);
-      });
-    }
+    DJUtils.clipboardShare(buildShareText(), $('rl-broke-share-btn'), 'Share Results');
   }
 
   /* ── Countdown ── */
@@ -554,13 +536,13 @@ const RLGame = (function () {
     function tick() {
       const diff = chicagoMidnight() - Date.now();
       const t = diff <= 0 ? '00:00:00' :
-        String(Math.floor(diff / 3600000)).padStart(2, '0') + ':' +
-        String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0') + ':' +
-        String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+        String(Math.floor(diff / MS_PER_HOUR)).padStart(2, '0') + ':' +
+        String(Math.floor((diff % MS_PER_HOUR) / MS_PER_MIN)).padStart(2, '0') + ':' +
+        String(Math.floor((diff % MS_PER_MIN) / MS_PER_SEC)).padStart(2, '0');
       targets.forEach(el => { if (el) el.textContent = t; });
     }
     tick();
-    setInterval(tick, 1000);
+    setInterval(tick, MS_PER_SEC);
   }
 
   /* ── Broke screen ── */

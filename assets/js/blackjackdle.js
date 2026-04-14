@@ -3,6 +3,10 @@ const BJGame = (function () {
   'use strict';
 
   /* ── Constants ── */
+  const MS_PER_HOUR = 3600000;
+  const MS_PER_MIN  = 60000;
+  const MS_PER_SEC  = 1000;
+
   const HANDS_PER_DAY = 3;
   const STARTING_CHIPS = 1000;
   const DAILY_BONUS_MIN = 50;
@@ -33,27 +37,15 @@ const BJGame = (function () {
   const $ = (id) => document.getElementById(id);
   let els = {};
 
-  /* ── Chicago date helper (DST-safe) ── */
-  function chicagoDate() {
-    const s = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
-    return s; // 'YYYY-MM-DD'
-  }
-  function chicagoMidnight() {
-    const now = new Date();
-    const chi = new Date(now.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
-    const tomorrow = new Date(chi);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(0, 0, 0, 0);
-    const diff = tomorrow - chi;
-    return Date.now() + diff;
-  }
+  /* ── Chicago date helpers (via shared DJUtils) ── */
+  const chicagoDate     = () => DJUtils.getChicagoDate();
+  const chicagoMidnight = () => DJUtils.getChicagoMidnight();
 
   /* ── LocalStorage ── */
   function loadStats() {
-    try { return JSON.parse(localStorage.getItem('bj_stats')) || { streak: 0, best: 0, played: 0 }; }
-    catch { return { streak: 0, best: 0, played: 0 }; }
+    return DJUtils.loadJSON('bj_stats', { streak: 0, best: 0, played: 0 });
   }
-  function saveStats(s) { localStorage.setItem('bj_stats', JSON.stringify(s)); }
+  function saveStats(s) { DJUtils.saveJSON('bj_stats', s); }
 
   function loadToday() {
     try {
@@ -804,22 +796,10 @@ const BJGame = (function () {
       'dailyjamm.com/blackjackdle/';
   }
   function shareResults() {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(buildShareText()).then(() => {
-        const btn = $('bj-share-btn');
-        btn.textContent = 'Copied!';
-        setTimeout(() => { btn.textContent = 'Share Results'; }, 2000);
-      });
-    }
+    DJUtils.clipboardShare(buildShareText(), $('bj-share-btn'), 'Share Results');
   }
   function shareBrokeResults() {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(buildShareText()).then(() => {
-        const btn = $('bj-broke-share-btn');
-        btn.textContent = 'Copied!';
-        setTimeout(() => { btn.textContent = 'Share Results'; }, 2000);
-      });
-    }
+    DJUtils.clipboardShare(buildShareText(), $('bj-broke-share-btn'), 'Share Results');
   }
 
   /* ── Countdown ── */
@@ -829,13 +809,13 @@ const BJGame = (function () {
       const target = chicagoMidnight();
       const diff = target - Date.now();
       if (diff <= 0) { el.textContent = '00:00:00'; return; }
-      const h = Math.floor(diff / 3600000);
-      const m = Math.floor((diff % 3600000) / 60000);
-      const s = Math.floor((diff % 60000) / 1000);
+      const h = Math.floor(diff / MS_PER_HOUR);
+      const m = Math.floor((diff % MS_PER_HOUR) / MS_PER_MIN);
+      const s = Math.floor((diff % MS_PER_MIN) / MS_PER_SEC);
       el.textContent = String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
     }
     tick();
-    setInterval(tick, 1000);
+    setInterval(tick, MS_PER_SEC);
   }
 
   /* ── Broke screen (ran out mid-session) ── */
@@ -873,13 +853,13 @@ const BJGame = (function () {
       const target = chicagoMidnight();
       const diff = target - Date.now();
       if (diff <= 0) { el.textContent = '00:00:00'; return; }
-      const h = Math.floor(diff / 3600000);
-      const m = Math.floor((diff % 3600000) / 60000);
-      const s = Math.floor((diff % 60000) / 1000);
+      const h = Math.floor(diff / MS_PER_HOUR);
+      const m = Math.floor((diff % MS_PER_HOUR) / MS_PER_MIN);
+      const s = Math.floor((diff % MS_PER_MIN) / MS_PER_SEC);
       el.textContent = String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
     }
     tick();
-    setInterval(tick, 1000);
+    setInterval(tick, MS_PER_SEC);
   }
 
   /* ── Modal ── */

@@ -17,6 +17,10 @@
   const CLASS_ABBREVS   = { bard:'Brd', cleric:'Clr', druid:'Drd', paladin:'Pal', ranger:'Rgr', sorcerer:'Sor', warlock:'Wlk', wizard:'Wiz' };
   const SCHOOL_ABBREVS  = { Abjuration:'Abj', Conjuration:'Conj', Divination:'Div', Enchantment:'Ench', Evocation:'Evoc', Illusion:'Illus', Necromancy:'Necro', Transmutation:'Trans' };
 
+  const SECONDS_PER_DAY  = 86400;
+  const SECONDS_PER_HOUR = 3600;
+  const SHARE_RESET_MS   = 2000;
+
   // Cached formatter for countdown — avoids creating a new object every second
   const COUNTDOWN_FMT = new Intl.DateTimeFormat('en-CA', {
     timeZone: 'America/Chicago',
@@ -25,16 +29,11 @@
     hour: '2-digit', minute: '2-digit', second: '2-digit',
   });
 
-  // ── Date helpers (DST-safe Chicago) ──────────────────────────────────────
-  function getTodayCST() {
-    return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
-  }
-
   // ── Puzzle selection (days since epoch, shuffled per cycle) ─────────────
   // Epoch = Jan 1 2026. Each cycle of N spells uses a seeded Fisher-Yates
   // shuffle so the order is random but deterministic (same spell for all
   // players on the same day) and every spell appears once before repeating.
-  var SPELL_EPOCH = new Date('2026-01-01T12:00:00Z');
+  const SPELL_EPOCH = new Date('2026-01-01T12:00:00Z');
 
   function getPuzzleIndex() {
     const parts = new Intl.DateTimeFormat('en-CA', {
@@ -51,10 +50,10 @@
 
   // Mulberry32 seeded RNG — deterministic, fast, good distribution
   function mulberry32(seed) {
-    var a = seed >>> 0;
+    let a = seed >>> 0;
     return function () {
       a = (a + 0x6D2B79F5) >>> 0;
-      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
       t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) | 0;
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
@@ -62,21 +61,21 @@
 
   // Returns the spell array index for a given 1-indexed puzzle day
   function getShuffledSpellIndex(dayIndex, count) {
-    var cycle      = Math.floor((dayIndex - 1) / count);
-    var posInCycle = (dayIndex - 1) % count;
-    var seed       = (0xABCD1234 + cycle * 0x9E3779B9) >>> 0;
-    var rng        = mulberry32(seed);
-    var arr        = [];
-    for (var i = 0; i < count; i++) arr[i] = i;
-    for (var i = count - 1; i > 0; i--) {
-      var j   = Math.floor(rng() * (i + 1));
-      var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+    const cycle      = Math.floor((dayIndex - 1) / count);
+    const posInCycle = (dayIndex - 1) % count;
+    const seed       = (0xABCD1234 + cycle * 0x9E3779B9) >>> 0;
+    const rng        = mulberry32(seed);
+    const arr        = [];
+    for (let i = 0; i < count; i++) arr[i] = i;
+    for (let i = count - 1; i > 0; i--) {
+      const j   = Math.floor(rng() * (i + 1));
+      const tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
     }
     return arr[posInCycle];
   }
 
   // ── State ────────────────────────────────────────────────────────────────
-  const todayCST  = getTodayCST();
+  const todayCST  = DJUtils.getChicagoDate();
   let spells      = [];
   let answer      = null;
   let puzzleNum   = 1;
@@ -85,12 +84,11 @@
 
   // ── localStorage ─────────────────────────────────────────────────────────
   function loadStats() {
-    try { return JSON.parse(localStorage.getItem(STATS_KEY)) || { streak: 0, best: 0, played: 0, wins: 0 }; }
-    catch (e) { return { streak: 0, best: 0, played: 0, wins: 0 }; }
+    return DJUtils.loadJSON(STATS_KEY, { streak: 0, best: 0, played: 0, wins: 0 });
   }
 
   function saveStats(won) {
-    var s = loadStats();
+    const s = loadStats();
     s.played++;
     if (won) {
       s.wins = (s.wins || 0) + 1;
@@ -103,30 +101,30 @@
 
   function loadTodayState() {
     try {
-      var raw = localStorage.getItem(TODAY_KEY);
+      const raw = localStorage.getItem(TODAY_KEY);
       if (!raw) return null;
-      var d = JSON.parse(raw);
+      const d = JSON.parse(raw);
       if (d.todayDate !== todayCST) return null;
       return d;
     } catch (e) { return null; }
   }
 
   function saveTodayState() {
-    localStorage.setItem(TODAY_KEY, JSON.stringify({
+    DJUtils.saveJSON(TODAY_KEY, {
       todayDate: todayCST,
       puzzleNum: puzzleNum,
       guesses:   guesses,
       gameOver:  gameOver,
-    }));
+    });
   }
 
   // ── Comparison logic ─────────────────────────────────────────────────────
   function compareGuess(guess, ans) {
-    var results = [];
+    const results = [];
 
     // Level (0-9): green=exact, yellow=within ±2 with arrow, red=>2 off
     (function () {
-      var status, arrow = null;
+      let status, arrow = null;
       if (guess.level === ans.level) {
         status = 'green';
       } else if (Math.abs(guess.level - ans.level) <= 2) {
@@ -155,9 +153,9 @@
 
     // Range: green=exact, yellow=adjacent tier with arrow, red=>1 tier off
     (function () {
-      var gi = RANGE_TIERS.indexOf(guess.range);
-      var ai = RANGE_TIERS.indexOf(ans.range);
-      var status, arrow = null;
+      const gi = RANGE_TIERS.indexOf(guess.range);
+      const ai = RANGE_TIERS.indexOf(ans.range);
+      let status, arrow = null;
       if (gi === ai) {
         status = 'green';
       } else if (Math.abs(gi - ai) === 1) {
@@ -172,14 +170,14 @@
 
     // Components: green=exact, yellow=≥1 shared letter, red=no overlap
     (function () {
-      var gc = guess.components;
-      var ac = ans.components;
-      var status;
+      const gc = guess.components;
+      const ac = ans.components;
+      let status;
       if (gc === ac) {
         status = 'green';
       } else {
-        var shared = false;
-        for (var i = 0; i < gc.length; i++) {
+        let shared = false;
+        for (let i = 0; i < gc.length; i++) {
           if (ac.indexOf(gc[i]) !== -1) { shared = true; break; }
         }
         status = shared ? 'yellow' : 'red';
@@ -203,9 +201,9 @@
 
     // Duration: green=exact, yellow=adjacent tier with arrow, red=>1 tier off
     (function () {
-      var gi = DURATION_TIERS.indexOf(guess.duration);
-      var ai = DURATION_TIERS.indexOf(ans.duration);
-      var status, arrow = null;
+      const gi = DURATION_TIERS.indexOf(guess.duration);
+      const ai = DURATION_TIERS.indexOf(ans.duration);
+      let status, arrow = null;
       if (gi === ai) {
         status = 'green';
       } else if (Math.abs(gi - ai) === 1) {
@@ -220,21 +218,21 @@
 
     // Classes: green=exact same set, yellow=≥1 class in common, red=no overlap
     (function () {
-      var gc = (guess.classes || []).slice().sort();
-      var ac = (ans.classes   || []).slice().sort();
-      var status;
+      const gc = (guess.classes || []).slice().sort();
+      const ac = (ans.classes   || []).slice().sort();
+      let status;
       if (gc.join(',') === ac.join(',')) {
         status = 'green';
       } else {
-        var shared = gc.some(function (c) { return ac.indexOf(c) !== -1; });
+        const shared = gc.some(function (c) { return ac.indexOf(c) !== -1; });
         status = shared ? 'yellow' : 'red';
       }
-      var names = (guess.classes || []).map(function (c) { return CLASS_ABBREVS[c] || c; });
-      var display;
+      const names = (guess.classes || []).map(function (c) { return CLASS_ABBREVS[c] || c; });
+      let display;
       if (names.length <= 2) {
         display = names.join('/');
       } else if (names.length <= 4) {
-        var half = Math.ceil(names.length / 2);
+        const half = Math.ceil(names.length / 2);
         display = names.slice(0, half).join('/') + '\n' + names.slice(half).join('/');
       } else {
         display = names.slice(0, 2).join('/') + '\n' + names[2] + '+' + (names.length - 3);
@@ -250,20 +248,20 @@
   }
 
   // ── Autocomplete ─────────────────────────────────────────────────────────
-  var selectedDropdownIndex = -1;
-  var dropdownItems = [];
+  let selectedDropdownIndex = -1;
+  let dropdownItems = [];
 
   function guessedNames() {
     return guesses.map(function (g) { return g.spellName.toLowerCase(); });
   }
 
   function filterSpells(query) {
-    var q = query.toLowerCase().trim();
+    const q = query.toLowerCase().trim();
     if (!q) return [];
-    var already = new Set(guessedNames());
-    var startsWith = [], contains = [];
+    const already = new Set(guessedNames());
+    const startsWith = [], contains = [];
     spells.forEach(function (s) {
-      var n = s.name.toLowerCase();
+      const n = s.name.toLowerCase();
       if (already.has(n)) return;
       if (n.startsWith(q)) startsWith.push(s);
       else if (n.indexOf(q) !== -1) contains.push(s);
@@ -272,13 +270,13 @@
   }
 
   function renderDropdown(matches) {
-    var ul = document.getElementById('spd-dropdown');
+    const ul = document.getElementById('spd-dropdown');
     if (!matches.length) { ul.classList.add('hidden'); dropdownItems = []; selectedDropdownIndex = -1; return; }
     ul.innerHTML = '';
     dropdownItems = matches;
     selectedDropdownIndex = -1;
     matches.forEach(function (spell, i) {
-      var li = document.createElement('li');
+      const li = document.createElement('li');
       li.textContent = spell.name;
       li.setAttribute('role', 'option');
       li.setAttribute('data-index', i);
@@ -292,21 +290,21 @@
   }
 
   function hideDropdown() {
-    var ul = document.getElementById('spd-dropdown');
+    const ul = document.getElementById('spd-dropdown');
     ul.classList.add('hidden');
     dropdownItems = [];
     selectedDropdownIndex = -1;
   }
 
   function selectSpell(spell) {
-    var input = document.getElementById('spd-input');
+    const input = document.getElementById('spd-input');
     input.value = spell.name;
     hideDropdown();
     input.focus();
   }
 
   function highlightDropdownItem(index) {
-    var items = document.querySelectorAll('#spd-dropdown li');
+    const items = document.querySelectorAll('#spd-dropdown li');
     items.forEach(function (li, i) {
       li.classList.toggle('spd-dropdown-active', i === index);
     });
@@ -314,37 +312,37 @@
 
   // ── Board rendering ──────────────────────────────────────────────────────
   function renderBoard(animateLastRow) {
-    var board     = document.getElementById('spd-board');
-    var namesCol  = document.getElementById('spd-names');
+    const board     = document.getElementById('spd-board');
+    const namesCol  = document.getElementById('spd-names');
     board.innerHTML    = '';
     namesCol.innerHTML = '';
 
     guesses.forEach(function (guess, rowIndex) {
       // Name cell in frozen left column
-      var nameCell = document.createElement('div');
+      const nameCell = document.createElement('div');
       nameCell.className = 'spd-cell spd-name-cell';
       nameCell.textContent = guess.spellName;
       namesCol.appendChild(nameCell);
 
       // Attribute row in scrollable right panel
-      var row = document.createElement('div');
+      const row = document.createElement('div');
       row.className = 'spd-row';
 
       guess.results.forEach(function (r, colIndex) {
-        var cell = document.createElement('div');
+        const cell = document.createElement('div');
         cell.className = 'spd-cell spd-tile spd-' + r.status;
         if (animateLastRow && rowIndex === guesses.length - 1) {
           cell.style.animationDelay = (colIndex * 100) + 'ms';
           cell.classList.add('spd-tile-pop');
         }
 
-        var top = document.createElement('span');
+        const top = document.createElement('span');
         top.className = 'spd-tile-val';
         top.textContent = r.display;
         cell.appendChild(top);
 
         if (r.arrow) {
-          var arrow = document.createElement('span');
+          const arrow = document.createElement('span');
           arrow.className = 'spd-tile-arrow';
           arrow.textContent = r.arrow;
           cell.appendChild(arrow);
@@ -357,16 +355,16 @@
     });
 
     // Empty rows for remaining guesses
-    var remaining = MAX_GUESSES - guesses.length;
-    for (var i = 0; i < remaining; i++) {
-      var emptyName = document.createElement('div');
+    const remaining = MAX_GUESSES - guesses.length;
+    for (let i = 0; i < remaining; i++) {
+      const emptyName = document.createElement('div');
       emptyName.className = 'spd-cell spd-name-cell spd-empty-cell';
       namesCol.appendChild(emptyName);
 
-      var row = document.createElement('div');
+      const row = document.createElement('div');
       row.className = 'spd-row spd-row-empty';
-      for (var j = 0; j < 9; j++) {
-        var cell = document.createElement('div');
+      for (let j = 0; j < 9; j++) {
+        const cell = document.createElement('div');
         cell.className = 'spd-cell spd-tile spd-empty';
         row.appendChild(cell);
       }
@@ -377,20 +375,20 @@
 
     // Scroll attr panel to show latest row; sync name column
     if (animateLastRow) {
-      var attrScroll = document.getElementById('spd-attr-scroll');
+      const attrScroll = document.getElementById('spd-attr-scroll');
       attrScroll.scrollTop = attrScroll.scrollHeight;
       namesCol.scrollTop   = attrScroll.scrollTop;
     }
   }
 
   function updateGuessCounter() {
-    var el = document.getElementById('spd-guess-count');
+    const el = document.getElementById('spd-guess-count');
     if (el) el.textContent = guesses.length + ' / ' + MAX_GUESSES;
   }
 
   // ── Animations / toast ────────────────────────────────────────────────────
   function shakeInput() {
-    var row = document.getElementById('spd-input-row');
+    const row = document.getElementById('spd-input-row');
     row.classList.remove('spd-shake');
     void row.offsetWidth; // reflow
     row.classList.add('spd-shake');
@@ -398,7 +396,7 @@
   }
 
   function toastMessage(text) {
-    var toast = document.getElementById('spd-toast');
+    const toast = document.getElementById('spd-toast');
     toast.textContent = text;
     toast.classList.remove('hidden');
     toast.classList.add('spd-toast-show');
@@ -412,14 +410,14 @@
   function submitGuess() {
     if (gameOver) return;
 
-    var input = document.getElementById('spd-input');
-    var raw   = input.value.trim();
+    const input = document.getElementById('spd-input');
+    const raw   = input.value.trim();
     if (!raw) return;
 
     // Find matching spell (case-insensitive)
-    var guessSpell = null;
-    var rawLower = raw.toLowerCase();
-    for (var i = 0; i < spells.length; i++) {
+    let guessSpell = null;
+    const rawLower = raw.toLowerCase();
+    for (let i = 0; i < spells.length; i++) {
       if (spells[i].name.toLowerCase() === rawLower) { guessSpell = spells[i]; break; }
     }
 
@@ -436,7 +434,7 @@
       return;
     }
 
-    var results = compareGuess(guessSpell, answer);
+    const results = compareGuess(guessSpell, answer);
     guesses.push({ spellName: guessSpell.name, results: results });
     saveTodayState();
     input.value = '';
@@ -457,12 +455,12 @@
   }
 
   function handleWin() {
-    var stats = saveStats(true);
+    const stats = saveStats(true);
     showResults(false, true, stats);
   }
 
   function handleLoss() {
-    var stats = saveStats(false);
+    const stats = saveStats(false);
     showResults(false, false, stats);
   }
 
@@ -476,11 +474,11 @@
   }
 
   function showResults(isRestore, won, stats) {
-    var inputArea  = document.getElementById('spd-input-area');
-    var resultsEl  = document.getElementById('spd-results');
-    var heading    = document.getElementById('spd-result-heading');
-    var sub        = document.getElementById('spd-result-sub');
-    var ansReveal  = document.getElementById('spd-answer-reveal');
+    const inputArea  = document.getElementById('spd-input-area');
+    const resultsEl  = document.getElementById('spd-results');
+    const heading    = document.getElementById('spd-result-heading');
+    const sub        = document.getElementById('spd-result-sub');
+    const ansReveal  = document.getElementById('spd-answer-reveal');
 
     inputArea.classList.add('hidden');
     resultsEl.classList.remove('hidden');
@@ -510,13 +508,13 @@
 
   // ── Share ────────────────────────────────────────────────────────────────
   function handleShare() {
-    var won       = guesses.length > 0 && isWin(guesses[guesses.length - 1].results);
-    var winLine   = won ? guesses.length + '/' + MAX_GUESSES : 'X/' + MAX_GUESSES;
-    var text      = 'Spelldle #' + puzzleNum + ' \u2014 ' + winLine + '\nhttps://dailyjamm.com/spelldle/';
-    var btn       = document.getElementById('spd-share-btn');
+    const won       = guesses.length > 0 && isWin(guesses[guesses.length - 1].results);
+    const winLine   = won ? guesses.length + '/' + MAX_GUESSES : 'X/' + MAX_GUESSES;
+    const text      = 'Spelldle #' + puzzleNum + ' \u2014 ' + winLine + '\nhttps://dailyjamm.com/spelldle/';
+    const btn       = document.getElementById('spd-share-btn');
     navigator.clipboard.writeText(text).then(function () {
       btn.textContent = 'Copied!';
-      setTimeout(function () { btn.textContent = 'Share Results'; }, 2000);
+      setTimeout(function () { btn.textContent = 'Share Results'; }, SHARE_RESET_MS);
     }).catch(function () {
       toastMessage('Copy failed — try selecting the text manually.');
     });
@@ -524,14 +522,14 @@
 
   // ── Countdown ─────────────────────────────────────────────────────────────
   function updateCountdown() {
-    var parts = COUNTDOWN_FMT.formatToParts(new Date());
-    var map = Object.fromEntries(parts.map(function (p) { return [p.type, p.value]; }));
-    var secsToday = parseInt(map.hour) * 3600 + parseInt(map.minute) * 60 + parseInt(map.second);
-    var remaining = Math.max(0, 86400 - secsToday);
-    var h = Math.floor(remaining / 3600);
-    var m = Math.floor((remaining % 3600) / 60);
-    var s = remaining % 60;
-    var el = document.getElementById('spd-countdown');
+    const parts = COUNTDOWN_FMT.formatToParts(new Date());
+    const map = Object.fromEntries(parts.map(function (p) { return [p.type, p.value]; }));
+    const secsToday = parseInt(map.hour) * SECONDS_PER_HOUR + parseInt(map.minute) * 60 + parseInt(map.second);
+    const remaining = Math.max(0, SECONDS_PER_DAY - secsToday);
+    const h = Math.floor(remaining / SECONDS_PER_HOUR);
+    const m = Math.floor((remaining % SECONDS_PER_HOUR) / 60);
+    const s = remaining % 60;
+    const el = document.getElementById('spd-countdown');
     if (el) el.textContent =
       String(h).padStart(2, '0') + ':' +
       String(m).padStart(2, '0') + ':' +
@@ -550,14 +548,14 @@
 
   // ── Init ─────────────────────────────────────────────────────────────────
   function init() {
-    var dayIndex = getPuzzleIndex();
+    const dayIndex = getPuzzleIndex();
     puzzleNum    = dayIndex;
     answer       = spells[getShuffledSpellIndex(dayIndex, spells.length)];
 
     document.getElementById('spd-meta').textContent = 'Daily Spelldle #' + puzzleNum;
 
     // Restore saved state
-    var saved = loadTodayState();
+    const saved = loadTodayState();
     if (saved) {
       guesses  = saved.guesses  || [];
       gameOver = saved.gameOver || false;
@@ -580,18 +578,18 @@
     setInterval(updateCountdown, 1000);
 
     // Events
-    var input     = document.getElementById('spd-input');
-    var submitBtn = document.getElementById('spd-submit-btn');
-    var shareBtn  = document.getElementById('spd-share-btn');
-    var helpBtn   = document.getElementById('spd-help-btn');
-    var modal     = document.getElementById('spd-modal');
+    const input     = document.getElementById('spd-input');
+    const submitBtn = document.getElementById('spd-submit-btn');
+    const shareBtn  = document.getElementById('spd-share-btn');
+    const helpBtn   = document.getElementById('spd-help-btn');
+    const modal     = document.getElementById('spd-modal');
 
     input.addEventListener('input', function () {
       renderDropdown(filterSpells(input.value));
     });
 
     input.addEventListener('keydown', function (e) {
-      var items = document.querySelectorAll('#spd-dropdown li');
+      const items = document.querySelectorAll('#spd-dropdown li');
       if (e.key === 'ArrowDown') {
         e.preventDefault();
         selectedDropdownIndex = Math.min(selectedDropdownIndex + 1, items.length - 1);
@@ -618,7 +616,7 @@
     });
 
     // Sync name column vertical scroll with attr panel
-    var attrScroll = document.getElementById('spd-attr-scroll');
+    const attrScroll = document.getElementById('spd-attr-scroll');
     attrScroll.addEventListener('scroll', function () {
       document.getElementById('spd-names').scrollTop = attrScroll.scrollTop;
     });
@@ -629,11 +627,11 @@
     document.getElementById('spd-modal-close').addEventListener('click', closeModal);
     modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
 
-    var statsBtn   = document.getElementById('spd-stats-btn');
-    var statsModal = document.getElementById('spd-stats-modal');
+    const statsBtn   = document.getElementById('spd-stats-btn');
+    const statsModal = document.getElementById('spd-stats-modal');
     if (statsBtn)   statsBtn.addEventListener('click', showStats);
     if (statsModal) statsModal.addEventListener('click', function (e) { if (e.target === statsModal) closeStats(); });
-    var statsClose = document.getElementById('spd-stats-close');
+    const statsClose = document.getElementById('spd-stats-close');
     if (statsClose) statsClose.addEventListener('click', closeStats);
 
     // ESC closes the modal (per site convention)
@@ -646,10 +644,10 @@
   }
 
   function showStats() {
-    var s      = loadStats();
-    var played = s.played || 0;
-    var wins   = s.wins   || 0;
-    var winPct = played > 0 ? Math.round(wins / played * 100) : 0;
+    const s      = loadStats();
+    const played = s.played || 0;
+    const wins   = s.wins   || 0;
+    const winPct = played > 0 ? Math.round(wins / played * 100) : 0;
 
     function row(label, value, color) {
       return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1f2937">' +
@@ -658,7 +656,7 @@
       '</div>';
     }
 
-    var el = document.getElementById('spd-stats-content');
+    const el = document.getElementById('spd-stats-content');
     if (el) {
       el.innerHTML =
         row('Games Played', played) +
@@ -667,12 +665,12 @@
         row('Current Streak', s.streak, '#facc15') +
         row('Best Streak', s.best, '#a78bfa');
     }
-    var statsModal = document.getElementById('spd-stats-modal');
+    const statsModal = document.getElementById('spd-stats-modal');
     if (statsModal) statsModal.classList.remove('hidden');
   }
 
   function closeStats() {
-    var statsModal = document.getElementById('spd-stats-modal');
+    const statsModal = document.getElementById('spd-stats-modal');
     if (statsModal) statsModal.classList.add('hidden');
   }
 

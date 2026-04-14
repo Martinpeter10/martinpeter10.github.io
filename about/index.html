@@ -34,8 +34,6 @@
 
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google AdSense -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4552090282675465" crossorigin="anonymous"></script>
 
   <style>
     :root {
@@ -73,6 +71,7 @@
     footer a { color: #6b7280; }
     footer a:hover { color: #fff; }
   </style>
+  <script src="/assets/js/menu.js" defer></script>
 </head>
 <body>
 
@@ -149,22 +148,10 @@
   </div>
 
   <script>
-    function toggleMenu() {
-      const d = document.getElementById('drawer');
-      const b = document.getElementById('backdrop');
-      const open = d.classList.toggle('open');
-      b.classList.toggle('open', open);
-      document.querySelector('.hamburger').setAttribute('aria-expanded', open ? 'true' : 'false');
-    }
-    function closeMenu() {
-      document.getElementById('drawer').classList.remove('open');
-      document.getElementById('backdrop').classList.remove('open');
-      document.querySelector('.hamburger').setAttribute('aria-expanded', 'false');
-    }
     document.getElementById('year').textContent = new Date().getFullYear();
   </script>
 
-  <!-- Cookie consent (required for AdSense) -->
+  <!-- Cookie consent -->
   <div id="dj-cookie-bar" style="display:none">
     <span>We use cookies for analytics and advertising. <a href="/privacy/">Privacy Policy</a></span>
     <button onclick="document.getElementById('dj-cookie-bar').style.display='none';localStorage.setItem('dj_cookie_ok','1')">Got it</button>

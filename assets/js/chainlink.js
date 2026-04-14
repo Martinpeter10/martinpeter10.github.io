@@ -1,13 +1,11 @@
 (function () {
   'use strict';
 
+  const SECONDS_PER_DAY  = 86400;
+  const SECONDS_PER_HOUR = 3600;
+
   // Puzzle data lives in /assets/data/chainlink-puzzles.json.
   // To add new puzzles, edit that file only - no changes needed here.
-
-  // ── Date helpers (DST-safe Chicago, matching Themedle) ───────────────────
-  function getTodayCST() {
-    return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
-  }
 
   // ── Puzzle selection ─────────────────────────────────────────────────────
   // Puzzle #1 plays on Jan 1 of each year. The day-of-year (1–365/366) maps
@@ -30,7 +28,7 @@
   }
 
   // ── State ────────────────────────────────────────────────────────────────
-  const todayCST = getTodayCST();
+  const todayCST = DJUtils.getChicagoDate();
   let puzzle; // set after fetch
   let currentStep = 0;
   let results     = [];   // { points: number }[]
@@ -46,8 +44,7 @@
   const SEEN_KEY  = 'cl_seen_howto';
 
   function loadStats() {
-    try { return JSON.parse(localStorage.getItem(STATS_KEY)) || { streak: 0, best: 0, played: 0, totalScore: 0, perfectGames: 0 }; }
-    catch { return { streak: 0, best: 0, played: 0, totalScore: 0, perfectGames: 0 }; }
+    return DJUtils.loadJSON(STATS_KEY, { streak: 0, best: 0, played: 0, totalScore: 0, perfectGames: 0 });
   }
 
   function saveStats(score) {
@@ -76,11 +73,11 @@
   }
 
   function saveTodayState() {
-    localStorage.setItem(TODAY_KEY, JSON.stringify({
+    DJUtils.saveJSON(TODAY_KEY, {
       todayDate: todayCST,
       puzzleId: puzzle.id,
       results, currentStep, gameOver, clueState,
-    }));
+    });
   }
 
   // ── Game helpers ─────────────────────────────────────────────────────────
@@ -304,11 +301,11 @@
       hour: '2-digit', minute: '2-digit', second: '2-digit',
     }).formatToParts(new Date());
     const map = Object.fromEntries(parts.map(p => [p.type, p.value]));
-    const secsToday = parseInt(map.hour) * 3600 + parseInt(map.minute) * 60 + parseInt(map.second);
-    let remaining = 86400 - secsToday;
+    const secsToday = parseInt(map.hour) * SECONDS_PER_HOUR + parseInt(map.minute) * 60 + parseInt(map.second);
+    let remaining = SECONDS_PER_DAY - secsToday;
     if (remaining < 0) remaining = 0;
-    const h = Math.floor(remaining / 3600);
-    const m = Math.floor((remaining % 3600) / 60);
+    const h = Math.floor(remaining / SECONDS_PER_HOUR);
+    const m = Math.floor((remaining % SECONDS_PER_HOUR) / 60);
     const s = remaining % 60;
     const el = document.getElementById('cl-countdown');
     if (el) el.textContent =
@@ -325,10 +322,7 @@
     const max     = perfect ? 20 : 15;
     const suffix  = perfect ? ' 🌟' : '';
     const text  = `Chain Link #${puzzle.id}\n${icons} ${score}/${max}${suffix}\nhttps://dailyjamm.com/chainlink/`;
-    navigator.clipboard.writeText(text).then(() => {
-      shareBtn.textContent = 'Copied!';
-      setTimeout(() => { shareBtn.textContent = 'Share Results'; }, 2000);
-    });
+    DJUtils.clipboardShare(text, shareBtn, 'Share Results');
   }
 
   // ── How to Play modal with animated demo ─────────────────────────────────
