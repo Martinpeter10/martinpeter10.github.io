@@ -220,7 +220,7 @@ Press `Ctrl+C` in the terminal to stop the server.
 - BlackJackdle: "Out of chips" game-over screen now includes a Share Results button
 
 ### v1.4.0 - 2026-03-28
-- Added **About** page (`/about/`) and **Privacy Policy** page (`/privacy/`) - required for Google AdSense approval
+- Added **About** page (`/about/`) and **Privacy Policy** page (`/privacy/`)
 - Footer on homepage now links to About and Privacy Policy
 - Info section added to hamburger menu on all pages
 - BlackJackdle card draw animations: hit, double down, and dealer draws now use flying card animation

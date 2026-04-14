@@ -34,8 +34,6 @@
 
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google AdSense -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4552090282675465" crossorigin="anonymous"></script>
 
   <style>
     :root {
@@ -75,6 +73,7 @@
     footer a { color: #6b7280; }
     footer a:hover { color: #fff; }
   </style>
+  <script src="/assets/js/menu.js" defer></script>
 </head>
 <body>
 
@@ -142,11 +141,6 @@
     <p>We use <strong style="color:#fff">Google Analytics</strong> to understand aggregate traffic patterns (page views, general geography, device types). Google Analytics may set cookies in your browser. This data is anonymized and we do not use it to identify individuals.</p>
     <p>You can opt out of Google Analytics by installing the <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener noreferrer">Google Analytics Opt-out Browser Add-on</a>.</p>
 
-    <h2>Advertising</h2>
-    <p>DailyJamm uses <strong style="color:#fff">Google AdSense</strong> to display advertisements. Google AdSense may use cookies and web beacons to serve ads based on your prior visits to this or other websites. Google's use of advertising cookies enables it and its partners to serve ads based on your visit to our site and/or other sites on the internet.</p>
-    <p>You may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer">Google Ads Settings</a>. Alternatively, you can opt out via the <a href="https://www.networkadvertising.org/choices/" target="_blank" rel="noopener noreferrer">Network Advertising Initiative opt-out page</a>.</p>
-    <p>For more information on how Google uses data from sites that use its services, visit: <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener noreferrer">How Google uses data when you use our partners' sites or apps</a>.</p>
-
     <h2>Third-Party Links</h2>
     <p>DailyJamm includes links to third-party game sites (Wordle, Connections, Heardle, etc.). We are not responsible for the privacy practices of those sites. We encourage you to review their privacy policies before interacting with them.</p>
 
@@ -165,22 +159,10 @@
   </div>
 
   <script>
-    function toggleMenu() {
-      const d = document.getElementById('drawer');
-      const b = document.getElementById('backdrop');
-      const open = d.classList.toggle('open');
-      b.classList.toggle('open', open);
-      document.querySelector('.hamburger').setAttribute('aria-expanded', open ? 'true' : 'false');
-    }
-    function closeMenu() {
-      document.getElementById('drawer').classList.remove('open');
-      document.getElementById('backdrop').classList.remove('open');
-      document.querySelector('.hamburger').setAttribute('aria-expanded', 'false');
-    }
     document.getElementById('year').textContent = new Date().getFullYear();
   </script>
 
-  <!-- Cookie consent (required for AdSense) -->
+  <!-- Cookie consent -->
   <div id="dj-cookie-bar" style="display:none">
     <span>We use cookies for analytics and advertising. <a href="/privacy/">Privacy Policy</a></span>
     <button onclick="document.getElementById('dj-cookie-bar').style.display='none';localStorage.setItem('dj_cookie_ok','1')">Got it</button>

@@ -69,8 +69,6 @@ Every game page MUST include all of these in the `<head>`:
 <!-- Tailwind CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
 
-<!-- Google AdSense - REQUIRED on every page -->
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4552090282675465" crossorigin="anonymous"></script>
 ```
 
 ### 3. Hamburger Nav (must be on every page)
@@ -212,7 +210,6 @@ Pages to update:
 ├── CNAME                         # Domain (dailyjamm.com)
 ├── sitemap.xml                   # SEO sitemap (update when adding pages)
 ├── robots.txt                    # Allows all crawling
-├── ads.txt                       # AdSense verification
 ├── assets/
 │   ├── css/styles.css            # Shared game styles
 │   ├── js/
@@ -233,7 +230,6 @@ Pages to update:
 
 ## Tracking IDs (do not change)
 - **Google Analytics**: `G-XLRXG28EZV`
-- **Google AdSense**: `ca-pub-4552090282675465`
 
 ## Game Design Conventions
 - **Daily reset**: Games use Chicago timezone (`America/Chicago` via `Intl.DateTimeFormat`) for consistent daily rotation
@@ -337,5 +333,4 @@ Pages to update:
 - **Curly quotes**: Always use straight quotes in JS (`'` and `"`, never `'` `'` `"` `"`). Curly quotes in onclick handlers cause silent JS failures.
 - **Nav sync**: The hamburger nav is duplicated in every page's HTML. When adding a game, you must update ALL pages' nav or they'll be out of sync.
 - **iOS safe areas**: Always include `viewport-fit=cover` and `apple-mobile-web-app-status-bar-style` metas.
-- **AdSense + Analytics**: Both scripts must be on every page. Missing them means lost revenue and tracking gaps.
 - **GitHub Pages cache mismatch**: After pushing JS + data file changes together, Pages may serve a stale JS with the new data (or vice versa), causing JS errors caught as "Failed to load puzzle." If this happens, a hard refresh or waiting a few minutes resolves it. Ensure JS and data changes are compatible in both old and new states when possible.
