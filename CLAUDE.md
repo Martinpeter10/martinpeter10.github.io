@@ -15,6 +15,11 @@ DailyJamm (dailyjamm.com) is a daily games hub hosted on GitHub Pages. It featur
 - **Style**: Dark mode only, rounded corners (8-16px), gradient accents, subtle box shadows
 - **Theme color meta**: `#1a1a2e` (matches background, prevents iOS toolbar color mismatch)
 
+## Writing Style
+- **No em dashes**: Never use em dashes (—) in any public-facing text (game pages, release notes, about, privacy, terms, etc.). Use a regular hyphen with spaces around it (` - `) instead.
+- **No en dashes as separators**: En dashes (–) are acceptable only for numeric ranges (e.g. "50–100 chips", "60–120 ft"). Do not use them as sentence separators.
+- This applies to all HTML content, release notes, card descriptions, modal copy, and any other player-visible text.
+
 ---
 
 ## Checklist: Adding a New Custom Game
@@ -193,7 +198,16 @@ Add a description paragraph in the "Our Games" section, following the same patte
 ### 9. Update Home Page Meta Description
 If the new game is notable, update the `<meta name="description">` and `og:description` on `index.html` to mention it.
 
-### 10. Game-Specific CSS
+### 10. Update Release Notes (REQUIRED for every release)
+
+Every release — whether a new game, feature update, or notable fix — must be documented in **two places**:
+
+1. **`README.md`** — add a new `### vX.Y.Z - YYYY-MM-DD` section at the top of the `## Releases` block
+2. **`/releases/index.html`** — add a matching `<div class="release-block">` at the top of the page content (before the previous release's block)
+
+The two should stay in sync with identical content. Release notes should be player-facing (describe the "what" and "why" users care about, not internal implementation details).
+
+### 11. Game-Specific CSS
 - Add game-specific styles to `/assets/css/styles.css` under a clearly commented section (e.g., `/* ── New Game ── */`)
 - Use existing CSS variable names for colors
 - Follow existing animation patterns (shake for errors, fade-up for entrances, pulse-glow for active states)

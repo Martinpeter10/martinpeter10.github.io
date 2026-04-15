@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Releases | DailyJamm</title>
+  <meta name="description" content="DailyJamm release notes - a history of updates, new games, and improvements to the daily games hub." />
+  <meta name="robots" content="index,follow">
+  <link rel="canonical" href="https://dailyjamm.com/releases/" />
+  <link rel="icon" type="image/png" href="/assets/img/favicon.png">
+
+  <!-- Open Graph -->
+  <meta property="og:site_name" content="DailyJamm" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://dailyjamm.com/releases/" />
+  <meta property="og:title" content="Releases | DailyJamm" />
+  <meta property="og:description" content="A history of updates, new games, and improvements to DailyJamm." />
+  <meta property="og:image" content="/assets/img/favicon.png" />
+
+  <meta name="theme-color" content="#1a1a2e" />
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1a1a2e" />
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#1a1a2e" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; img-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com; font-src 'self' https://cdn.tailwindcss.com;" />
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XLRXG28EZV"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    if (localStorage.getItem('dj_cookie_ok')) { gtag('config', 'G-XLRXG28EZV'); }
+  </script>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --panel: #0f172a;
+      --brand: #10b981;
+      --muted: #cbd5e1;
+      --line:  #1f2937;
+    }
+
+    /* Hamburger + drawer */
+    .hamburger{position:fixed;top:20px;left:20px;z-index:1000;cursor:pointer;background:transparent;border:none;padding:0;appearance:none;-webkit-appearance:none}
+    .hamburger:focus{outline:2px solid rgba(255,255,255,.25);outline-offset:4px;border-radius:10px}
+    .hamburger-box{width:30px;height:30px;display:flex;flex-direction:column;justify-content:space-around;background:transparent;border-radius:8px;padding:6px;transition:.3s}
+    .hamburger-box:hover{background:rgba(0,0,0,.3)}
+    .hamburger-line{width:100%;height:3px;background:#fff;border-radius:2px}
+    .backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);opacity:0;visibility:hidden;transition:.3s;z-index:998}
+    .backdrop.open{opacity:1;visibility:visible}
+    .drawer{position:fixed;top:0;left:-300px;width:300px;height:100vh;background:var(--panel);border-right:2px solid var(--brand);transition:left .3s ease;z-index:999;padding:80px 20px 20px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+    .drawer.open{left:0}
+    .menu-sec{margin-bottom:1.5rem}
+    .menu-title{font-size:1rem;font-weight:700;color:var(--brand);margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:1px solid var(--line)}
+    .menu-link{display:block;color:var(--muted);text-decoration:none;padding:.6rem 0;border-radius:5px;transition:.2s}
+    .menu-link:hover{color:#fff;background:rgba(16,185,129,.1);padding-left:.5rem}
+
+    body { background: #111827; color: #f9fafb; font-family: system-ui, sans-serif; }
+    .page-wrap { max-width: 680px; margin: 0 auto; padding: 5rem 1.5rem 3rem; }
+    h1 { font-size: 2rem; font-weight: 900; margin-bottom: .5rem; }
+    h2 { font-size: 1.25rem; font-weight: 800; color: #10b981; margin: 2.5rem 0 .25rem; display: flex; align-items: baseline; gap: .6rem; }
+    .version-date { font-size: .8rem; font-weight: 500; color: #6b7280; }
+    h3 { font-size: .85rem; font-weight: 700; color: #94a3b8; margin: 1.1rem 0 .35rem; text-transform: uppercase; letter-spacing: .04em; }
+    ul { list-style: none; padding: 0; margin: 0 0 .5rem; }
+    ul li { color: #cbd5e1; line-height: 1.6; padding: .2rem 0 .2rem 1.1rem; position: relative; }
+    ul li::before { content: '–'; position: absolute; left: 0; color: #4b5563; }
+    a  { color: #10b981; text-decoration: underline; }
+    a:hover { color: #34d399; }
+    .back { display: inline-block; margin-bottom: 2rem; font-size: .875rem; color: #6b7280; text-decoration: none; }
+    .back:hover { color: #fff; }
+    .release-block { border-top: 1px dashed rgba(255,255,255,.08); padding-top: 2rem; }
+    .release-block:first-child { border-top: none; padding-top: 0; }
+    .badge-new { display: inline-block; font-size: .65rem; font-weight: 700; background: #064e3b; color: #34d399; border-radius: 4px; padding: 1px 6px; vertical-align: middle; margin-left: .3rem; text-transform: uppercase; letter-spacing: .05em; }
+
+    /* Collapsible older releases */
+    details { border-top: 1px dashed rgba(255,255,255,.08); padding-top: 2rem; }
+    details summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: .5rem; user-select: none; }
+    details summary::-webkit-details-marker { display: none; }
+    details summary .chevron { font-size: .65rem; color: #4b5563; transition: transform .2s; flex-shrink: 0; }
+    details[open] summary .chevron { transform: rotate(90deg); }
+    details summary:hover h2, details summary:hover .chevron { color: #34d399; }
+    details summary h2 { margin: 0; border: none; padding: 0; }
+    details .release-body { margin-top: .75rem; }
+    footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px dashed rgba(255,255,255,.1); color: #6b7280; text-align: center; font-size: .8rem; }
+    footer a { color: #6b7280; }
+    footer a:hover { color: #fff; }
+  </style>
+  <script src="/assets/js/menu.js" defer></script>
+</head>
+<body>
+
+  <button class="hamburger" aria-label="Open menu" aria-controls="drawer" aria-expanded="false" onclick="toggleMenu()">
+    <span class="hamburger-box">
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+    </span>
+  </button>
+  <div class="backdrop" id="backdrop" onclick="closeMenu()"></div>
+  <nav id="drawer" class="drawer" role="navigation" aria-label="Main">
+    <a class="menu-link" href="/" onclick="closeMenu()" style="margin-bottom:1rem;font-weight:700;color:#fff">Home</a>
+    <div class="menu-sec">
+      <div class="menu-title">Our Games</div>
+      <a class="menu-link" href="/themedle/">Themedle</a>
+      <a class="menu-link" href="/chainlink/">Chain Link</a>
+      <a class="menu-link" href="/blackjackdle/">BlackJackdle</a>
+      <a class="menu-link" href="/spelldle/">Spelldle</a>
+      <a class="menu-link" href="/roulettedle/">Roulettedle</a>
+    </div>
+    <div class="menu-sec">
+      <div class="menu-title">Info</div>
+      <a class="menu-link" href="/about/">About</a>
+      <a class="menu-link" href="/releases/">Releases</a>
+      <a class="menu-link" href="/terms/">Terms of Service</a>
+      <a class="menu-link" href="/privacy/">Privacy Policy</a>
+    </div>
+    <div class="menu-sec">
+      <div class="menu-title">Other Daily Games</div>
+      <a class="menu-link" href="https://dailyakari.com/" target="_blank" rel="noopener noreferrer">Akari</a>
+      <a class="menu-link" href="https://bandle.app/" target="_blank" rel="noopener noreferrer">Bandle</a>
+      <a class="menu-link" href="https://www.puzzmo.com/play/circuits/" target="_blank" rel="noopener noreferrer">Circuits</a>
+      <a class="menu-link" href="https://www.nytimes.com/games/connections" target="_blank" rel="noopener noreferrer">Connections</a>
+      <a class="menu-link" href="https://contexto.me/en/" target="_blank" rel="noopener noreferrer">Contexto</a>
+      <a class="menu-link" href="https://costcodle.com/" target="_blank" rel="noopener noreferrer">Costcodle</a>
+      <a class="menu-link" href="https://www.puzzmo.com/play/crossword/" target="_blank" rel="noopener noreferrer">Cross|word</a>
+      <a class="menu-link" href="https://dailydozentrivia.com/" target="_blank" rel="noopener noreferrer">Daily Dozen</a>
+      <a class="menu-link" href="https://framed.wtf/" target="_blank" rel="noopener noreferrer">Framed</a>
+      <a class="menu-link" href="https://guessthe.game/" target="_blank" rel="noopener noreferrer">Guess the Game</a>
+      <a class="menu-link" href="https://heardlewordle.io/" target="_blank" rel="noopener noreferrer">Heardle</a>
+      <a class="menu-link" href="https://linxicon.com/" target="_blank" rel="noopener noreferrer">Linxicon</a>
+      <a class="menu-link" href="https://minecraftle.zachmanson.com/" target="_blank" rel="noopener noreferrer">Minecraftle</a>
+      <a class="menu-link" href="https://www.nytimes.com/games/pips" target="_blank" rel="noopener noreferrer">Pips</a>
+      <a class="menu-link" href="https://raddle.quest/" target="_blank" rel="noopener noreferrer">Raddle</a>
+      <a class="menu-link" href="https://lessgames.com/songless" target="_blank" rel="noopener noreferrer">Songless</a>
+      <a class="menu-link" href="https://spotle.io/" target="_blank" rel="noopener noreferrer">Spotle</a>
+      <a class="menu-link" href="https://www.nytimes.com/puzzles/spelling-bee" target="_blank" rel="noopener noreferrer">Spelling Bee</a>
+      <a class="menu-link" href="https://heardlewordle.io/taylor-swift-heardle" target="_blank" rel="noopener noreferrer">Taylor Swift Heardle</a>
+      <a class="menu-link" href="https://www.nytimes.com/games/wordle/index.html" target="_blank" rel="noopener noreferrer">Wordle</a>
+    </div>
+  </nav>
+
+  <div class="page-wrap">
+    <a class="back" href="/">← Back to DailyJamm</a>
+    <h1>Releases</h1>
+    <p style="color:#6b7280;margin-bottom:2rem">A history of updates and new games on DailyJamm.</p>
+
+    <div class="release-block">
+      <h2>v1.9.0 <span class="version-date">April 15, 2026</span></h2>
+      <p style="color:#cbd5e1;margin:.4rem 0 .8rem"><strong style="color:#fbbf24">Stats have been reset across all games.</strong> The stats system was rebuilt to track guess distributions and richer lifetime data. Because previous stats were recorded without this structure, all game stats have been cleared so every player starts on equal footing with accurate numbers from this point forward. Daily game progress (today's puzzle, chip balance) was not affected.</p>
+      <ul>
+        <li>Stats keys bumped to <code style="color:#a5f3fc;font-size:.85em">_v2</code> - previous counts, streaks, and chip history cleared site-wide</li>
+        <li>Guess distribution charts now appear in the Stats modal for Themedle and Spelldle, showing how often you win on each attempt</li>
+        <li>Share Stats button added to every game's Stats modal - copies a shareable text summary to clipboard</li>
+        <li>Game-over result panels redesigned: compact panel with two side-by-side buttons - <strong style="color:#4ade80">Share Results</strong> and <strong style="color:#c084fc">See Stats</strong> - replacing the old inline streak/played mini-display</li>
+        <li>Themedle: fixed a crash on page load when previously stored stats data was malformed, which silently prevented the result panel from rendering</li>
+        <li>Themedle: removed the redundant countdown from the page header; the timer now only appears in the result panel after the game ends</li>
+        <li>Themedle: result panel now uses the same compact card style as all other games for visual consistency</li>
+      </ul>
+    </div>
+
+    <details>
+      <summary><span class="chevron">▶</span><h2>v1.8.0 <span class="version-date">April 3, 2026</span></h2></summary>
+      <div class="release-body">
+        <ul>
+          <li>Launched <strong style="color:#fff">Roulettedle</strong> <span class="badge-new">New</span> - daily American roulette with 3 spins per day</li>
+          <li>Full animated wheel with ball physics: ball orbits the outer rim counter-clockwise then drops into the winning pocket</li>
+          <li>Place bets on straight numbers (35:1), red/black, odd/even, low/high, dozens, and columns before each spin</li>
+          <li>Persistent chip stack carries over between days; daily bonus of 50–100 chips each session</li>
+          <li>Share results with emoji summary after completing all 3 spins</li>
+          <li>Stats button (bar chart icon) added to all game pages - shows lifetime stats modal</li>
+          <li>Standardized header layout: Stats and ? (How to Play) buttons always appear top-right in the fixed header on every game page</li>
+          <li>BlackJackdle: improved active hand glow during split</li>
+          <li>Roulettedle spin history modal: last 10 spins, red/black and odd/even split bars, spins since last 0/00, and all-time net</li>
+        </ul>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="chevron">▶</span><h2>v1.7.0 <span class="version-date">April 3, 2026</span></h2></summary>
+      <div class="release-body">
+        <ul>
+          <li>Expanded Themedle song library from <strong style="color:#fff">117 to 156 songs</strong> (+39 new shows)</li>
+          <li>New additions: Baywatch, Boy Meets World, Buffy the Vampire Slayer, Cheers, Chip 'n Dale Rescue Rangers, DuckTales, Everybody Hates Chris, Family Guy, Family Matters, Friends, Futurama, Game of Thrones, George Lopez, Gilligan's Island, Gilmore Girls, Gravity Falls, Happy Days, Hawaii Five-0, Home Improvement, Inspector Gadget, King of the Hill, Law &amp; Order SVU, Naruto, Saved by the Bell, Seinfeld, South Park, Steven Universe, Stranger Things, That '70s Show, The Big Bang Theory, The Brady Bunch, The Flintstones, The Jeffersons, The Jetsons, The Simpsons, The X-Files, Twilight Zone, Walker Texas Ranger, X-Men</li>
+        </ul>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="chevron">▶</span><h2>v1.6.0 <span class="version-date">March 30, 2026</span></h2></summary>
+      <div class="release-body">
+        <ul>
+          <li>Launched <strong style="color:#fff">Spelldle</strong> <span class="badge-new">New</span> - daily D&amp;D 5E spell guessing game with 9 attribute columns</li>
+          <li>Spell library sourced from SRD 5.2: 339 unique spells cycling day-of-year before any repeat</li>
+          <li>Attributes: Level (proximity ±2), School, Casting Time, Range (tier), Components (partial match), Concentration, Ritual, Duration (tier), Class (partial match)</li>
+          <li>Hover tooltips on all column headers with D&amp;D rules descriptions</li>
+        </ul>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="chevron">▶</span><h2>v1.5.0 <span class="version-date">March 29, 2026</span></h2></summary>
+      <div class="release-body">
+        <ul>
+          <li>Chain Link scoring overhaul: two-stage hint system (first letter → phrase clue) replaces single-clue system</li>
+          <li>Correct guess with no hints: 3 pts; after first-letter hint: 2 pts; after phrase clue: 1 pt; wrong/skip with phrase showing: 0 pts</li>
+          <li>Wrong guess with no hints now reveals the first letter instead of jumping straight to the phrase clue</li>
+          <li>Added +5 perfect bonus for solving all 5 words with no hints or wrong guesses (max score 20/20)</li>
+          <li>BlackJackdle: "Out of chips" game-over screen now includes a Share Results button</li>
+        </ul>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="chevron">▶</span><h2>v1.4.0 <span class="version-date">March 28, 2026</span></h2></summary>
+      <div class="release-body">
+        <ul>
+          <li>Added About page (<code style="color:#a5f3fc;font-size:.85em">/about/</code>) and Privacy Policy page (<code style="color:#a5f3fc;font-size:.85em">/privacy/</code>)</li>
+          <li>Footer on homepage now links to About and Privacy Policy</li>
+          <li>Info section added to hamburger menu on all pages</li>
+          <li>BlackJackdle card draw animations: hit, double down, and dealer draws now use a flying card animation</li>
+          <li>Dealer hole card reveals with a flip animation</li>
+          <li>Existing cards slide smoothly (FLIP technique) when a new card is added to a hand</li>
+          <li>Chain Link How to Play modal redesigned as a bottom-sheet on mobile (fully scrollable, safe-area aware)</li>
+        </ul>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="chevron">▶</span><h2>v1.3.0 <span class="version-date">March 28, 2026</span></h2></summary>
+      <div class="release-body">
+        <ul>
+          <li>Launched <strong style="color:#fff">BlackJackdle</strong> <span class="badge-new">New</span> - daily blackjack with 3 hands per day, chip stack, and daily bonus</li>
+        </ul>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="chevron">▶</span><h2>v1.2.0 <span class="version-date">March 27, 2026</span></h2></summary>
+      <div class="release-body">
+        <ul>
+          <li>Launched <strong style="color:#fff">Chain Link</strong> <span class="badge-new">New</span> - daily compound word chain puzzle with 30 puzzles cycling indefinitely</li>
+          <li>Puzzle data extracted to <code style="color:#a5f3fc;font-size:.85em">chainlink-puzzles.json</code> - add new puzzles without touching source code</li>
+          <li>Added How to Play modal to Chain Link (animated demo, shown once on first visit)</li>
+          <li>Added How to Play modal to Themedle (animated demo with wrong → correct guess flow, shown once on first visit)</li>
+          <li>Chain Link submit button renamed from "Go" to "Enter"</li>
+        </ul>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="chevron">▶</span><h2>v1.1.0 <span class="version-date">March 27, 2026</span></h2></summary>
+      <div class="release-body">
+        <ul>
+          <li>Fixed volume slider track not updating visually when dragged</li>
+          <li>Changed audio preload from <code style="color:#a5f3fc;font-size:.85em">auto</code> to <code style="color:#a5f3fc;font-size:.85em">none</code> - MP3 no longer downloads on page load, only on Play</li>
+          <li>Optimized favicon images from ~2.3 MB total down to under 20 KB</li>
+        </ul>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="chevron">▶</span><h2>v1.0.0 <span class="version-date">Initial Release</span></h2></summary>
+      <div class="release-body">
+        <ul>
+          <li>Launched <strong style="color:#fff">Themedle</strong> - daily TV show theme song guessing game (Wordle-style, 6 attempts)</li>
+          <li>Streak tracking and best streak memory</li>
+          <li>Autocomplete for known show names</li>
+          <li>Countdown timer to next song</li>
+          <li>All game data stored in localStorage - no account needed</li>
+        </ul>
+      </div>
+    </details>
+
+    <footer>
+      <p>© <span id="year"></span> DailyJamm &nbsp;·&nbsp; <a href="/about/">About</a> &nbsp;·&nbsp; <a href="/terms/">Terms of Service</a> &nbsp;·&nbsp; <a href="/privacy/">Privacy Policy</a></p>
+    </footer>
+  </div>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+
+  <!-- Cookie consent -->
+  <div id="dj-cookie-bar" style="display:none">
+    <span>We use cookies for analytics. <a href="/privacy/">Privacy Policy</a></span>
+    <button onclick="document.getElementById('dj-cookie-bar').style.display='none';localStorage.setItem('dj_cookie_ok','1')">Got it</button>
+  </div>
+  <script>if(!localStorage.getItem('dj_cookie_ok'))document.getElementById('dj-cookie-bar').style.display='flex';</script>
+</body>
+</html>

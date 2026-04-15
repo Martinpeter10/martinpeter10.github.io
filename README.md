@@ -190,6 +190,8 @@ Press `Ctrl+C` in the terminal to stop the server.
 
 ## Releases
 
+Full release notes are also available at [dailyjamm.com/releases](https://dailyjamm.com/releases/).
+
 ### v1.9.0 - 2026-04-15
 
 **Stats have been reset across all games.** The stats system was rebuilt to track guess distributions and richer lifetime data. Because previous stats were recorded without this structure, all game stats have been cleared so every player starts on equal footing with accurate numbers from this point forward. Daily game progress (today's puzzle, chip balance) was not affected.
