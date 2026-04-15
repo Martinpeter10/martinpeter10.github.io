@@ -122,9 +122,37 @@ Every game page **must** have two icon buttons in the **top-right of the fixed h
 - Chip-based games (Roulettedle, BlackJackdle): also show Current Stack, Best/Worst single round, All-Time Net
 - Score-based games (Chain Link): also show Average Score, Perfect Games count
 
-**Stats tracking** — store all-time stats in a dedicated localStorage key (`XX_alltime` or as extra fields on the existing stats key). Update on every game completion. Do **not** rely solely on today's session data.
+**Stats tracking** — store all-time stats in a dedicated localStorage key (`XX_alltime_v2` or as extra fields on the existing stats key). Update on every game completion. Do **not** rely solely on today's session data.
+
+**Stats key versioning** — stats keys use a `_v2` suffix (e.g. `td_stats_v2`, `cl_stats_v2`). If the stats schema changes in a way that makes old data incompatible (e.g. adding a required new field), bump the suffix to `_v3` so all users start fresh rather than carrying over malformed data.
 
 **Rule:** Never put these buttons inside the game container or content area. They always live in the fixed header, top-right, on every game page.
+
+### 5. Game-Over Result Panel (REQUIRED on every game page)
+
+Every game page must show a result panel when the game is complete. The panel uses a consistent two-button row: **Share Results** (green) and **See Stats** (purple), side by side. Do **not** show inline streak/best/played stats inside this panel — those live in the full Stats modal.
+
+```html
+<div class="bg-gray-800/60 border border-gray-700 rounded-xl p-4 text-center flex flex-col items-center gap-2">
+  <!-- game-specific result content (heading, score, answer, etc.) -->
+  <div class="flex gap-2 mt-1 w-full justify-center">
+    <button id="XX-share-btn"
+      class="flex-1 px-5 py-2 bg-green-700 hover:bg-green-600 text-white text-xs font-bold rounded-lg transition-colors">
+      Share Results
+    </button>
+    <button onclick="XXGame.showStats()"
+      class="flex-1 px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg transition-colors">
+      See Stats
+    </button>
+  </div>
+  <p class="text-xs text-gray-500">Next [game] in: <span id="XX-countdown" class="font-mono text-yellow-300 tabular-nums">--:--:--</span></p>
+</div>
+```
+
+To wire the **See Stats** button, expose `showStats()` (or equivalent) on a global object from within the JS IIFE:
+```javascript
+window.XXGame = { showStats: showStats };
+```
 
 ### 6. Add to Home Page (`index.html`)
 Add a card in the "Our Games" section grid. Follow the existing card pattern:
@@ -244,7 +272,9 @@ Pages to update:
 - **Puzzle cycling**: Chain Link uses day-of-year (puzzle #1 = Jan 1, auto-resets each Jan 1). Other games cycle modularly off a fixed epoch. Prefer day-of-year for clean annual resets.
 - **Scoring**: Use emoji dots in share text (🟢 = best, 🟡 = partial, 🔴 = missed)
 - **Share format**: Copy-to-clipboard with game name, puzzle number, score, and emoji grid
+- **Share buttons**: game-over result panels have two side-by-side buttons — **Share Results** (green, `bg-green-700`) and **See Stats** (purple, `bg-purple-600`). Stats modals have a separate **Share Stats** button (green).
 - **Streaks**: Track current streak, best streak, total games played
+- **localStorage key convention**: stats keys use a `_v2` suffix (`td_stats_v2`, `cl_stats_v2`, `spd_stats_v2`, `bj_stats_v2`, `bj_alltime_v2`, `rl_stats_v2`, `rl_alltime_v2`). Daily state keys have no suffix (`themedleDailyState`, `cl_today`, `spd_today`, `bj_today`, `rl_today`). Bump the suffix when resetting stats site-wide.
 - **How to Play**: Show modal on first visit (check localStorage flag), include animated demo
 - **Mobile**: 16px minimum font on inputs (prevents iOS zoom), use `viewport-fit=cover` for notch support
 - **Accessibility**: ARIA labels on interactive elements, keyboard navigation (Enter activates role="button", ESC closes modals), screen-reader-only helper text via `.sr-only` class
@@ -295,7 +325,9 @@ Pages to update:
 - `showBrokeScreen()` — player runs out of chips before completing all 3 hands. Shows "Out of Chips!" panel with hand results, share button, and countdown to next day.
 - **Both screens have a Share Results button.** `shareResults()` targets `#bj-share-btn`; `shareBrokeResults()` targets `#bj-broke-share-btn`.
 
-**Public API** (exposed on `window.BJGame`): `closeModal`, `showModal`, `shareResults`, `shareBrokeResults`.
+**Public API** (exposed on `window.BJGame`): `closeModal`, `showModal`, `shareResults`, `shareBrokeResults`, `shareStats`, `showStats`, `closeStats`.
+
+**localStorage keys**: `bj_stats_v2`, `bj_alltime_v2`, `bj_today`
 
 ---
 
@@ -332,7 +364,7 @@ Pages to update:
 
 **Class abbreviations** (defined in `CLASS_ABBREVS` constant): Brd/Clr/Drd/Pal/Rgr/Sor/Wlk/Wiz
 
-**localStorage keys**: `spd_stats`, `spd_today`, `spd_seen_howto`
+**localStorage keys**: `spd_stats_v2`, `spd_today`, `spd_seen_howto`
 
 ---
 
@@ -376,3 +408,5 @@ All pages include `<meta name="referrer" content="strict-origin-when-cross-origi
 - **iOS safe areas**: Always include `viewport-fit=cover` and `apple-mobile-web-app-status-bar-style` metas.
 - **GitHub Pages cache mismatch**: After pushing JS + data file changes together, Pages may serve a stale JS with the new data (or vice versa), causing JS errors caught as "Failed to load puzzle." If this happens, a hard refresh or waiting a few minutes resolves it. Ensure JS and data changes are compatible in both old and new states when possible.
 - **New external resources**: If you add a new CDN, font, or API endpoint, update the CSP meta on every affected page. Forgetting this will silently block the resource in supporting browsers.
+- **Bare `JSON.parse` aborts boot**: Never call `JSON.parse(localStorage.getItem(...))` without a try/catch at the top level of a boot function. A malformed stored value will throw, silently aborting `boot()` mid-execution — game state never restores, result panels stay empty, and there is no visible error. Always wrap in try/catch or use `DJUtils.loadJSON()` which handles this safely.
+- **Stats key versioning**: When adding fields to a stats object that old saves won't have, bump the key suffix (e.g. `_v2` → `_v3`) rather than trying to migrate. Stale data under the old key is simply ignored and users start fresh. Do not remove the old key proactively — it ages out naturally as players accumulate new data.

@@ -294,18 +294,20 @@ function highlightSuggestion(index) {
 
 // -------------------- Stats --------------------
 function loadStats() {
-  const saved = localStorage.getItem('themedleStats');
-  if (saved) {
-    const parsed = JSON.parse(saved);
-    // Merge saved stats into gameStats; ensure guessDistribution exists
-    gameStats = Object.assign({ guessDistribution: [0,0,0,0,0,0,0] }, parsed);
-    if (!Array.isArray(gameStats.guessDistribution) || gameStats.guessDistribution.length !== 7) {
-      gameStats.guessDistribution = [0,0,0,0,0,0,0];
+  try {
+    const saved = localStorage.getItem('td_stats_v2');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      // Merge saved stats into gameStats; ensure guessDistribution exists
+      gameStats = Object.assign({ guessDistribution: [0,0,0,0,0,0,0] }, parsed);
+      if (!Array.isArray(gameStats.guessDistribution) || gameStats.guessDistribution.length !== 7) {
+        gameStats.guessDistribution = [0,0,0,0,0,0,0];
+      }
     }
-  }
+  } catch (e) { /* start with defaults on parse error */ }
 }
 function saveStats() {
-  DJUtils.saveJSON('themedleStats', gameStats);
+  DJUtils.saveJSON('td_stats_v2', gameStats);
 }
 
 /** Returns a 1-based puzzle number (days since 2024-01-01 Chicago) */
@@ -316,15 +318,18 @@ function getPuzzleNumber() {
 
 // -------------------- Daily State --------------------
 function loadDailyGameState() {
-  const saved = localStorage.getItem('themedleDailyState');
-  const today = DJUtils.getChicagoDate();
-  if (saved) {
-    const savedState = JSON.parse(saved);
-    if (savedState.date === today) {
-      dailyGameState = savedState;
-      return true;
+  try {
+    const saved = localStorage.getItem('themedleDailyState');
+    const today = DJUtils.getChicagoDate();
+    if (saved) {
+      const savedState = JSON.parse(saved);
+      if (savedState.date === today) {
+        dailyGameState = savedState;
+        return true;
+      }
     }
-  }
+  } catch (e) { /* fall through to fresh state */ }
+  const today = DJUtils.getChicagoDate();
   dailyGameState = {
     date: today,
     completed: false,
@@ -412,9 +417,7 @@ function updateCountdown() {
   const minutes = Math.floor((remaining % SECONDS_PER_HOUR) / 60);
   const seconds = remaining % 60;
   const formatted = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-  const el = document.getElementById('countdown');
-  if (el) el.textContent = formatted;
-  // Also sync countdowns in the game-over modal and answer panel
+  // Sync countdown in the game-over modal and answer panel
   const goEl = document.getElementById('go-countdown');
   if (goEl) goEl.textContent = formatted;
   const rcEl = document.getElementById('td-result-countdown');

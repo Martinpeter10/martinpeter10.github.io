@@ -190,6 +190,18 @@ Press `Ctrl+C` in the terminal to stop the server.
 
 ## Releases
 
+### v1.9.0 - 2026-04-15
+
+**Stats have been reset across all games.** The stats system was rebuilt to track guess distributions and richer lifetime data. Because previous stats were recorded without this structure, all game stats have been cleared so every player starts on equal footing with accurate numbers from this point forward. Daily game progress (today's puzzle, chip balance) was not affected.
+
+- **Stats reset**: All stats keys bumped to `_v2` — previous counts, streaks, and chip history cleared site-wide
+- **Guess distribution charts** now appear in the Stats modal for Themedle and Spelldle, showing how often you win on each attempt
+- **Share Stats** button added to every game's Stats modal — copies a shareable text summary to clipboard
+- **Game-over result panels redesigned**: after completing any game, a compact panel shows the outcome with two side-by-side action buttons — **Share Results** (green) and **See Stats** (purple) — replacing the old inline streak/played mini-display
+- **Themedle**: fixed a crash on page load when previously stored stats data was malformed, which silently prevented the result panel from rendering
+- **Themedle**: removed the redundant countdown from the page header; the timer now only appears in the result panel after the game is over
+- **Themedle**: result panel now uses the same compact card style as all other games for visual consistency
+
 ### v1.8.0 - 2026-04-03
 - Launched **Roulettedle** - daily American roulette with 3 spins per day
 - Full animated wheel with ball physics: ball orbits the outer rim counter-clockwise then drops into the winning pocket

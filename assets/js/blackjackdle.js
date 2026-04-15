@@ -43,9 +43,9 @@ const BJGame = (function () {
 
   /* ── LocalStorage ── */
   function loadStats() {
-    return DJUtils.loadJSON('bj_stats', { streak: 0, best: 0, played: 0 });
+    return DJUtils.loadJSON('bj_stats_v2', { streak: 0, best: 0, played: 0 });
   }
-  function saveStats(s) { DJUtils.saveJSON('bj_stats', s); }
+  function saveStats(s) { DJUtils.saveJSON('bj_stats_v2', s); }
 
   function loadToday() {
     try {
@@ -74,7 +74,7 @@ const BJGame = (function () {
   function saveChips() { localStorage.setItem('bj_chips', JSON.stringify(chips)); }
 
   function loadAllTime() {
-    try { return JSON.parse(localStorage.getItem('bj_alltime')) || { biggestWin: 0, biggestLoss: 0, totalNet: 0 }; }
+    try { return JSON.parse(localStorage.getItem('bj_alltime_v2')) || { biggestWin: 0, biggestLoss: 0, totalNet: 0 }; }
     catch { return { biggestWin: 0, biggestLoss: 0, totalNet: 0 }; }
   }
   function updateAllTime(net) {
@@ -82,7 +82,7 @@ const BJGame = (function () {
     if (net > 0 && net > a.biggestWin)  a.biggestWin  = net;
     if (net < 0 && net < a.biggestLoss) a.biggestLoss = net;
     a.totalNet += net;
-    localStorage.setItem('bj_alltime', JSON.stringify(a));
+    localStorage.setItem('bj_alltime_v2', JSON.stringify(a));
   }
 
   /* ── Deck ── */

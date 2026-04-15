@@ -3,7 +3,7 @@
 
   // ── Constants ────────────────────────────────────────────────────────────
   const MAX_GUESSES = 8;
-  const STATS_KEY   = 'spd_stats';
+  const STATS_KEY   = 'spd_stats_v2';
   const TODAY_KEY   = 'spd_today';
   const SEEN_KEY    = 'spd_seen_howto';
 

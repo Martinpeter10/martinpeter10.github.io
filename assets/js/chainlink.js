@@ -39,7 +39,7 @@
   let clueState   = 'hidden';
 
   // ── localStorage (keyed by today's Chicago date, matching Themedle) ──────
-  const STATS_KEY = 'cl_stats';
+  const STATS_KEY = 'cl_stats_v2';
   const TODAY_KEY = 'cl_today';
   const SEEN_KEY  = 'cl_seen_howto';
 

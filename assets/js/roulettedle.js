@@ -45,9 +45,9 @@ const RLGame = (function () {
 
   /* ── LocalStorage ── */
   function loadStats() {
-    return DJUtils.loadJSON('rl_stats', { streak: 0, best: 0, played: 0 });
+    return DJUtils.loadJSON('rl_stats_v2', { streak: 0, best: 0, played: 0 });
   }
-  function saveStats(s) { DJUtils.saveJSON('rl_stats', s); }
+  function saveStats(s) { DJUtils.saveJSON('rl_stats_v2', s); }
 
   function loadToday() {
     try {
@@ -577,7 +577,7 @@ const RLGame = (function () {
 
   /* ── All-time stats ── */
   function loadAllTime() {
-    try { return JSON.parse(localStorage.getItem('rl_alltime')) || { biggestWin: 0, biggestLoss: 0, totalNet: 0 }; }
+    try { return JSON.parse(localStorage.getItem('rl_alltime_v2')) || { biggestWin: 0, biggestLoss: 0, totalNet: 0 }; }
     catch { return { biggestWin: 0, biggestLoss: 0, totalNet: 0 }; }
   }
   function updateAllTime(net) {
@@ -585,7 +585,7 @@ const RLGame = (function () {
     if (net > 0 && net > a.biggestWin)   a.biggestWin  = net;
     if (net < 0 && net < a.biggestLoss)  a.biggestLoss = net;
     a.totalNet += net;
-    localStorage.setItem('rl_alltime', JSON.stringify(a));
+    localStorage.setItem('rl_alltime_v2', JSON.stringify(a));
   }
 
   /* ── Spin history ── */
