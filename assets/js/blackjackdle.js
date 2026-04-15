@@ -773,10 +773,6 @@ const BJGame = (function () {
       row.appendChild(dot);
     });
 
-    $('bj-stat-streak').textContent = stats.streak;
-    $('bj-stat-best').textContent = stats.best;
-    $('bj-stat-played').textContent = stats.played;
-
     els.results.classList.remove('hidden');
     els.betArea.classList.add('hidden');
     els.actions.classList.add('hidden');
@@ -1016,6 +1012,25 @@ const BJGame = (function () {
     if (modal) modal.classList.remove('hidden');
   }
 
+  function shareStats() {
+    const s  = loadStats();
+    const at = loadAllTime();
+    const atSign = at.totalNet >= 0 ? '+' : '';
+    const lines = [
+      'BlackJackdle Stats \uD83C\uDCCF',
+      '',
+      '\uD83C\uDFAE Played: ' + (s.played || 0),
+      '\uD83D\uDD25 Streak: ' + s.streak + '  \u2502  Best: ' + s.best,
+      '\uD83D\uDCB0 Best Hand: +' + at.biggestWin.toLocaleString(),
+      '\uD83D\uDCC9 Worst Hand: ' + at.biggestLoss.toLocaleString(),
+      '\uD83D\uDCCA All-Time Net: ' + atSign + at.totalNet.toLocaleString(),
+      '',
+      'dailyjamm.com/blackjackdle/',
+    ];
+    const btn = $('bj-stats-share-btn');
+    if (btn) DJUtils.clipboardShare(lines.join('\n'), btn, 'Share Stats');
+  }
+
   function closeStats() {
     const modal = $('bj-stats-modal');
     if (modal) modal.classList.add('hidden');
@@ -1023,5 +1038,5 @@ const BJGame = (function () {
 
   document.addEventListener('DOMContentLoaded', init);
 
-  return { closeModal, showModal, shareResults, shareBrokeResults, showStats, closeStats };
+  return { closeModal, showModal, shareResults, shareBrokeResults, shareStats, showStats, closeStats };
 })();

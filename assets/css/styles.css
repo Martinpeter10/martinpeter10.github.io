@@ -1199,10 +1199,12 @@ input[type=range].slider::-moz-range-thumb {
 
 /* On wider screens: fluid columns, no frozen-col styling needed */
 @media (min-width: 580px) {
-  .spd-frozen-col  { background: transparent; box-shadow: none; }
-  .spd-attr-scroll { overflow: visible; }
-  .spd-col-labels  { grid-template-columns: repeat(9, 1fr); }
-  .spd-row         { grid-template-columns: repeat(9, 1fr); }
+  .spd-frozen-col    { background: transparent; box-shadow: none; }
+  .spd-attr-scroll   { overflow: visible; }
+  /* Lock both header rows to the same height so every guess row lines up */
+  .spd-frozen-header { height: 26px; }
+  .spd-col-labels    { grid-template-columns: repeat(9, 1fr); height: 26px; align-items: center; }
+  .spd-row           { grid-template-columns: repeat(9, 1fr); }
 }
 
 /* ── Roulettedle ──────────────────────────────────────────────────────────── */

@@ -83,8 +83,16 @@
   let gameOver    = false;
 
   // ── localStorage ─────────────────────────────────────────────────────────
+  // guessDistribution: indices 0..(MAX_GUESSES-1) = won on guess N; last = losses
+  const DIST_LEN = MAX_GUESSES + 1;
+
   function loadStats() {
-    return DJUtils.loadJSON(STATS_KEY, { streak: 0, best: 0, played: 0, wins: 0 });
+    const defaults = { streak: 0, best: 0, played: 0, wins: 0, guessDistribution: new Array(DIST_LEN).fill(0) };
+    const s = DJUtils.loadJSON(STATS_KEY, defaults);
+    if (!Array.isArray(s.guessDistribution) || s.guessDistribution.length !== DIST_LEN) {
+      s.guessDistribution = new Array(DIST_LEN).fill(0);
+    }
+    return s;
   }
 
   function saveStats(won) {
@@ -94,7 +102,12 @@
       s.wins = (s.wins || 0) + 1;
       s.streak++;
       if (s.streak > s.best) s.best = s.streak;
-    } else { s.streak = 0; }
+      const idx = Math.min(guesses.length - 1, MAX_GUESSES - 1);
+      s.guessDistribution[idx] = (s.guessDistribution[idx] || 0) + 1;
+    } else {
+      s.streak = 0;
+      s.guessDistribution[MAX_GUESSES] = (s.guessDistribution[MAX_GUESSES] || 0) + 1;
+    }
     localStorage.setItem(STATS_KEY, JSON.stringify(s));
     return s;
   }
@@ -500,10 +513,6 @@
       ansReveal.classList.remove('hidden');
     }
 
-    // Stats
-    document.getElementById('spd-stat-streak').textContent = stats ? stats.streak : loadStats().streak;
-    document.getElementById('spd-stat-best').textContent   = stats ? stats.best   : loadStats().best;
-    document.getElementById('spd-stat-played').textContent = stats ? stats.played : loadStats().played;
   }
 
   // ── Share ────────────────────────────────────────────────────────────────
@@ -643,6 +652,32 @@
     });
   }
 
+  function shareStatsText() {
+    const s      = loadStats();
+    const played = s.played || 0;
+    const wins   = s.wins   || 0;
+    const winPct = played > 0 ? Math.round(wins / played * 100) : 0;
+    const dist   = s.guessDistribution || new Array(DIST_LEN).fill(0);
+    const maxVal = Math.max.apply(null, dist.concat([1]));
+    const NUMS   = ['1\uFE0F\u20E3','2\uFE0F\u20E3','3\uFE0F\u20E3','4\uFE0F\u20E3',
+                    '5\uFE0F\u20E3','6\uFE0F\u20E3','7\uFE0F\u20E3','8\uFE0F\u20E3','\u274C'];
+
+    function bar(n) {
+      var filled = Math.round((n / maxVal) * 8);
+      return '\u2588'.repeat(filled) + '\u2591'.repeat(8 - filled) + ' ' + n;
+    }
+
+    return [
+      'Spelldle All-Time Stats \uD83E\uDDD9',
+      'Played: ' + played + ' \u2502 Wins: ' + wins + ' \u2502 Win Rate: ' + winPct + '%',
+      'Streak: ' + (s.streak || 0) + ' \uD83D\uDD25 \u2502 Best: ' + (s.best || 0),
+      '',
+      'Guess Distribution:',
+    ].concat(dist.map(function (c, i) { return NUMS[i] + ' ' + bar(c); }))
+     .concat(['', 'dailyjamm.com/spelldle'])
+     .join('\n');
+  }
+
   function showStats() {
     const s      = loadStats();
     const played = s.played || 0;
@@ -656,6 +691,14 @@
       { label: 'Current Streak', value: s.streak, color: '#facc15' },
       { label: 'Best Streak', value: s.best, color: '#a78bfa' },
     ]);
+
+    DJUtils.renderGuessDist('spd-stats-dist', s.guessDistribution || new Array(DIST_LEN).fill(0));
+
+    var shareBtn = document.getElementById('spd-stats-share-btn');
+    if (shareBtn) {
+      shareBtn.textContent = 'Share Stats';
+      shareBtn.onclick = function () { DJUtils.clipboardShare(shareStatsText(), shareBtn, 'Share Stats'); };
+    }
     const statsModal = document.getElementById('spd-stats-modal');
     if (statsModal) statsModal.classList.remove('hidden');
   }
@@ -664,6 +707,9 @@
     const statsModal = document.getElementById('spd-stats-modal');
     if (statsModal) statsModal.classList.add('hidden');
   }
+
+  // Expose for HTML onclick handlers
+  window.SPDGame = { showStats: showStats };
 
   // ── Boot ─────────────────────────────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', function () {

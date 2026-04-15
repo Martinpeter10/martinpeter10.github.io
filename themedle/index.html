@@ -142,22 +142,6 @@
     <div class="text-center mb-8">
       <h1 class="text-4xl font-bold mb-2">Themedle</h1>
       <p class="text-lg opacity-90">Next theme song in: <span id="countdown" class="font-mono text-yellow-300">--:--:--</span></p>
-      <div class="mt-4 bg-white/10 rounded-lg p-4">
-        <div class="flex justify-center space-x-8 text-sm">
-          <div>
-            <span class="font-semibold">Current Streak:</span>
-            <span id="currentStreak" class="ml-1 text-yellow-300">0</span>
-          </div>
-          <div>
-            <span class="font-semibold">Best Streak:</span>
-            <span id="bestStreak" class="ml-1 text-green-300">0</span>
-          </div>
-          <div>
-            <span class="font-semibold">Games Played:</span>
-            <span id="gamesPlayed" class="ml-1 text-blue-300">0</span>
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- Guess Display - 6 Constant Rectangles -->
@@ -232,17 +216,28 @@
       </div>
     </section>
 
-    <!-- Answer Display (hidden at start) -->
+    <!-- Answer Display (hidden at start, shown after game over) -->
     <section id="answerDisplay" class="mb-6 hidden">
-      <div class="bg-gradient-to-r from-green-900/30 to-green-800/30 border border-green-500/50 rounded-lg p-6 text-center max-w-md mx-auto">
-        <h3 class="text-lg font-semibold mb-2 text-green-300">Today's Answer</h3>
-        <p id="displayedAnswer" class="text-2xl font-bold text-green-100 mb-2">Adventure Time</p>
-        <p class="text-sm text-green-200/80">Come back tomorrow for a new theme song!</p>
+      <div class="bg-gray-800/60 border border-gray-700 rounded-xl p-4 text-center flex flex-col items-center gap-2 max-w-md mx-auto">
+        <h2 id="td-result-heading" class="text-base font-black"></h2>
+        <p id="td-result-sub" class="text-xs text-gray-400"></p>
+        <p id="displayedAnswer" class="text-sm font-bold text-yellow-300"></p>
+        <div class="flex gap-2 mt-1 w-full justify-center">
+          <button id="td-answer-share-btn" onclick="shareResults(this)"
+            class="flex-1 px-5 py-2 bg-green-700 hover:bg-green-600 text-white text-xs font-bold rounded-lg transition-colors">
+            Share Results
+          </button>
+          <button onclick="showStatsModal()"
+            class="flex-1 px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg transition-colors">
+            See Stats
+          </button>
+        </div>
+        <p class="text-xs text-gray-500">Next theme song in: <span id="td-result-countdown" class="font-mono text-yellow-300 tabular-nums">--:--:--</span></p>
       </div>
     </section>
 
     <!-- Guess Input Section -->
-    <section class="mb-6">
+    <section id="guessInputSection" class="mb-6">
       <h3 class="text-lg font-semibold mb-4 text-center">Make Your Guess</h3>
       <div class="flex flex-col items-center space-y-4">
         <div class="w-full max-w-md relative">
@@ -264,21 +259,12 @@
     </section>
 
 
-    <!-- Game Over Modal -->
-    <div id="gameOverModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
-      <div class="bg-gray-800 rounded-xl p-8 max-w-md mx-4 text-center">
-        <h2 id="gameOverTitle" class="text-2xl font-bold mb-4">🎉 Congratulations!</h2>
-        <p id="gameOverMessage" class="text-lg mb-6">You guessed it correctly!</p>
-        <div class="bg-white/10 rounded-lg p-4 mb-6">
-          <p class="text-sm text-gray-300 mb-2">The answer was:</p>
-          <p id="correctAnswer" class="text-xl font-semibold text-yellow-300">Breaking Bad</p>
-        </div>
-        <div class="mb-6">
-          <p class="text-sm text-gray-300">🎵 Playing full theme song</p>
-        </div>
-        <div class="flex justify-center">
-          <button id="closeModal" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg transition-colors">Close</button>
-        </div>
+    <!-- Game Over Modal (slide-up; content built by showGameOverModal() in main.js) -->
+    <div id="gameOverModal" class="fixed inset-0 bg-black/80 flex items-end justify-center z-[1050] hidden">
+      <div class="go-inner bg-gray-900 border border-gray-700 rounded-t-2xl p-5 max-w-sm w-full max-h-[85vh] overflow-y-auto"
+           style="-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:calc(1.25rem + env(safe-area-inset-bottom,0px))"
+           onclick="event.stopPropagation()">
+        <!-- populated by JS -->
       </div>
     </div>
   </main>
@@ -292,8 +278,13 @@
          style="-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:calc(1.25rem + env(safe-area-inset-bottom,0px))">
       <h2 class="text-xl font-black text-center mb-4">My Stats</h2>
       <div id="td-stats-content"></div>
+      <div id="td-stats-dist"></div>
+      <button id="td-stats-share-btn" onclick="shareStats()"
+        class="w-full mt-3 py-2.5 bg-green-700 hover:bg-green-600 text-white text-sm font-bold rounded-lg transition-colors">
+        Share Stats
+      </button>
       <button onclick="closeStatsModal()"
-        class="w-full mt-4 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-sm font-bold rounded-lg transition-colors">
+        class="w-full mt-2 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-sm font-bold rounded-lg transition-colors">
         Close
       </button>
     </div>

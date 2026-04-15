@@ -34,7 +34,8 @@ let gameStats = {
   bestStreak: 0,
   gamesPlayed: 0,
   wins: 0,
-  lastPlayedDate: null
+  lastPlayedDate: null,
+  guessDistribution: [0, 0, 0, 0, 0, 0, 0]  // [g1,g2,g3,g4,g5,g6,losses]
 };
 
 let dailyGameState = {
@@ -295,20 +296,22 @@ function highlightSuggestion(index) {
 function loadStats() {
   const saved = localStorage.getItem('themedleStats');
   if (saved) {
-    gameStats = JSON.parse(saved);
-    updateStatsDisplay();
+    const parsed = JSON.parse(saved);
+    // Merge saved stats into gameStats; ensure guessDistribution exists
+    gameStats = Object.assign({ guessDistribution: [0,0,0,0,0,0,0] }, parsed);
+    if (!Array.isArray(gameStats.guessDistribution) || gameStats.guessDistribution.length !== 7) {
+      gameStats.guessDistribution = [0,0,0,0,0,0,0];
+    }
   }
 }
 function saveStats() {
   DJUtils.saveJSON('themedleStats', gameStats);
 }
-function updateStatsDisplay() {
-  const cur = document.getElementById('currentStreak');
-  const best = document.getElementById('bestStreak');
-  const played = document.getElementById('gamesPlayed');
-  if (cur) cur.textContent = gameStats.currentStreak;
-  if (best) cur && (best.textContent = gameStats.bestStreak);
-  if (played) played.textContent = gameStats.gamesPlayed;
+
+/** Returns a 1-based puzzle number (days since 2024-01-01 Chicago) */
+function getPuzzleNumber() {
+  const epoch = Math.floor(new Date('2024-01-01').getTime() / 86400000);
+  return getDayIndexFromISO(DJUtils.getChicagoDate()) - epoch + 1;
 }
 
 // -------------------- Daily State --------------------
@@ -359,18 +362,24 @@ function restoreGameState() {
   });
 }
 function disableGameControls() {
-  const gi = document.getElementById('guessInput');
-  const sg = document.getElementById('submitGuess');
-  const sk = document.getElementById('skipGuess');
-  if (gi) gi.disabled = true;
-  if (sg) sg.disabled = true;
-  if (sk) sk.disabled = true;
-  if (gi) gi.placeholder = "Game completed for today";
+  const section = document.getElementById('guessInputSection');
+  if (section) section.classList.add('hidden');
+
+  const won = dailyGameState.won;
+  const guessNum = dailyGameState.currentGuess;
+
+  const heading = document.getElementById('td-result-heading');
+  const sub     = document.getElementById('td-result-sub');
+  if (heading) heading.textContent = won ? 'Got it!' : 'Better luck tomorrow!';
+  if (sub)     sub.textContent     = won
+    ? 'You got it in ' + guessNum + '/6 guesses.'
+    : 'All 6 guesses used — see you tomorrow!';
+
+  const displayedAnswer = document.getElementById('displayedAnswer');
+  if (displayedAnswer) displayedAnswer.textContent = currentSong.title;
 
   const answerDisplay = document.getElementById('answerDisplay');
-  const displayedAnswer = document.getElementById('displayedAnswer');
   if (answerDisplay) answerDisplay.classList.remove('hidden');
-  if (displayedAnswer) displayedAnswer.textContent = currentSong.title;
 }
 function updateMaxClipIndicator() {
   const maxWidth = (currentClipLength / 15) * 100;
@@ -402,8 +411,14 @@ function updateCountdown() {
   const hours = Math.floor(remaining / SECONDS_PER_HOUR);
   const minutes = Math.floor((remaining % SECONDS_PER_HOUR) / 60);
   const seconds = remaining % 60;
+  const formatted = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   const el = document.getElementById('countdown');
-  if (el) el.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  if (el) el.textContent = formatted;
+  // Also sync countdowns in the game-over modal and answer panel
+  const goEl = document.getElementById('go-countdown');
+  if (goEl) goEl.textContent = formatted;
+  const rcEl = document.getElementById('td-result-countdown');
+  if (rcEl) rcEl.textContent = formatted;
 }
 
 // -------------------- Volume --------------------
@@ -531,15 +546,19 @@ if (submitBtn) {
         gameStats.wins = (gameStats.wins || 0) + 1;
         gameStats.lastPlayedDate = today;
         if (gameStats.currentStreak > gameStats.bestStreak) gameStats.bestStreak = gameStats.currentStreak;
+        gameStats.guessDistribution[currentGuess - 1]++;
         saveStats();
       }
-      updateStatsDisplay();
       disableGameControls();
 
       // Full song visuals
       if (clipLengthSpan) clipLengthSpan.textContent = '15 seconds';
       if (maxClipIndicator) maxClipIndicator.style.width = '100%';
       showGameOverModal(true);
+      setTimeout(function () {
+        const panel = document.getElementById('answerDisplay');
+        if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 150);
     } else {
       if (guessSlot) {
         guessSlot.classList.remove('border-gray-600');
@@ -560,13 +579,17 @@ if (submitBtn) {
           gameStats.currentStreak = 0;
           gameStats.gamesPlayed++;
           gameStats.lastPlayedDate = today;
+          gameStats.guessDistribution[6]++;
           saveStats();
         }
-        updateStatsDisplay();
         disableGameControls();
         if (clipLengthSpan) clipLengthSpan.textContent = '15 seconds';
         if (maxClipIndicator) maxClipIndicator.style.width = '100%';
         showGameOverModal(false);
+        setTimeout(function () {
+          const panel = document.getElementById('answerDisplay');
+          if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 150);
       } else {
         saveDailyGameState();
         currentClipLength = timeIncrements[currentGuess - 1];
@@ -605,13 +628,17 @@ if (skipBtn) {
           gameStats.currentStreak = 0;
           gameStats.gamesPlayed++;
           gameStats.lastPlayedDate = today;
+          gameStats.guessDistribution[6]++;
           saveStats();
         }
-        updateStatsDisplay();
         disableGameControls();
         if (clipLengthSpan) clipLengthSpan.textContent = '15 seconds';
         if (maxClipIndicator) maxClipIndicator.style.width = '100%';
         showGameOverModal(false);
+        setTimeout(function () {
+          const panel = document.getElementById('answerDisplay');
+          if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 150);
       } else {
         saveDailyGameState();
         currentClipLength = timeIncrements[currentGuess - 1];
@@ -670,8 +697,28 @@ if (guessInput) {
 }
 
 // -------------------- Stats Modal --------------------
+function shareStats() {
+  const s    = gameStats;
+  const played = s.gamesPlayed || 0;
+  const wins   = s.wins || 0;
+  const winPct = played > 0 ? Math.round(wins / played * 100) : 0;
+  const dist   = s.guessDistribution || [0,0,0,0,0,0,0];
+  const NUMS   = ['1\uFE0F\u20E3','2\uFE0F\u20E3','3\uFE0F\u20E3','4\uFE0F\u20E3','5\uFE0F\u20E3','6\uFE0F\u20E3','\u274C'];
+
+  const lines = [
+    'Themedle All-Time Stats \uD83C\uDFB5',
+    'Played: ' + played + ' \u2502 Wins: ' + wins + ' \u2502 Win Rate: ' + winPct + '%',
+    'Streak: ' + (s.currentStreak || 0) + ' \uD83D\uDD25 \u2502 Best: ' + (s.bestStreak || 0),
+    '',
+    'Guess Distribution:',
+  ].concat(dist.map(function (c, i) { return NUMS[i] + ': ' + c; })).concat(['', 'dailyjamm.com/themedle']);
+
+  const btn = document.getElementById('td-stats-share-btn');
+  if (btn) DJUtils.clipboardShare(lines.join('\n'), btn, 'Share Stats');
+}
+
 function showStatsModal() {
-  const s = gameStats;
+  const s      = gameStats;
   const played = s.gamesPlayed || 0;
   const wins   = s.wins || 0;
   const winPct = played > 0 ? Math.round(wins / played * 100) : 0;
@@ -683,6 +730,15 @@ function showStatsModal() {
     { label: 'Current Streak', value: s.currentStreak, color: '#facc15' },
     { label: 'Best Streak', value: s.bestStreak, color: '#a78bfa' },
   ]);
+
+  DJUtils.renderGuessDist('td-stats-dist', s.guessDistribution || [0,0,0,0,0,0,0]);
+
+  const shareBtn = document.getElementById('td-stats-share-btn');
+  if (shareBtn) {
+    shareBtn.textContent = 'Share Stats';
+    shareBtn.onclick = shareStats;
+  }
+
   const modal = document.getElementById('td-stats-modal');
   if (modal) modal.classList.remove('hidden');
 }
@@ -691,40 +747,142 @@ function closeStatsModal() {
   if (modal) modal.classList.add('hidden');
 }
 
-// -------------------- Modal --------------------
-function showGameOverModal(won) {
-  const modal = document.getElementById('gameOverModal');
-  const title = document.getElementById('gameOverTitle');
-  const message = document.getElementById('gameOverMessage');
-  const answer = document.getElementById('correctAnswer');
-  if (!modal || !title || !message || !answer) return;
+// -------------------- Game Over Modal --------------------
+function shareResults(btnEl) {
+  const guesses    = dailyGameState.guesses;
+  const won        = dailyGameState.won;
+  const puzzleNum  = getPuzzleNumber();
+  const guessLabel = won ? String(dailyGameState.currentGuess) + '/6' : 'X/6';
+  const EMOJI      = { correct: '\uD83D\uDFE2', wrong: '\uD83D\uDD34', skipped: '\u23E9' };
 
-  if (won) {
-    title.textContent = '🎉 Congratulations!';
-    message.textContent = `You guessed it in ${currentGuess} ${currentGuess === 1 ? 'try' : 'tries'}!`;
-  } else {
-    title.textContent = '😔 Game Over';
-    message.textContent = 'Better luck next time!';
-  }
-  answer.textContent = currentSong.title;
-  modal.classList.remove('hidden');
-  modal.classList.add('flex');
+  const rows = guesses.map(function (g) {
+    return EMOJI[g.type] + ' ' + g.clipLength + 's';
+  });
 
-  setTimeout(() => {
-    if (!isPlaying && playBtn) {
-      playBtn.click();
-    }
-  }, 500);
+  const lines = ['Themedle #' + puzzleNum + ' ' + guessLabel + ' \uD83C\uDFB5']
+    .concat(rows)
+    .concat(['dailyjamm.com/themedle']);
+
+  const btn = (btnEl instanceof Element) ? btnEl
+            : document.getElementById('td-share-btn')
+           || document.getElementById('td-answer-share-btn');
+  if (btn) DJUtils.clipboardShare(lines.join('\n'), btn, 'Share');
 }
 
-const closeModalBtn = document.getElementById('closeModal');
-if (closeModalBtn) {
-  closeModalBtn.addEventListener('click', function () {
-    const modal = document.getElementById('gameOverModal');
-    if (!modal) return;
+function showGameOverModal(won) {
+  const modal = document.getElementById('gameOverModal');
+  if (!modal) return;
+  const inner = modal.querySelector('.go-inner');
+  if (!inner) return;
+
+  inner.textContent = '';
+
+  // Title
+  const title = document.createElement('h2');
+  title.style.cssText = 'font-size:1.25rem;font-weight:900;text-align:center;margin-bottom:3px';
+  title.textContent = won ? '\uD83C\uDF89 Got it!' : '\uD83D\uDE14 Better luck tomorrow!';
+  inner.appendChild(title);
+
+  // Subtitle
+  const sub = document.createElement('p');
+  sub.style.cssText = 'font-size:0.75rem;color:#9ca3af;text-align:center;margin-bottom:14px';
+  sub.textContent = won
+    ? 'Guess ' + dailyGameState.currentGuess + ' of 6'
+    : 'All 6 guesses used — see you tomorrow!';
+  inner.appendChild(sub);
+
+  // Guess rows
+  const guessWrap = document.createElement('div');
+  guessWrap.style.cssText = 'display:flex;flex-direction:column;gap:5px;margin-bottom:14px';
+  dailyGameState.guesses.forEach(function (g) {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:6px 10px;border-radius:8px;font-size:0.82rem;font-weight:600';
+    const left  = document.createElement('span');
+    const right = document.createElement('span');
+    right.style.fontSize = '0.72rem';
+    right.textContent = g.clipLength + 's';
+    if (g.type === 'correct') {
+      row.style.cssText += ';background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.35)';
+      left.style.color  = '#4ade80';
+      right.style.color = '#86efac';
+      left.textContent  = '\uD83D\uDFE2 ' + g.text;
+    } else if (g.type === 'wrong') {
+      row.style.cssText += ';background:rgba(239,68,68,0.09);border:1px solid rgba(239,68,68,0.28)';
+      left.style.color  = '#f87171';
+      right.style.color = '#fca5a5';
+      left.textContent  = '\uD83D\uDD34 ' + g.text;
+    } else {
+      row.style.cssText += ';background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.25)';
+      left.style.color  = '#fbbf24';
+      right.style.color = '#fcd34d';
+      left.textContent  = '\u23E9 Skipped';
+    }
+    row.appendChild(left);
+    row.appendChild(right);
+    guessWrap.appendChild(row);
+  });
+  inner.appendChild(guessWrap);
+
+  // Answer box
+  const ansBox = document.createElement('div');
+  ansBox.style.cssText = 'background:rgba(255,255,255,0.05);border-radius:10px;padding:10px;text-align:center;margin-bottom:12px';
+  const ansLbl = document.createElement('p');
+  ansLbl.style.cssText = 'font-size:0.7rem;color:#6b7280;margin-bottom:3px';
+  ansLbl.textContent = 'The answer was:';
+  const ansName = document.createElement('p');
+  ansName.style.cssText = 'font-size:1.05rem;font-weight:800;color:#fbbf24';
+  ansName.textContent = currentSong.title;
+  ansBox.appendChild(ansLbl);
+  ansBox.appendChild(ansName);
+  inner.appendChild(ansBox);
+
+  // Action buttons
+  const btns = document.createElement('div');
+  btns.style.cssText = 'display:flex;gap:8px;margin-bottom:10px';
+
+  const shareBtn = document.createElement('button');
+  shareBtn.id = 'td-share-btn';
+  shareBtn.style.cssText = 'flex:1;padding:10px 4px;background:#2ecc71;color:#0b1220;border:none;border-radius:8px;font-size:0.82rem;font-weight:800;cursor:pointer';
+  shareBtn.textContent = 'Share';
+  shareBtn.addEventListener('click', shareResults);
+
+  const closeBtn = document.createElement('button');
+  closeBtn.style.cssText = 'flex:1;padding:10px 4px;background:#374151;color:#fff;border:none;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer';
+  closeBtn.textContent = 'Close';
+  closeBtn.addEventListener('click', function () {
     modal.classList.remove('flex');
     modal.classList.add('hidden');
   });
+
+  btns.appendChild(shareBtn);
+  btns.appendChild(closeBtn);
+  inner.appendChild(btns);
+
+  // Countdown
+  const cdRow = document.createElement('p');
+  cdRow.style.cssText = 'font-size:0.7rem;color:#6b7280;text-align:center';
+  cdRow.textContent = 'Next theme song in ';
+  const cdSpan = document.createElement('span');
+  cdSpan.id = 'go-countdown';
+  cdSpan.style.cssText = 'color:#fbbf24;font-family:monospace;font-weight:700';
+  cdSpan.textContent = (document.getElementById('countdown') || {}).textContent || '--:--:--';
+  cdRow.appendChild(cdSpan);
+  inner.appendChild(cdRow);
+
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+
+  // Close on backdrop click
+  modal.onclick = function (e) {
+    if (e.target === modal) {
+      modal.classList.remove('flex');
+      modal.classList.add('hidden');
+    }
+  };
+
+  setTimeout(function () {
+    if (!isPlaying && playBtn) playBtn.click();
+  }, 500);
 }
 
 const tdStatsBtn = document.getElementById('td-stats-btn');
@@ -766,7 +924,10 @@ function boot() {
     disableGameControls();
     if (clipLengthSpan) clipLengthSpan.textContent = '15 seconds';
     if (maxClipIndicator) maxClipIndicator.style.width = '100%';
-    setTimeout(() => { showGameOverModal(dailyGameState.won); }, 500);
+    setTimeout(function () {
+      const panel = document.getElementById('answerDisplay');
+      if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 150);
   } else if (hasPlayedToday && !dailyGameState.completed) {
     restoreGameState();
     updateMaxClipIndicator();
@@ -783,4 +944,7 @@ document.addEventListener('DOMContentLoaded', boot);
 
 // Expose functions called from HTML onclick handlers
 window.closeStatsModal = closeStatsModal;
+window.showStatsModal  = showStatsModal;
+window.shareStats      = shareStats;
+window.shareResults    = shareResults;
 })();

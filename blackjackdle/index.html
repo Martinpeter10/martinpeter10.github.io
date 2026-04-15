@@ -223,14 +223,15 @@
           </div>
           <div id="bj-session-net" class="text-sm font-bold mt-1"></div>
           <div id="bj-hand-results-row" class="flex gap-2 mt-2 text-xs"></div>
-          <button id="bj-share-btn"
-            class="mt-2 px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg transition-colors">
-            Share Results
-          </button>
-          <div class="mt-2 pt-2 border-t border-gray-700 w-full flex justify-center gap-6 text-xs text-gray-500">
-            <div><span id="bj-stat-streak" class="font-bold text-gray-300">0</span> streak</div>
-            <div><span id="bj-stat-best" class="font-bold text-gray-300">0</span> best</div>
-            <div><span id="bj-stat-played" class="font-bold text-gray-300">0</span> played</div>
+          <div class="flex gap-2 mt-2 w-full justify-center">
+            <button id="bj-share-btn"
+              class="flex-1 px-5 py-2 bg-green-700 hover:bg-green-600 text-white text-xs font-bold rounded-lg transition-colors">
+              Share Results
+            </button>
+            <button onclick="BJGame.showStats()"
+              class="flex-1 px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg transition-colors">
+              See Stats
+            </button>
           </div>
           <p class="text-xs text-gray-500 mt-1">Next hands in: <span id="bj-countdown" class="font-mono text-yellow-300 tabular-nums">--:--:--</span></p>
         </div>
@@ -246,10 +247,16 @@
             <p class="text-xs text-yellow-200/70">This is a free daily game for entertainment only. No real money is wagered or won. Must be 18+ to play.</p>
           </div>
           <div id="bj-broke-hands" class="flex gap-2 mt-3 text-xs"></div>
-          <button id="bj-broke-share-btn" onclick="BJGame.shareBrokeResults()"
-            class="mt-2 px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg transition-colors">
-            Share Results
-          </button>
+          <div class="flex gap-2 mt-2 w-full justify-center">
+            <button id="bj-broke-share-btn" onclick="BJGame.shareBrokeResults()"
+              class="flex-1 px-5 py-2 bg-green-700 hover:bg-green-600 text-white text-xs font-bold rounded-lg transition-colors">
+              Share Results
+            </button>
+            <button onclick="BJGame.showStats()"
+              class="flex-1 px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg transition-colors">
+              See Stats
+            </button>
+          </div>
           <p class="text-xs text-gray-500 mt-2">Next hands in: <span id="bj-broke-countdown" class="font-mono text-yellow-300 tabular-nums">--:--:--</span></p>
         </div>
       </div>
@@ -264,8 +271,12 @@
          style="-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:calc(1.25rem + env(safe-area-inset-bottom,0px))">
       <h2 class="text-xl font-black text-center mb-4">My Stats</h2>
       <div id="bj-stats-content"></div>
+      <button id="bj-stats-share-btn" onclick="BJGame.shareStats()"
+        class="w-full mt-4 py-2.5 bg-green-700 hover:bg-green-600 text-white text-sm font-bold rounded-lg transition-colors">
+        Share Stats
+      </button>
       <button onclick="BJGame.closeStats()"
-        class="w-full mt-4 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-sm font-bold rounded-lg transition-colors">
+        class="w-full mt-2 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-sm font-bold rounded-lg transition-colors">
         Close
       </button>
     </div>

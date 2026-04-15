@@ -235,14 +235,15 @@
           </div>
           <div id="rl-session-net" class="text-sm font-bold mt-1"></div>
           <div id="rl-spin-results-row" class="flex gap-2 mt-2 text-xs flex-wrap justify-center"></div>
-          <button id="rl-share-btn"
-            class="mt-2 px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg transition-colors">
-            Share Results
-          </button>
-          <div class="mt-2 pt-2 border-t border-gray-700 w-full flex justify-center gap-6 text-xs text-gray-500">
-            <div><span id="rl-stat-streak" class="font-bold text-gray-300">0</span> streak</div>
-            <div><span id="rl-stat-best" class="font-bold text-gray-300">0</span> best</div>
-            <div><span id="rl-stat-played" class="font-bold text-gray-300">0</span> played</div>
+          <div class="flex gap-2 mt-2 w-full justify-center">
+            <button id="rl-share-btn"
+              class="flex-1 px-5 py-2 bg-green-700 hover:bg-green-600 text-white text-xs font-bold rounded-lg transition-colors">
+              Share Results
+            </button>
+            <button onclick="RLGame.showHistory()"
+              class="flex-1 px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg transition-colors">
+              See Stats
+            </button>
           </div>
           <p class="text-xs text-gray-500 mt-1">Next spins in: <span id="rl-countdown" class="font-mono text-yellow-300 tabular-nums">--:--:--</span></p>
         </div>
@@ -258,10 +259,16 @@
             <p class="text-xs text-yellow-200/70">This is a free daily game for entertainment only. No real money is wagered or won. Must be 18+ to play.</p>
           </div>
           <div id="rl-broke-spins" class="flex gap-2 mt-3 text-xs flex-wrap justify-center"></div>
-          <button id="rl-broke-share-btn" onclick="RLGame.shareBrokeResults()"
-            class="mt-2 px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg transition-colors">
-            Share Results
-          </button>
+          <div class="flex gap-2 mt-2 w-full justify-center">
+            <button id="rl-broke-share-btn" onclick="RLGame.shareBrokeResults()"
+              class="flex-1 px-5 py-2 bg-green-700 hover:bg-green-600 text-white text-xs font-bold rounded-lg transition-colors">
+              Share Results
+            </button>
+            <button onclick="RLGame.showHistory()"
+              class="flex-1 px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg transition-colors">
+              See Stats
+            </button>
+          </div>
           <p class="text-xs text-gray-500 mt-2">Next spins in: <span id="rl-broke-countdown" class="font-mono text-yellow-300 tabular-nums">--:--:--</span></p>
         </div>
       </div>
@@ -307,6 +314,10 @@
         <div id="rl-hist-alltime"></div>
       </div>
 
+      <button id="rl-hist-share-btn"
+        class="w-full py-2.5 bg-green-700 hover:bg-green-600 text-white text-sm font-bold rounded-lg transition-colors mb-2">
+        Share Stats
+      </button>
       <button onclick="RLGame.closeHistory()"
         class="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-sm font-bold rounded-lg transition-colors">
         Close

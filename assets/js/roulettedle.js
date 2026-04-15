@@ -498,10 +498,6 @@ const RLGame = (function () {
       row.appendChild(dot);
     });
 
-    $('rl-stat-streak').textContent = stats.streak;
-    $('rl-stat-best').textContent   = stats.best;
-    $('rl-stat-played').textContent = stats.played;
-
     $('rl-results').classList.remove('hidden');
     $('rl-bet-area').classList.add('hidden');
     $('rl-spin-result').classList.add('hidden');
@@ -743,7 +739,28 @@ const RLGame = (function () {
     });
     alltimeEl.appendChild(atWrap);
 
+    const shareBtn = $('rl-hist-share-btn');
+    if (shareBtn) {
+      shareBtn.onclick = function () { shareStats(); };
+    }
+
     $('rl-history-modal').classList.remove('hidden');
+  }
+
+  function shareStats() {
+    const at = loadAllTime();
+    const atSign = at.totalNet >= 0 ? '+' : '';
+    const lines = [
+      'Roulettedle Stats \u26AA',
+      '',
+      '\uD83C\uDFC6 Best Spin: +' + at.biggestWin.toLocaleString(),
+      '\uD83D\uDCB8 Worst Spin: ' + at.biggestLoss.toLocaleString(),
+      '\uD83D\uDCCA All-Time Net: ' + atSign + at.totalNet.toLocaleString(),
+      '',
+      'dailyjamm.com/roulettedle/',
+    ];
+    const btn = $('rl-hist-share-btn');
+    if (btn) DJUtils.clipboardShare(lines.join('\n'), btn, 'Share Stats');
   }
 
   function closeHistory() {

@@ -115,9 +115,6 @@
   const bonusMsgEl = document.getElementById('cl-bonus-msg');
   const dotsEl     = document.getElementById('cl-dots');
   const shareBtn   = document.getElementById('cl-share-btn');
-  const statStreak = document.getElementById('cl-stat-streak');
-  const statBest   = document.getElementById('cl-stat-best');
-  const statPlayed = document.getElementById('cl-stat-played');
   const helpBtn    = document.getElementById('cl-help-btn');
   const modal      = document.getElementById('cl-modal');
   const modalClose = document.getElementById('cl-modal-close');
@@ -287,9 +284,6 @@
       .map(r => `<span>${r.points === 3 ? '🟢' : r.points > 0 ? '🟡' : '🔴'}</span>`)
       .join('');
 
-    statStreak.textContent = stats.streak;
-    statBest.textContent   = stats.best;
-    statPlayed.textContent = stats.played;
   }
 
   // ── Countdown (DST-safe Chicago, matching Themedle) ──────────────────────
@@ -451,14 +445,41 @@
       { label: 'Current Streak', value: s.streak, color: '#facc15' },
       { label: 'Best Streak', value: s.best, color: '#a78bfa' },
     ]);
+
+    const shareBtn = document.getElementById('cl-stats-share-btn');
+    if (shareBtn) {
+      shareBtn.onclick = function () { shareStats(); };
+    }
+
     const modal = document.getElementById('cl-stats-modal');
     if (modal) modal.classList.remove('hidden');
+  }
+
+  function shareStats() {
+    const s      = loadStats();
+    const played = s.played || 0;
+    const avg    = played > 0 ? ((s.totalScore || 0) / played).toFixed(1) : '—';
+    const lines  = [
+      'Chain Link Stats \uD83D\uDD17',
+      '',
+      '\uD83C\uDFAE Played: ' + played,
+      '\uD83D\uDCCA Avg Score: ' + avg + ' / 20',
+      '\uD83C\uDF1F Perfect Games: ' + (s.perfectGames || 0),
+      '\uD83D\uDD25 Streak: ' + s.streak + '  \u2502  Best: ' + s.best,
+      '',
+      'dailyjamm.com/chainlink/',
+    ];
+    const btn = document.getElementById('cl-stats-share-btn');
+    if (btn) DJUtils.clipboardShare(lines.join('\n'), btn, 'Share Stats');
   }
 
   function closeStats() {
     const modal = document.getElementById('cl-stats-modal');
     if (modal) modal.classList.add('hidden');
   }
+
+  // Expose for HTML onclick handlers
+  window.CLGame = { showStats: showStats };
 
   // ── Boot: fetch puzzles, then init ────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', function () {

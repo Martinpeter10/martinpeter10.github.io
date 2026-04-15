@@ -198,14 +198,15 @@
           <p id="cl-result-msg" class="text-xs text-gray-400 font-semibold"></p>
           <p id="cl-bonus-msg" class="text-xs text-yellow-300 font-bold hidden">🌟 +5 perfect bonus!</p>
           <div id="cl-dots" class="flex gap-1.5 text-base"></div>
-          <button id="cl-share-btn"
-            class="mt-1 px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg transition-colors">
-            Share Results
-          </button>
-          <div class="mt-1 pt-2 border-t border-gray-700 w-full flex justify-center gap-6 text-xs text-gray-500">
-            <div><span id="cl-stat-streak" class="font-bold text-gray-300">0</span> streak</div>
-            <div><span id="cl-stat-best"   class="font-bold text-gray-300">0</span> best</div>
-            <div><span id="cl-stat-played" class="font-bold text-gray-300">0</span> played</div>
+          <div class="flex gap-2 mt-1 w-full justify-center">
+            <button id="cl-share-btn"
+              class="flex-1 px-5 py-2 bg-green-700 hover:bg-green-600 text-white text-xs font-bold rounded-lg transition-colors">
+              Share Results
+            </button>
+            <button onclick="CLGame.showStats()"
+              class="flex-1 px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg transition-colors">
+              See Stats
+            </button>
           </div>
           <p class="text-xs text-gray-500">Next chain in: <span id="cl-countdown" class="font-mono text-yellow-300 tabular-nums">--:--:--</span></p>
         </div>
@@ -221,8 +222,12 @@
          style="-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:calc(1.25rem + env(safe-area-inset-bottom,0px))">
       <h2 class="text-xl font-black text-center mb-4">My Stats</h2>
       <div id="cl-stats-content"></div>
+      <button id="cl-stats-share-btn"
+        class="w-full mt-4 py-2.5 bg-green-700 hover:bg-green-600 text-white text-sm font-bold rounded-lg transition-colors">
+        Share Stats
+      </button>
       <button id="cl-stats-close"
-        class="w-full mt-4 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-sm font-bold rounded-lg transition-colors">
+        class="w-full mt-2 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-sm font-bold rounded-lg transition-colors">
         Close
       </button>
     </div>
