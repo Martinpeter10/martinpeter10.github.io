@@ -189,6 +189,8 @@ Add a new `<url>` entry:
 </url>
 ```
 
+**Sitemap rule (applies to ALL page work, not just new games):** Any time a page is added, renamed, or has significant content changes, verify `sitemap.xml` is up to date — correct URL, `lastmod` date, and appropriate `changefreq`/`priority`. This applies to info pages (about, releases, privacy, terms) and game pages alike. Never finish a page task without checking the sitemap.
+
 ### 8. Update the About Page (`/about/index.html`)
 Add a description paragraph in the "Our Games" section, following the same pattern:
 ```html
