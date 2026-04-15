@@ -896,6 +896,11 @@ function boot() {
   loadStats();
   const hasPlayedToday = loadDailyGameState();
   currentSong = themeSongs[dailyGameState.songIndex];
+  const metaEl = document.getElementById('td-meta');
+  if (metaEl) {
+    const songNum = (getDayIndexFromISO(DJUtils.getChicagoDate()) % themeSongs.length) + 1;
+    metaEl.textContent = '#' + songNum + ' \u00B7 ' + DJUtils.getChicagoDate();
+  }
   audioElement = new Audio();
   audioElement.addEventListener('error', function () {
     console.log('Audio failed to load, using fallback');
