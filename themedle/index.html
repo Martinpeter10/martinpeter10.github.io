@@ -58,9 +58,7 @@
   <!-- =============================== -->
   <!-- Fixed Header w/ Hamburger + Logo -->
   <!-- =============================== -->
-  <header class="fixed top-0 left-0 w-full z-[1001] border-b border-gray-800/80 bg-gray-900/70 backdrop-blur-md">
-    <div class="container mx-auto px-4 py-3 flex items-center gap-3">
-      <!-- Hamburger (exact homepage markup, repositioned inline next to logo via CSS override above) -->
+  <header class="site-header">
       <button class="hamburger" aria-label="Open menu" onclick="toggleMenu()">
         <span class="hamburger-box">
           <span class="hamburger-line"></span>
@@ -68,11 +66,7 @@
           <span class="hamburger-line"></span>
         </span>
       </button>
-
-      <!-- Brand -->
-      <a href="/" class="text-2xl font-extrabold tracking-tight text-green-400 select-none">
-        DailyJamm
-      </a>
+      <a href="/" class="site-brand">DailyJamm</a>
 
       <div class="flex-1"></div>
       <button id="td-stats-btn" aria-label="Stats"
@@ -87,7 +81,6 @@
         class="w-8 h-8 rounded-full border border-gray-600 bg-transparent text-gray-400 text-sm font-bold hover:border-gray-400 hover:text-white transition-colors">
         ?
       </button>
-    </div>
   </header>
 
   <!-- Backdrop + Drawer live OUTSIDE the header to avoid filter/transform clipping issues -->
@@ -180,8 +173,8 @@
     <section class="mb-6">
       <div class="flex flex-col items-center space-y-4">
         <div class="flex items-center space-x-4">
-          <button id="playBtn" class="bg-green-500 hover:bg-green-600 text-black px-6 py-3 rounded-full font-semibold transition-colors">
-            ▶ Play
+          <button id="playBtn" class="bg-green-500 hover:bg-green-600 text-black px-6 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
+            <svg viewBox="0 0 10 12" width="10" height="12" fill="currentColor" aria-hidden="true"><polygon points="0,0 10,6 0,12"/></svg> Play
           </button>
           <div class="flex items-center space-x-2">
             <!-- Speaker icon with 3 sound wave lines -->

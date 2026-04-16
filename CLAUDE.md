@@ -83,8 +83,35 @@ Every game page MUST include all of these in the `<head>`:
 
 > **Note on Themedle** (`media-src`): Themedle loads audio files from `/assets/audio/` so its CSP also needs `media-src 'self';` appended.
 
-### 3. Hamburger Nav (must be on every page)
-Copy the hamburger button + backdrop + drawer nav from an existing game page. Then **add the new game** to the "Our Games" section of the drawer on ALL pages:
+### 3. Header + Hamburger Nav (must be identical on every page)
+
+**CRITICAL:** All header and hamburger/drawer CSS lives exclusively in `/assets/css/styles.css`. Never define `.site-header`, `.site-brand`, `.hamburger`, `.hamburger-box`, `.hamburger-line`, `.backdrop`, `.drawer`, `.menu-sec`, `.menu-title`, or `.menu-link` inline in any page's `<style>` block. Doing so creates inconsistency and was the source of past visual bugs.
+
+Every page must use this exact header structure — no Tailwind classes on the `<header>` or brand link:
+
+```html
+<header class="site-header">
+  <button class="hamburger" aria-label="Open menu" onclick="toggleMenu()">
+    <span class="hamburger-box">
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+    </span>
+  </button>
+  <a href="/" class="site-brand">DailyJamm</a>
+  <div class="flex-1"></div>
+  <!-- stats + help buttons go here (game pages only) -->
+</header>
+
+<div class="backdrop" id="backdrop" onclick="closeMenu()"></div>
+<nav id="drawer" class="drawer" aria-label="Site">
+  ...
+</nav>
+```
+
+The `<header>` has **no inner wrapper div** — all children are direct flex children of `<header class="site-header">`. Do not add `<div class="px-5 py-3 flex items-center gap-3">` or any similar wrapper inside it.
+
+**Add the new game** to the "Our Games" section of the drawer on ALL pages:
 - `index.html` (home)
 - `/themedle/index.html`
 - `/chainlink/index.html`
@@ -421,6 +448,8 @@ All pages include `<meta name="referrer" content="strict-origin-when-cross-origi
 ## Common Pitfalls
 - **Curly quotes**: Always use straight quotes in JS (`'` and `"`, never `'` `'` `"` `"`). Curly quotes in onclick handlers cause silent JS failures.
 - **Nav sync**: The hamburger nav is duplicated in every page's HTML. When adding a game, you must update ALL pages' nav or they'll be out of sync.
+- **Inline header CSS**: Never define `.site-header`, `.site-brand`, `.hamburger`, `.backdrop`, `.drawer`, or `.menu-*` CSS inside a page's `<style>` block. All of that lives in `/assets/css/styles.css`. Duplicating it inline causes visual inconsistency across pages (different font sizes, colors, blur values) and was the root cause of the "DailyJamm moves and changes style" bug. Every page must link styles.css and use `class="site-header"` / `class="site-brand"` with no extra Tailwind classes on those elements.
+- **Header inner wrapper**: Do not add a wrapper `<div>` inside `<header class="site-header">`. The header is a flex container itself — all children (hamburger, brand link, spacer, buttons) are direct flex children.
 - **iOS safe areas**: Always include `viewport-fit=cover` and `apple-mobile-web-app-status-bar-style` metas.
 - **GitHub Pages cache mismatch**: After pushing JS + data file changes together, Pages may serve a stale JS with the new data (or vice versa), causing JS errors caught as "Failed to load puzzle." If this happens, a hard refresh or waiting a few minutes resolves it. Ensure JS and data changes are compatible in both old and new states when possible.
 - **New external resources**: If you add a new CDN, font, or API endpoint, update the CSP meta on every affected page. Forgetting this will silently block the resource in supporting browsers.

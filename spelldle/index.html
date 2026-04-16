@@ -63,16 +63,15 @@
 <body class="bg-gray-900 text-white">
 
   <!-- Fixed header -->
-  <header class="fixed top-0 left-0 w-full z-[1001] border-b border-gray-800/80 bg-gray-900/70 backdrop-blur-md">
-    <div class="container mx-auto px-4 py-3 flex items-center gap-3">
-      <button class="hamburger" aria-label="Open menu" onclick="toggleMenu()">
-        <span class="hamburger-box">
-          <span class="hamburger-line"></span>
-          <span class="hamburger-line"></span>
-          <span class="hamburger-line"></span>
-        </span>
-      </button>
-      <a href="/" class="text-2xl font-extrabold tracking-tight text-green-400 select-none">DailyJamm</a>
+  <header class="site-header">
+    <button class="hamburger" aria-label="Open menu" onclick="toggleMenu()">
+      <span class="hamburger-box">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </span>
+    </button>
+    <a href="/" class="site-brand">DailyJamm</a>
       <div class="flex-1"></div>
       <button id="spd-stats-btn" aria-label="Stats"
         class="w-8 h-8 rounded-full border border-gray-600 bg-transparent text-gray-400 hover:border-gray-400 hover:text-white transition-colors flex items-center justify-center mr-1">
@@ -86,7 +85,6 @@
         class="w-8 h-8 rounded-full border border-gray-600 bg-transparent text-gray-400 text-sm font-bold hover:border-gray-400 hover:text-white transition-colors">
         ?
       </button>
-    </div>
   </header>
 
   <div class="backdrop" id="backdrop" onclick="closeMenu()"></div>

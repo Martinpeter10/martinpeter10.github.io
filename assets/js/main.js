@@ -448,7 +448,7 @@ function startPlayback(playLength) {
 
   isPlaying = true;
   if (playBtn) {
-    playBtn.textContent = '■ Pause';
+    playBtn.innerHTML = '&#9646; Pause';
     playBtn.classList.add('pulse-animation');
   }
 
@@ -491,7 +491,7 @@ function stopPlayback(completed) {
 
   isPlaying = false;
   if (playBtn) {
-    playBtn.textContent = '▶ Play';
+    playBtn.innerHTML = '<svg viewBox="0 0 10 12" width="10" height="12" fill="currentColor" aria-hidden="true" style="display:inline-block;vertical-align:middle;margin-right:.35rem"><polygon points="0,0 10,6 0,12"/></svg>Play';
     playBtn.classList.remove('pulse-animation');
   }
 
