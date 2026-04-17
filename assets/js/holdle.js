@@ -960,11 +960,16 @@ const HDGame = (function () {
         break;
       }
     }
-    // Update chip display in seat
+    // Update chip display and visual state
     const seat = $('hd-ai-seat-' + seatIndex);
     if (seat) {
       const chipsEl = seat.querySelector('.hd-ai-chips');
       if (chipsEl) chipsEl.textContent = ai.chips.toLocaleString() + ' chips';
+      if (ai.folded) {
+        seat.classList.add('hd-ai-folded');
+        const cEl = seat.querySelector('.hd-ai-cards');
+        if (cEl) cEl.classList.add('hd-cards-folded');
+      }
     }
   }
 
@@ -1378,9 +1383,28 @@ const HDGame = (function () {
   }
 
   /* ── Raise picker ── */
+  const RAISE_LABELS = { min: 'Min', half: 'Half Pot', pot: 'Pot', allin: 'All In' };
+
   function showRaisePicker() {
     const rp = $('hd-raise-picker');
     if (!rp) return;
+
+    // Refresh chip costs on each open so amounts reflect current pot/stack
+    rp.querySelectorAll('.hd-raise-opt').forEach(btn => {
+      const type  = btn.dataset.raise;
+      const total = getRaiseAmount(type);
+      const cost  = total - playerStreetBet; // additional chips leaving the player's stack
+
+      btn.textContent = '';
+      const lbl = document.createElement('span');
+      lbl.textContent = RAISE_LABELS[type] || type;
+      const amt = document.createElement('span');
+      amt.className   = 'hd-raise-cost';
+      amt.textContent = cost.toLocaleString() + ' chips';
+      btn.appendChild(lbl);
+      btn.appendChild(amt);
+    });
+
     rp.classList.toggle('hidden');
   }
 
