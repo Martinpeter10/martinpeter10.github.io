@@ -1667,10 +1667,16 @@ input[type=range].slider::-moz-range-thumb {
   gap: 2px;
   flex: 1;
   min-width: 0;
-  transition: opacity 0.3s;
+  padding: 3px;
+  border-radius: 8px;
+  transition: opacity 0.3s, box-shadow 0.2s, background 0.2s;
 }
 .hd-ai-seat.hd-ai-folded { opacity: 0.35; }
 .hd-ai-seat.hd-ai-allin .hd-ai-name { color: #f87171; }
+.hd-ai-seat.hd-ai-active {
+  background: rgba(251,191,36,0.07);
+  box-shadow: 0 0 0 1.5px rgba(251,191,36,0.5), 0 0 14px rgba(251,191,36,0.2);
+}
 .hd-ai-name {
   font-size: 9px;
   font-weight: 800;
@@ -1691,6 +1697,13 @@ input[type=range].slider::-moz-range-thumb {
   letter-spacing: 0.5px;
   min-height: 11px;
   text-align: center;
+}
+.hd-ai-action.hd-action-anim {
+  animation: hd-action-pop 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes hd-action-pop {
+  from { opacity: 0; transform: scale(0.4); }
+  to   { opacity: 1; transform: scale(1); }
 }
 .hd-ai-cards {
   display: flex;
@@ -1823,11 +1836,11 @@ input[type=range].slider::-moz-range-thumb {
   font-size: 22px;
 }
 .hd-card-dealt {
-  animation: hd-card-in 0.25s ease both;
+  animation: hd-card-in 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 @keyframes hd-card-in {
-  from { opacity: 0; transform: translateY(-12px) scale(0.85); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+  from { opacity: 0; transform: translateY(-16px) scale(0.6) rotate(-5deg); }
+  to   { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
 }
 
 /* Chip bar */

@@ -9,6 +9,7 @@ const HDGame = (function () {
 
   const HANDS_PER_DAY  = 3;
   const STARTING_CHIPS = 1000;
+  const DEAL_DELAY_MS  = 190;   // ms between each card dealt
   const SMALL_BLIND    = 10;
   const BIG_BLIND      = 20;
   const DAILY_BONUS_MIN = 50;
@@ -550,6 +551,76 @@ const HDGame = (function () {
     });
   }
 
+  /* ── AI seat highlighting ── */
+  function setAIActive(index) {
+    for (let i = 0; i < todayAIs.length; i++) {
+      const s = $('hd-ai-seat-' + i);
+      if (s) s.classList.toggle('hd-ai-active', i === index);
+    }
+  }
+  function clearAIActive() {
+    for (let i = 0; i < todayAIs.length; i++) {
+      const s = $('hd-ai-seat-' + i);
+      if (s) s.classList.remove('hd-ai-active');
+    }
+  }
+
+  /* ── Sequential card dealing ── */
+  function dealHoleCardsSequentially(callback) {
+    const steps = [];
+    // Round 1: one card to each seat in order
+    steps.push({ target: 'player', cardIdx: 0 });
+    for (let i = 0; i < todayAIs.length; i++) {
+      if (!todayAIs[i].folded) steps.push({ target: 'ai', aiIdx: i, cardIdx: 0 });
+    }
+    // Round 2: second card to each seat
+    steps.push({ target: 'player', cardIdx: 1 });
+    for (let i = 0; i < todayAIs.length; i++) {
+      if (!todayAIs[i].folded) steps.push({ target: 'ai', aiIdx: i, cardIdx: 1 });
+    }
+
+    const playerCardEl = $('hd-player-cards');
+    if (playerCardEl) playerCardEl.textContent = '';
+
+    let step = 0;
+    function dealNext() {
+      if (step >= steps.length) {
+        if (callback) callback();
+        return;
+      }
+      const s = steps[step++];
+      if (s.target === 'player') {
+        if (playerCardEl && playerHole[s.cardIdx]) {
+          const c = cardEl(playerHole[s.cardIdx], false);
+          playerCardEl.appendChild(c);
+        }
+      } else {
+        const ai   = todayAIs[s.aiIdx];
+        const seat = $('hd-ai-seat-' + s.aiIdx);
+        const cEl  = seat ? seat.querySelector('.hd-ai-cards') : null;
+        if (cEl && ai.hole[s.cardIdx]) {
+          const c = cardEl(ai.hole[s.cardIdx], true);
+          c.classList.add('hd-ai-card-size');
+          cEl.appendChild(c);
+        }
+      }
+      setTimeout(dealNext, DEAL_DELAY_MS);
+    }
+    dealNext();
+  }
+
+  /* Deal flop cards one at a time */
+  function dealFlop(callback) {
+    let idx = 0;
+    function next() {
+      if (idx >= 3) { if (callback) callback(); return; }
+      renderCommunityCard(idx, community[idx]);
+      idx++;
+      setTimeout(next, DEAL_DELAY_MS + 30);
+    }
+    next();
+  }
+
   function renderCommunityCard(idx, card) {
     const slot = $('hd-comm-' + idx);
     if (!slot) return;
@@ -575,7 +646,11 @@ const HDGame = (function () {
     const seat = $('hd-ai-seat-' + index);
     if (!seat) return;
     const el = seat.querySelector('.hd-ai-action');
-    if (el) el.textContent = text;
+    if (!el) return;
+    el.textContent = text;
+    el.classList.remove('hd-action-anim');
+    void el.offsetHeight; // force reflow to restart animation
+    el.classList.add('hd-action-anim');
   }
 
   function setStreetLabel(text) {
@@ -744,15 +819,20 @@ const HDGame = (function () {
       if (!ai.folded) ai.hole = [drawCard(), drawCard()];
     });
 
-    renderPlayerCards();
+    // Render AI seat names/chips; cards dealt sequentially below
     todayAIs.forEach((ai, i) => {
       renderAISeat(ai, i);
-      renderAICards(ai, i, false);
+      const seat = $('hd-ai-seat-' + i);
+      const cEl  = seat ? seat.querySelector('.hd-ai-cards') : null;
+      if (cEl) cEl.textContent = '';
     });
     updatePot();
     setStreetLabel('PRE-FLOP');
 
-    beginStreet('preflop');
+    // Deal cards one at a time in poker order, then begin the street
+    dealHoleCardsSequentially(() => {
+      beginStreet('preflop');
+    });
   }
 
   /* Pre-flop: player acts last (button) - AIs act first */
@@ -800,8 +880,17 @@ const HDGame = (function () {
     const active = todayAIs.filter(ai => !ai.folded && !ai.allIn);
     let i = 0;
     function next() {
-      if (i >= active.length) { if (callback) callback(); return; }
-      const ai     = active[i];
+      if (i >= active.length) {
+        clearAIActive();
+        if (callback) callback();
+        return;
+      }
+      const ai      = active[i];
+      const seatIdx = todayAIs.indexOf(ai);
+
+      // Highlight the seat so it's clear whose turn it is
+      setAIActive(seatIdx);
+
       const toCall = Math.max(currentStreetBet - ai.streetBet, 0);
       const ctx    = {
         hand:      ai.hole,
@@ -812,13 +901,18 @@ const HDGame = (function () {
         street:    street,
         rand:      dailyRng,
       };
-      const dec = ai.decide(ctx);
-      applyAIDecision(ai, dec, todayAIs.indexOf(ai));
-      updatePot();
-      i++;
-      setTimeout(next, 700);
+
+      // Brief "thinking" pause, then show the action
+      setTimeout(() => {
+        const dec = ai.decide(ctx);
+        applyAIDecision(ai, dec, seatIdx);
+        updatePot();
+        i++;
+        // Hold the action visible, then move on
+        setTimeout(next, 700);
+      }, 380);
     }
-    setTimeout(next, 300);
+    setTimeout(next, 200);
   }
 
   function applyAIDecision(ai, dec, seatIndex) {
@@ -953,24 +1047,24 @@ const HDGame = (function () {
     }
 
     if (street === 'preflop') {
-      // Deal flop
       community.push(drawCard(), drawCard(), drawCard());
-      community.forEach((c, i) => { if (i < 3) renderCommunityCard(i, c); });
       setStreetLabel('FLOP');
       street = 'flop';
-      beginStreet('flop');
+      // Deal flop cards one at a time, then start betting
+      dealFlop(() => beginStreet('flop'));
     } else if (street === 'flop') {
       community.push(drawCard());
       renderCommunityCard(3, community[3]);
       setStreetLabel('TURN');
       street = 'turn';
-      beginStreet('turn');
+      // Short pause after card lands before betting resumes
+      setTimeout(() => beginStreet('turn'), 420);
     } else if (street === 'turn') {
       community.push(drawCard());
       renderCommunityCard(4, community[4]);
       setStreetLabel('RIVER');
       street = 'river';
-      beginStreet('river');
+      setTimeout(() => beginStreet('river'), 420);
     } else {
       doShowdown();
     }
