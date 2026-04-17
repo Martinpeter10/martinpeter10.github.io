@@ -71,6 +71,13 @@
     <a href="/" class="site-brand">DailyJamm</a>
     <h1 class="sr-only">Holdle</h1>
     <div class="flex-1"></div>
+    <button id="hd-guide-btn" aria-label="Hand rankings guide"
+      class="w-8 h-8 rounded-full border border-gray-600 bg-transparent text-gray-400 hover:border-gray-400 hover:text-white transition-colors flex items-center justify-center mr-1">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+      </svg>
+    </button>
     <button id="hd-stats-btn" aria-label="Stats"
       class="w-8 h-8 rounded-full border border-gray-600 bg-transparent text-gray-400 hover:border-gray-400 hover:text-white transition-colors flex items-center justify-center mr-1">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -174,6 +181,7 @@
         <div class="hd-player-area">
           <div class="hd-label">YOU</div>
           <div id="hd-player-cards" class="hd-cards"></div>
+          <div id="hd-player-hand-label" class="hd-player-hand-label"></div>
         </div>
 
       </div><!-- /hd-table -->
@@ -387,6 +395,131 @@
       <button id="hd-daily-close"
         class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold rounded-lg transition-colors">
         Let's Play
+      </button>
+    </div>
+  </div>
+
+  <!-- Hand Rankings Guide modal -->
+  <div id="hd-guide-modal" class="fixed inset-0 bg-black/80 flex items-end justify-center z-50 hidden" onclick="HDGame.closeGuide()">
+    <div class="bg-gray-900 border border-gray-700 rounded-t-2xl p-5 max-w-sm w-full max-h-[92vh] overflow-y-auto"
+         onclick="event.stopPropagation()"
+         style="-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:calc(1.25rem + env(safe-area-inset-bottom,0px))">
+      <h2 class="text-xl font-black text-center mb-0.5">Hand Rankings</h2>
+      <p class="text-xs text-gray-400 text-center mb-4">Best to worst. In a tie, the higher ranked hand wins.</p>
+
+      <div class="hd-guide-hand">
+        <div class="hd-guide-hand-header">
+          <div class="hd-guide-rank-badge">1</div>
+          <span class="hd-guide-hand-name">Royal Flush</span>
+        </div>
+        <div class="hd-guide-cards-row">
+          <span class="hd-mc r">A♥</span><span class="hd-mc r">K♥</span><span class="hd-mc r">Q♥</span><span class="hd-mc r">J♥</span><span class="hd-mc r">10♥</span>
+        </div>
+        <p class="hd-guide-hand-desc">Ace, King, Queen, Jack, 10 - all the same suit. The best possible hand.</p>
+      </div>
+
+      <div class="hd-guide-hand">
+        <div class="hd-guide-hand-header">
+          <div class="hd-guide-rank-badge">2</div>
+          <span class="hd-guide-hand-name">Straight Flush</span>
+        </div>
+        <div class="hd-guide-cards-row">
+          <span class="hd-mc">9♠</span><span class="hd-mc">8♠</span><span class="hd-mc">7♠</span><span class="hd-mc">6♠</span><span class="hd-mc">5♠</span>
+        </div>
+        <p class="hd-guide-hand-desc">Five consecutive cards all of the same suit.</p>
+      </div>
+
+      <div class="hd-guide-hand">
+        <div class="hd-guide-hand-header">
+          <div class="hd-guide-rank-badge">3</div>
+          <span class="hd-guide-hand-name">Four of a Kind</span>
+        </div>
+        <div class="hd-guide-cards-row">
+          <span class="hd-mc">K♠</span><span class="hd-mc r">K♥</span><span class="hd-mc r">K♦</span><span class="hd-mc">K♣</span><span class="hd-mc r">A♥</span>
+        </div>
+        <p class="hd-guide-hand-desc">All four cards of the same rank. The highest rank wins ties.</p>
+      </div>
+
+      <div class="hd-guide-hand">
+        <div class="hd-guide-hand-header">
+          <div class="hd-guide-rank-badge">4</div>
+          <span class="hd-guide-hand-name">Full House</span>
+        </div>
+        <div class="hd-guide-cards-row">
+          <span class="hd-mc">Q♠</span><span class="hd-mc r">Q♥</span><span class="hd-mc r">Q♦</span><span class="hd-mc">8♣</span><span class="hd-mc r">8♦</span>
+        </div>
+        <p class="hd-guide-hand-desc">Three of a kind combined with a pair. The trips rank decides ties.</p>
+      </div>
+
+      <div class="hd-guide-hand">
+        <div class="hd-guide-hand-header">
+          <div class="hd-guide-rank-badge">5</div>
+          <span class="hd-guide-hand-name">Flush</span>
+        </div>
+        <div class="hd-guide-cards-row">
+          <span class="hd-mc r">A♦</span><span class="hd-mc r">J♦</span><span class="hd-mc r">8♦</span><span class="hd-mc r">5♦</span><span class="hd-mc r">2♦</span>
+        </div>
+        <p class="hd-guide-hand-desc">Any five cards of the same suit. Highest card decides ties.</p>
+      </div>
+
+      <div class="hd-guide-hand">
+        <div class="hd-guide-hand-header">
+          <div class="hd-guide-rank-badge">6</div>
+          <span class="hd-guide-hand-name">Straight</span>
+        </div>
+        <div class="hd-guide-cards-row">
+          <span class="hd-mc">8♠</span><span class="hd-mc r">7♥</span><span class="hd-mc r">6♦</span><span class="hd-mc">5♣</span><span class="hd-mc">4♠</span>
+        </div>
+        <p class="hd-guide-hand-desc">Five cards in consecutive order, any suits. Ace can be high or low.</p>
+      </div>
+
+      <div class="hd-guide-hand">
+        <div class="hd-guide-hand-header">
+          <div class="hd-guide-rank-badge">7</div>
+          <span class="hd-guide-hand-name">Three of a Kind</span>
+        </div>
+        <div class="hd-guide-cards-row">
+          <span class="hd-mc">J♠</span><span class="hd-mc r">J♥</span><span class="hd-mc r">J♦</span><span class="hd-mc r">A♥</span><span class="hd-mc">7♠</span>
+        </div>
+        <p class="hd-guide-hand-desc">Three cards of the same rank. Higher rank beats lower rank.</p>
+      </div>
+
+      <div class="hd-guide-hand">
+        <div class="hd-guide-hand-header">
+          <div class="hd-guide-rank-badge">8</div>
+          <span class="hd-guide-hand-name">Two Pair</span>
+        </div>
+        <div class="hd-guide-cards-row">
+          <span class="hd-mc r">A♥</span><span class="hd-mc">A♠</span><span class="hd-mc">9♣</span><span class="hd-mc r">9♦</span><span class="hd-mc">K♠</span>
+        </div>
+        <p class="hd-guide-hand-desc">Two different pairs. The higher pair decides ties.</p>
+      </div>
+
+      <div class="hd-guide-hand">
+        <div class="hd-guide-hand-header">
+          <div class="hd-guide-rank-badge">9</div>
+          <span class="hd-guide-hand-name">One Pair</span>
+        </div>
+        <div class="hd-guide-cards-row">
+          <span class="hd-mc">10♠</span><span class="hd-mc r">10♦</span><span class="hd-mc r">A♥</span><span class="hd-mc">K♣</span><span class="hd-mc">7♠</span>
+        </div>
+        <p class="hd-guide-hand-desc">Two cards of the same rank. Higher pair wins; kicker cards break ties.</p>
+      </div>
+
+      <div class="hd-guide-hand">
+        <div class="hd-guide-hand-header">
+          <div class="hd-guide-rank-badge">10</div>
+          <span class="hd-guide-hand-name">High Card</span>
+        </div>
+        <div class="hd-guide-cards-row">
+          <span class="hd-mc r">A♦</span><span class="hd-mc">Q♠</span><span class="hd-mc r">9♥</span><span class="hd-mc">6♣</span><span class="hd-mc r">3♦</span>
+        </div>
+        <p class="hd-guide-hand-desc">No combination. The highest card in your hand plays.</p>
+      </div>
+
+      <button onclick="HDGame.closeGuide()"
+        class="w-full mt-4 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-sm font-bold rounded-lg transition-colors">
+        Got It
       </button>
     </div>
   </div>

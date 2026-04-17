@@ -248,6 +248,25 @@ const HDGame = (function () {
     return best || evalFive(all.slice(0, 5));
   }
 
+  /* Same as evalBest but also returns the 5 cards that make the best hand */
+  function evalBestWithCards(hole, comm) {
+    const all = hole.concat(comm);
+    const n   = all.length;
+    let best  = null;
+    let bestCombo = null;
+    for (let a = 0; a < n - 4; a++)
+      for (let b = a+1; b < n - 3; b++)
+        for (let c = b+1; c < n - 2; c++)
+          for (let d = c+1; d < n - 1; d++)
+            for (let e = d+1; e < n; e++) {
+              const combo = [all[a], all[b], all[c], all[d], all[e]];
+              const res   = evalFive(combo);
+              if (!best || res.score > best.score) { best = res; bestCombo = combo; }
+            }
+    if (!best) { bestCombo = all.slice(0, 5); best = evalFive(bestCombo); }
+    return { score: best.score, label: best.label, cards: bestCombo };
+  }
+
   /* Normalised hand strength 0-1 */
   function handStrength(hole, comm) {
     if (!hole || hole.length < 2) return 0;
@@ -482,6 +501,8 @@ const HDGame = (function () {
     const color = SUIT_COLOR[card.suit];
     wrap.className = 'hd-card hd-card-front hd-card-dealt';
     wrap.style.color = color;
+    wrap.dataset.rank = card.rank;
+    wrap.dataset.suit = card.suit;
 
     const tl = document.createElement('div');
     tl.className = 'hd-card-corner hd-card-tl';
@@ -564,6 +585,73 @@ const HDGame = (function () {
       if (s) s.classList.remove('hd-ai-active');
     }
   }
+
+  /* ── Live hand label + card highlighting ── */
+  const PREFLOP_RANK_NAMES = {
+    '2':'Twos','3':'Threes','4':'Fours','5':'Fives','6':'Sixes',
+    '7':'Sevens','8':'Eights','9':'Nines','10':'Tens',
+    'J':'Jacks','Q':'Queens','K':'Kings','A':'Aces',
+  };
+
+  function clearHandHighlights() {
+    document.querySelectorAll('.hd-card-highlight').forEach(el => el.classList.remove('hd-card-highlight'));
+  }
+
+  function clearPlayerHandDisplay() {
+    const el = $('hd-player-hand-label');
+    if (el) el.textContent = '';
+    clearHandHighlights();
+  }
+
+  function updatePlayerHandDisplay() {
+    const labelEl = $('hd-player-hand-label');
+    if (!labelEl || playerFolded || playerHole.length < 2) {
+      clearPlayerHandDisplay();
+      return;
+    }
+
+    clearHandHighlights();
+
+    let label, winCards;
+    const total = playerHole.length + community.length;
+
+    if (total < 5) {
+      // Pre-flop: only 2 cards, evaluate manually
+      const [c1, c2] = playerHole;
+      if (c1.rank === c2.rank) {
+        label    = 'Pair of ' + (PREFLOP_RANK_NAMES[c1.rank] || c1.rank);
+        winCards = [c1, c2];
+      } else {
+        const hc = RANK_VAL[c1.rank] >= RANK_VAL[c2.rank] ? c1 : c2;
+        label    = hc.rank + ' high';
+        winCards = [hc];
+      }
+    } else {
+      const result = evalBestWithCards(playerHole, community);
+      label    = result.label;
+      winCards = result.cards;
+    }
+
+    labelEl.textContent = label;
+
+    // Highlight contributing cards - scope to player area + community only
+    const searchEls = [];
+    const pc = $('hd-player-cards');
+    if (pc) pc.querySelectorAll('.hd-card[data-rank]').forEach(el => searchEls.push(el));
+    for (let i = 0; i < 5; i++) {
+      const slot = $('hd-comm-' + i);
+      if (slot) slot.querySelectorAll('.hd-card[data-rank]').forEach(el => searchEls.push(el));
+    }
+    searchEls.forEach(el => {
+      if (winCards.some(c => c.rank === el.dataset.rank && c.suit === el.dataset.suit)) {
+        el.classList.add('hd-card-highlight');
+      }
+    });
+  }
+
+  /* ── Guide modal ── */
+  function showGuide()  { const m = $('hd-guide-modal'); if (m) m.classList.remove('hidden'); }
+  function closeGuide() { const m = $('hd-guide-modal'); if (m) m.classList.add('hidden'); }
 
   /* ── Sequential card dealing ── */
   function dealHoleCardsSequentially(callback) {
@@ -730,6 +818,7 @@ const HDGame = (function () {
 
     setStreetLabel('');
     clearCommunityCards();
+    clearPlayerHandDisplay();
     updatePot();
     $('hd-pot').textContent = '';
 
@@ -831,6 +920,7 @@ const HDGame = (function () {
 
     // Deal cards one at a time in poker order, then begin the street
     dealHoleCardsSequentially(() => {
+      updatePlayerHandDisplay();
       beginStreet('preflop');
     });
   }
@@ -1055,21 +1145,19 @@ const HDGame = (function () {
       community.push(drawCard(), drawCard(), drawCard());
       setStreetLabel('FLOP');
       street = 'flop';
-      // Deal flop cards one at a time, then start betting
-      dealFlop(() => beginStreet('flop'));
+      dealFlop(() => { updatePlayerHandDisplay(); beginStreet('flop'); });
     } else if (street === 'flop') {
       community.push(drawCard());
       renderCommunityCard(3, community[3]);
       setStreetLabel('TURN');
       street = 'turn';
-      // Short pause after card lands before betting resumes
-      setTimeout(() => beginStreet('turn'), 420);
+      setTimeout(() => { updatePlayerHandDisplay(); beginStreet('turn'); }, 420);
     } else if (street === 'turn') {
       community.push(drawCard());
       renderCommunityCard(4, community[4]);
       setStreetLabel('RIVER');
       street = 'river';
-      setTimeout(() => beginStreet('river'), 420);
+      setTimeout(() => { updatePlayerHandDisplay(); beginStreet('river'); }, 420);
     } else {
       doShowdown();
     }
@@ -1078,6 +1166,7 @@ const HDGame = (function () {
   function doShowdown() {
     setStreetLabel('SHOWDOWN');
     hideActions();
+    clearPlayerHandDisplay();
 
     // Reveal all AI cards with delay
     let delay = 200;
@@ -1510,13 +1599,16 @@ const HDGame = (function () {
 
     const helpBtn  = $('hd-help-btn');
     const statsBtn = $('hd-stats-btn');
+    const guideBtn = $('hd-guide-btn');
     if (helpBtn)  helpBtn.addEventListener('click', showModal);
     if (statsBtn) statsBtn.addEventListener('click', showStats);
+    if (guideBtn) guideBtn.addEventListener('click', showGuide);
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         closeModal();
         closeStats();
+        closeGuide();
         const dm = $('hd-daily-modal');
         if (dm) dm.classList.add('hidden');
       }
@@ -1525,5 +1617,5 @@ const HDGame = (function () {
 
   document.addEventListener('DOMContentLoaded', init);
 
-  return { showModal, closeModal, showStats, closeStats, shareResults, shareBrokeResults, shareStats };
+  return { showModal, closeModal, showStats, closeStats, shareResults, shareBrokeResults, shareStats, showGuide, closeGuide };
 })();
