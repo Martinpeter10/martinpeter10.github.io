@@ -204,19 +204,15 @@
 
       <!-- Betting UI (shown between hands) -->
       <div id="hd-bet-area" class="hd-bet-area">
-        <div class="hd-bet-title">Place Your Bet</div>
+        <div class="hd-bet-title">Choose Your Ante</div>
+        <p style="font-size:10px;color:rgba(255,255,255,0.4);text-align:center;margin:-2px 0 6px;">All opponents will match your ante to play</p>
         <div class="hd-bet-chips">
           <button class="hd-bet-chip" data-amount="10">10</button>
           <button class="hd-bet-chip" data-amount="25">25</button>
           <button class="hd-bet-chip" data-amount="50">50</button>
           <button class="hd-bet-chip" data-amount="100">100</button>
-          <button class="hd-bet-chip hd-bet-allin" data-amount="all">ALL IN</button>
         </div>
-        <div class="hd-bet-selected">
-          Bet: <span id="hd-bet-amount">0</span>
-        </div>
-        <div class="hd-bet-actions">
-          <button id="hd-bet-clear" class="hd-btn hd-btn-muted">Clear</button>
+        <div class="hd-bet-actions" style="margin-top:8px;">
           <button id="hd-bet-deal" class="hd-btn hd-btn-primary" disabled>Deal Hand</button>
         </div>
       </div>
@@ -303,6 +299,7 @@
          style="-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:calc(1.25rem + env(safe-area-inset-bottom,0px))">
       <h2 class="text-xl font-black text-center mb-4">My Stats</h2>
       <div id="hd-stats-content"></div>
+      <div id="hd-ai-stats-section" class="mt-4"></div>
       <button id="hd-stats-share-btn" onclick="HDGame.shareStats()"
         class="w-full mt-4 py-2.5 bg-green-700 hover:bg-green-600 text-white text-sm font-bold rounded-lg transition-colors">
         Share Stats
@@ -347,15 +344,8 @@
       </div>
 
       <div class="mb-4">
-        <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">The Cast</h3>
-        <ul class="text-xs text-gray-300 leading-relaxed space-y-2">
-          <li><strong class="text-white">Bluffington</strong> - Raises constantly regardless of hand. Never trust his bets.</li>
-          <li><strong class="text-white">Granite Greta</strong> - Only plays premium hands. If she's still in, she has the goods.</li>
-          <li><strong class="text-white">Reckless Rex</strong> - All-in prone maniac. Huge swings, huge chips at risk.</li>
-          <li><strong class="text-white">Otto the Odds</strong> - Calculates pot odds before every call. Won't pay too high a price.</li>
-          <li><strong class="text-white">River Rita</strong> - Chases every flush and straight draw to the bitter end.</li>
-          <li><strong class="text-white">Steady Sam</strong> - Balanced and adaptive. The hardest one to read.</li>
-        </ul>
+        <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">The Opponents</h3>
+        <p class="text-xs text-gray-300 leading-relaxed">Each AI opponent has a unique play style - pay attention and figure out their tendencies as you play. Part of the challenge is reading the table!</p>
       </div>
 
       <div class="mb-5">

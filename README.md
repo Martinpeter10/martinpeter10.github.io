@@ -181,6 +181,7 @@ Then open your browser to:
 - `http://localhost:8080/blackjackdle/` - BlackJackdle game
 - `http://localhost:8080/spelldle/` - Spelldle game
 - `http://localhost:8080/roulettedle/` - Roulettedle game
+- `http://localhost:8080/holdle/` - Holdle game
 - `http://localhost:8080/about/` - About page
 - `http://localhost:8080/privacy/` - Privacy Policy
 
@@ -192,15 +193,16 @@ Press `Ctrl+C` in the terminal to stop the server.
 
 Full release notes are also available at [dailyjamm.com/releases](https://dailyjamm.com/releases/).
 
-### v2.0.0 - 2026-04-15
+### v2.0.0 - 2026-04-21
 
 **New Game: Holdle** - Daily Texas Hold'em poker.
 
-- Launched **Holdle** - daily Texas Hold'em poker against 3 AI opponents
-- Six distinct AI personalities: Bluffington (bluffer), Granite Greta (tight/rock), Reckless Rex (maniac), Otto the Odds (math-based), River Rita (draw chaser), Steady Sam (balanced)
-- 3 hands per day; daily opponent lineup is date-seeded so all players face the same 3 AIs each day
-- Full poker hand evaluator with flop, turn, and river betting rounds; AI hole cards revealed at showdown
-- Chip stack persists across days with a daily bonus; full stats modal and share-to-clipboard support
+- Launched **Holdle** - daily Texas Hold'em poker against 3 AI opponents per day
+- 7 AI opponents to face across your sessions - each with a distinct play style you can learn over time; pay attention to how they bet and react and you may start to predict their next move
+- 3 hands per day; the daily lineup of 3 opponents is date-seeded so all players face the same AIs each day
+- Choose your ante (10, 25, 50, or 100 chips) before each hand - all opponents match your ante to build the pot before cards are dealt
+- Full poker hand evaluator with flop, turn, and river betting; AI hole cards revealed at showdown
+- Chip stack persists across days with a daily bonus of 100-500 chips; full stats modal with head-to-head records per opponent and share-to-clipboard support
 
 ### v1.9.0 - 2026-04-15
 

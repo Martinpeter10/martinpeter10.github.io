@@ -411,6 +411,50 @@ Pages to update:
 
 ---
 
+### Holdle (`/assets/js/holdle.js`)
+
+Texas Hold'em poker game. Player faces 3 randomly selected AI opponents each day (seeded from date). 3 hands are played per session; chip total carries over. Starting chips: 1,000.
+
+**localStorage keys**: `hd_stats_v2`, `hd_alltime_v2`, `hd_ai_stats_v2`, `hd_today`, `hd_chips`, `hd_seen_howto`, `hd_bonus_date`
+
+**Daily AI selection**: `getDailyAIIndexes(dateStr)` shuffles indices 0-5 using a seeded RNG and returns 3 for the day. Same 3 opponents for all players on a given date.
+
+**AI Personalities:**
+
+| ID | Name | Style | Aggression | Decide fn | Notes |
+|---|---|---|---|---|---|
+| 0 | David | Bluffer | Very High | `davidDecide` | Raises frequently with weak hands; 55% bluff-raise post-flop; last hand can all-in |
+| 1 | Peter | Rock | Very Low | `peterDecide` | Only plays premium hands; never goes all-in (too conservative) |
+| 2 | Jon | Math | Medium | `jonDecide` | Calculates pot odds; on last hand with equity > 0.80 will all-in |
+| 3 | Caleb | Draw Chaser | Medium | `calebDecide` | Loves suited hands; last hand will all-in on strong draws (oc >= 8) |
+| 4 | Mandy | Balanced | Medium | `mandyDecide` | Reads pot odds + mixes in aggression; last hand will all-in with equity > 0.70 |
+| 5 | Madelyn | Random | Unpredictable | `madelynDecide` | Completely random; all-in only available on last hand |
+| 6 | Josh | Semi-bluffer | Low-Medium | `joshDecide` | Plays decent hands sensibly; ~15% preflop bluff, ~18% post-flop bluff; all-in on last hand with strong hands |
+
+**Hand-awareness rules** (all AIs):
+- Hand 1 (`handNum=0`): raises capped at 45% of stack via `safeRaise()`; no all-in actions
+- Hand 2 (`handNum=1`): raises capped at 70% of stack; no all-in actions
+- Hand 3 (`handNum=2`): no raise cap; all-in allowed for appropriate personalities (David, Jon, Caleb, Mandy, Madelyn, Josh); Peter never goes all-in regardless
+
+**AI chip persistence**: AI stacks start at 1,000 each day and carry over between hands within the day (same as the player). Saved in `hd_today.aiChips[]` and restored on page reload. Each new day `buildAIStates` resets them to 1,000.
+
+**Daily bonus**: Player receives 100-500 chips (in increments of 10, matching BlackJackdle style) each day on their first visit.
+
+**Madelyn peek feature**: On each new hand, there is a 1% chance Madelyn's hole cards briefly appear face-up with a chat bubble ("Is this good??") for ~2.4 seconds before flipping back over and play begins. Implemented in `maybeShowMadelynPeek()`.
+
+**Per-AI head-to-head stats**: `hd_ai_stats_v2` stores `{ [aiId]: { w, l, f } }` - wins, losses, and folds per AI across all sessions. Updated in `recordAIStats(type)` called from `finishHand`. Displayed in the stats modal under "Head-to-Head" with W/L/F columns and win percentage per AI.
+
+**Betting flow:**
+- Pre-flop: AIs act first (SB/BB posted), then player acts (button). If player raises, AIs respond again. If an AI re-raises, player gets one more action.
+- Post-flop (Flop/Turn/River): Player acts first, then AIs. If an AI raises, player gets another action before street advances.
+- `proceedAfterPlayerAction()` handles the re-action loop for both streets.
+
+**Card highlighting**: `getRelevantCards(combo)` strips kicker cards from the best 5-card combo, returning only the cards that form the named hand (e.g. for "Pair of Aces" - returns only the 2 aces, not the 3 kickers).
+
+**Sequential dealing**: `dealHoleCardsSequentially()` deals in poker order (P, AI0, AI1, AI2, P, AI0, AI1, AI2) with 190ms gaps. `dealFlop()` deals 3 community cards with 220ms gaps.
+
+---
+
 ## Security Practices
 
 ### No Advertising (AdSense removed)

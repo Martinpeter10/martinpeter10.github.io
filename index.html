@@ -25,7 +25,7 @@
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://dailyjamm.com/" />
   <meta property="og:title" content="DailyJamm - Daily Games Hub" />
-  <meta property="og:description" content="DailyJamm is your hub for daily mini-games. Play Themedle, Chain Link, and BlackJackdle - our original daily games - and discover other daily games we love." />
+  <meta property="og:description" content="DailyJamm is your hub for daily mini-games. Play Themedle, Chain Link, BlackJackdle, Spelldle, Roulettedle, and Holdle - our original daily games - and discover other daily games we love." />
   <meta property="og:image" content="https://dailyjamm.com/assets/img/favicon.png" />
 
   <!-- THEME COLOR FIXES FOR iOS SAFARI: set to site background so overscroll/toolbar areas aren't green -->
@@ -99,7 +99,7 @@
     "@type": "WebSite",
     "name": "DailyJamm",
     "url": "https://dailyjamm.com/",
-    "description": "Your hub for daily mini-games. Play Themedle, Chain Link, BlackJackdle, and discover more daily games.",
+    "description": "Your hub for daily mini-games. Play Themedle, Chain Link, BlackJackdle, Spelldle, Roulettedle, and Holdle - plus a curated collection of the best daily games.",
     "author": { "@type": "Organization", "name": "DailyJamm", "url": "https://dailyjamm.com" }
   }
   </script>
@@ -197,10 +197,11 @@
         </article>
         <article class="card our" onclick="goto('/blackjackdle/')" role="button" tabindex="0" aria-label="Play BlackJackdle">
           <div class="icon our">
-            <!-- Playing card icon -->
             <svg viewBox="0 0 24 24" aria-hidden="true">
-              <rect x="4" y="2" width="16" height="20" rx="2" fill="none" stroke="white" stroke-width="2"/>
-              <text x="12" y="15" text-anchor="middle" font-size="9" font-weight="bold" fill="white" font-family="sans-serif">21</text>
+              <rect x="3" y="4" width="9" height="13" rx="2" fill="white" stroke="rgba(26,26,46,0.25)" stroke-width="1.5"/>
+              <text x="7.5" y="14" text-anchor="middle" fill="#45b7d1" font-size="9" font-weight="800" font-family="Georgia,serif">A</text>
+              <rect x="12" y="7" width="9" height="13" rx="2" fill="white" stroke="rgba(26,26,46,0.25)" stroke-width="1.5"/>
+              <text x="16.5" y="17" text-anchor="middle" fill="#45b7d1" font-size="9" font-weight="800" font-family="Georgia,serif">K</text>
             </svg>
           </div>
           <h3>BlackJackdle</h3>
@@ -251,10 +252,20 @@
           <span class="badge">New</span>
           <div class="icon our">
             <svg viewBox="0 0 24 24" aria-hidden="true">
-              <rect x="3" y="4" width="9" height="13" rx="2" fill="none" stroke="white" stroke-width="2"/>
-              <text x="7.5" y="14" text-anchor="middle" fill="white" font-size="9" font-weight="800" font-family="Georgia,serif">A</text>
-              <rect x="12" y="7" width="9" height="13" rx="2" fill="#1a1a2e" stroke="white" stroke-width="2"/>
-              <text x="16.5" y="17" text-anchor="middle" fill="white" font-size="9" font-weight="800" font-family="Georgia,serif">K</text>
+              <g transform="rotate(-32, 12, 24)">
+                <rect x="8" y="5" width="8" height="12" rx="1.5" fill="rgba(255,255,255,0.6)" stroke="rgba(26,26,46,0.2)" stroke-width="1"/>
+              </g>
+              <g transform="rotate(-16, 12, 24)">
+                <rect x="8" y="5" width="8" height="12" rx="1.5" fill="rgba(255,255,255,0.78)" stroke="rgba(26,26,46,0.2)" stroke-width="1"/>
+              </g>
+              <g transform="rotate(32, 12, 24)">
+                <rect x="8" y="5" width="8" height="12" rx="1.5" fill="rgba(255,255,255,0.6)" stroke="rgba(26,26,46,0.2)" stroke-width="1"/>
+              </g>
+              <g transform="rotate(16, 12, 24)">
+                <rect x="8" y="5" width="8" height="12" rx="1.5" fill="rgba(255,255,255,0.78)" stroke="rgba(26,26,46,0.2)" stroke-width="1"/>
+              </g>
+              <rect x="8" y="5" width="8" height="12" rx="1.5" fill="white" stroke="rgba(26,26,46,0.2)" stroke-width="1"/>
+              <text x="12" y="13.5" text-anchor="middle" fill="#45b7d1" font-size="9" font-weight="800" font-family="Georgia,serif">&#9824;</text>
             </svg>
           </div>
           <h3>Holdle</h3>
