@@ -44,6 +44,7 @@ const HDGame = (function () {
   let todayAIs     = [];      // array of 3 AI state objects for this session
   let street       = 'preflop';
   let playerFolded = false;
+  let playerAllIn  = false;
   let currentStreetBet = 0;  // highest bet on current street
   let playerStreetBet  = 0;  // how much player has put in this street
   let streetRaiseCount = 0;  // total raises on current street (capped at 2)
@@ -1049,6 +1050,7 @@ const HDGame = (function () {
 
     // Reset hand state
     playerFolded     = false;
+    playerAllIn      = false;
     community        = [];
 
     // Reset per-hand AI state - chips persist across hands within the day
@@ -1298,6 +1300,7 @@ const HDGame = (function () {
       playerStreetBet += toCall;
       pot             += toCall;
     }
+    if (chips === 0) playerAllIn = true;
     updateChipDisplay();
     updatePot();
     proceedAfterPlayerAction();
@@ -1324,7 +1327,7 @@ const HDGame = (function () {
     pot             += paid;
     currentStreetBet = Math.max(currentStreetBet, playerStreetBet);
     streetRaiseCount++;
-    if (chips === 0) { /* player all-in */ }
+    if (chips === 0) playerAllIn = true;
 
     updateChipDisplay();
     updatePot();
@@ -1367,14 +1370,34 @@ const HDGame = (function () {
     }
   }
 
-  function advanceStreet() {
-    const active = [!playerFolded, ...todayAIs.map(a => !a.folded && !a.allIn)];
-    const activeCnt = active.filter(Boolean).length;
-
-    if (activeCnt <= 1) {
-      doShowdown();
-      return;
+  function runOut() {
+    function advance(cb) {
+      if (street === 'river') { cb(); return; }
+      if (street === 'preflop') {
+        community.push(drawCard(), drawCard(), drawCard());
+        setStreetLabel('FLOP'); street = 'flop';
+        dealFlop(() => { updatePlayerHandDisplay(); advance(cb); });
+      } else if (street === 'flop') {
+        community.push(drawCard());
+        renderCommunityCard(3, community[3]);
+        setStreetLabel('TURN'); street = 'turn';
+        setTimeout(() => { updatePlayerHandDisplay(); advance(cb); }, 420);
+      } else if (street === 'turn') {
+        community.push(drawCard());
+        renderCommunityCard(4, community[4]);
+        setStreetLabel('RIVER'); street = 'river';
+        setTimeout(() => { updatePlayerHandDisplay(); advance(cb); }, 420);
+      }
     }
+    advance(() => doShowdown());
+  }
+
+  function advanceStreet() {
+    const withCardsCnt = [!playerFolded, ...todayAIs.map(a => !a.folded && a.hole.length >= 2)].filter(Boolean).length;
+    const activeCnt    = [!playerFolded && !playerAllIn, ...todayAIs.map(a => !a.folded && !a.allIn)].filter(Boolean).length;
+
+    if (withCardsCnt <= 1) { doShowdown(); return; }
+    if (activeCnt <= 1)    { runOut(); return; }
 
     if (street === 'preflop') {
       community.push(drawCard(), drawCard(), drawCard());
