@@ -425,6 +425,17 @@ const HDGame = (function () {
     return amt; // last hand - no cap
   }
 
+  // Snap an AI raise total to the nearest player-valid option (min / half pot / pot)
+  function snapAIRaise(rawAmt, aiStreetBet, aiChips) {
+    const minR  = currentStreetBet + BIG_BLIND;
+    const halfR = aiStreetBet + Math.floor(pot / 2);
+    const potR  = aiStreetBet + pot;
+    const maxAffordable = aiChips + aiStreetBet;
+    const opts = [minR, halfR, potR].filter(v => v > aiStreetBet && v <= maxAffordable);
+    if (!opts.length) return Math.min(rawAmt, maxAffordable);
+    return opts.reduce((best, v) => Math.abs(v - rawAmt) < Math.abs(best - rawAmt) ? v : best);
+  }
+
   function davidDecide(ctx) {
     const { toCall, pot: p, myChips, street: st, rand, handNum: hn } = ctx;
     const isLast = hn === 2;
@@ -1241,7 +1252,8 @@ const HDGame = (function () {
         let raiseAmt = dec.amount || BIG_BLIND * 2;
         // Hand 1: cap AI raises at half the pot (min 2×BB to keep it meaningful)
         if (handNum === 0) raiseAmt = Math.min(raiseAmt, Math.max(Math.floor(pot * 0.5), BIG_BLIND * 2));
-        raiseAmt = Math.min(raiseAmt, ai.chips);
+        raiseAmt = snapAIRaise(raiseAmt, ai.streetBet, ai.chips);
+        raiseAmt = Math.min(raiseAmt, ai.chips + ai.streetBet);
         const extra = raiseAmt - ai.streetBet; // extra beyond what's already in
         const paid  = Math.min(extra, ai.chips);
         ai.chips         -= paid;
