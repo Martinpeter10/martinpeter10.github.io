@@ -1610,6 +1610,9 @@ input[type=range].slider::-moz-range-thumb {
   justify-content: center;
   overflow-y: auto;
   overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 .hd-container {
   width: 100%;
@@ -2120,6 +2123,11 @@ input[type=range].slider::-moz-range-thumb {
 @keyframes hd-fade-in {
   from { opacity: 0; transform: translateY(5px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Reduce table height on short viewports (landscape mobile / small phones) */
+@media (max-height: 600px) {
+  .hd-table { height: 38vh; }
 }
 
 /* Modal responsive */
