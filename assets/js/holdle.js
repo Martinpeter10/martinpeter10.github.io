@@ -769,6 +769,42 @@ const HDGame = (function () {
     });
   }
 
+  /* ── Showdown winner highlighting ── */
+  function highlightWinnerCards(winners) {
+    clearHandHighlights();
+    winners.forEach(w => {
+      const hole = w.who === 'player' ? playerHole : (todayAIs[w.who] ? todayAIs[w.who].hole : []);
+      if (!hole || hole.length < 2) return;
+
+      let relevant;
+      if (hole.length + community.length >= 5) {
+        const result = evalBestWithCards(hole, community);
+        relevant = getRelevantCards(result.cards);
+      } else {
+        relevant = hole; // pre-river fold — just the hole cards
+      }
+
+      const searchEls = [];
+      if (w.who === 'player') {
+        const pc = $('hd-player-cards');
+        if (pc) pc.querySelectorAll('.hd-card[data-rank]').forEach(el => searchEls.push(el));
+      } else {
+        const seat = $('hd-ai-seat-' + w.who);
+        if (seat) seat.querySelectorAll('.hd-card[data-rank]').forEach(el => searchEls.push(el));
+      }
+      for (let i = 0; i < 5; i++) {
+        const slot = $('hd-comm-' + i);
+        if (slot) slot.querySelectorAll('.hd-card[data-rank]').forEach(el => searchEls.push(el));
+      }
+
+      searchEls.forEach(el => {
+        if (relevant.some(c => c.rank === el.dataset.rank && c.suit === el.dataset.suit)) {
+          el.classList.add('hd-card-highlight');
+        }
+      });
+    });
+  }
+
   /* ── Guide modal ── */
   function showGuide()  { const m = $('hd-guide-modal'); if (m) m.classList.remove('hidden'); }
   function closeGuide() { const m = $('hd-guide-modal'); if (m) m.classList.add('hidden'); }
@@ -1423,6 +1459,7 @@ const HDGame = (function () {
         setHandResult(winnerName + ' wins with ' + winners[0].label, 'lose');
       }
 
+      highlightWinnerCards(winners);
       updateChipDisplay();
       setTimeout(() => finishHand(playerNet, playerNet > 0 ? 'win' : playerNet < 0 ? 'lose' : 'push'), 4000);
     }, delay + 200);
@@ -1507,10 +1544,7 @@ const HDGame = (function () {
         const nm    = document.createElement('div');
         nm.className = 'hd-ai-reveal-name';
         nm.textContent = ai.def.name;
-        const tg    = document.createElement('div');
-        tg.style.cssText = 'font-size:9px;color:#6b7280;text-align:center;max-width:80px';
-        tg.textContent = ai.def.tagline;
-        item.appendChild(nm); item.appendChild(tg);
+        item.appendChild(nm);
         aiRow.appendChild(item);
       });
     }
@@ -1785,6 +1819,18 @@ const HDGame = (function () {
       if (nameEl)  nameEl.textContent  = ai.def.name;
       if (chipsEl) chipsEl.textContent = ai.chips.toLocaleString() + ' chips';
     });
+
+    // Populate "Today's Opponents" list in how-to-play modal (names only)
+    const howtoList = $('hd-howto-ai-list');
+    if (howtoList) {
+      howtoList.textContent = '';
+      todayAIs.forEach(ai => {
+        const p = document.createElement('p');
+        p.textContent = ai.def.name;
+        p.style.cssText = 'font-size:12px;font-weight:700;color:#e5e7eb;';
+        howtoList.appendChild(p);
+      });
+    }
 
     updateChipDisplay();
 
