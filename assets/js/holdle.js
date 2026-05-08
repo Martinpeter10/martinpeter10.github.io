@@ -104,22 +104,30 @@ const HDGame = (function () {
     localStorage.setItem('hd_alltime_v2', JSON.stringify(a));
   }
 
-  /* Per-AI head-to-head stats: { [aiId]: { w, l, f } } */
+  /* Per-AI head-to-head stats: { [aiId]: { w, l, f, af } }
+     w=player wins, l=player losses, f=player folds, af=AI folds */
   function loadAIStats() {
-    try { return JSON.parse(localStorage.getItem('hd_ai_stats_v2')) || {}; }
+    try { return JSON.parse(localStorage.getItem('hd_ai_stats_v3')) || {}; }
     catch { return {}; }
   }
-  function saveAIStats(s) { localStorage.setItem('hd_ai_stats_v2', JSON.stringify(s)); }
+  function saveAIStats(s) { localStorage.setItem('hd_ai_stats_v3', JSON.stringify(s)); }
   function recordAIStats(type) {
-    // type: 'win' | 'lose' | 'fold'
+    // type: 'win' | 'lose' | 'fold' (player folded)
     const s = loadAIStats();
     todayAIs.forEach(ai => {
       const id = String(ai.def.id);
-      if (!s[id]) s[id] = { w:0, l:0, f:0 };
-      if (type === 'win')  s[id].w++;
-      else if (type === 'fold') s[id].f++;
-      else                 s[id].l++;
+      if (!s[id]) s[id] = { w:0, l:0, f:0, af:0 };
+      if (type === 'win')        s[id].w++;
+      else if (type === 'fold')  s[id].f++;
+      else                       s[id].l++;
     });
+    saveAIStats(s);
+  }
+  function recordAIFold(seatIndex) {
+    const s  = loadAIStats();
+    const id = String(todayAIs[seatIndex].def.id);
+    if (!s[id]) s[id] = { w:0, l:0, f:0, af:0 };
+    s[id].af++;
     saveAIStats(s);
   }
 
@@ -437,57 +445,81 @@ const HDGame = (function () {
   }
 
   function davidDecide(ctx) {
-    const { toCall, pot: p, myChips, street: st, rand, handNum: hn } = ctx;
+    const { toCall, pot: p, myChips, street: st, rand, handNum: hn, activePlayers } = ctx;
+    const alone  = activePlayers <= 2;
     const isLast = hn === 2;
     if (st === 'preflop') {
-      if (rand() < 0.40) return { action: 'raise', amount: safeRaise(Math.min(p + BIG_BLIND * 3, myChips), myChips, hn) };
+      if (rand() < 0.50) return { action: 'raise', amount: safeRaise(Math.min(p + BIG_BLIND * 3, myChips), myChips, hn) };
       return toCall > 0 ? { action: 'call' } : { action: 'check' };
     }
     const r = rand();
-    if (r < 0.55) {
+    if (r < 0.60) {
       const amt = safeRaise(Math.min(Math.floor(p * 1.25), myChips), myChips, hn);
-      // Last hand: if the raise would be near all-in, just go all-in
       if (isLast && amt >= myChips * 0.85) return { action: 'allin' };
       return { action: 'raise', amount: amt };
     }
     if (toCall > 0) {
-      if (rand() < 0.15) return { action: 'fold' };
+      // Only fold when not alone vs player
+      if (!alone && rand() < 0.15) return { action: 'fold' };
       return { action: 'call' };
     }
     return { action: 'check' };
   }
 
   function peterDecide(ctx) {
-    const { hand, community: comm, toCall, myChips, street: st, handNum: hn } = ctx;
-    const pr = preflopRank(hand);
-    const hs = handStrength(hand, comm);
+    const { hand, community: comm, toCall, myChips, street: st, handNum: hn, playerHand, activePlayers } = ctx;
+    const pr    = preflopRank(hand);
+    const hs    = handStrength(hand, comm);
+    const alone = activePlayers <= 2;
+
     if (st === 'preflop') {
-      if (pr >= 8) return { action: 'raise', amount: safeRaise(Math.min(BIG_BLIND * 3, myChips), myChips, hn) };
-      if (pr >= 6) return toCall <= BIG_BLIND * 2 ? { action: 'call' } : { action: 'fold' };
+      if (pr >= 7) return { action: 'raise', amount: safeRaise(Math.min(BIG_BLIND * 3, myChips), myChips, hn) };
+      if (pr >= 5) return toCall <= BIG_BLIND * 3 ? { action: 'call' } : { action: 'fold' };
+      if (alone)   return toCall <= BIG_BLIND * 2 ? { action: 'call' } : { action: 'fold' };
       return toCall > 0 ? { action: 'fold' } : { action: 'check' };
     }
-    if (hs < 0.45) return toCall > 0 ? { action: 'fold' } : { action: 'check' };
+
+    // Peter knows the player's hand - use it to make sharper decisions
+    const playerHs = (playerHand && comm.length > 0) ? handStrength(playerHand, comm) : null;
+
+    if (playerHs !== null) {
+      // Player looks weak - Peter pounces even with a marginal hand
+      if (playerHs < 0.30 && hs > 0.25) {
+        const amt = safeRaise(Math.min(Math.floor(pot * 0.75), myChips), myChips, hn);
+        return { action: 'raise', amount: amt };
+      }
+      // Player has a monster and Peter can't compete - get out
+      if (playerHs > 0.75 && hs < 0.55) {
+        return toCall > 0 ? { action: 'fold' } : { action: 'check' };
+      }
+    }
+
+    const foldThreshold = alone ? 0.25 : 0.40;
+    if (hs < foldThreshold) return toCall > 0 ? { action: 'fold' } : { action: 'check' };
     if (hs < 0.65) return toCall > 0 ? { action: 'call' } : { action: 'check' };
     const amt = safeRaise(Math.min(Math.floor(pot * 0.75), myChips), myChips, hn);
-    // Peter (rock) never goes all-in - too conservative
     return { action: 'raise', amount: amt };
   }
 
   function jonDecide(ctx) {
-    const { hand, community: comm, toCall, pot: p, myChips, street: st, handNum: hn } = ctx;
-    const pr = preflopRank(hand);
-    const hs = handStrength(hand, comm);
-    const oc = outCount(hand, comm);
+    const { hand, community: comm, toCall, pot: p, myChips, street: st, handNum: hn, activePlayers } = ctx;
+    const pr    = preflopRank(hand);
+    const hs    = handStrength(hand, comm);
+    const oc    = outCount(hand, comm);
     const equity = hs + oc * 0.035;
+    const alone  = activePlayers <= 2;
+
     if (st === 'preflop') {
-      if (pr >= 8) return { action: 'raise', amount: safeRaise(Math.min(Math.floor(BIG_BLIND * 2.5), myChips), myChips, hn) };
-      if (pr >= 5) return toCall <= BIG_BLIND * 2 ? { action: 'call' } : { action: 'fold' };
+      if (pr >= 7) return { action: 'raise', amount: safeRaise(Math.min(Math.floor(BIG_BLIND * 2.5), myChips), myChips, hn) };
+      if (pr >= 4) return toCall <= BIG_BLIND * 3 ? { action: 'call' } : { action: 'fold' };
+      if (alone)   return toCall <= BIG_BLIND * 2 ? { action: 'call' } : { action: 'fold' };
       return toCall > 0 ? { action: 'fold' } : { action: 'check' };
     }
     const needed = potOdds(toCall, p);
-    if (equity < needed) return toCall > 0 ? { action: 'fold' } : { action: 'check' };
-    if (equity > 0.65) {
-      // Last hand with very strong equity: go all-in
+    // When alone, accept worse pot odds to keep contesting
+    const neededAdj = alone ? needed * 0.65 : needed;
+    if (equity < neededAdj) return toCall > 0 ? { action: 'fold' } : { action: 'check' };
+    if (equity > 0.60) {
       if (hn === 2 && equity > 0.80) return { action: 'allin' };
       const amt = safeRaise(Math.min(Math.floor(p * 0.75), myChips), myChips, hn);
       return { action: 'raise', amount: amt };
@@ -496,49 +528,59 @@ const HDGame = (function () {
   }
 
   function calebDecide(ctx) {
-    const { hand, community: comm, toCall, myChips, street: st, rand, handNum: hn } = ctx;
-    const pr = preflopRank(hand);
-    const oc = outCount(hand, comm);
-    const hs = handStrength(hand, comm);
+    const { hand, community: comm, toCall, myChips, street: st, rand, handNum: hn, activePlayers } = ctx;
+    const pr    = preflopRank(hand);
+    const oc    = outCount(hand, comm);
+    const hs    = handStrength(hand, comm);
+    const alone = activePlayers <= 2;
+
     if (st === 'preflop') {
       const suited = hand.length >= 2 && hand[0].suit === hand[1].suit;
-      if (suited || pr >= 4) return toCall > 0 ? { action: 'call' } : { action: 'check' };
-      if (rand() < 0.55) return toCall > 0 ? { action: 'call' } : { action: 'check' };
+      if (suited || pr >= 3) return toCall > 0 ? { action: 'call' } : { action: 'check' };
+      if (rand() < (alone ? 0.70 : 0.55)) return toCall > 0 ? { action: 'call' } : { action: 'check' };
       return toCall > 0 ? { action: 'fold' } : { action: 'check' };
     }
     if (st === 'river') {
-      if (oc === 0 && hs < 0.35) return rand() < 0.20 ? { action: 'raise', amount: safeRaise(Math.min(Math.floor(pot * 0.4), myChips), myChips, hn) } : (toCall > 0 ? { action: 'fold' } : { action: 'check' });
+      if (oc === 0 && hs < 0.35) {
+        if (alone) return toCall > 0 ? { action: 'call' } : { action: 'check' };
+        return rand() < 0.20 ? { action: 'raise', amount: safeRaise(Math.min(Math.floor(pot * 0.4), myChips), myChips, hn) } : (toCall > 0 ? { action: 'fold' } : { action: 'check' });
+      }
     }
     if (oc >= 8) {
-      // Last hand: go all-in on a strong flush/straight draw
       if (hn === 2) return { action: 'allin' };
       const amt = safeRaise(Math.min(Math.floor(pot * 0.6), myChips), myChips, hn);
       return { action: 'raise', amount: amt };
     }
     if (oc >= 4) return toCall > 0 ? { action: 'call' } : { action: 'check' };
-    if (hs < 0.35) return toCall > 0 ? { action: 'fold' } : { action: 'check' };
+    if (hs < 0.35) return alone ? (toCall > 0 ? { action: 'call' } : { action: 'check' }) : (toCall > 0 ? { action: 'fold' } : { action: 'check' });
     return toCall > 0 ? { action: 'call' } : { action: 'check' };
   }
 
   function mandyDecide(ctx) {
-    const { hand, community: comm, toCall, pot: p, myChips, street: st, rand, handNum: hn } = ctx;
-    const pr = preflopRank(hand);
-    const hs = handStrength(hand, comm);
-    const oc = outCount(hand, comm);
+    const { hand, community: comm, toCall, pot: p, myChips, street: st, rand, handNum: hn, activePlayers } = ctx;
+    const pr     = preflopRank(hand);
+    const hs     = handStrength(hand, comm);
+    const oc     = outCount(hand, comm);
     const equity = hs + oc * 0.035;
+    const alone  = activePlayers <= 2;
+
     if (st === 'preflop') {
-      if (pr >= 7) return { action: 'raise', amount: safeRaise(Math.min(BIG_BLIND * 3, myChips), myChips, hn) };
-      if (pr >= 4) return toCall <= BIG_BLIND * 2 ? { action: 'call' } : { action: 'fold' };
+      if (pr >= 6) return { action: 'raise', amount: safeRaise(Math.min(BIG_BLIND * 3, myChips), myChips, hn) };
+      if (pr >= 3) return toCall <= BIG_BLIND * 3 ? { action: 'call' } : { action: 'fold' };
+      if (alone)   return toCall <= BIG_BLIND * 2 ? { action: 'call' } : { action: 'fold' };
       return toCall > 0 ? { action: 'fold' } : { action: 'check' };
     }
     const needed = potOdds(toCall, p);
-    if (rand() < 0.40 && equity > 0.40) {
+    if (rand() < 0.40 && equity > 0.35) {
       const amt = safeRaise(Math.min(Math.floor(p * 0.65), myChips), myChips, hn);
       return { action: 'raise', amount: amt };
     }
-    if (equity < needed && toCall > 0) return { action: 'fold' };
-    if (equity > 0.70) {
-      // Last hand with strong hand: go all-in
+    if (equity < needed && toCall > 0) {
+      // When alone, fight for the pot even at unfavorable odds
+      if (alone) return { action: 'call' };
+      return { action: 'fold' };
+    }
+    if (equity > 0.65) {
       if (hn === 2) return { action: 'allin' };
       const amt = safeRaise(Math.min(Math.floor(p * 0.75), myChips), myChips, hn);
       return { action: 'raise', amount: amt };
@@ -556,36 +598,37 @@ const HDGame = (function () {
       const amt = safeRaise(Math.min(Math.floor(myChips * (0.1 + rand() * 0.5)), myChips), myChips, hn);
       return { action: 'raise', amount: Math.max(amt, 1) };
     }
-    // All-in only available on last hand
     if (hn === 2) return { action: 'allin' };
     const amt = safeRaise(Math.min(Math.floor(myChips * 0.6), myChips), myChips, hn);
     return { action: 'raise', amount: Math.max(amt, 1) };
   }
 
   function joshDecide(ctx) {
-    // Semi-bluffer: mostly sensible play with occasional bluffs
-    const { hand, community: comm, toCall, pot: p, myChips, street: st, rand, handNum: hn } = ctx;
+    const { hand, community: comm, toCall, pot: p, myChips, street: st, rand, handNum: hn, activePlayers } = ctx;
     const pr     = preflopRank(hand);
     const hs     = handStrength(hand, comm);
     const needed = potOdds(toCall, p);
+    const alone  = activePlayers <= 2;
 
     if (st === 'preflop') {
-      // Play decent hands, fold weak ones, bluff ~15% of the time
-      if (pr >= 6) return { action: 'raise', amount: safeRaise(Math.min(BIG_BLIND * 2, myChips), myChips, hn) };
-      if (pr >= 3) return toCall <= BIG_BLIND * 3 ? { action: 'call' } : { action: 'fold' };
-      if (rand() < 0.15) return { action: 'raise', amount: safeRaise(Math.min(BIG_BLIND * 2, myChips), myChips, hn) };
+      if (pr >= 5) return { action: 'raise', amount: safeRaise(Math.min(BIG_BLIND * 2, myChips), myChips, hn) };
+      if (pr >= 2) return toCall <= BIG_BLIND * 3 ? { action: 'call' } : { action: 'fold' };
+      if (rand() < (alone ? 0.30 : 0.15)) return { action: 'raise', amount: safeRaise(Math.min(BIG_BLIND * 2, myChips), myChips, hn) };
+      if (alone) return toCall <= BIG_BLIND * 2 ? { action: 'call' } : { action: 'fold' };
       return toCall > 0 ? { action: 'fold' } : { action: 'check' };
     }
 
-    // Post-flop: ~18% bluff, otherwise stay in when odds are decent
+    const bluffChance = alone ? 0.28 : 0.18;
     const r = rand();
-    if (r < 0.18) {
+    if (r < bluffChance) {
       const amt = safeRaise(Math.min(Math.floor(p * 0.5), myChips), myChips, hn);
       if (hn === 2 && amt >= myChips * 0.85) return { action: 'allin' };
       return { action: 'raise', amount: Math.max(amt, BIG_BLIND) };
     }
+    // When alone, don't fold unless the hand is truly hopeless
+    if (alone && hs >= 0.20 && toCall > 0) return { action: 'call' };
     if (hs < needed && toCall > 0) return { action: 'fold' };
-    if (hs > 0.60) {
+    if (hs > 0.55) {
       if (hn === 2 && hs > 0.75) return { action: 'allin' };
       const amt = safeRaise(Math.min(Math.floor(p * 0.55), myChips), myChips, hn);
       return { action: 'raise', amount: Math.max(amt, BIG_BLIND) };
@@ -823,7 +866,7 @@ const HDGame = (function () {
 
   /* ── Madelyn peek (1% chance her cards flash face-up before action) ── */
   function maybeShowMadelynPeek(callback) {
-    const mIdx = todayAIs.findIndex(ai => ai.def.id === 6);
+    const mIdx = todayAIs.findIndex(ai => ai.def.id === 5);
     if (mIdx === -1 || Math.random() >= 0.01) { callback(); return; }
 
     // Flip Madelyn's cards face-up and show chat bubble
@@ -1200,14 +1243,16 @@ const HDGame = (function () {
 
       const toCall = Math.max(currentStreetBet - ai.streetBet, 0);
       const ctx    = {
-        hand:      ai.hole,
-        community: community,
-        pot:       pot,
-        toCall:    Math.min(toCall, ai.chips),
-        myChips:   ai.chips,
-        street:    street,
-        rand:      dailyRng,
-        handNum:   handNum,   // 0 = hand 1, 1 = hand 2, 2 = hand 3 (last)
+        hand:          ai.hole,
+        community:     community,
+        pot:           pot,
+        toCall:        Math.min(toCall, ai.chips),
+        myChips:       ai.chips,
+        street:        street,
+        rand:          dailyRng,
+        handNum:       handNum,
+        activePlayers: [!playerFolded, ...todayAIs.map(a => !a.folded)].filter(Boolean).length,
+        playerHand:    playerHole,   // only Peter uses this
       };
 
       // Brief "thinking" pause, then show the action
@@ -1234,6 +1279,7 @@ const HDGame = (function () {
       case 'fold':
         ai.folded = true;
         setAIAction(seatIndex, 'FOLDED');
+        recordAIFold(seatIndex);
         break;
       case 'check':
         setAIAction(seatIndex, 'CHECK');
@@ -1502,7 +1548,7 @@ const HDGame = (function () {
 
   function finishHand(net, type) {
     updateAllTime(net);
-    recordAIStats(type);
+    recordAIStats(playerFolded ? 'fold' : type);
     sessionResults.push({ net });
     handNum++;
     saveToday();
@@ -1687,20 +1733,20 @@ const HDGame = (function () {
         aiSec.appendChild(title);
 
         const table = document.createElement('div');
-        table.style.cssText = 'display:grid;grid-template-columns:1fr auto auto auto auto;gap:2px 8px;align-items:center;';
+        table.style.cssText = 'display:grid;grid-template-columns:1fr auto auto auto auto auto;gap:2px 8px;align-items:center;';
 
         // Header row
-        ['', 'W', 'L', 'F', 'Win%'].forEach((h, ci) => {
+        [['', 'left'], ['W', 'center'], ['L', 'center'], ['Player Fold', 'center'], ['AI Fold', 'center'], ['Win%', 'center']].forEach(([h, align]) => {
           const hd = document.createElement('span');
           hd.textContent = h;
-          hd.style.cssText = 'font-size:9px;font-weight:700;color:#6b7280;text-align:' + (ci === 0 ? 'left' : 'center') + ';padding-bottom:3px;';
+          hd.style.cssText = 'font-size:9px;font-weight:700;color:#6b7280;text-align:' + align + ';padding-bottom:3px;';
           table.appendChild(hd);
         });
 
         AI_DEFS.forEach(def => {
-          const rec = aiStats[String(def.id)] || { w:0, l:0, f:0 };
+          const rec = aiStats[String(def.id)] || { w:0, l:0, f:0, af:0 };
           const total = rec.w + rec.l + rec.f;
-          if (total === 0) return; // never faced this AI, skip
+          if (total === 0 && (rec.af || 0) === 0) return; // never faced this AI, skip
           const pct = total > 0 ? Math.round((rec.w / total) * 100) : 0;
           const pctColor = pct >= 60 ? '#4ade80' : pct >= 40 ? '#facc15' : '#f87171';
 
@@ -1709,7 +1755,7 @@ const HDGame = (function () {
           nameEl.style.cssText = 'font-size:11px;font-weight:700;color:#e5e7eb;';
           table.appendChild(nameEl);
 
-          [[rec.w, '#4ade80'], [rec.l, '#f87171'], [rec.f, '#9ca3af']].forEach(([val, col]) => {
+          [[rec.w, '#4ade80'], [rec.l, '#f87171'], [rec.f, '#9ca3af'], [rec.af || 0, '#60a5fa']].forEach(([val, col]) => {
             const cell = document.createElement('span');
             cell.textContent = val;
             cell.style.cssText = 'font-size:11px;font-weight:700;color:' + col + ';text-align:center;';

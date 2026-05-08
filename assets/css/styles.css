@@ -2200,7 +2200,7 @@ input[type=range].slider::-moz-range-thumb {
 /* Madelyn chat bubble */
 .hd-chat-bubble {
   position: absolute;
-  bottom: calc(100% + 8px);
+  top: calc(100% + 8px);
   left: 50%;
   transform: translateX(-50%);
   background: #fff;
@@ -2217,11 +2217,11 @@ input[type=range].slider::-moz-range-thumb {
 .hd-chat-bubble::after {
   content: '';
   position: absolute;
-  top: 100%;
+  bottom: 100%;
   left: 50%;
   transform: translateX(-50%);
   border: 5px solid transparent;
-  border-top-color: #fff;
+  border-bottom-color: #fff;
 }
 .hd-chat-bubble-out {
   animation: hd-bubble-out 0.25s ease-in both;
