@@ -193,6 +193,17 @@ Press `Ctrl+C` in the terminal to stop the server.
 
 Full release notes are also available at [dailyjamm.com/releases](https://dailyjamm.com/releases/).
 
+### v2.1.0 - 2026-05-08
+
+**Holdle improvements** - Bug fixes, AI updates, and pot visualization.
+
+- Fixed a bug where the river card was not dealt when the player went all-in on the turn
+- Fixed AI bets occasionally using odd chip amounts; AI raises now snap to valid bet sizes (multiples of 5) matching the player's available options
+- Fixed a bug where two community cards could be dealt back-to-back when all opponents went all-in, skipping a betting round
+- Added a visual pot chip stack - one chip is added per call or raise action, with the stack color scaling with pot size
+- Added AI fold tracking to the head-to-head stats table, with separate columns for player folds and AI folds (stats key bumped to `hd_ai_stats_v3`)
+- Adjusted AI difficulty - opponents play more aggressively and fold less, particularly when fewer players remain in the hand
+
 ### v2.0.0 - 2026-04-21
 
 **New Game: Holdle** - Daily Texas Hold'em poker.

@@ -1745,12 +1745,19 @@ input[type=range].slider::-moz-range-thumb {
 
 /* Pot display */
 .hd-pot {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 6px;
+  z-index: 1;
+}
+.hd-pot-label {
   font-size: 10px;
   font-weight: 800;
-  color: rgba(255,255,255,0.45);
-  letter-spacing: 2px;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 1.5px;
   text-transform: uppercase;
-  z-index: 1;
+  line-height: 11px;
 }
 
 /* Player area */

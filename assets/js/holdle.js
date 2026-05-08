@@ -43,8 +43,9 @@ const HDGame = (function () {
   let dailyDone    = false;
   let todayAIs     = [];      // array of 3 AI state objects for this session
   let street       = 'preflop';
-  let playerFolded = false;
-  let playerAllIn  = false;
+  let playerFolded      = false;
+  let playerAllIn       = false;
+  let potContributions  = 0;   // number of bet/call/raise actions this hand
   let currentStreetBet = 0;  // highest bet on current street
   let playerStreetBet  = 0;  // how much player has put in this street
   let streetRaiseCount = 0;  // total raises on current street (capped at 2)
@@ -431,6 +432,37 @@ const HDGame = (function () {
     if (handNum === 0) return Math.min(amt, Math.floor(myChips * 0.45));
     if (handNum === 1) return Math.min(amt, Math.floor(myChips * 0.70));
     return amt; // last hand - no cap
+  }
+
+  // Round a chip amount down to the nearest clean denomination (multiples of 5)
+  function roundChips(n) {
+    return Math.max(5, Math.floor(n / 5) * 5);
+  }
+
+  // Build a visual chip stack DOM element — 4-column grid, up to 16 chips
+  function buildChipStack(count, color) {
+    const D = 11, GAP = 4, SV = 7, COLS = 4;
+    const n = Math.max(0, Math.min(count, 16));
+    const rows = Math.ceil(n / COLS) || 1;
+    const W = COLS * (D + GAP) - GAP;
+    const H = D + (rows - 1) * SV;
+    const wrap = document.createElement('span');
+    wrap.style.cssText = 'position:relative;display:inline-block;flex-shrink:0;width:' + W + 'px;height:' + H + 'px;';
+    for (let i = 0; i < n; i++) {
+      const col = i % COLS;
+      const row = Math.floor(i / COLS);
+      const chip = document.createElement('span');
+      chip.style.cssText =
+        'position:absolute;' +
+        'left:' + (col * (D + GAP)) + 'px;' +
+        'top:'  + (H - D - row * SV) + 'px;' +
+        'width:' + D + 'px;height:' + D + 'px;border-radius:50%;' +
+        'background:' + color + ';' +
+        'border:1.5px solid rgba(255,255,255,0.3);' +
+        'box-shadow:0 2px 3px rgba(0,0,0,0.45);';
+      wrap.appendChild(chip);
+    }
+    return wrap;
   }
 
   // Snap an AI raise total to the nearest player-valid option (min / half pot / pot)
@@ -968,7 +1000,21 @@ const HDGame = (function () {
 
   function updatePot() {
     const el = $('hd-pot');
-    if (el) el.textContent = 'POT: ' + pot.toLocaleString() + ' chips';
+    if (!el) return;
+    el.textContent = '';
+    if (pot <= 0) return;
+
+    const colorTiers = ['#6b7280','#ef4444','#f97316','#3b82f6','#8b5cf6','#2ecc71','#f59e0b'];
+    const colorIdx   = pot < 100 ? 0 : pot < 300 ? 1 : pot < 600 ? 2 : pot < 1000 ? 3 : pot < 1600 ? 4 : pot < 2500 ? 5 : 6;
+    const color      = colorTiers[colorIdx];
+    const count      = Math.min(potContributions, 16);
+
+    const label = document.createElement('span');
+    label.className = 'hd-pot-label';
+    label.textContent = 'POT ' + pot.toLocaleString();
+
+    el.appendChild(label);
+    if (count > 0) el.appendChild(buildChipStack(count, color));
   }
 
   function setAIAction(index, text) {
@@ -1123,10 +1169,11 @@ const HDGame = (function () {
     deck = shuffleDeck(createDeck());
 
     // Player antes their chosen amount
-    chips           -= pendingBet;
-    pot              = pendingBet;
-    playerStreetBet  = pendingBet;
-    currentStreetBet = pendingBet;
+    chips            -= pendingBet;
+    pot               = pendingBet;
+    playerStreetBet   = pendingBet;
+    currentStreetBet  = pendingBet;
+    potContributions  = 1;
 
     // All active AIs must match the ante (mandatory buy-in)
     todayAIs.forEach(ai => {
@@ -1189,11 +1236,16 @@ const HDGame = (function () {
     const activePlayers = todayAIs.filter(a => !a.folded && !a.allIn);
     if (activePlayers.length === 0) {
       // All AIs folded or all-in
-      if (playerFolded) {
+      if (playerFolded) { doShowdown(); return; }
+      const toCall = Math.min(currentStreetBet - playerStreetBet, chips);
+      if (toCall > 0) {
+        // Player still needs to call the all-in amount
+        showActions(toCall);
+      } else if (street === 'river') {
         doShowdown();
       } else {
-        const toCall = Math.min(currentStreetBet - playerStreetBet, chips);
-        showActions(Math.max(toCall, 0));
+        // No bet to make - run out the remaining board automatically
+        setTimeout(runOut, 600);
       }
       return;
     }
@@ -1290,6 +1342,7 @@ const HDGame = (function () {
         ai.streetBet += amt;
         ai.totalBet  += amt;
         pot          += amt;
+        potContributions = Math.min(potContributions + 1, 16);
         if (ai.chips === 0) { ai.allIn = true; setAIAction(seatIndex, 'ALL IN'); }
         else setAIAction(seatIndex, 'CALL ' + amt);
         break;
@@ -1299,8 +1352,9 @@ const HDGame = (function () {
         // Hand 1: cap AI raises at half the pot (min 2×BB to keep it meaningful)
         if (handNum === 0) raiseAmt = Math.min(raiseAmt, Math.max(Math.floor(pot * 0.5), BIG_BLIND * 2));
         raiseAmt = snapAIRaise(raiseAmt, ai.streetBet, ai.chips);
+        raiseAmt = roundChips(raiseAmt);
         raiseAmt = Math.min(raiseAmt, ai.chips + ai.streetBet);
-        const extra = raiseAmt - ai.streetBet; // extra beyond what's already in
+        const extra = raiseAmt - ai.streetBet;
         const paid  = Math.min(extra, ai.chips);
         ai.chips         -= paid;
         ai.streetBet     += paid;
@@ -1308,6 +1362,7 @@ const HDGame = (function () {
         pot              += paid;
         currentStreetBet  = Math.max(currentStreetBet, ai.streetBet);
         streetRaiseCount++;
+        potContributions = Math.min(potContributions + 1, 16);
         if (ai.chips === 0) { ai.allIn = true; setAIAction(seatIndex, 'ALL IN'); }
         else setAIAction(seatIndex, 'RAISE ' + ai.streetBet);
         break;
@@ -1321,6 +1376,7 @@ const HDGame = (function () {
         ai.allIn      = true;
         currentStreetBet = Math.max(currentStreetBet, ai.streetBet);
         streetRaiseCount++;
+        potContributions = Math.min(potContributions + 1, 16);
         setAIAction(seatIndex, 'ALL IN');
         break;
       }
@@ -1357,6 +1413,7 @@ const HDGame = (function () {
       chips           -= toCall;
       playerStreetBet += toCall;
       pot             += toCall;
+      potContributions = Math.min(potContributions + 1, 16);
     }
     if (chips === 0) playerAllIn = true;
     updateChipDisplay();
@@ -1386,6 +1443,7 @@ const HDGame = (function () {
     currentStreetBet = Math.max(currentStreetBet, playerStreetBet);
     streetRaiseCount++;
     if (chips === 0) playerAllIn = true;
+    potContributions = Math.min(potContributions + 1, 16);
 
     updateChipDisplay();
     updatePot();
@@ -1430,21 +1488,21 @@ const HDGame = (function () {
 
   function runOut() {
     function advance(cb) {
-      if (street === 'river') { cb(); return; }
+      if (street === 'river') { setTimeout(cb, 400); return; }
       if (street === 'preflop') {
         community.push(drawCard(), drawCard(), drawCard());
         setStreetLabel('FLOP'); street = 'flop';
-        dealFlop(() => { updatePlayerHandDisplay(); advance(cb); });
+        dealFlop(() => { updatePlayerHandDisplay(); setTimeout(() => advance(cb), 1200); });
       } else if (street === 'flop') {
         community.push(drawCard());
         renderCommunityCard(3, community[3]);
         setStreetLabel('TURN'); street = 'turn';
-        setTimeout(() => { updatePlayerHandDisplay(); advance(cb); }, 420);
+        setTimeout(() => { updatePlayerHandDisplay(); setTimeout(() => advance(cb), 1200); }, 550);
       } else if (street === 'turn') {
         community.push(drawCard());
         renderCommunityCard(4, community[4]);
         setStreetLabel('RIVER'); street = 'river';
-        setTimeout(() => { updatePlayerHandDisplay(); advance(cb); }, 420);
+        setTimeout(() => { updatePlayerHandDisplay(); setTimeout(() => advance(cb), 1200); }, 550);
       }
     }
     advance(() => doShowdown());
