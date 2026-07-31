@@ -1,7 +1,7 @@
 # DailyJamm - Project Instructions
 
 ## What This Is
-DailyJamm (dailyjamm.com) is a daily games hub hosted on GitHub Pages. It features original custom-built games and curates links to external daily games. Dark-mode-only, mobile-first, no backend - all game state lives in localStorage.
+DailyJamm (dailyjamm.com) is a daily games hub hosted on GitHub Pages. It features original custom-built games, curates links to external daily games, and lets players build their own "Your Favorite Games" list (star built-in games or add custom links; see Favorites System below). Dark-mode-only, mobile-first, no backend - all game state lives in localStorage.
 
 ## Domain & Hosting
 - Domain: `dailyjamm.com` (CNAME file)
@@ -129,6 +129,21 @@ The nav structure:
 </div>
 ```
 
+**Drawer section order (must be the same on every page):**
+1. Home link
+2. **Our Games** (hardcoded in each page's HTML)
+3. **Your Favorite Games** — do NOT hardcode this section; `favorites.js` injects it after "Our Games" at runtime, only when the player has favorites
+4. **Our Favorite Games** (hardcoded; the curated external games list)
+5. **Info** (About / Releases / Terms / Privacy) — always last
+
+Every page also loads the shared scripts (in this order, both `defer`):
+```html
+<script src="/assets/js/menu.js" defer></script>
+<script src="/assets/js/favorites.js" defer></script>
+```
+
+**Also add the new game to the `SITES` catalog in `/assets/js/favorites.js`** (id, title, url — internal games have no `ext` flag) so players can favorite it. See the Favorites section below.
+
 ### 4. Header Buttons — Stats & Instructions (REQUIRED on every game page)
 
 Every game page **must** have two icon buttons in the **top-right of the fixed header**, to the left of the hamburger menu area. The standard order is: **Stats button** (bar-chart icon) → **? button** (How to Play), both sitting after the `<div class="flex-1"></div>` spacer.
@@ -187,10 +202,10 @@ window.XXGame = { showStats: showStats };
 ```
 
 ### 6. Add to Home Page (`index.html`)
-Add a card in the "Our Games" section grid. Follow the existing card pattern:
+Add a card in the "Our Games" section grid. Follow the existing card pattern. The `data-fav-id` attribute is **required** — it must match the game's id in the `SITES` catalog in `favorites.js`; `favorites.js` uses it to inject the favorite star button and to clone the card's icon/description into Your Favorite Games.
 
 ```html
-<article class="card our" onclick="goto('/<game-slug>/')" role="button" tabindex="0" aria-label="Play Game Name">
+<article class="card our" data-fav-id="<game-slug>" onclick="goto('/<game-slug>/')" role="button" tabindex="0" aria-label="Play Game Name">
   <span class="badge">New</span>
   <div class="icon our">
     <!-- SVG icon for the game -->
@@ -236,12 +251,17 @@ Every release — whether a new game, feature update, or notable fix — must be
 
 The two should stay in sync with identical content. Release notes should be player-facing (describe the "what" and "why" users care about, not internal implementation details).
 
+**Releases page conventions:**
+- Only the **newest** release is shown expanded (a `<div class="release-block">`). When adding a new release, convert the previously-newest block to the collapsible `<details>` pattern used by all older releases: `<summary><span class="chevron">▶</span><h2>...</h2></summary><div class="release-body">...</div>`
+- Any release that launches a new game gets a green **NEW GAME** badge in its `<h2>`: `<span style="background:#10b981;color:#000;font-size:.7em;font-weight:800;padding:2px 8px;border-radius:6px;vertical-align:middle">NEW GAME</span>` (visible even when collapsed)
+- The v3.0.0 block has a **View Instructions** button (`onclick="DJFav.showIntro()"`) that re-shows the favorites intro modal
+
 ### 11. Game-Specific CSS
 - Add game-specific styles to `/assets/css/styles.css` under a clearly commented section (e.g., `/* ── New Game ── */`)
 - Use existing CSS variable names for colors
 - Follow existing animation patterns (shake for errors, fade-up for entrances, pulse-glow for active states)
 
-### 11. Game-Specific JavaScript
+### 12. Game-Specific JavaScript
 - Place game JS in `/assets/js/<game-slug>.js`
 - Use `America/Chicago` timezone for daily puzzle rotation (DST-safe)
 - Store game state in localStorage with a unique prefix (e.g., `ng_stats`, `ng_today`)
@@ -255,9 +275,9 @@ The two should stay in sync with identical content. Release notes should be play
 When adding a new third-party game to the curated list:
 
 ### 1. Add to Home Page Card Grid
-Add in the "Other Daily Games" section of `index.html`, keeping **alphabetical order**:
+Add in the "Our Favorite Games" section of `index.html` (formerly "Other Daily Games"), keeping **alphabetical order**. Include a `data-fav-id` matching the id you add to the `SITES` catalog:
 ```html
-<article class="card" onclick="openExternal('https://example.com/')" role="button" tabindex="0" aria-label="Game Name">
+<article class="card" data-fav-id="<game-id>" onclick="openExternal('https://example.com/')" role="button" tabindex="0" aria-label="Game Name">
   <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><!-- icon --></svg></div>
   <h3>Game Name</h3>
   <p>Short description</p>
@@ -265,44 +285,56 @@ Add in the "Other Daily Games" section of `index.html`, keeping **alphabetical o
 ```
 
 ### 2. Add to Hamburger Nav on ALL Pages
-Add to the "Other Daily Games" section of the drawer nav in **alphabetical order** on every page:
+Add to the "Our Favorite Games" section of the drawer nav in **alphabetical order** on every page:
 ```html
 <a class="menu-link" href="https://example.com/" target="_blank" rel="noopener">Game Name</a>
 ```
 
 Pages to update:
 - `index.html`
-- `/themedle/index.html`
-- `/chainlink/index.html`
-- `/blackjackdle/index.html`
-- `/about/index.html`
-- `/privacy/index.html`
-- Any other custom game pages
+- All 6 game pages (`/themedle/`, `/chainlink/`, `/blackjackdle/`, `/spelldle/`, `/roulettedle/`, `/holdle/`)
+- All info pages (`/about/`, `/releases/`, `/terms/`, `/privacy/`)
+
+### 3. Add to the Favorites Catalog
+Add an entry to the `SITES` catalog in `/assets/js/favorites.js` (with `ext: true` for external games) so players can favorite it:
+```javascript
+gameid: { title: 'Game Name', url: 'https://example.com/', ext: true },
+```
 
 ---
 
 ## File Structure Reference
 ```
 /
-├── index.html                    # Home page hub
+├── index.html                    # Home page hub (Our Games / Your Favorite Games / Our Favorite Games)
+├── 404.html                      # Not-found page
 ├── CNAME                         # Domain (dailyjamm.com)
 ├── sitemap.xml                   # SEO sitemap (update when adding pages)
 ├── robots.txt                    # Allows all crawling
+├── server.py                     # Local dev server (port 8080, no-cache headers)
 ├── assets/
-│   ├── css/styles.css            # Shared game styles
+│   ├── css/styles.css            # Shared styles (header, drawer, favorites modal, all game styles)
 │   ├── js/
+│   │   ├── menu.js               # Hamburger drawer open/close (all pages)
+│   │   ├── favorites.js          # Favorites system + intro modal (all pages)
+│   │   ├── utils.js              # DJUtils shared helpers
 │   │   ├── main.js               # Themedle game logic
 │   │   ├── chainlink.js          # Chain Link game logic
-│   │   └── blackjackdle.js       # BlackJackdle game logic
+│   │   ├── blackjackdle.js       # BlackJackdle game logic
+│   │   ├── spelldle.js           # Spelldle game logic
+│   │   ├── roulettedle.js        # Roulettedle game logic
+│   │   └── holdle.js             # Holdle game logic
 │   ├── data/
-│   │   └── chainlink-puzzles.json  # Chain Link puzzle data
-│   ├── audio/                    # Themedle theme song MP3s (117 files)
+│   │   ├── chainlink-puzzles.json  # Chain Link puzzle data
+│   │   └── spelldle-spells.json    # Spelldle spell data
+│   ├── audio/                    # Themedle theme song MP3s
 │   └── img/
 │       └── favicon.png           # Site favicon
-├── themedle/index.html           # Themedle game page
-├── chainlink/index.html          # Chain Link game page
-├── blackjackdle/index.html       # BlackJackdle game page
+├── themedle/index.html           # Game pages (also chainlink, blackjackdle,
+├── ...                           #   spelldle, roulettedle, holdle)
 ├── about/index.html              # About page
+├── releases/index.html           # Release notes page
+├── terms/index.html              # Terms of Service page
 └── privacy/index.html            # Privacy Policy page
 ```
 
@@ -318,9 +350,50 @@ Pages to update:
 - **Share buttons**: game-over result panels have two side-by-side buttons — **Share Results** (green, `bg-green-700`) and **See Stats** (purple, `bg-purple-600`). Stats modals have a separate **Share Stats** button (green).
 - **Streaks**: Track current streak, best streak, total games played
 - **localStorage key convention**: stats keys use a `_v2` suffix (`td_stats_v2`, `cl_stats_v2`, `spd_stats_v2`, `bj_stats_v2`, `bj_alltime_v2`, `rl_stats_v2`, `rl_alltime_v2`). Daily state keys have no suffix (`themedleDailyState`, `cl_today`, `spd_today`, `bj_today`, `rl_today`). Bump the suffix when resetting stats site-wide.
+- **Site-wide localStorage keys** (not game-specific): `dj_cookie_ok` (cookie consent), `dj_favorites` (favorites list), `dj_seen_favs_intro` (favorites intro modal dismissed)
 - **How to Play**: Show modal on first visit (check localStorage flag), include animated demo
 - **Mobile**: 16px minimum font on inputs (prevents iOS zoom), use `viewport-fit=cover` for notch support
 - **Accessibility**: ARIA labels on interactive elements, keyboard navigation (Enter activates role="button", ESC closes modals), screen-reader-only helper text via `.sr-only` class
+
+---
+
+## Home Page Structure (`index.html`)
+
+Three sections, in this order (added in v3.0.0 "Your Games, Your Way"):
+1. **Our Games** — cards for the 6 original games
+2. **Your Favorite Games** — player-curated section, rendered entirely by `favorites.js` into `#yf-grid`; shows an empty-state hint (`#yf-empty`) plus a dashed "Add Your Own" card
+3. **Our Favorite Games** — curated external games (renamed from "Other Daily Games" in v3.0.0)
+
+**Section help popovers**: each section heading sits in a `.sec-head` with a `.sec-help` "?" button and a hidden `.sec-desc` popover (absolutely positioned, no layout shift). Behavior is device-aware via `matchMedia('(hover: hover) and (pointer: fine)')`: hover opens/closes on mouse devices; tap toggles on touch, and tapping elsewhere dismisses. Only one popover open at a time. Logic is inline in `index.html`.
+
+**First-visit intro**: on the home page, `favorites.js` auto-shows the favorites intro modal 600ms after load if `dj_seen_favs_intro` is unset. Any dismissal sets the flag.
+
+---
+
+## Favorites System (`/assets/js/favorites.js`)
+
+Loaded on **every page** (after `menu.js`, both `defer`). Exposes `window.DJFav = { openModal, closeModal, showIntro }`.
+
+**localStorage**: single key `dj_favorites` — an ordered array of items:
+- `{ type: 'site', id: '<catalog-id>' }` — a favorited built-in/curated game
+- `{ type: 'custom', id: 'c<timestamp><rand>', title, url, icon }` — a player-added link
+
+`load()` validates every item on read (unknown site ids, bad shapes, and non-http(s) URLs are silently dropped), so corrupt data can never break boot.
+
+**`SITES` catalog**: id → `{ title, url, ext }` for all 6 our-games + all curated external games. Add every new game here (see checklists above). External entries set `ext: true` (open in new tab with `noopener,noreferrer`).
+
+**What it renders:**
+- **All pages**: injects a "Your Favorite Games" `.menu-sec` (id `fav-menu-sec`) into the drawer right after "Our Games", only when the list is non-empty. Re-rendered after every mutation.
+- **Home only** (detected by `#yf-grid` existing):
+  - Injects a `.fav-star` toggle button into every card with a `data-fav-id` attribute (star = top-LEFT of card; badges stay top-right)
+  - Renders the Your Favorite Games grid: each card has ‹ › reorder buttons (`.yf-ctrl`, disabled at the ends), an × remove button (`.yf-remove`), the game's cloned icon + description (site favorites) or preset icon + hostname (custom links), plus the dashed "Add Your Own" card last
+  - Wires the add-link modal (`#yf-modal-backdrop` markup lives in `index.html`): name (max 40 chars), URL, and a 6-icon picker (star, controller, globe, link, dice, trophy from the `ICONS` map)
+
+**URL safety**: `safeUrl()` accepts only `http:`/`https:` (parsed via `new URL`); schemeless input gets `https://` prepended; `javascript:` and other schemes are rejected with an inline error. All user text is rendered via `textContent` — never `innerHTML`. The only `innerHTML` uses are static strings (`ICONS`, `INTRO_HTML`).
+
+**Intro modal**: built lazily from the static `INTRO_HTML` string and appended to `<body>` on demand. Contains a pure-CSS animated demo (`.yf-demo` / `.yfd-*` classes, 8s keyframe loop showing a card being starred then two cards swapping; honors `prefers-reduced-motion`). `DJFav.showIntro()` opens it anywhere — used by the auto-show on home and the "View Instructions" button on the releases page. Closing sets `dj_seen_favs_intro`.
+
+**CSS locations**: shared modal + demo styles live in `styles.css` under `/* ── Favorites ── */` (they use literal brand colors `#2ecc71`/`#45b7d1`, not vars, because game pages define different `--brand` values). Home-only styles (`.fav-star`, `.yf-ctrl`, `.yf-card`, add-modal fields, `.sec-help`/`.sec-desc`) are inline in `index.html`.
 
 ---
 
@@ -449,6 +522,10 @@ Texas Hold'em poker game. Player faces 3 randomly selected AI opponents each day
 - Post-flop (Flop/Turn/River): Player acts first, then AIs. If an AI raises, player gets another action before street advances.
 - `proceedAfterPlayerAction()` handles the re-action loop for both streets.
 
+**Side-pot payouts** (v3.0.0): `doShowdown()` distributes the pot in contribution layers - each contender (player `playerTotalBet`, AIs `ai.totalBet`) can only win pot layers their own contribution reaches. Folded players' chips are dead money won by layer winners; a top layer nobody live matched (an uncalled bet) is refunded to its contributor. Split layers give the floor share to each winner and the remainder to the first, so chips are always conserved exactly. `playerTotalBet` tracks the player's full hand contribution (ante + every street) and is the basis for `playerNet`; do not use `playerStreetBet` for hand results (it resets each street).
+
+**Display conventions**: AI raise bubbles read `RAISE TO <n>` where n is the street total (including ante on preflop). At showdown the pot is zeroed and all stack labels refreshed in the same tick as the payout.
+
 **Card highlighting**: `getRelevantCards(combo)` strips kicker cards from the best 5-card combo, returning only the cards that form the named hand (e.g. for "Pair of Aces" - returns only the 2 aces, not the 3 kickers).
 
 **Sequential dealing**: `dealHoleCardsSequentially()` deals in poker order (P, AI0, AI1, AI2, P, AI0, AI1, AI2) with 190ms gaps. `dealFlop()` deals 3 community cards with 220ms gaps.
@@ -491,12 +568,12 @@ All pages include `<meta name="referrer" content="strict-origin-when-cross-origi
 
 ## Common Pitfalls
 - **Curly quotes**: Always use straight quotes in JS (`'` and `"`, never `'` `'` `"` `"`). Curly quotes in onclick handlers cause silent JS failures.
-- **Nav sync**: The hamburger nav is duplicated in every page's HTML. When adding a game, you must update ALL pages' nav or they'll be out of sync.
+- **Nav sync**: The hamburger nav is duplicated in every page's HTML. When adding a game, you must update ALL pages' nav or they'll be out of sync. (The "Your Favorite Games" drawer section is the exception — it is injected by `favorites.js` and must NOT be hardcoded anywhere.)
 - **Inline header CSS**: Never define `.site-header`, `.site-brand`, `.hamburger`, `.backdrop`, `.drawer`, or `.menu-*` CSS inside a page's `<style>` block. All of that lives in `/assets/css/styles.css`. Duplicating it inline causes visual inconsistency across pages (different font sizes, colors, blur values) and was the root cause of the "DailyJamm moves and changes style" bug. Every page must link styles.css and use `class="site-header"` / `class="site-brand"` with no extra Tailwind classes on those elements.
 - **Header inner wrapper**: Do not add a wrapper `<div>` inside `<header class="site-header">`. The header is a flex container itself — all children (hamburger, brand link, spacer, buttons) are direct flex children.
 - **iOS safe areas**: Always include `viewport-fit=cover` and `apple-mobile-web-app-status-bar-style` metas.
 - **GitHub Pages cache mismatch**: After pushing JS + data file changes together, Pages may serve a stale JS with the new data (or vice versa), causing JS errors caught as "Failed to load puzzle." If this happens, a hard refresh or waiting a few minutes resolves it. Ensure JS and data changes are compatible in both old and new states when possible.
-- **`styles.css` cache busting**: All pages link to `styles.css` with a version query string (e.g. `?v=20260429`). Whenever `styles.css` gains new rules (e.g. adding a new game), bump this version on ALL pages — otherwise mobile and desktop browsers serve the old cached CSS and new game elements render unstyled. Update the version in all 12 pages: `index.html`, `404.html`, all game pages, and all info pages.
+- **`styles.css` cache busting**: All pages link to `styles.css` with a version query string (currently `?v=20260731`). Whenever `styles.css` gains new rules (e.g. adding a new game), bump this version on ALL pages — otherwise mobile and desktop browsers serve the old cached CSS and new game elements render unstyled. Update the version in all 12 pages: `index.html`, `404.html`, all game pages, and all info pages.
 - **New external resources**: If you add a new CDN, font, or API endpoint, update the CSP meta on every affected page. Forgetting this will silently block the resource in supporting browsers.
 - **Bare `JSON.parse` aborts boot**: Never call `JSON.parse(localStorage.getItem(...))` without a try/catch at the top level of a boot function. A malformed stored value will throw, silently aborting `boot()` mid-execution — game state never restores, result panels stay empty, and there is no visible error. Always wrap in try/catch or use `DJUtils.loadJSON()` which handles this safely.
 - **Stats key versioning**: When adding fields to a stats object that old saves won't have, bump the key suffix (e.g. `_v2` → `_v3`) rather than trying to migrate. Stale data under the old key is simply ignored and users start fresh. Do not remove the old key proactively — it ages out naturally as players accumulate new data.

@@ -48,6 +48,7 @@ const HDGame = (function () {
   let potContributions  = 0;   // number of bet/call/raise actions this hand
   let currentStreetBet = 0;  // highest bet on current street
   let playerStreetBet  = 0;  // how much player has put in this street
+  let playerTotalBet   = 0;  // player's total contribution this hand (ante + all streets)
   let streetRaiseCount = 0;  // total raises on current street (capped at 2)
   let dailyRng     = null;   // seeded rng function
   let actionLocked = false;  // prevent double-clicks during AI animation
@@ -1172,6 +1173,7 @@ const HDGame = (function () {
     chips            -= pendingBet;
     pot               = pendingBet;
     playerStreetBet   = pendingBet;
+    playerTotalBet    = pendingBet;
     currentStreetBet  = pendingBet;
     potContributions  = 1;
 
@@ -1364,7 +1366,7 @@ const HDGame = (function () {
         streetRaiseCount++;
         potContributions = Math.min(potContributions + 1, 16);
         if (ai.chips === 0) { ai.allIn = true; setAIAction(seatIndex, 'ALL IN'); }
-        else setAIAction(seatIndex, 'RAISE ' + ai.streetBet);
+        else setAIAction(seatIndex, 'RAISE TO ' + ai.streetBet);
         break;
       }
       case 'allin': {
@@ -1412,6 +1414,7 @@ const HDGame = (function () {
     if (toCall > 0) {
       chips           -= toCall;
       playerStreetBet += toCall;
+      playerTotalBet  += toCall;
       pot             += toCall;
       potContributions = Math.min(potContributions + 1, 16);
     }
@@ -1435,10 +1438,11 @@ const HDGame = (function () {
     if (rp) rp.classList.add('hidden');
     hideActions();
 
-    const raiseTotal = Math.min(amount, chips);
-    const paid       = raiseTotal - playerStreetBet;
+    const raiseTotal = Math.min(amount, chips + playerStreetBet);
+    const paid       = Math.max(raiseTotal - playerStreetBet, 0);
     chips           -= paid;
     playerStreetBet += paid;
+    playerTotalBet  += paid;
     pot             += paid;
     currentStreetBet = Math.max(currentStreetBet, playerStreetBet);
     streetRaiseCount++;
@@ -1566,20 +1570,57 @@ const HDGame = (function () {
 
       if (players.length === 0) { finishHand(0, 'push'); return; }
 
-      // Find winner(s)
+      // Find winner(s) of the main pot (best live hand) - used for the banner
       const maxScore = Math.max(...players.map(p => p.score));
       const winners  = players.filter(p => p.score === maxScore);
-      const share    = Math.floor(pot / winners.length);
 
-      let playerNet = -playerStreetBet; // started as a loss of what player put in
+      // Side-pot payout: nobody can win more from an opponent than they put in
+      // themselves. Split the pot into layers by contribution level; each layer
+      // goes to the best live hand among those whose contribution reaches it.
+      // A layer nobody live matched (uncalled excess) refunds to its contributor.
+      const contribs = [{ who: 'player', put: playerTotalBet,
+                          entry: players.find(p => p.who === 'player') || null }];
+      todayAIs.forEach((ai, i) => {
+        contribs.push({ who: i, put: ai.totalBet, entry: players.find(p => p.who === i) || null });
+      });
+      contribs.forEach(c => { c.won = 0; });
 
-      winners.forEach(w => {
-        if (w.who === 'player') {
-          playerNet += share;
-          chips     += share;
+      let level = 0;
+      for (;;) {
+        const above = contribs.filter(c => c.put > level).map(c => c.put);
+        if (!above.length) break;
+        const top = Math.min(...above);
+        let layerPot = 0;
+        contribs.forEach(c => { layerPot += Math.max(Math.min(c.put, top) - level, 0); });
+        const elig = contribs.filter(c => c.entry && c.put >= top);
+        let layerWinners;
+        if (elig.length) {
+          const best = Math.max(...elig.map(c => c.entry.score));
+          layerWinners = elig.filter(c => c.entry.score === best);
         } else {
-          todayAIs[w.who].chips += share;
-          // Highlight winning AI seat
+          layerWinners = contribs.filter(c => c.put >= top);
+        }
+        const base = Math.floor(layerPot / layerWinners.length);
+        layerWinners.forEach((c, idx) => {
+          c.won += base + (idx === 0 ? layerPot - base * layerWinners.length : 0);
+        });
+        level = top;
+      }
+
+      let playerNet = -playerTotalBet;
+      contribs.forEach(c => {
+        if (!c.won) return;
+        if (c.who === 'player') {
+          playerNet += c.won;
+          chips     += c.won;
+        } else {
+          todayAIs[c.who].chips += c.won;
+        }
+      });
+
+      // Highlight winning AI seats (main-pot winners)
+      winners.forEach(w => {
+        if (w.who !== 'player') {
           const seat = $('hd-ai-seat-' + w.who);
           if (seat) seat.classList.add('hd-winner');
         }
@@ -1600,6 +1641,15 @@ const HDGame = (function () {
 
       highlightWinnerCards(winners);
       updateChipDisplay();
+      // Pot has been paid out - clear it and refresh AI stacks so displays match
+      pot = 0;
+      potContributions = 0;
+      updatePot();
+      todayAIs.forEach((ai, i) => {
+        const seat = $('hd-ai-seat-' + i);
+        const chipsEl = seat ? seat.querySelector('.hd-ai-chips') : null;
+        if (chipsEl) chipsEl.textContent = ai.chips.toLocaleString() + ' chips';
+      });
       setTimeout(() => finishHand(playerNet, playerNet > 0 ? 'win' : playerNet < 0 ? 'lose' : 'push'), 4000);
     }, delay + 200);
   }

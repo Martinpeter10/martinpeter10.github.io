@@ -193,6 +193,28 @@ Press `Ctrl+C` in the terminal to stop the server.
 
 Full release notes are also available at [dailyjamm.com/releases](https://dailyjamm.com/releases/).
 
+### v3.0.0 - 2026-07-31
+
+**Your Games, Your Way** - DailyJamm is now yours to customize. Build your own personal list of daily games.
+
+- New "Your Favorite Games" section on the home page, shown right after Our Games
+- Tap the star on any game card to pin it to your favorites; tap again to remove it
+- Add your own links to any daily game on the web - pick a name, a link, and one of six icons (star, game controller, globe, link, dice, or trophy)
+- Reorder your favorites with the arrow buttons on each card, or remove one anytime with the x button
+- Your favorites also appear as a new section in the menu on every page, and both the menu and the home page update instantly as you make changes
+- The "Other Daily Games" section is now called "Our Favorite Games"
+- Everything is saved on your device - no account needed
+- Added a "?" button next to each home page section heading with a quick description of what that section is and how to use it
+- A one-time welcome popup on the home page introduces the new section with an animated demo of starring and reordering (re-watch it anytime from the Releases page)
+- Menu sections reordered to match the home page: Our Games, Your Favorite Games, Our Favorite Games, then Info
+- Past game-launch releases on the Releases page now carry a NEW GAME badge
+- The side menu now looks identical on every page - previously the home page menu had slightly different colors and styling than the rest of the site
+- Holdle: pot payouts now use proper side pots - an opponent who goes all-in with a short stack can only win the portion of the pot they actually matched, and any uncalled chips are returned to the bettor
+- Holdle: fixed hand net results only counting your final-street bet instead of your full contribution (ante plus every street), which skewed session stats
+- Holdle: fixed the All In raise option leaving chips behind if you had already bet earlier on the same street
+- Holdle: AI raise labels now read "RAISE TO" so the amount clearly means the street total, and the pot and stacks now update the moment a hand is decided
+- Fixed a missing Holdle link in the menu on the Releases page
+
 ### v2.1.0 - 2026-05-08
 
 **Holdle improvements** - Bug fixes, AI updates, and pot visualization.

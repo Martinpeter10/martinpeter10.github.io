@@ -14,18 +14,18 @@
     if (localStorage.getItem('dj_cookie_ok')) { gtag('config', 'G-XLRXG28EZV'); }
   </script>
 
-  <meta name="description" content="DailyJamm is your hub for daily mini-games. Play Themedle, Chain Link, BlackJackdle, Spelldle, Roulettedle, and Holdle - our original daily games - and discover other daily games we love." />
+  <meta name="description" content="DailyJamm is your hub for daily mini-games. Play Themedle, Chain Link, BlackJackdle, Spelldle, Roulettedle, and Holdle - our original daily games - and discover other daily games we love. Star games and add your own links to build your personal favorites list." />
   <meta name="robots" content="index,follow">
   <link rel="canonical" href="https://dailyjamm.com/" />
   <link rel="icon" type="image/png" href="/assets/img/favicon.png">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=20260429">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=20260731">
 
   <!-- Open Graph -->
   <meta property="og:site_name" content="DailyJamm" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://dailyjamm.com/" />
   <meta property="og:title" content="DailyJamm - Daily Games Hub" />
-  <meta property="og:description" content="DailyJamm is your hub for daily mini-games. Play Themedle, Chain Link, BlackJackdle, Spelldle, Roulettedle, and Holdle - our original daily games - and discover other daily games we love." />
+  <meta property="og:description" content="DailyJamm is your hub for daily mini-games. Play Themedle, Chain Link, BlackJackdle, Spelldle, Roulettedle, and Holdle - our original daily games - and discover other daily games we love. Star games and add your own links to build your personal favorites list." />
   <meta property="og:image" content="https://dailyjamm.com/assets/img/favicon.png" />
 
   <!-- THEME COLOR FIXES FOR iOS SAFARI: set to site background so overscroll/toolbar areas aren't green -->
@@ -54,18 +54,17 @@
     h1{font-size:2.5rem;line-height:1.2;background:linear-gradient(135deg,var(--brand2),var(--brand));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;padding-bottom:.5rem}
     .tag{font-size:1.05rem;color:var(--muted);max-width:700px;margin:0 auto}
 
-    /* side menu */
-    .backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);opacity:0;visibility:hidden;transition:.3s;z-index:998}
-    .backdrop.open{opacity:1;visibility:visible}
-    .drawer{position:fixed;top:0;left:-300px;width:300px;height:100%;background:linear-gradient(180deg,#0f1b2d,#111a33);box-shadow:2px 0 20px rgba(0,0,0,.4);transition:left .3s ease;z-index:999;padding:80px 20px 20px;overflow-y:auto;-webkit-overflow-scrolling:touch}
-    .drawer.open{left:0}
-    .menu-sec{margin-bottom:1.5rem}
-    .menu-title{font-size:1rem;font-weight:700;color:var(--brand);margin-bottom:.5rem;letter-spacing:.03em;text-transform:uppercase}
-    .menu-link{display:block;color:#fff;text-decoration:none;padding:.5rem 0;border-bottom:1px dashed rgba(255,255,255,.08)}
-    .menu-link:hover{color:var(--brand)}
+    /* side menu styles live in styles.css (shared across all pages) */
 
     .section{margin:2.5rem 0}
     .section h2{font-size:1.5rem;margin-bottom:1rem;text-align:center;background:linear-gradient(135deg,var(--brand2),var(--brand));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+
+    /* section headings with help toggle */
+    .sec-head{position:relative;display:flex;align-items:center;justify-content:center;gap:.5rem;margin-bottom:1rem}
+    .sec-head h2{margin-bottom:0}
+    .sec-help{width:24px;height:24px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:transparent;color:var(--muted);font-size:.8rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;font-family:inherit;flex-shrink:0;transition:color .15s,border-color .15s}
+    .sec-help:hover,.sec-help[aria-expanded="true"]{color:#fff;border-color:var(--brand2)}
+    .sec-desc{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:.5rem;width:min(600px,calc(100vw - 3rem));z-index:20;color:var(--muted);text-align:center;font-size:.9rem;line-height:1.5;background:linear-gradient(180deg,#111a33,#0f1b2d);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:.75rem 1rem;box-shadow:0 10px 30px rgba(0,0,0,.5)}
 
     .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.25rem}
     .grid-centered{display:flex;flex-wrap:wrap;gap:1.25rem;justify-content:center}
@@ -92,6 +91,36 @@
 
     /* accessibility helpers */
     .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+    /* favorites: star toggle on game cards */
+    .fav-star{position:absolute;top:8px;left:8px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8a8fb0;transition:color .15s,border-color .15s;padding:0;z-index:2}
+    .fav-star svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linejoin:round}
+    .fav-star:hover{color:#f1c40f;border-color:#f1c40f}
+    .fav-star.active{color:#f1c40f;border-color:rgba(241,196,15,.5)}
+    .fav-star.active svg{fill:#f1c40f}
+
+    /* favorites: Your Favorite Games section */
+    .yf-hint{color:var(--muted);text-align:center;margin:-.5rem auto 1.25rem;font-size:.9rem;max-width:600px}
+    .yf-card{padding-top:44px}
+    .yf-ctrls{position:absolute;top:8px;left:8px;display:flex;gap:6px;z-index:2}
+    .yf-ctrl{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);color:#b8b8d1;font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;font-family:inherit}
+    .yf-ctrl:hover{color:#fff;border-color:#fff}
+    .yf-ctrl:disabled{opacity:.3;cursor:default}
+    .yf-ctrl:disabled:hover{color:#b8b8d1;border-color:rgba(255,255,255,.15)}
+    .yf-remove{position:absolute;top:8px;right:8px;z-index:2}
+    .yf-remove:hover{color:#e74c3c;border-color:#e74c3c}
+    .yf-add-card{border:1px dashed rgba(255,255,255,.25);background:transparent}
+    .yf-add-card:hover{border-color:var(--brand)}
+
+    /* favorites: add-link modal fields (modal frame styles live in styles.css) */
+    .yf-label{display:block;font-size:.8rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin:.9rem 0 .35rem}
+    .yf-input{width:100%;background:#0b1220;border:1px solid rgba(255,255,255,.15);border-radius:10px;color:#fff;padding:.6rem .75rem;font-size:16px;font-family:inherit}
+    .yf-input:focus{outline:none;border-color:var(--brand2)}
+    .yf-icons{display:flex;gap:.5rem;flex-wrap:wrap}
+    .yf-icon-btn{width:46px;height:46px;border-radius:12px;background:#0b1220;border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+    .yf-icon-btn svg{width:26px;height:26px}
+    .yf-icon-btn.sel{border-color:var(--brand);box-shadow:0 0 0 2px rgba(46,204,113,.35);background:linear-gradient(135deg,rgba(69,183,209,.25),rgba(46,204,113,.25))}
+    .yf-error{color:#e74c3c;font-size:.85rem;margin-top:.75rem}
   </style>
   <script type="application/ld+json">
   {
@@ -104,6 +133,7 @@
   }
   </script>
   <script src="/assets/js/menu.js" defer></script>
+  <script src="/assets/js/favorites.js" defer></script>
 </head>
 <body>
   <header class="site-header">
@@ -129,14 +159,7 @@
       <a class="menu-link" href="/holdle/">Holdle</a>
     </div>
     <div class="menu-sec">
-      <div class="menu-title">Info</div>
-      <a class="menu-link" href="/about/">About</a>
-      <a class="menu-link" href="/releases/">Releases</a>
-      <a class="menu-link" href="/terms/">Terms of Service</a>
-      <a class="menu-link" href="/privacy/">Privacy Policy</a>
-    </div>
-    <div class="menu-sec">
-      <div class="menu-title">Other Daily Games</div>
+      <div class="menu-title">Our Favorite Games</div>
       <a class="menu-link" href="https://dailyakari.com/" target="_blank" rel="noopener noreferrer">Akari</a>
       <a class="menu-link" href="https://bandle.app/" target="_blank" rel="noopener noreferrer">Bandle</a>
       <a class="menu-link" href="https://www.puzzmo.com/play/circuits/" target="_blank" rel="noopener noreferrer">Circuits</a>
@@ -158,6 +181,13 @@
       <a class="menu-link" href="https://heardlewordle.io/taylor-swift-heardle" target="_blank" rel="noopener noreferrer">Taylor Swift Heardle</a>
       <a class="menu-link" href="https://www.nytimes.com/games/wordle/index.html" target="_blank" rel="noopener noreferrer">Wordle</a>
     </div>
+    <div class="menu-sec">
+      <div class="menu-title">Info</div>
+      <a class="menu-link" href="/about/">About</a>
+      <a class="menu-link" href="/releases/">Releases</a>
+      <a class="menu-link" href="/terms/">Terms of Service</a>
+      <a class="menu-link" href="/privacy/">Privacy Policy</a>
+    </div>
   </nav>
 
   <main class="wrap" id="main">
@@ -165,13 +195,17 @@
       <div class="brandmark">
         <h1>DailyJamm</h1>
       </div>
-      <p class="tag">DailyJamm is your dose of daily games. Play <strong>Themedle</strong>, <strong>Chain Link</strong>, <strong>BlackJackdle</strong>, <strong>Spelldle</strong>, and <strong>Roulettedle</strong> - our original daily games - plus a curated collection of our favorite daily games!</p>
+      <p class="tag">DailyJamm is your dose of daily games. Play <strong>Themedle</strong>, <strong>Chain Link</strong>, <strong>BlackJackdle</strong>, <strong>Spelldle</strong>, <strong>Roulettedle</strong>, and <strong>Holdle</strong> - our original daily games - plus a curated collection of our favorite daily games. Star any game or add your own links to build your own list!</p>
     </header>
 
     <section class="section">
-      <h2 class="accent">Our Games</h2>
+      <div class="sec-head">
+        <h2 class="accent">Our Games</h2>
+        <button class="sec-help" type="button" aria-expanded="false" aria-controls="help-our" aria-label="About Our Games">?</button>
+        <p class="sec-desc" id="help-our" hidden>Original daily games built by DailyJamm. Each one gives you a new puzzle, hand, or spin every day, and your progress, streaks, and stats are saved right on your device - no account needed.</p>
+      </div>
       <div class="grid-centered">
-        <article class="card our" onclick="goto('/themedle/')" role="button" tabindex="0" aria-label="Play Themedle">
+        <article class="card our" data-fav-id="themedle" onclick="goto('/themedle/')" role="button" tabindex="0" aria-label="Play Themedle">
           <span class="badge">Featured</span>
           <div class="icon our">
             <!-- Old-school TV icon (no feet) -->
@@ -184,7 +218,7 @@
           <h3>Themedle</h3>
           <p>Guess the TV show from its theme song. A new challenge every day.</p>
         </article>
-        <article class="card our" onclick="goto('/chainlink/')" role="button" tabindex="0" aria-label="Play Chain Link">
+        <article class="card our" data-fav-id="chainlink" onclick="goto('/chainlink/')" role="button" tabindex="0" aria-label="Play Chain Link">
           <div class="icon our">
             <!-- Chain link icon -->
             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -195,7 +229,7 @@
           <h3>Chain Link</h3>
           <p>Find the missing words to complete the compound word chain.</p>
         </article>
-        <article class="card our" onclick="goto('/blackjackdle/')" role="button" tabindex="0" aria-label="Play BlackJackdle">
+        <article class="card our" data-fav-id="blackjackdle" onclick="goto('/blackjackdle/')" role="button" tabindex="0" aria-label="Play BlackJackdle">
           <div class="icon our">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <rect x="3" y="4" width="9" height="13" rx="2" fill="white" stroke="rgba(26,26,46,0.25)" stroke-width="1.5"/>
@@ -207,7 +241,7 @@
           <h3>BlackJackdle</h3>
           <p>Daily Black Jack - 3 hands per day. Beat the dealer and build your stack.</p>
         </article>
-        <article class="card our" onclick="goto('/spelldle/')" role="button" tabindex="0" aria-label="Play Spelldle">
+        <article class="card our" data-fav-id="spelldle" onclick="goto('/spelldle/')" role="button" tabindex="0" aria-label="Play Spelldle">
           <div class="icon our">
             <!-- Spell/wand icon -->
             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -229,7 +263,7 @@
           <h3>Spelldle</h3>
           <p>Guess the daily D&amp;D 5E spell. Hints on level, school, range &amp; more.</p>
         </article>
-        <article class="card our" onclick="goto('/roulettedle/')" role="button" tabindex="0" aria-label="Play Roulettedle">
+        <article class="card our" data-fav-id="roulettedle" onclick="goto('/roulettedle/')" role="button" tabindex="0" aria-label="Play Roulettedle">
 
           <div class="icon our">
             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -248,7 +282,7 @@
           <h3>Roulettedle</h3>
           <p>Daily roulette - 3 spins per day. Place your bets and spin the wheel!</p>
         </article>
-        <article class="card our" onclick="goto('/holdle/')" role="button" tabindex="0" aria-label="Play Holdle">
+        <article class="card our" data-fav-id="holdle" onclick="goto('/holdle/')" role="button" tabindex="0" aria-label="Play Holdle">
           <span class="badge">New</span>
           <div class="icon our">
             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -274,104 +308,118 @@
       </div>
     </section>
 
+    <section class="section" id="yf-section">
+      <div class="sec-head">
+        <h2>Your Favorite Games</h2>
+        <button class="sec-help" type="button" aria-expanded="false" aria-controls="help-yf" aria-label="About Your Favorite Games">?</button>
+        <p class="sec-desc" id="help-yf" hidden>Your personal list of daily games. Tap the star on any game on this page to pin it here, or use the Add Your Own card to link any daily game on the web. Reorder cards with the arrow buttons, remove one with the x, and your list follows you in the menu on every page.</p>
+      </div>
+      <p class="yf-hint" id="yf-empty">Nothing here yet! Tap the star on any game below to pin it here, or use the plus card to add your own link to any daily game on the web.</p>
+      <div class="grid-centered" id="yf-grid"></div>
+    </section>
+
     <section class="section">
-      <h2>Other Daily Games</h2>
+      <div class="sec-head">
+        <h2>Our Favorite Games</h2>
+        <button class="sec-help" type="button" aria-expanded="false" aria-controls="help-of" aria-label="About Our Favorite Games">?</button>
+        <p class="sec-desc" id="help-of" hidden>Daily games from around the web that we play and love. These are made by other creators - each one opens in a new tab. Spot a favorite? Tap its star to add it to your list above.</p>
+      </div>
       <div class="grid">
-        <article class="card" onclick="openExternal('https://dailyakari.com/')" role="button" tabindex="0" aria-label="Akari">
+        <article class="card" data-fav-id="akari" onclick="openExternal('https://dailyakari.com/')" role="button" tabindex="0" aria-label="Akari">
           <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4a6 6 0 0 0-6 6c0 2 .8 3.4 2 4.6.6.6 1 1.2 1 1.9V18h6v-1.5c0-.7.4-1.3 1-1.9 1.2-1.2 2-2.6 2-4.6a6 6 0 0 0-6-6z" fill="none" stroke="white" stroke-width="2"/><path d="M9 19h6M9 21h6" stroke="white" stroke-width="2"/></svg></div>
           <h3>Akari</h3>
           <p>Daily logic puzzle - light up each cell</p>
-        </article><article class="card" onclick="openExternal('https://bandle.app/')" role="button" tabindex="0" aria-label="Bandle">
+        </article><article class="card" data-fav-id="bandle" onclick="openExternal('https://bandle.app/')" role="button" tabindex="0" aria-label="Bandle">
           <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/><circle cx="10" cy="17" r="2"/></svg></div>
           <h3>Bandle</h3>
           <p>Guess the song by progressively adding instruments</p>
         </article>
-        <article class="card" onclick="openExternal('https://www.puzzmo.com/play/circuits/')" role="button" tabindex="0" aria-label="Circuits">
+        <article class="card" data-fav-id="circuits" onclick="openExternal('https://www.puzzmo.com/play/circuits/')" role="button" tabindex="0" aria-label="Circuits">
           <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M8 6h8M7 7l4 9M17 7l-4 9" stroke="white" stroke-width="2" fill="none"/></svg></div>
           <h3>Circuits</h3>
           <p>Connect compound words with guesses </p>
         </article>
-        <article class="card" onclick="openExternal('https://www.nytimes.com/games/connections')" role="button" tabindex="0" aria-label="Connections">
+        <article class="card" data-fav-id="connections" onclick="openExternal('https://www.nytimes.com/games/connections')" role="button" tabindex="0" aria-label="Connections">
           <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2" fill="none" stroke="white" stroke-width="2"/><circle cx="8" cy="8" r="1.5"/><circle cx="16" cy="12" r="1.5"/><circle cx="10" cy="16" r="1.5"/><path d="M9.5 8h5M16 13.5v2M10 14.5v-4" stroke="white" stroke-width="2" fill="none"/></svg></div>
           <h3>Connections</h3>
           <p>Group words that share a theme</p>
         </article>
-        <article class="card" onclick="openExternal('https://contexto.me/en/')" role="button" tabindex="0" aria-label="Contexto">
+        <article class="card" data-fav-id="contexto" onclick="openExternal('https://contexto.me/en/')" role="button" tabindex="0" aria-label="Contexto">
           <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="white" stroke-width="2"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1"/></svg></div>
           <h3>Contexto</h3>
           <p>Find the secret word by semantic guessing</p>
         </article>
-        <article class="card" onclick="openExternal('https://costcodle.com/')" role="button" tabindex="0" aria-label="Costcodle">
+        <article class="card" data-fav-id="costcodle" onclick="openExternal('https://costcodle.com/')" role="button" tabindex="0" aria-label="Costcodle">
           <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm10 0a2 2 0 1 0 .001 4A2 2 0 0 0 17 18zM3 4h2l3.6 7.59c.17.33.52.41.8.41H19a1 1 0 0 1 0 2H9.4a2 2 0 0 1-1.8-1.09L5.1 6H3a1 1 0 1 1 0-2zM7 8h12a1 1 0 1 1 0 2H7a1 1 0 1 1 0-2z"/></svg></div>
           <h3>Costcodle</h3>
           <p>Guess the price for a Costco item</p>
         </article>
-        <article class="card" onclick="openExternal('https://www.puzzmo.com/play/crossword/')" role="button" tabindex="0" aria-label="Cross|word">
+        <article class="card" data-fav-id="crossword" onclick="openExternal('https://www.puzzmo.com/play/crossword/')" role="button" tabindex="0" aria-label="Cross|word">
           <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" fill="none" stroke="white" stroke-width="2"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18" stroke="white" stroke-width="2"/></svg></div>
           <h3>Cross|word</h3>
           <p>Classic daily crossword</p>
         </article>
-        <article class="card" onclick="openExternal('https://dailydozentrivia.com/')" role="button" tabindex="0" aria-label="Daily Dozen">
+        <article class="card" data-fav-id="dailydozen" onclick="openExternal('https://dailydozentrivia.com/')" role="button" tabindex="0" aria-label="Daily Dozen">
           <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2" fill="none" stroke="white" stroke-width="2"/><path d="M3 9h18" stroke="white" stroke-width="2" fill="none"/><text x="7" y="19" font-size="10" font-weight="700" fill="white">12</text></svg></div>
           <h3>Daily Dozen</h3>
           <p>12 daily trivia questions</p>
         </article>
-        <article class="card" onclick="openExternal('https://framed.wtf/')" role="button" tabindex="0" aria-label="Framed">
+        <article class="card" data-fav-id="framed" onclick="openExternal('https://framed.wtf/')" role="button" tabindex="0" aria-label="Framed">
           <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="4" fill="none" stroke="white" stroke-width="2"/><rect x="3" y="11" width="18" height="8" rx="2" ry="2" fill="none" stroke="white" stroke-width="2"/><path d="M5 7l3 4M9 7l3 4M13 7l3 4M17 7l3 4" stroke="white" stroke-width="2"/></svg></div>
           <h3>Framed</h3>
           <p>Identify the movie from a single frame at a time</p>
         </article>
-        <article class="card" onclick="openExternal('https://guessthe.game/')" role="button" tabindex="0" aria-label="Guess the Game">
+        <article class="card" data-fav-id="guessthegame" onclick="openExternal('https://guessthe.game/')" role="button" tabindex="0" aria-label="Guess the Game">
           <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7h12a4 4 0 0 1 4 4v2a3 3 0 0 1-3 3h-2l-2-2h-6l-2 2H5a3 3 0 0 1-3-3v-2a4 4 0 0 1 4-4zM8 11a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm8-1.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg></div>
           <h3>Guess the Game</h3>
           <p>Name the video game from hints</p>
         </article>
-        <article class="card" onclick="openExternal('https://heardlewordle.io/')" role="button" tabindex="0" aria-label="Heardle">
+        <article class="card" data-fav-id="heardle" onclick="openExternal('https://heardlewordle.io/')" role="button" tabindex="0" aria-label="Heardle">
           <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13a8 8 0 0 1 16 0" fill="none" stroke="white" stroke-width="2"/><rect x="4" y="13" width="4" height="6" rx="2"/><rect x="16" y="13" width="4" height="6" rx="2"/></svg></div>
           <h3>Heardle</h3>
           <p>Guess the song from short clips</p>
         </article>
-        <article class="card" onclick="openExternal('https://linxicon.com/')" role="button" tabindex="0" aria-label="Linxicon">
+        <article class="card" data-fav-id="linxicon" onclick="openExternal('https://linxicon.com/')" role="button" tabindex="0" aria-label="Linxicon">
           <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12a4 4 0 0 1 4-4h3" stroke="white" stroke-width="2" fill="none"/><path d="M17 12a4 4 0 0 1-4 4h-3" stroke="white" stroke-width="2" fill="none"/><rect x="14" y="4" width="6" height="6" rx="1" fill="none" stroke="white" stroke-width="2"/><text x="16" y="9" font-size="4" font-weight="700" fill="white">A</text></svg></div>
           <h3>Linxicon</h3>
           <p>Link two keywords with guesses</p>
         </article>
-        <article class="card" onclick="openExternal('https://minecraftle.zachmanson.com/')" role="button" tabindex="0" aria-label="Minecraftle">
+        <article class="card" data-fav-id="minecraftle" onclick="openExternal('https://minecraftle.zachmanson.com/')" role="button" tabindex="0" aria-label="Minecraftle">
           <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" fill="none" stroke="white" stroke-width="2"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18" stroke="white" stroke-width="2"/></svg></div>
           <h3>Minecraftle</h3>
           <p>Guess the daily crafted item</p>
         </article>
-        <article class="card" onclick="openExternal('https://www.nytimes.com/games/pips')" role="button" tabindex="0" aria-label="Pips">
+        <article class="card" data-fav-id="pips" onclick="openExternal('https://www.nytimes.com/games/pips')" role="button" tabindex="0" aria-label="Pips">
           <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="4" width="12" height="16" rx="2" fill="none" stroke="white" stroke-width="2"/><line x1="6" y1="12" x2="18" y2="12" stroke="white" stroke-width="2"/><circle cx="12" cy="8" r="1.2"/><circle cx="9" cy="16" r="1.2"/><circle cx="15" cy="16" r="1.2"/></svg></div>
           <h3>Pips</h3>
           <p>Place the dominos in the correct orientation</p>
         </article>
-        <article class="card" onclick="openExternal('https://raddle.quest/')" role="button" tabindex="0" aria-label="Raddle">
+        <article class="card" data-fav-id="raddle" onclick="openExternal('https://raddle.quest/')" role="button" tabindex="0" aria-label="Raddle">
           <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3v18M16 3v18M8 7h8M8 11h8M8 15h8" stroke="white" stroke-width="2" fill="none"/></svg></div>
           <h3>Raddle</h3>
           <p>Solve a daily word ladder puzzle</p>
         </article>
-        <article class="card" onclick="openExternal('https://lessgames.com/songless')" role="button" tabindex="0" aria-label="Songless">
+        <article class="card" data-fav-id="songless" onclick="openExternal('https://lessgames.com/songless')" role="button" tabindex="0" aria-label="Songless">
           <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/><circle cx="10" cy="17" r="2"/></svg></div>
           <h3>Songless</h3>
           <p>Guess the song in short clips</p>
         </article>
-        <article class="card" onclick="openExternal('https://spotle.io/')" role="button" tabindex="0" aria-label="Spotle">
+        <article class="card" data-fav-id="spotle" onclick="openExternal('https://spotle.io/')" role="button" tabindex="0" aria-label="Spotle">
           <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="16" width="2" height="4"/><rect x="6" y="10" width="2" height="10"/><rect x="9" y="12" width="2" height="8"/><rect x="12" y="6" width="2" height="14"/><rect x="15" y="14" width="2" height="6"/><rect x="18" y="8" width="2" height="12"/></svg></div>
           <h3>Spotle</h3>
           <p>Guess the artist using Spotify-style clues</p>
         </article>
-        <article class="card" onclick="openExternal('https://www.nytimes.com/puzzles/spelling-bee')" role="button" tabindex="0" aria-label="Spelling Bee">
+        <article class="card" data-fav-id="spellingbee" onclick="openExternal('https://www.nytimes.com/puzzles/spelling-bee')" role="button" tabindex="0" aria-label="Spelling Bee">
           <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.5" r="1.2"/><ellipse cx="9" cy="9.5" rx="2.6" ry="1.7" fill="none" stroke="white" stroke-width="2"/><ellipse cx="15" cy="9.5" rx="2.6" ry="1.7" fill="none" stroke="white" stroke-width="2"/><ellipse cx="12" cy="14" rx="4" ry="3.5" fill="none" stroke="white" stroke-width="2"/><path d="M9 13.2h6M9 14.7h6M9 16.2h6" stroke="white" stroke-width="2"/><path d="M11.2 7l-1.2-1M12.8 7l1.2-1" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M12 17.8v1.2" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></div>
           <h3>Spelling Bee</h3>
           <p>Make as many words as you can</p>
         </article>
-        <article class="card" onclick="openExternal('https://heardlewordle.io/taylor-swift-heardle')" role="button" tabindex="0" aria-label="Taylor Swift Heardle">
+        <article class="card" data-fav-id="tsheardle" onclick="openExternal('https://heardlewordle.io/taylor-swift-heardle')" role="button" tabindex="0" aria-label="Taylor Swift Heardle">
           <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><text x="4" y="17" font-size="12" font-weight="700" fill="white">TS</text></svg></div>
           <h3>Taylor Swift Heardle</h3>
           <p>Guess the Taylor Swift song</p>
         </article>
-        <article class="card" onclick="openExternal('https://www.nytimes.com/games/wordle/index.html')" role="button" tabindex="0" aria-label="Wordle">
+        <article class="card" data-fav-id="wordle" onclick="openExternal('https://www.nytimes.com/games/wordle/index.html')" role="button" tabindex="0" aria-label="Wordle">
           <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="1.5" y="9" width="3.5" height="6" rx="1"/><rect x="6" y="9" width="3.5" height="6" rx="1"/><rect x="10.5" y="9" width="3.5" height="6" rx="1"/><rect x="15" y="9" width="3.5" height="6" rx="1"/><rect x="19.5" y="9" width="3.5" height="6" rx="1"/></svg></div>
           <h3>Wordle</h3>
           <p>The OG word-guessing game</p>
@@ -385,11 +433,61 @@
     </footer>
   </main>
 
+  <!-- Add-your-own-game modal -->
+  <div id="yf-modal-backdrop" class="yf-modal-backdrop">
+    <div class="yf-modal" role="dialog" aria-modal="true" aria-labelledby="yf-modal-title">
+      <h3 id="yf-modal-title">Add Your Own Game</h3>
+      <p class="yf-modal-sub">Link any daily game and it joins Your Favorite Games.</p>
+      <label class="yf-label" for="yf-name">Name</label>
+      <input id="yf-name" class="yf-input" maxlength="40" placeholder="My favorite game" autocomplete="off">
+      <label class="yf-label" for="yf-url">Link</label>
+      <input id="yf-url" class="yf-input" inputmode="url" placeholder="https://example.com" autocomplete="off">
+      <div class="yf-label" id="yf-icons-label">Icon</div>
+      <div id="yf-icons" class="yf-icons" role="group" aria-labelledby="yf-icons-label"></div>
+      <p id="yf-error" class="yf-error" hidden></p>
+      <div class="yf-modal-btns">
+        <button id="yf-cancel" class="yf-btn yf-btn-ghost" type="button">Cancel</button>
+        <button id="yf-save" class="yf-btn yf-btn-primary" type="button">Add Game</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     function openExternal(url){window.open(url,'_blank','noopener,noreferrer')}
     function goto(path){window.location.href=path}
     document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.activeElement&&document.activeElement.getAttribute('role')==='button'){document.activeElement.click()}})
     document.getElementById('year').textContent=new Date().getFullYear();
+
+    // Section help popovers: hover on mouse devices, tap to toggle on touch.
+    (function(){
+      var canHover=window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+      function closeAll(){
+        document.querySelectorAll('.sec-desc').forEach(function(d){d.hidden=true});
+        document.querySelectorAll('.sec-help').forEach(function(b){b.setAttribute('aria-expanded','false')});
+      }
+      function open(btn){
+        closeAll();
+        document.getElementById(btn.getAttribute('aria-controls')).hidden=false;
+        btn.setAttribute('aria-expanded','true');
+      }
+      document.querySelectorAll('.sec-head').forEach(function(head){
+        var btn=head.querySelector('.sec-help');
+        var desc=head.querySelector('.sec-desc');
+        if(!btn||!desc)return;
+        btn.addEventListener('click',function(e){
+          e.stopPropagation();
+          if(desc.hidden){open(btn)}else{closeAll()}
+        });
+        if(canHover){
+          btn.addEventListener('mouseenter',function(){open(btn)});
+          head.addEventListener('mouseleave',closeAll);
+        }
+      });
+      // Tap/click anywhere else dismisses an open popover
+      document.addEventListener('click',function(e){
+        if(!e.target.closest('.sec-head'))closeAll();
+      });
+    })();
   </script>
 
   <!-- Cookie consent -->

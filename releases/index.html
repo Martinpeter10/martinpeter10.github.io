@@ -8,7 +8,7 @@
   <meta name="robots" content="index,follow">
   <link rel="canonical" href="https://dailyjamm.com/releases/" />
   <link rel="icon" type="image/png" href="/assets/img/favicon.png">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=20260429">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=20260731">
 
   <!-- Open Graph -->
   <meta property="og:site_name" content="DailyJamm" />
@@ -70,6 +70,7 @@
     footer a:hover { color: #fff; }
   </style>
   <script src="/assets/js/menu.js" defer></script>
+  <script src="/assets/js/favorites.js" defer></script>
 </head>
 <body>
 
@@ -93,16 +94,10 @@
       <a class="menu-link" href="/blackjackdle/">BlackJackdle</a>
       <a class="menu-link" href="/spelldle/">Spelldle</a>
       <a class="menu-link" href="/roulettedle/">Roulettedle</a>
+      <a class="menu-link" href="/holdle/">Holdle</a>
     </div>
     <div class="menu-sec">
-      <div class="menu-title">Info</div>
-      <a class="menu-link" href="/about/">About</a>
-      <a class="menu-link" href="/releases/">Releases</a>
-      <a class="menu-link" href="/terms/">Terms of Service</a>
-      <a class="menu-link" href="/privacy/">Privacy Policy</a>
-    </div>
-    <div class="menu-sec">
-      <div class="menu-title">Other Daily Games</div>
+      <div class="menu-title">Our Favorite Games</div>
       <a class="menu-link" href="https://dailyakari.com/" target="_blank" rel="noopener noreferrer">Akari</a>
       <a class="menu-link" href="https://bandle.app/" target="_blank" rel="noopener noreferrer">Bandle</a>
       <a class="menu-link" href="https://www.puzzmo.com/play/circuits/" target="_blank" rel="noopener noreferrer">Circuits</a>
@@ -124,6 +119,13 @@
       <a class="menu-link" href="https://heardlewordle.io/taylor-swift-heardle" target="_blank" rel="noopener noreferrer">Taylor Swift Heardle</a>
       <a class="menu-link" href="https://www.nytimes.com/games/wordle/index.html" target="_blank" rel="noopener noreferrer">Wordle</a>
     </div>
+    <div class="menu-sec">
+      <div class="menu-title">Info</div>
+      <a class="menu-link" href="/about/">About</a>
+      <a class="menu-link" href="/releases/">Releases</a>
+      <a class="menu-link" href="/terms/">Terms of Service</a>
+      <a class="menu-link" href="/privacy/">Privacy Policy</a>
+    </div>
   </nav>
 
   <div class="page-wrap">
@@ -132,7 +134,34 @@
     <p style="color:#6b7280;margin-bottom:2rem">A history of updates and new games on DailyJamm.</p>
 
     <div class="release-block">
-      <h2>v2.1.0 <span class="version-date">May 8, 2026</span></h2>
+      <h2>v3.0.0 <span class="version-date">July 31, 2026</span></h2>
+      <h3>Your Games, Your Way</h3>
+      <p style="color:#cbd5e1;margin:.4rem 0 .8rem">DailyJamm is now yours to customize. Build your own personal list of daily games with the new <strong style="color:#fff">Your Favorite Games</strong> section.</p>
+      <ul>
+        <li>New <strong style="color:#fff">Your Favorite Games</strong> section on the home page, shown right after Our Games</li>
+        <li>Tap the star on any game card to pin it to your favorites; tap again to remove it</li>
+        <li>Add your own links to any daily game on the web - pick a name, a link, and one of six icons (star, game controller, globe, link, dice, or trophy)</li>
+        <li>Reorder your favorites with the arrow buttons on each card, or remove one anytime with the x button</li>
+        <li>Your favorites also appear as a new section in the menu on every page, and both the menu and the home page update instantly as you make changes</li>
+        <li>The "Other Daily Games" section is now called "Our Favorite Games"</li>
+        <li>Everything is saved on your device - no account needed</li>
+        <li>Added a "?" button next to each home page section heading with a quick description of what that section is and how to use it</li>
+        <li>A one-time welcome popup on the home page introduces the new section with an animated demo of starring and reordering (re-watch it anytime with the button below)</li>
+        <li>Menu sections reordered to match the home page: Our Games, Your Favorite Games, Our Favorite Games, then Info</li>
+        <li>Past game-launch releases on this page now carry a NEW GAME badge</li>
+        <li>The side menu now looks identical on every page - previously the home page menu had slightly different colors and styling than the rest of the site</li>
+        <li>Holdle: pot payouts now use proper side pots - an opponent who goes all-in with a short stack can only win the portion of the pot they actually matched, and any uncalled chips are returned to the bettor</li>
+        <li>Holdle: fixed hand net results only counting your final-street bet instead of your full contribution (ante plus every street), which skewed session stats</li>
+        <li>Holdle: fixed the All In raise option leaving chips behind if you had already bet earlier on the same street</li>
+        <li>Holdle: AI raise labels now read "RAISE TO" so the amount clearly means the street total, and the pot and stacks now update the moment a hand is decided</li>
+        <li>Fixed a missing Holdle link in the menu on this page</li>
+      </ul>
+      <button class="yf-btn yf-btn-primary" type="button" style="flex:none;width:auto;padding:.5rem 1.1rem;margin-top:.75rem" onclick="DJFav.showIntro()">View Instructions</button>
+    </div>
+
+    <details>
+      <summary><span class="chevron">▶</span><h2>v2.1.0 <span class="version-date">May 8, 2026</span></h2></summary>
+      <div class="release-body">
       <h3>Holdle Improvements</h3>
       <ul>
         <li>Fixed a bug where the river card was not dealt when the player went all-in on the turn</li>
@@ -142,10 +171,12 @@
         <li>Added AI fold tracking to the head-to-head stats table, with separate columns for player folds and AI folds</li>
         <li>Adjusted AI difficulty - opponents play more aggressively and fold less, particularly when fewer players remain in the hand</li>
       </ul>
-    </div>
+      </div>
+    </details>
 
-    <div class="release-block">
-      <h2>v2.0.0 <span class="version-date">April 21, 2026</span> <span style="background:#10b981;color:#000;font-size:.7em;font-weight:800;padding:2px 8px;border-radius:6px;vertical-align:middle">NEW GAME</span></h2>
+    <details>
+      <summary><span class="chevron">▶</span><h2>v2.0.0 <span class="version-date">April 21, 2026</span> <span style="background:#10b981;color:#000;font-size:.7em;font-weight:800;padding:2px 8px;border-radius:6px;vertical-align:middle">NEW GAME</span></h2></summary>
+      <div class="release-body">
       <h3>Holdle</h3>
       <ul>
         <li>New game: Holdle - daily Texas Hold'em poker against 3 AI opponents per day</li>
@@ -155,10 +186,12 @@
         <li>Full poker hand evaluation with flop, turn, and river betting - AI hole cards are revealed at showdown so you can see how they played</li>
         <li>Chip stack persists across days with a daily bonus of 100-500 chips; full stats modal with head-to-head records per opponent and share-to-clipboard support</li>
       </ul>
-    </div>
+      </div>
+    </details>
 
-    <div class="release-block">
-      <h2>v1.9.0 <span class="version-date">April 15, 2026</span></h2>
+    <details>
+      <summary><span class="chevron">▶</span><h2>v1.9.0 <span class="version-date">April 15, 2026</span></h2></summary>
+      <div class="release-body">
       <p style="color:#cbd5e1;margin:.4rem 0 .8rem"><strong style="color:#fbbf24">Stats have been reset across all games.</strong> The stats system was rebuilt to track guess distributions and richer lifetime data. Because previous stats were recorded without this structure, all game stats have been cleared so every player starts on equal footing with accurate numbers from this point forward. Daily game progress (today's puzzle, chip balance) was not affected.</p>
       <ul>
         <li>Stats keys bumped to <code style="color:#a5f3fc;font-size:.85em">_v2</code> - previous counts, streaks, and chip history cleared site-wide</li>
@@ -169,10 +202,11 @@
         <li>Themedle: removed the redundant countdown from the page header; the timer now only appears in the result panel after the game ends</li>
         <li>Themedle: result panel now uses the same compact card style as all other games for visual consistency</li>
       </ul>
-    </div>
+      </div>
+    </details>
 
     <details>
-      <summary><span class="chevron">▶</span><h2>v1.8.0 <span class="version-date">April 3, 2026</span></h2></summary>
+      <summary><span class="chevron">▶</span><h2>v1.8.0 <span class="version-date">April 3, 2026</span> <span style="background:#10b981;color:#000;font-size:.7em;font-weight:800;padding:2px 8px;border-radius:6px;vertical-align:middle">NEW GAME</span></h2></summary>
       <div class="release-body">
         <ul>
           <li>Launched <strong style="color:#fff">Roulettedle</strong> <span class="badge-new">New</span> - daily American roulette with 3 spins per day</li>
@@ -199,7 +233,7 @@
     </details>
 
     <details>
-      <summary><span class="chevron">▶</span><h2>v1.6.0 <span class="version-date">March 30, 2026</span></h2></summary>
+      <summary><span class="chevron">▶</span><h2>v1.6.0 <span class="version-date">March 30, 2026</span> <span style="background:#10b981;color:#000;font-size:.7em;font-weight:800;padding:2px 8px;border-radius:6px;vertical-align:middle">NEW GAME</span></h2></summary>
       <div class="release-body">
         <ul>
           <li>Launched <strong style="color:#fff">Spelldle</strong> <span class="badge-new">New</span> - daily D&amp;D 5E spell guessing game with 9 attribute columns</li>
@@ -239,7 +273,7 @@
     </details>
 
     <details>
-      <summary><span class="chevron">▶</span><h2>v1.3.0 <span class="version-date">March 28, 2026</span></h2></summary>
+      <summary><span class="chevron">▶</span><h2>v1.3.0 <span class="version-date">March 28, 2026</span> <span style="background:#10b981;color:#000;font-size:.7em;font-weight:800;padding:2px 8px;border-radius:6px;vertical-align:middle">NEW GAME</span></h2></summary>
       <div class="release-body">
         <ul>
           <li>Launched <strong style="color:#fff">BlackJackdle</strong> <span class="badge-new">New</span> - daily blackjack with 3 hands per day, chip stack, and daily bonus</li>
@@ -248,7 +282,7 @@
     </details>
 
     <details>
-      <summary><span class="chevron">▶</span><h2>v1.2.0 <span class="version-date">March 27, 2026</span></h2></summary>
+      <summary><span class="chevron">▶</span><h2>v1.2.0 <span class="version-date">March 27, 2026</span> <span style="background:#10b981;color:#000;font-size:.7em;font-weight:800;padding:2px 8px;border-radius:6px;vertical-align:middle">NEW GAME</span></h2></summary>
       <div class="release-body">
         <ul>
           <li>Launched <strong style="color:#fff">Chain Link</strong> <span class="badge-new">New</span> - daily compound word chain puzzle with 30 puzzles cycling indefinitely</li>
@@ -272,7 +306,7 @@
     </details>
 
     <details>
-      <summary><span class="chevron">▶</span><h2>v1.0.0 <span class="version-date">Initial Release</span></h2></summary>
+      <summary><span class="chevron">▶</span><h2>v1.0.0 <span class="version-date">Initial Release</span> <span style="background:#10b981;color:#000;font-size:.7em;font-weight:800;padding:2px 8px;border-radius:6px;vertical-align:middle">NEW GAME</span></h2></summary>
       <div class="release-body">
         <ul>
           <li>Launched <strong style="color:#fff">Themedle</strong> - daily TV show theme song guessing game (Wordle-style, 6 attempts)</li>
