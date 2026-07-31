@@ -143,6 +143,35 @@
     return el;
   }
 
+  // Animate a card back flying from the draw pile to a card row
+  function flyFromDeck(targetEl, small, cb) {
+    const table = document.querySelector('.sb-table');
+    const deckEl = $('sb-deck');
+    if (!table || !deckEl || !targetEl ||
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches) { cb(); return; }
+    let ghost = null;
+    try {
+      const tr = table.getBoundingClientRect();
+      const dr = deckEl.getBoundingClientRect();
+      const gr = targetEl.getBoundingClientRect();
+      ghost = makeCardBack(small);
+      ghost.classList.add('sb-fly');
+      ghost.style.left = (dr.left - tr.left + dr.width / 2) + 'px';
+      ghost.style.top = (dr.top - tr.top + dr.height / 2) + 'px';
+      table.appendChild(ghost);
+      const dx = (gr.left + gr.width / 2) - (dr.left + dr.width / 2);
+      const dy = (gr.top + gr.height / 2) - (dr.top + dr.height / 2);
+      requestAnimationFrame(() => {
+        ghost.style.transform = 'translate(calc(-50% + ' + dx + 'px), calc(-50% + ' + dy + 'px)) rotate(360deg)';
+      });
+    } catch (e) {
+      if (ghost) ghost.remove();
+      cb();
+      return;
+    }
+    setTimeout(() => { ghost.remove(); cb(); }, 400);
+  }
+
   /* ── Dice rendering ── */
   const DIE_PIPS = { 1: [4], 2: [0, 8], 3: [0, 4, 8], 4: [0, 2, 6, 8], 5: [0, 2, 4, 6, 8], 6: [0, 2, 3, 5, 6, 8] };
 
@@ -224,8 +253,9 @@
     $('sb-turn-note').classList.toggle('hidden', myTurn || phase !== 'act');
     if (!myTurn) return;
     $('sb-btn-draw').disabled = hands[0].length >= HAND_MAX;
-    $('sb-btn-swap').disabled = selCard < 0;
+    $('sb-btn-swap').disabled = false;
     $('sb-btn-swap').textContent = selCard >= 0 ? 'Swap ' + rankLabel(hands[0][selCard].r) + SUIT_CHAR[hands[0][selCard].s] : 'Swap';
+    $('sb-deck').classList.toggle('sb-deck-ready', selCard >= 0);
   }
 
   /* ── AI decision ── */
@@ -260,6 +290,7 @@
 
   /* ── Actions ── */
   function applyAction(seat, dec) {
+    const fromDeck = dec.action === 'draw' || dec.action === 'swap';
     if (dec.action === 'draw') {
       hands[seat].push(drawCard());
       setBubble(seat, seat === 0 ? 'You draw a card' : 'draws a card');
@@ -271,9 +302,18 @@
       setBubble(seat, seat === 0 ? 'You stand' : 'stands');
     }
     turnCount++;
-    if (seat === 0) { selCard = -1; renderPlayerHand(dec.action !== 'stand'); }
-    else renderSeats(false, dec.action !== 'stand');
-    renderMid();
+    const finish = () => {
+      if (seat === 0) { selCard = -1; renderPlayerHand(fromDeck); }
+      else renderSeats(false, fromDeck);
+      renderMid();
+    };
+    if (fromDeck) {
+      const target = seat === 0 ? $('sb-player-cards')
+        : $('sb-ai-seat-' + (seat - 1)).querySelector('.sb-ai-cards');
+      flyFromDeck(target, seat !== 0, finish);
+    } else {
+      finish();
+    }
   }
 
   function onCardTap(i) {
@@ -286,10 +326,25 @@
   function onPlayerAction(type) {
     if (phase !== 'act' || turnSeat !== 0 || actionLocked || outcome) return;
     if (type === 'draw' && hands[0].length >= HAND_MAX) return;
-    if (type === 'swap' && selCard < 0) return;
+    if (type === 'swap' && selCard < 0) {
+      setMessage('Tap one of your cards first - then Swap trades it for the top card of the pile.');
+      const row = $('sb-player-cards');
+      row.classList.remove('sb-nudge');
+      void row.offsetWidth;
+      row.classList.add('sb-nudge');
+      return;
+    }
+    setMessage('');
     actionLocked = true;
     applyAction(0, type === 'swap' ? { action: 'swap', idx: selCard } : { action: type });
     advanceSeat();
+  }
+
+  // Tapping the draw pile: completes a swap if a card is selected, otherwise draws
+  function onDeckTap() {
+    if (phase !== 'act' || turnSeat !== 0 || actionLocked || outcome) return;
+    if (selCard >= 0) onPlayerAction('swap');
+    else if (hands[0].length < HAND_MAX) onPlayerAction('draw');
   }
 
   function advanceSeat() {
@@ -622,6 +677,7 @@
     $('sb-btn-stand').addEventListener('click', () => onPlayerAction('stand'));
     $('sb-btn-draw').addEventListener('click', () => onPlayerAction('draw'));
     $('sb-btn-swap').addEventListener('click', () => onPlayerAction('swap'));
+    $('sb-deck').addEventListener('click', onDeckTap);
     $('sb-share-btn').addEventListener('click', () => {
       DJUtils.clipboardShare(shareText(), $('sb-share-btn'), 'Share Results');
     });
