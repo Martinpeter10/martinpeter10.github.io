@@ -16,6 +16,7 @@ window.DJFav = (function () {
     holdle:       { title: 'Holdle',              url: '/holdle/' },
     bluffdle:     { title: 'Bluffdle',            url: '/bluffdle/' },
     shutthebox:   { title: 'Shut the Box',        url: '/shutthebox/' },
+    sabaac:       { title: 'Sabaac',              url: '/sabaac/' },
     akari:        { title: 'Akari',               url: 'https://dailyakari.com/', ext: true },
     bandle:       { title: 'Bandle',              url: 'https://bandle.app/', ext: true },
     circuits:     { title: 'Circuits',            url: 'https://www.puzzmo.com/play/circuits/', ext: true },

@@ -2426,3 +2426,62 @@ input[type=range].slider::-moz-range-thumb {
 .stb-btn:active{transform:translateY(1px)}
 .stb-btn-alt{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.3)}
 @media (prefers-reduced-motion: reduce){.stb-tile,.stb-cube{transition:none!important}.stb-die-rolling,.stb-tile.stb-deny,.stb-tile.stb-stuck{animation:none}}
+/* ── Sabaac ── */
+.sb-wrap{max-width:560px;margin:0 auto;padding:4.6rem 12px 24px}
+.sb-table{background:radial-gradient(ellipse at 50% 28%,#4a2a63,#2a1740 78%);border:2px solid #1d0f2e;border-radius:16px;padding:12px 10px;box-shadow:0 14px 34px rgba(0,0,0,.5),inset 0 0 30px rgba(0,0,0,.35)}
+.sb-ai-row{display:flex;gap:8px}
+.sb-ai-seat{flex:1;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:8px 4px;text-align:center;min-height:118px;transition:box-shadow .25s}
+.sb-ai-seat.sb-active{box-shadow:0 0 0 2px #45b7d1}
+.sb-ai-name{font-size:.8rem;font-weight:800;color:#fff}
+.sb-ai-bubble{display:block;font-size:.66rem;color:#d8b4fe;min-height:1.05em;margin:2px 0 4px}
+.sb-ai-cards{display:flex;gap:3px;justify-content:center;flex-wrap:wrap;min-height:52px}
+.sb-ai-total{font-size:.8rem;font-weight:900;margin-top:4px;min-height:1.1em}
+.sb-total-plain{color:#e5e7eb}
+.sb-total-good{color:#4ade80}
+.sb-total-zero{color:#fbbf24}
+.sb-winner{box-shadow:0 0 0 2px rgba(46,204,113,.85),0 0 22px rgba(46,204,113,.4)!important;border-radius:12px}
+.sb-card{width:56px;height:78px;border-radius:8px;background:linear-gradient(160deg,#fdfdfd,#e6e9f1);color:#111827;position:relative;font-family:Georgia,'Times New Roman',serif;box-shadow:0 2px 6px rgba(0,0,0,.45);flex-shrink:0;cursor:default;transition:transform .18s,box-shadow .18s}
+.sb-card-red{color:#c0392b}
+.sb-corner{position:absolute;top:4px;left:6px;font-size:.72rem;font-weight:800;line-height:1}
+.sb-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:900}
+.sb-card-sm{width:36px;height:50px;border-radius:6px}
+.sb-card-sm .sb-corner{font-size:.5rem;top:3px;left:4px}
+.sb-card-sm .sb-center{font-size:.85rem}
+.sb-card-back{background:repeating-linear-gradient(45deg,#5b21b6,#5b21b6 4px,#7c3aed 4px,#7c3aed 8px);border:2px solid #c4b5fd}
+@keyframes sb-deal{from{opacity:0;transform:translateY(-16px) scale(.7)}to{opacity:1;transform:none}}
+.sb-dealt{animation:sb-deal .38s ease both}
+#sb-player-cards .sb-card{cursor:pointer}
+#sb-player-cards .sb-card:hover{transform:translateY(-4px)}
+.sb-card.sb-cardsel{transform:translateY(-8px);box-shadow:0 0 0 2px #2ecc71,0 8px 16px rgba(0,0,0,.5)}
+.sb-mid{margin:10px 2px;min-height:64px;display:flex;flex-direction:column;align-items:center;gap:6px;position:relative}
+.sb-midline{display:flex;justify-content:space-between;width:100%;padding:0 4px}
+.sb-round-label{font-size:.78rem;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:.06em}
+.sb-deck-count{font-size:.72rem;color:#c4b5fd}
+.sb-msg{font-size:.8rem;color:#e9d5ff;min-height:1.1em;text-align:center}
+.sb-dice{display:flex;gap:10px}
+.sb-die{width:34px;height:34px;background:linear-gradient(145deg,#fdfdfd,#dde2ec);border:1px solid #b8bfce;border-radius:7px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);padding:5px}
+.sb-cell{display:flex;align-items:center;justify-content:center}
+.sb-pip{background:radial-gradient(circle at 35% 35%,#3d4451,#111827);border-radius:50%;width:70%;height:70%;margin:auto}
+@keyframes sb-die-spin{0%{transform:rotate(0) translateY(0)}25%{transform:rotate(90deg) translateY(-4px)}50%{transform:rotate(180deg)}75%{transform:rotate(270deg) translateY(-3px)}100%{transform:rotate(360deg)}}
+.sb-die-roll{animation:sb-die-spin .5s linear infinite}
+@keyframes sb-shift-pop{0%{transform:scale(.4) rotate(-6deg);opacity:0}45%{transform:scale(1.12) rotate(2deg);opacity:1}100%{transform:scale(1) rotate(0);opacity:1}}
+.sb-shift-banner{position:absolute;top:50%;left:50%;translate:-50% -50%;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;font-size:1.15rem;font-weight:900;letter-spacing:.08em;padding:.5rem 1.1rem;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.6);animation:sb-shift-pop .45s ease both;z-index:5;white-space:nowrap}
+.sb-player-area{margin-top:8px;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:10px 8px}
+.sb-player-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:0 2px}
+.sb-label{font-size:.72rem;font-weight:800;color:#c4b5fd;text-transform:uppercase;letter-spacing:.07em}
+.sb-player-bubble{flex:1;font-size:.7rem;color:#d8b4fe;min-height:1em}
+.sb-player-total{font-size:.85rem;font-weight:900}
+.sb-player-cards{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;min-height:82px}
+.sb-turn-note{text-align:center;color:#9ca3af;font-size:.8rem;margin-top:12px}
+.sb-controls{background:#111827;border:1px solid #1f2937;border-radius:14px;padding:12px;margin-top:12px}
+.sb-controls.hidden{display:none}
+.sb-your-turn{text-align:center;font-size:.72rem;font-weight:900;color:#4ade80;text-transform:uppercase;letter-spacing:.1em}
+.sb-help-line{text-align:center;font-size:.72rem;color:#9ca3af;margin:4px 0 10px}
+.sb-action-row{display:flex;gap:8px}
+.sb-btn{flex:1;border:none;border-radius:10px;padding:.62rem 0;font-family:inherit;font-size:.85rem;font-weight:900;cursor:pointer;transition:transform .12s,opacity .12s}
+.sb-btn:disabled{opacity:.4;cursor:not-allowed}
+.sb-btn:not(:disabled):active{transform:translateY(1px)}
+.sb-btn-ghost{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.25)}
+.sb-btn-alt{background:#45b7d1;color:#0b1220}
+.sb-btn-primary{background:#2ecc71;color:#0b1220}
+@media (prefers-reduced-motion: reduce){.sb-dealt,.sb-die-roll,.sb-shift-banner{animation:none}}
