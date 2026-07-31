@@ -1,0 +1,9 @@
+.git
+.gitignore
+.assetsignore
+.claude
+.wrangler
+wrangler.jsonc
+server.py
+CLAUDE.md
+README.md
