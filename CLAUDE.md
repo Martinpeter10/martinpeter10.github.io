@@ -9,25 +9,29 @@ DailyJamm (dailyjamm.com) is a daily games hub hosted on GitHub Pages. It featur
 - Test environment: Cloudflare Worker `dailyjammtest` deployed from the `tst` branch; dev environment: worker `dailyjammdev` from the `dev` branch (both `*.workers.dev` URLs)
 - No framework - vanilla HTML/CSS/JS + Tailwind CDN on game pages
 
-## Release Workflow (three environments, ALWAYS test before prod)
+## Release Workflow (dev -> tst -> prod, with approval gates)
 
 | Env | Branch | Hosting | Purpose |
 |---|---|---|---|
-| Dev | `dev` | Cloudflare Worker `dailyjammdev` | Integration playground: ALL in-progress games merged together. Never merged forward. |
-| Test | `tst` | Cloudflare Worker `dailyjammtest` | Release candidate only - friends play-test exactly what is about to ship |
+| Dev | `dev` | Cloudflare Worker `dailyjammdev` | Integration playground: ALL in-progress work merged together. Never merged forward. |
+| Test | `tst` | Cloudflare Worker `dailyjammtest` | Exactly ONE approved release candidate at a time - friends play-test exactly what is about to ship |
 | Prod | `main` | GitHub Pages (dailyjamm.com) | Live site |
 
-**Never push release work directly to `main`.**
+**Golden rules (Claude MUST follow these):**
+1. **Everything starts in dev.** ALL work - new games, features, and fixes - is built on a branch off `tst` and merged into `dev` first. Never build or verify anything directly on `tst` or `main`.
+2. **Confirm the target environment.** If a request does not clearly state which environment it applies to, ASK ("Is this for dev, or are we promoting to test/prod?") before pushing anywhere. Never assume a change or a test request implies promotion.
+3. **Approval gate 1 (dev -> tst):** merging anything into `tst` requires the user's explicit approval of that specific item, given after it has been verified on the dev site. When asking for this approval, name exactly what would ship to test. `tst` holds only the one release candidate currently being play-tested - never stack unapproved work on it.
+4. **Approval gate 2 (tst -> main):** merging `tst` into `main` (prod release) requires a second explicit approval after the playtest. Never push release work directly to `main`.
 
 **New games / large features:**
 1. Branch from `tst`: `git checkout tst && git checkout -b game/<slug>`
 2. Build the game on its branch; merge the branch into `dev` (`git checkout dev && git merge game/<slug> && git push`) whenever you want it visible on the dev site
-3. Games ship independently: when ONE game is ready, merge its `game/<slug>` branch (not `dev`) into `tst`, play-test on the test URL, then merge `tst` into `main`
+3. Games ship independently: when the user approves ONE game for testing (gate 1), merge its `game/<slug>` branch (not `dev`) into `tst`; after the playtest is approved (gate 2), merge `tst` into `main`
 4. `dev` is disposable - if it gets tangled, rebuild it from `tst` plus the active game branches (`git branch -f dev tst` then re-merge each `game/*`)
 
-**Small fixes/features:** work directly on `tst`, verify on the test URL, then merge `tst` into `main`. Hotfix exception: a trivial, urgent production fix may go straight to `main`, but still verify it on test or locally first.
+**Small fixes/features:** branch from `tst` (`fix/<slug>`), merge the branch into `dev`, and verify on the dev site - same as large work, same two approval gates to reach `tst` and then `main`. Hotfix exception: a trivial, urgent production fix may go straight to `main` only with the user's explicit approval, and still verify it locally first.
 
-Cloudflare setup: both Worker projects are connected to this repo via Workers Builds and configured by `wrangler.jsonc` (+ `.assetsignore` to keep `.git` and non-site files out of the upload). The test project deploys the `tst` branch as worker `dailyjammtest` (name from wrangler.jsonc); the dev project deploys the `dev` branch with deploy command `npx wrangler deploy --name dailyjammdev` (the `--name` override keeps it from clobbering the test worker).
+Cloudflare setup: both Worker projects are connected to this repo via Workers Builds and configured by `wrangler.jsonc` (+ `.assetsignore` to keep `.git` and non-site files out of the upload). The test project deploys the `tst` branch as worker `dailyjammtest` (name from wrangler.jsonc); the dev project deploys the `dev` branch with deploy command `npx wrangler deploy --name dailyjammdev` (the `--name` override keeps it from clobbering the test worker). **Non-production branch builds are disabled on BOTH projects** - each project builds and deploys only its own branch. If a worker ever serves the other branch's content, re-check that dashboard setting, then push an empty commit to the affected branch to redeploy the correct content.
 
 Notes:
 - Google Analytics is **hostname-gated**: `gtag('config', ...)` only fires when `location.hostname === 'dailyjamm.com'`, so test/dev/local traffic never pollutes analytics. Preserve this gate when adding GA snippets to new pages.
@@ -268,8 +272,8 @@ Add a description paragraph in the "Our Games" section, following the same patte
 ### 9. Update Home Page Meta Description
 If the new game is notable, update the `<meta name="description">` and `og:description` on `index.html` to mention it.
 
-### 10. Test on the Test Environment Before Release (REQUIRED)
-Deploy the release to the `tst` branch and play-test it on the test site before merging to `main`. See "Release Workflow (ALWAYS beta first)" at the top of this file.
+### 10. Verify on Dev, Then Pass Both Approval Gates (REQUIRED)
+Every game is built on its `game/<slug>` branch and verified on the dev site first. It only reaches the `tst` branch after the user explicitly approves it for testing (gate 1), and only reaches `main` after the playtest is explicitly approved (gate 2). See "Release Workflow" at the top of this file.
 
 ### 11. Update Release Notes (REQUIRED for every release)
 
