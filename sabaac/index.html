@@ -155,15 +155,22 @@
         </div>
       </div>
 
-      <!-- Mid: round info, spike dice, messages -->
+      <!-- Mid: round info, draw pile, spike dice, messages -->
       <div class="sb-mid">
         <div class="sb-midline">
           <span id="sb-round-label" class="sb-round-label">Round 1 of 3</span>
           <span id="sb-deck-count" class="sb-deck-count">32 cards in deck</span>
         </div>
-        <div id="sb-dice" class="sb-dice hidden">
-          <span class="sb-die" id="sb-die-0"></span>
-          <span class="sb-die" id="sb-die-1"></span>
+        <div class="sb-center-row">
+          <button id="sb-deck" class="sb-deck" type="button" aria-label="Draw pile">
+            <span class="sb-card sb-card-back sb-card-sm sb-deck-c sb-deck-c1"></span>
+            <span class="sb-card sb-card-back sb-card-sm sb-deck-c sb-deck-c2"></span>
+            <span class="sb-card sb-card-back sb-card-sm sb-deck-c sb-deck-c3"></span>
+          </button>
+          <div id="sb-dice" class="sb-dice hidden">
+            <span class="sb-die" id="sb-die-0"></span>
+            <span class="sb-die" id="sb-die-1"></span>
+          </div>
         </div>
         <div id="sb-msg" class="sb-msg"></div>
         <div id="sb-shift-banner" class="sb-shift-banner hidden">SABAAC SHIFT!</div>
@@ -186,11 +193,11 @@
     <!-- Player controls -->
     <div id="sb-controls" class="sb-controls">
       <div class="sb-your-turn">Your Turn</div>
-      <p class="sb-help-line">Get your hand as close to 0 as you can. Tap a card to select it for a swap.</p>
+      <p class="sb-help-line">Get close to 0: Stand to keep your hand, Draw to take a card from the pile, or tap one of your cards then Swap to trade it for the top of the pile.</p>
       <div class="sb-action-row">
         <button id="sb-btn-stand" class="sb-btn sb-btn-ghost">Stand</button>
         <button id="sb-btn-draw" class="sb-btn sb-btn-alt">Draw</button>
-        <button id="sb-btn-swap" class="sb-btn sb-btn-primary" disabled>Swap</button>
+        <button id="sb-btn-swap" class="sb-btn sb-btn-primary">Swap</button>
       </div>
     </div>
 
