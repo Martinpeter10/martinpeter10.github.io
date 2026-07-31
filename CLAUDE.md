@@ -9,15 +9,25 @@ DailyJamm (dailyjamm.com) is a daily games hub hosted on GitHub Pages. It featur
 - Beta/test environment: Cloudflare Pages project connected to this repo, deployed from the `beta` branch (testers use the `*.pages.dev` URL)
 - No framework - vanilla HTML/CSS/JS + Tailwind CDN on game pages
 
-## Release Workflow (ALWAYS beta first)
+## Release Workflow (three environments, ALWAYS beta before prod)
 
-**Never push release work directly to `main`.** Every release - new games, features, and notable fixes - must be play-tested on the beta environment before it reaches production:
+| Env | Branch | Hosting | Purpose |
+|---|---|---|---|
+| Dev | `dev` | Cloudflare Worker `dailyjamm-dev` | Integration playground: ALL in-progress games merged together. Never merged forward. |
+| Beta | `beta` | Cloudflare Worker `dailyjamm` | Release candidate only - friends play-test exactly what is about to ship |
+| Prod | `main` | GitHub Pages (dailyjamm.com) | Live site |
 
-1. Do release work on the **`beta`** branch (branch from `main`)
-2. Push `beta` - Cloudflare Pages auto-deploys it to the test URL within ~1 minute
-3. Play-test there (and share the URL with testers) until the release is confirmed good
-4. Only then merge to production: `git checkout main && git merge beta && git push` - GitHub Pages ships it to dailyjamm.com
-5. Hotfix exception: a trivial, urgent production fix may go straight to `main`, but still verify it on beta or locally first
+**Never push release work directly to `main`.**
+
+**New games / large features:**
+1. Branch from `beta`: `git checkout beta && git checkout -b game/<slug>`
+2. Build the game on its branch; merge the branch into `dev` (`git checkout dev && git merge game/<slug> && git push`) whenever you want it visible on the dev site
+3. Games ship independently: when ONE game is ready, merge its `game/<slug>` branch (not `dev`) into `beta`, play-test on the beta URL, then merge `beta` into `main`
+4. `dev` is disposable - if it gets tangled, rebuild it from `beta` plus the active game branches (`git branch -f dev beta` then re-merge each `game/*`)
+
+**Small fixes/features:** work directly on `beta`, test on the beta URL, then merge `beta` into `main`. Hotfix exception: a trivial, urgent production fix may go straight to `main`, but still verify it on beta or locally first.
+
+Cloudflare setup: both Worker projects are connected to this repo via Workers Builds and configured by `wrangler.jsonc` (+ `.assetsignore` to keep `.git` and non-site files out of the upload). The beta project deploys the `beta` branch as worker `dailyjamm`; the dev project deploys the `dev` branch with deploy command `npx wrangler deploy --name dailyjamm-dev` (the `--name` override keeps it from clobbering the beta worker).
 
 Notes:
 - Google Analytics is **hostname-gated**: `gtag('config', ...)` only fires when `location.hostname === 'dailyjamm.com'`, so beta/local traffic never pollutes analytics. Preserve this gate when adding GA snippets to new pages.
