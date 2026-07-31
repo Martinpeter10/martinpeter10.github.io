@@ -8,7 +8,7 @@
   <meta name="robots" content="index,follow">
   <link rel="canonical" href="https://dailyjamm.com/holdle/">
   <link rel="icon" type="image/png" href="/assets/img/favicon.png">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=20260509">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=20260801">
 
   <!-- Open Graph -->
   <meta property="og:site_name" content="DailyJamm" />
@@ -33,7 +33,7 @@
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-    if (localStorage.getItem('dj_cookie_ok')) { gtag('config', 'G-XLRXG28EZV'); }
+    if (localStorage.getItem('dj_cookie_ok') && location.hostname === 'dailyjamm.com') { gtag('config', 'G-XLRXG28EZV'); }
   </script>
 
   <!-- Tailwind -->
@@ -104,6 +104,7 @@
       <a class="menu-link" href="/spelldle/">Spelldle</a>
       <a class="menu-link" href="/roulettedle/">Roulettedle</a>
       <a class="menu-link" href="/holdle/">Holdle</a>
+      <a class="menu-link" href="/bluffdle/">Bluffdle</a>
     </div>
     <div class="menu-sec">
       <div class="menu-title">Our Favorite Games</div>
@@ -516,7 +517,7 @@
   </div>
 
   <script src="/assets/js/utils.js" defer></script>
-  <script src="/assets/js/holdle.js?v=20260429" defer></script>
+  <script src="/assets/js/holdle.js?v=20260801" defer></script>
 
 </body>
 </html>

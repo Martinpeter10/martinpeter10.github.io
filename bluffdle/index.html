@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Bluffdle | DailyJamm</title>
+  <meta name="description" content="Play Bluffdle on DailyJamm - daily Liar's Dice against 3 AI opponents. Bid, bluff, and call Liar to be the last one standing.">
+  <meta name="robots" content="index,follow">
+  <link rel="canonical" href="https://dailyjamm.com/bluffdle/">
+  <link rel="icon" type="image/png" href="/assets/img/favicon.png">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=20260801">
+
+  <!-- Open Graph -->
+  <meta property="og:site_name" content="DailyJamm" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://dailyjamm.com/bluffdle/" />
+  <meta property="og:title" content="Bluffdle | DailyJamm" />
+  <meta property="og:description" content="Daily Liar's Dice - bid, bluff, and call Liar against 3 AI opponents. One wrong call and you're out for the day." />
+  <meta property="og:image" content="https://dailyjamm.com/assets/img/favicon.png" />
+
+  <!-- Theme color -->
+  <meta name="theme-color" content="#1a1a2e" />
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1a1a2e" />
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#1a1a2e" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; img-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com; font-src 'self' https://cdn.tailwindcss.com;" />
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XLRXG28EZV"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    if (localStorage.getItem('dj_cookie_ok') && location.hostname === 'dailyjamm.com') { gtag('config', 'G-XLRXG28EZV'); }
+  </script>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body { overflow: hidden; }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Bluffdle",
+    "url": "https://dailyjamm.com/bluffdle/",
+    "applicationCategory": "GameApplication",
+    "operatingSystem": "Web",
+    "description": "Daily Liar's Dice against 3 AI opponents. Bid, bluff, and call Liar to be the last one standing.",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "author": { "@type": "Organization", "name": "DailyJamm", "url": "https://dailyjamm.com" }
+  }
+  </script>
+  <script src="/assets/js/menu.js" defer></script>
+  <script src="/assets/js/favorites.js" defer></script>
+</head>
+<body class="bg-gray-900 text-white">
+
+  <!-- Fixed header -->
+  <header class="site-header">
+    <button class="hamburger" aria-label="Open menu" onclick="toggleMenu()">
+      <span class="hamburger-box">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </span>
+    </button>
+    <a href="/" class="site-brand">DailyJamm</a>
+    <h1 class="sr-only">Bluffdle</h1>
+    <div class="flex-1"></div>
+    <button id="bf-stats-btn" aria-label="Stats"
+      class="w-8 h-8 rounded-full border border-gray-600 bg-transparent text-gray-400 hover:border-gray-400 hover:text-white transition-colors flex items-center justify-center mr-1">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <line x1="18" y1="20" x2="18" y2="10"/>
+        <line x1="12" y1="20" x2="12" y2="4"/>
+        <line x1="6"  y1="20" x2="6"  y2="14"/>
+      </svg>
+    </button>
+    <button id="bf-help-btn" aria-label="How to play"
+      class="w-8 h-8 rounded-full border border-gray-600 bg-transparent text-gray-400 text-sm font-bold hover:border-gray-400 hover:text-white transition-colors">
+      ?
+    </button>
+  </header>
+
+  <div class="backdrop" id="backdrop" onclick="closeMenu()"></div>
+  <nav id="drawer" class="drawer" aria-label="Site">
+    <a class="menu-link" href="/" style="margin-bottom:1rem;font-weight:700;color:#fff">Home</a>
+    <div class="menu-sec">
+      <div class="menu-title">Our Games</div>
+      <a class="menu-link" href="/themedle/">Themedle</a>
+      <a class="menu-link" href="/chainlink/">Chain Link</a>
+      <a class="menu-link" href="/blackjackdle/">BlackJackdle</a>
+      <a class="menu-link" href="/spelldle/">Spelldle</a>
+      <a class="menu-link" href="/roulettedle/">Roulettedle</a>
+      <a class="menu-link" href="/holdle/">Holdle</a>
+      <a class="menu-link" href="/bluffdle/">Bluffdle</a>
+    </div>
+    <div class="menu-sec">
+      <div class="menu-title">Our Favorite Games</div>
+      <a class="menu-link" href="https://dailyakari.com/" target="_blank" rel="noopener noreferrer">Akari</a>
+      <a class="menu-link" href="https://bandle.app/" target="_blank" rel="noopener noreferrer">Bandle</a>
+      <a class="menu-link" href="https://www.puzzmo.com/play/circuits/" target="_blank" rel="noopener noreferrer">Circuits</a>
+      <a class="menu-link" href="https://www.nytimes.com/games/connections" target="_blank" rel="noopener noreferrer">Connections</a>
+      <a class="menu-link" href="https://contexto.me/en/" target="_blank" rel="noopener noreferrer">Contexto</a>
+      <a class="menu-link" href="https://costcodle.com/" target="_blank" rel="noopener noreferrer">Costcodle</a>
+      <a class="menu-link" href="https://www.puzzmo.com/play/crossword/" target="_blank" rel="noopener noreferrer">Cross|word</a>
+      <a class="menu-link" href="https://dailydozentrivia.com/" target="_blank" rel="noopener noreferrer">Daily Dozen</a>
+      <a class="menu-link" href="https://framed.wtf/" target="_blank" rel="noopener noreferrer">Framed</a>
+      <a class="menu-link" href="https://guessthe.game/" target="_blank" rel="noopener noreferrer">Guess the Game</a>
+      <a class="menu-link" href="https://heardlewordle.io/" target="_blank" rel="noopener noreferrer">Heardle</a>
+      <a class="menu-link" href="https://linxicon.com/" target="_blank" rel="noopener noreferrer">Linxicon</a>
+      <a class="menu-link" href="https://minecraftle.zachmanson.com/" target="_blank" rel="noopener noreferrer">Minecraftle</a>
+      <a class="menu-link" href="https://www.nytimes.com/games/pips" target="_blank" rel="noopener noreferrer">Pips</a>
+      <a class="menu-link" href="https://raddle.quest/" target="_blank" rel="noopener noreferrer">Raddle</a>
+      <a class="menu-link" href="https://lessgames.com/songless" target="_blank" rel="noopener noreferrer">Songless</a>
+      <a class="menu-link" href="https://spotle.io/" target="_blank" rel="noopener noreferrer">Spotle</a>
+      <a class="menu-link" href="https://www.nytimes.com/puzzles/spelling-bee" target="_blank" rel="noopener noreferrer">Spelling Bee</a>
+      <a class="menu-link" href="https://heardlewordle.io/taylor-swift-heardle" target="_blank" rel="noopener noreferrer">Taylor Swift Heardle</a>
+      <a class="menu-link" href="https://www.nytimes.com/games/wordle/index.html" target="_blank" rel="noopener noreferrer">Wordle</a>
+    </div>
+    <div class="menu-sec">
+      <div class="menu-title">Info</div>
+      <a class="menu-link" href="/about/">About</a>
+      <a class="menu-link" href="/releases/">Releases</a>
+      <a class="menu-link" href="/terms/">Terms of Service</a>
+      <a class="menu-link" href="/privacy/">Privacy Policy</a>
+    </div>
+  </nav>
+
+  <!-- Game area -->
+  <div class="bf-game-wrap">
+    <div class="bf-container">
+
+      <!-- Felt table -->
+      <div class="bf-table">
+
+        <!-- Opponents -->
+        <div class="bf-ai-row">
+          <div class="bf-ai-seat" id="bf-ai-seat-0">
+            <div class="bf-ai-name">-</div>
+            <div class="bf-ai-bubble"></div>
+            <div class="bf-ai-dicearea"></div>
+          </div>
+          <div class="bf-ai-seat" id="bf-ai-seat-1">
+            <div class="bf-ai-name">-</div>
+            <div class="bf-ai-bubble"></div>
+            <div class="bf-ai-dicearea"></div>
+          </div>
+          <div class="bf-ai-seat" id="bf-ai-seat-2">
+            <div class="bf-ai-name">-</div>
+            <div class="bf-ai-bubble"></div>
+            <div class="bf-ai-dicearea"></div>
+          </div>
+        </div>
+
+        <!-- Round info + current bid -->
+        <div class="bf-mid">
+          <div class="bf-topline">
+            <span id="bf-round-label" class="bf-round-label">Round 1</span>
+            <span id="bf-total-dice" class="bf-total-dice">20 dice on the table</span>
+          </div>
+          <div id="bf-current-bid" class="bf-current-bid"></div>
+        </div>
+
+        <!-- Player dice -->
+        <div class="bf-player-area">
+          <div class="bf-player-head">
+            <span class="bf-label">Your Dice</span>
+            <span id="bf-player-bubble" class="bf-player-bubble"></span>
+          </div>
+          <div id="bf-player-dice" class="bf-player-dice"></div>
+        </div>
+
+      </div><!-- /bf-table -->
+
+      <p id="bf-turn-note" class="bf-turn-note hidden">Waiting for opponents...</p>
+
+      <!-- Reveal panel -->
+      <div id="bf-reveal-panel" class="bf-reveal-panel hidden">
+        <div id="bf-reveal-title" class="bf-reveal-title"></div>
+        <div id="bf-reveal-count" class="bf-reveal-count"></div>
+        <div id="bf-reveal-verdict" class="bf-reveal-verdict"></div>
+        <button id="bf-continue-btn" class="bf-btn bf-btn-primary">Continue</button>
+      </div>
+
+      <!-- Player controls -->
+      <div id="bf-controls" class="bf-controls hidden">
+        <div class="bf-your-turn">Your Turn</div>
+        <p class="bf-help-line">Raise the bid (more dice, or same dice with a higher face) - or call LIAR!</p>
+        <div class="bf-ctl-row">
+          <span class="bf-ctl-label">How many</span>
+          <div class="bf-qty">
+            <button id="bf-qty-minus" class="bf-qty-btn" aria-label="Fewer dice">−</button>
+            <span id="bf-qty-val" class="bf-qty-val">2</span>
+            <button id="bf-qty-plus" class="bf-qty-btn" aria-label="More dice">+</button>
+          </div>
+        </div>
+        <div class="bf-ctl-row">
+          <span class="bf-ctl-label">Of which face</span>
+          <div id="bf-face-row" class="bf-face-row"></div>
+        </div>
+        <div class="bf-action-row">
+          <button id="bf-btn-liar" class="bf-btn bf-btn-danger">LIAR!</button>
+          <button id="bf-btn-bid" class="bf-btn bf-btn-primary">Bid</button>
+        </div>
+      </div>
+
+  <!-- Results panel -->
+      <div id="bf-results" class="bf-results hidden">
+        <div class="bf-results-inner">
+          <h2 id="bf-result-title" class="text-lg font-black">Bluffdle Complete!</h2>
+          <p id="bf-result-sub" class="text-sm text-gray-400 mt-1"></p>
+          <div id="bf-result-dots" class="text-xl mt-2 flex gap-1 justify-center"></div>
+          <div class="flex gap-2 mt-3 w-full justify-center">
+            <button id="bf-share-btn"
+              class="flex-1 px-5 py-2 bg-green-700 hover:bg-green-600 text-white text-xs font-bold rounded-lg transition-colors">
+              Share Results
+            </button>
+            <button onclick="BFGame.showStats()"
+              class="flex-1 px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg transition-colors">
+              See Stats
+            </button>
+          </div>
+          <p class="text-xs text-gray-500 mt-2">Next table in: <span id="bf-countdown" class="font-mono text-yellow-300 tabular-nums">--:--:--</span></p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Stats modal -->
+  <div id="bf-stats-modal" class="fixed inset-0 bg-black/80 flex items-end justify-center z-50 hidden" onclick="BFGame.closeStats()">
+    <div class="bg-gray-900 border border-gray-700 rounded-t-2xl p-5 max-w-sm w-full max-h-[80vh] overflow-y-auto"
+         onclick="event.stopPropagation()"
+         style="-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:calc(1.25rem + env(safe-area-inset-bottom,0px))">
+      <h2 class="text-xl font-black text-center mb-4">My Stats</h2>
+      <div id="bf-stats-content"></div>
+      <div id="bf-place-section"></div>
+      <div id="bf-hh-section"></div>
+      <button id="bf-stats-share-btn" onclick="BFGame.shareStats()"
+        class="w-full mt-4 py-2.5 bg-green-700 hover:bg-green-600 text-white text-sm font-bold rounded-lg transition-colors">
+        Share Stats
+      </button>
+      <button onclick="BFGame.closeStats()"
+        class="w-full mt-2 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-sm font-bold rounded-lg transition-colors">
+        Close
+      </button>
+    </div>
+  </div>
+
+  <!-- How to Play modal -->
+  <div id="bf-modal" class="fixed inset-0 bg-black/80 flex items-end justify-center z-50 hidden" onclick="BFGame.closeModal()">
+    <div class="bg-gray-900 border border-gray-700 rounded-t-2xl p-5 max-w-sm w-full max-h-[92vh] overflow-y-auto"
+         onclick="event.stopPropagation()"
+         style="-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:calc(1.25rem + env(safe-area-inset-bottom,0px))">
+      <h2 class="text-xl font-black text-center mb-0.5">How to Play</h2>
+      <p class="text-xs text-gray-400 text-center mb-3">Daily Liar's Dice - outlast 3 opponents to win the table.</p>
+
+      <div class="mb-4">
+        <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">Rules</h3>
+        <ul class="text-xs text-gray-300 leading-relaxed space-y-1.5 list-disc pl-4">
+          <li>Everyone shakes a cup of <strong class="text-white">5 dice</strong>. You only see your own.</li>
+          <li>Players take turns bidding on how many dice of one face are on the <strong class="text-white">whole table</strong> - for example "four 3s" means at least four 3s among ALL dice.</li>
+          <li>Each bid must raise the last one: either a <strong class="text-white">higher quantity</strong> (any face), or the <strong class="text-white">same quantity with a higher face</strong>.</li>
+          <li>Ones are <strong class="text-white">not wild</strong> - every face only counts as itself.</li>
+          <li>Instead of bidding, you can call <strong class="text-white">LIAR!</strong> All dice are revealed: if the bid was good, the caller is out - if it was a bluff, the bidder is out.</li>
+          <li><strong class="text-white">One wrong call and you're out for the day.</strong> Survive every challenge and be the last one standing to win.</li>
+          <li>After each elimination the remaining players reshake and a new round begins.</li>
+        </ul>
+      </div>
+
+      <div class="mb-4">
+        <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">Example</h3>
+        <div class="bf-demo-lines text-xs text-gray-300 leading-relaxed space-y-1">
+          <p class="bf-demo-1">Jon bids <strong class="text-white">three 4s</strong></p>
+          <p class="bf-demo-2">You raise to <strong class="text-white">three 5s</strong> (same amount, higher face)</p>
+          <p class="bf-demo-3">David raises to <strong class="text-white">five 2s</strong> (higher amount, any face)</p>
+          <p class="bf-demo-4"><strong class="text-red-400">You call LIAR!</strong> Only three 2s show up - David was bluffing and is out!</p>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">Today's Opponents</h3>
+        <div id="bf-howto-ai-list" class="space-y-2"></div>
+        <p class="text-xs text-gray-300 leading-relaxed mt-2">Each opponent has their own style - some bluff constantly, some only bid what they can see. Learn their tells!</p>
+      </div>
+
+      <button onclick="BFGame.closeModal()"
+        class="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-sm font-bold rounded-lg transition-colors">
+        Let's Play
+      </button>
+    </div>
+  </div>
+
+  <script src="/assets/js/utils.js" defer></script>
+  <script src="/assets/js/bluffdle.js?v=20260801" defer></script>
+
+</body>
+</html>

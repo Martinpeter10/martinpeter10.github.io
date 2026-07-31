@@ -8,7 +8,7 @@
   <meta name="robots" content="index,follow">
   <link rel="canonical" href="https://dailyjamm.com/spelldle/">
   <link rel="icon" type="image/png" href="/assets/img/favicon.png">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=20260731">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=20260801">
 
   <!-- Open Graph -->
   <meta property="og:site_name" content="DailyJamm" />
@@ -33,7 +33,7 @@
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-    if (localStorage.getItem('dj_cookie_ok')) { gtag('config', 'G-XLRXG28EZV'); }
+    if (localStorage.getItem('dj_cookie_ok') && location.hostname === 'dailyjamm.com') { gtag('config', 'G-XLRXG28EZV'); }
   </script>
 
   <!-- Tailwind CDN -->
@@ -99,6 +99,7 @@
       <a class="menu-link" href="/spelldle/">Spelldle</a>
       <a class="menu-link" href="/roulettedle/">Roulettedle</a>
       <a class="menu-link" href="/holdle/">Holdle</a>
+      <a class="menu-link" href="/bluffdle/">Bluffdle</a>
     </div>
     <div class="menu-sec">
       <div class="menu-title">Our Favorite Games</div>
