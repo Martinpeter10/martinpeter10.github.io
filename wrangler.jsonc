@@ -1,8 +1,9 @@
-// Cloudflare Workers config for the BETA test site only.
+// Cloudflare Workers config for the TEST site (worker: dailyjammtest, branch: tst).
+// The DEV site overrides the name via its deploy command: npx wrangler deploy --name dailyjammdev
 // Production (dailyjamm.com) is served by GitHub Pages from main - this file is unused there.
 // The "name" must match the Worker/project name in the Cloudflare dashboard.
 {
-  "name": "dailyjamm",
+  "name": "dailyjammtest",
   "compatibility_date": "2026-07-31",
   "assets": {
     "directory": "./",

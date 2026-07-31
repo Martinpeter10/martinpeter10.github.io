@@ -6,33 +6,33 @@ DailyJamm (dailyjamm.com) is a daily games hub hosted on GitHub Pages. It featur
 ## Domain & Hosting
 - Domain: `dailyjamm.com` (CNAME file)
 - Hosting: GitHub Pages (static HTML, no build step), deployed from `main`
-- Beta/test environment: Cloudflare Pages project connected to this repo, deployed from the `beta` branch (testers use the `*.pages.dev` URL)
+- Test environment: Cloudflare Worker `dailyjammtest` deployed from the `tst` branch; dev environment: worker `dailyjammdev` from the `dev` branch (both `*.workers.dev` URLs)
 - No framework - vanilla HTML/CSS/JS + Tailwind CDN on game pages
 
-## Release Workflow (three environments, ALWAYS beta before prod)
+## Release Workflow (three environments, ALWAYS test before prod)
 
 | Env | Branch | Hosting | Purpose |
 |---|---|---|---|
-| Dev | `dev` | Cloudflare Worker `dailyjamm-dev` | Integration playground: ALL in-progress games merged together. Never merged forward. |
-| Beta | `beta` | Cloudflare Worker `dailyjamm` | Release candidate only - friends play-test exactly what is about to ship |
+| Dev | `dev` | Cloudflare Worker `dailyjammdev` | Integration playground: ALL in-progress games merged together. Never merged forward. |
+| Test | `tst` | Cloudflare Worker `dailyjammtest` | Release candidate only - friends play-test exactly what is about to ship |
 | Prod | `main` | GitHub Pages (dailyjamm.com) | Live site |
 
 **Never push release work directly to `main`.**
 
 **New games / large features:**
-1. Branch from `beta`: `git checkout beta && git checkout -b game/<slug>`
+1. Branch from `tst`: `git checkout tst && git checkout -b game/<slug>`
 2. Build the game on its branch; merge the branch into `dev` (`git checkout dev && git merge game/<slug> && git push`) whenever you want it visible on the dev site
-3. Games ship independently: when ONE game is ready, merge its `game/<slug>` branch (not `dev`) into `beta`, play-test on the beta URL, then merge `beta` into `main`
-4. `dev` is disposable - if it gets tangled, rebuild it from `beta` plus the active game branches (`git branch -f dev beta` then re-merge each `game/*`)
+3. Games ship independently: when ONE game is ready, merge its `game/<slug>` branch (not `dev`) into `tst`, play-test on the test URL, then merge `tst` into `main`
+4. `dev` is disposable - if it gets tangled, rebuild it from `tst` plus the active game branches (`git branch -f dev tst` then re-merge each `game/*`)
 
-**Small fixes/features:** work directly on `beta`, test on the beta URL, then merge `beta` into `main`. Hotfix exception: a trivial, urgent production fix may go straight to `main`, but still verify it on beta or locally first.
+**Small fixes/features:** work directly on `tst`, verify on the test URL, then merge `tst` into `main`. Hotfix exception: a trivial, urgent production fix may go straight to `main`, but still verify it on test or locally first.
 
-Cloudflare setup: both Worker projects are connected to this repo via Workers Builds and configured by `wrangler.jsonc` (+ `.assetsignore` to keep `.git` and non-site files out of the upload). The beta project deploys the `beta` branch as worker `dailyjamm`; the dev project deploys the `dev` branch with deploy command `npx wrangler deploy --name dailyjamm-dev` (the `--name` override keeps it from clobbering the beta worker).
+Cloudflare setup: both Worker projects are connected to this repo via Workers Builds and configured by `wrangler.jsonc` (+ `.assetsignore` to keep `.git` and non-site files out of the upload). The test project deploys the `tst` branch as worker `dailyjammtest` (name from wrangler.jsonc); the dev project deploys the `dev` branch with deploy command `npx wrangler deploy --name dailyjammdev` (the `--name` override keeps it from clobbering the test worker).
 
 Notes:
-- Google Analytics is **hostname-gated**: `gtag('config', ...)` only fires when `location.hostname === 'dailyjamm.com'`, so beta/local traffic never pollutes analytics. Preserve this gate when adding GA snippets to new pages.
-- The beta site is a full copy of the `beta` branch with its own localStorage (separate from prod), and Cloudflare serves it with `X-Robots-Tag: noindex` so it is not indexed.
-- Do not push half-finished work to `beta` while a playtest is in progress.
+- Google Analytics is **hostname-gated**: `gtag('config', ...)` only fires when `location.hostname === 'dailyjamm.com'`, so test/dev/local traffic never pollutes analytics. Preserve this gate when adding GA snippets to new pages.
+- The test site is a full copy of the `tst` branch with its own localStorage (separate from prod), and Cloudflare serves it with `X-Robots-Tag: noindex` so it is not indexed.
+- Do not push half-finished work to `tst` while a playtest is in progress (half-finished work belongs on `dev` / game branches).
 
 ## Branding & Theme
 - **Colors**: `--bg:#1a1a2e`, `--panel:#16213e`, `--brand:#2ecc71` (green), `--brand2:#45b7d1` (cyan), `--ink:#fff`, `--muted:#b8b8d1`
@@ -268,8 +268,8 @@ Add a description paragraph in the "Our Games" section, following the same patte
 ### 9. Update Home Page Meta Description
 If the new game is notable, update the `<meta name="description">` and `og:description` on `index.html` to mention it.
 
-### 10. Test on Beta Before Release (REQUIRED)
-Deploy the release to the beta environment and play-test it there before merging to `main`. See "Release Workflow (ALWAYS beta first)" at the top of this file.
+### 10. Test on the Test Environment Before Release (REQUIRED)
+Deploy the release to the `tst` branch and play-test it on the test site before merging to `main`. See "Release Workflow (ALWAYS beta first)" at the top of this file.
 
 ### 11. Update Release Notes (REQUIRED for every release)
 
