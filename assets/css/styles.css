@@ -2290,3 +2290,104 @@ input[type=range].slider::-moz-range-thumb {
   .yfd-pointer{display:none}
   #yfd-a .yfd-star{color:#f1c40f}
 }
+
+/* ── Liar's Dice ── */
+.bf-game-wrap{position:fixed;top:56px;left:0;right:0;bottom:0;display:flex;justify-content:center;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:env(safe-area-inset-bottom,0px);background:#111827}
+.bf-container{width:100%;max-width:440px;display:flex;flex-direction:column;min-height:100%}
+
+/* Felt table (same look as Holdle) */
+.bf-table{flex:0 0 auto;min-height:48vh;background:radial-gradient(ellipse at 50% 80%, #1a5c2a 0%, #14472a 40%, #0d3320 70%, #0a2618 100%);border:3px solid #2a1a0a;border-radius:0 0 50% 50% / 0 0 18% 18%;box-shadow:inset 0 0 60px rgba(0,0,0,0.4), 0 4px 20px rgba(0,0,0,0.5);position:relative;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:10px 16px 26px;overflow:hidden}
+.bf-table::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23000' fill-opacity='0.06'%3E%3Ccircle cx='1' cy='1' r='0.5'/%3E%3C/g%3E%3C/svg%3E");pointer-events:none;border-radius:inherit}
+.bf-table::after{content:'';position:absolute;inset:3px;border:1.5px solid rgba(218,165,32,0.2);border-radius:0 0 50% 50% / 0 0 18% 18%;pointer-events:none}
+
+/* Opponent seats on the felt */
+.bf-ai-row{display:flex;justify-content:space-around;width:100%;align-items:flex-start;z-index:1}
+.bf-ai-seat{display:flex;flex-direction:column;align-items:center;gap:2px;flex:1;min-width:0;padding:4px 3px;border-radius:8px;position:relative;transition:opacity .3s, box-shadow .2s, background .2s}
+.bf-ai-seat.bf-active{background:rgba(251,191,36,0.07);box-shadow:0 0 0 1.5px rgba(251,191,36,0.5), 0 0 14px rgba(251,191,36,0.2)}
+.bf-ai-seat.bf-out{opacity:.35}
+.bf-ai-name{font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.75)}
+.bf-ai-bubble{display:block;font-size:9px;font-weight:700;color:rgba(255,255,255,0.55);min-height:13px;text-align:center}
+.bf-player-bubble{font-size:10px;font-weight:700;color:rgba(255,255,255,0.55)}
+.bf-bubble-bid{color:#4ade80}
+.bf-bubble-liar{color:#f87171;font-size:11px}
+.bf-ai-dicearea{display:flex;flex-wrap:wrap;gap:2px;justify-content:center;margin-top:3px;min-height:20px;max-width:110px}
+.bf-out-label{font-size:10px;font-weight:900;color:#f87171;letter-spacing:.12em}
+
+/* Center of the table: round info + current bid */
+.bf-mid{display:flex;flex-direction:column;align-items:center;gap:4px;z-index:1}
+.bf-topline{display:flex;gap:10px;font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.45)}
+.bf-round-label{color:#fbbf24}
+.bf-current-bid{text-align:center;min-height:74px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.bf-bid-none{font-size:12px;color:rgba(255,255,255,0.5);font-style:italic}
+.bf-bid-who{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.6)}
+.bf-bid-val{display:flex;align-items:center;gap:8px}
+.bf-bid-qty{font-size:26px;font-weight:900;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,.5)}
+.bf-bid-sub{font-size:10px;color:rgba(255,255,255,0.55)}
+
+/* Player dice on the felt */
+.bf-player-area{display:flex;flex-direction:column;align-items:center;gap:5px;z-index:1}
+.bf-player-head{display:flex;align-items:center;gap:8px}
+.bf-label{font-size:9px;font-weight:800;color:rgba(255,255,255,0.6);letter-spacing:.15em;text-transform:uppercase}
+.bf-player-dice{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+
+/* Dice */
+.bf-die{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);width:36px;height:36px;background:#f9fafb;border-radius:7px;padding:4px;gap:1px;box-shadow:0 2px 4px rgba(0,0,0,.4);flex-shrink:0}
+.bf-cell{border-radius:50%}
+.bf-pip{background:#111827}
+.bf-die-sm{width:19px;height:19px;border-radius:4px;padding:3px}
+.bf-die-bid{width:32px;height:32px}
+.bf-die-pick{width:26px;height:26px;padding:3px}
+.bf-die-hidden{display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.35);color:rgba(255,255,255,0.45);font-size:10px;font-weight:800;box-shadow:none;border:1px solid rgba(255,255,255,0.15)}
+.bf-die-hit{outline:2.5px solid #fbbf24;outline-offset:1px}
+
+/* Below the table */
+.bf-turn-note{text-align:center;font-size:12px;color:#6b7280;font-style:italic;padding:14px 12px}
+.bf-controls{background:rgba(17,24,39,.95);border-top:1px solid #1f2937;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.bf-your-turn{text-align:center;font-size:11px;font-weight:900;letter-spacing:.12em;color:#fbbf24;text-transform:uppercase}
+.bf-help-line{text-align:center;font-size:10px;color:#6b7280;margin-top:-4px}
+.bf-ctl-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.bf-ctl-label{font-size:10px;font-weight:800;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;flex-shrink:0}
+.bf-qty{display:flex;align-items:center;gap:10px}
+.bf-qty-btn{width:36px;height:36px;border-radius:8px;background:#1f2937;border:1px solid #374151;color:#fff;font-size:18px;font-weight:800;cursor:pointer;line-height:1}
+.bf-qty-btn:hover:not(:disabled){border-color:#fbbf24}
+.bf-qty-btn:disabled{opacity:.3;cursor:not-allowed}
+.bf-qty-val{font-size:20px;font-weight:900;min-width:28px;text-align:center}
+.bf-face-row{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.bf-face-btn{background:transparent;border:2px solid transparent;border-radius:8px;padding:2px;cursor:pointer}
+.bf-face-btn.bf-face-sel{border-color:#fbbf24}
+.bf-face-btn:disabled{opacity:.25;cursor:not-allowed}
+.bf-action-row{display:flex;gap:8px}
+.bf-btn{flex:1;padding:11px;border-radius:10px;font-weight:800;font-size:13px;cursor:pointer;border:none;color:#fff;font-family:inherit;transition:background .15s}
+.bf-btn-primary{background:#059669}
+.bf-btn-primary:hover:not(:disabled){background:#10b981}
+.bf-btn-danger{background:#b91c1c}
+.bf-btn-danger:hover:not(:disabled){background:#dc2626}
+.bf-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* Reveal + results */
+.bf-reveal-panel{background:rgba(17,24,39,.95);border-top:1px solid #374151;padding:14px;text-align:center;display:flex;flex-direction:column;gap:6px}
+.bf-reveal-title{font-size:13px;font-weight:800;color:#fff}
+.bf-reveal-count{font-size:12px;color:#9ca3af}
+.bf-reveal-verdict{font-size:15px;font-weight:900;margin:2px 0 4px}
+.bf-verdict-good{color:#4ade80}
+.bf-verdict-bad{color:#ef4444}
+.bf-results{background:rgba(17,24,39,.95);border-top:1px solid #374151;padding:16px}
+.bf-results-inner{display:flex;flex-direction:column;align-items:center;text-align:center}
+
+@keyframes bf-demo-fade{0%,100%{opacity:.25}20%,80%{opacity:1}}
+.bf-demo-lines p{opacity:.25;animation:bf-demo-fade 8s infinite}
+.bf-demo-1{animation-delay:0s!important}
+.bf-demo-2{animation-delay:2s!important}
+.bf-demo-3{animation-delay:4s!important}
+.bf-demo-4{animation-delay:6s!important}
+@media (prefers-reduced-motion: reduce){.bf-demo-lines p{animation:none;opacity:1}}
+@media (max-height:700px){.bf-table{min-height:44vh}}
+
+/* Liar's Dice: dice roll animation */
+@keyframes bf-roll{0%{transform:rotate(0) translateY(0)}25%{transform:rotate(90deg) translateY(-5px)}50%{transform:rotate(180deg) translateY(0)}75%{transform:rotate(270deg) translateY(-4px)}100%{transform:rotate(360deg) translateY(0)}}
+.bf-die-roll{animation:bf-roll .5s linear infinite}
+@keyframes bf-settle{0%{transform:scale(1.25) rotate(-8deg)}60%{transform:scale(.95) rotate(3deg)}100%{transform:scale(1) rotate(0)}}
+.bf-die-settle{animation:bf-settle .3s ease-out}
+@keyframes bf-cup-shake{0%,100%{transform:translate(0,0) rotate(0)}20%{transform:translate(-2px,1px) rotate(-3deg)}40%{transform:translate(2px,-1px) rotate(2deg)}60%{transform:translate(-2px,0) rotate(-2deg)}80%{transform:translate(2px,1px) rotate(3deg)}}
+.bf-rolling .bf-ai-dicearea{animation:bf-cup-shake .45s ease-in-out 3}
+@media (prefers-reduced-motion: reduce){.bf-die-roll,.bf-die-settle,.bf-rolling .bf-ai-dicearea{animation:none}}

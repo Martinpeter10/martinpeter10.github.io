@@ -14,6 +14,7 @@ window.DJFav = (function () {
     spelldle:     { title: 'Spelldle',            url: '/spelldle/' },
     roulettedle:  { title: 'Roulettedle',         url: '/roulettedle/' },
     holdle:       { title: 'Holdle',              url: '/holdle/' },
+    liarsdice:    { title: "Liar's Dice",         url: '/liarsdice/' },
     akari:        { title: 'Akari',               url: 'https://dailyakari.com/', ext: true },
     bandle:       { title: 'Bandle',              url: 'https://bandle.app/', ext: true },
     circuits:     { title: 'Circuits',            url: 'https://www.puzzmo.com/play/circuits/', ext: true },

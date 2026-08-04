@@ -5,8 +5,38 @@ DailyJamm (dailyjamm.com) is a daily games hub hosted on GitHub Pages. It featur
 
 ## Domain & Hosting
 - Domain: `dailyjamm.com` (CNAME file)
-- Hosting: GitHub Pages (static HTML, no build step)
+- Hosting: GitHub Pages (static HTML, no build step), deployed from `main`
+- Test environment: Cloudflare Worker `dailyjammtest` deployed from the `tst` branch; dev environment: worker `dailyjammdev` from the `dev` branch (both `*.workers.dev` URLs)
 - No framework - vanilla HTML/CSS/JS + Tailwind CDN on game pages
+
+## Release Workflow (dev -> tst -> prod, with approval gates)
+
+| Env | Branch | Hosting | Purpose |
+|---|---|---|---|
+| Dev | `dev` | Cloudflare Worker `dailyjammdev` | Integration playground: ALL in-progress work merged together. Never merged forward. |
+| Test | `tst` | Cloudflare Worker `dailyjammtest` | Exactly ONE approved release candidate at a time - friends play-test exactly what is about to ship |
+| Prod | `main` | GitHub Pages (dailyjamm.com) | Live site |
+
+**Golden rules (Claude MUST follow these):**
+1. **Everything starts in dev.** ALL work - new games, features, and fixes - is built on a branch off `tst` and merged into `dev` first. Never build or verify anything directly on `tst` or `main`.
+2. **Confirm the target environment.** If a request does not clearly state which environment it applies to, ASK ("Is this for dev, or are we promoting to test/prod?") before pushing anywhere. Never assume a change or a test request implies promotion.
+3. **Approval gate 1 (dev -> tst):** merging anything into `tst` requires the user's explicit approval of that specific item, given after it has been verified on the dev site. When asking for this approval, name exactly what would ship to test. `tst` holds only the one release candidate currently being play-tested - never stack unapproved work on it.
+4. **Approval gate 2 (tst -> main):** merging `tst` into `main` (prod release) requires a second explicit approval after the playtest. Never push release work directly to `main`.
+
+**New games / large features:**
+1. Branch from `tst`: `git checkout tst && git checkout -b game/<slug>`
+2. Build the game on its branch; merge the branch into `dev` (`git checkout dev && git merge game/<slug> && git push`) whenever you want it visible on the dev site
+3. Games ship independently: when the user approves ONE game for testing (gate 1), merge its `game/<slug>` branch (not `dev`) into `tst`; after the playtest is approved (gate 2), merge `tst` into `main`
+4. `dev` is disposable - if it gets tangled, rebuild it from `tst` plus the active game branches (`git branch -f dev tst` then re-merge each `game/*`)
+
+**Small fixes/features:** branch from `tst` (`fix/<slug>`), merge the branch into `dev`, and verify on the dev site - same as large work, same two approval gates to reach `tst` and then `main`. Hotfix exception: a trivial, urgent production fix may go straight to `main` only with the user's explicit approval, and still verify it locally first.
+
+Cloudflare setup: both Worker projects are connected to this repo via Workers Builds and configured by `wrangler.jsonc` (+ `.assetsignore` to keep `.git` and non-site files out of the upload). The test project deploys the `tst` branch as worker `dailyjammtest` (name from wrangler.jsonc); the dev project deploys the `dev` branch with deploy command `npx wrangler deploy --name dailyjammdev` (the `--name` override keeps it from clobbering the test worker). **Non-production branch builds are disabled on BOTH projects** - each project builds and deploys only its own branch. If a worker ever serves the other branch's content, re-check that dashboard setting, then push an empty commit to the affected branch to redeploy the correct content.
+
+Notes:
+- Google Analytics is **hostname-gated**: `gtag('config', ...)` only fires when `location.hostname === 'dailyjamm.com'`, so test/dev/local traffic never pollutes analytics. Preserve this gate when adding GA snippets to new pages.
+- The test site is a full copy of the `tst` branch with its own localStorage (separate from prod), and Cloudflare serves it with `X-Robots-Tag: noindex` so it is not indexed.
+- Do not push half-finished work to `tst` while a playtest is in progress (half-finished work belongs on `dev` / game branches).
 
 ## Branding & Theme
 - **Colors**: `--bg:#1a1a2e`, `--panel:#16213e`, `--brand:#2ecc71` (green), `--brand2:#45b7d1` (cyan), `--ink:#fff`, `--muted:#b8b8d1`
@@ -242,7 +272,10 @@ Add a description paragraph in the "Our Games" section, following the same patte
 ### 9. Update Home Page Meta Description
 If the new game is notable, update the `<meta name="description">` and `og:description` on `index.html` to mention it.
 
-### 10. Update Release Notes (REQUIRED for every release)
+### 10. Verify on Dev, Then Pass Both Approval Gates (REQUIRED)
+Every game is built on its `game/<slug>` branch and verified on the dev site first. It only reaches the `tst` branch after the user explicitly approves it for testing (gate 1), and only reaches `main` after the playtest is explicitly approved (gate 2). See "Release Workflow" at the top of this file.
+
+### 11. Update Release Notes (REQUIRED for every release)
 
 Every release — whether a new game, feature update, or notable fix — must be documented in **two places**:
 
@@ -256,12 +289,12 @@ The two should stay in sync with identical content. Release notes should be play
 - Any release that launches a new game gets a green **NEW GAME** badge in its `<h2>`: `<span style="background:#10b981;color:#000;font-size:.7em;font-weight:800;padding:2px 8px;border-radius:6px;vertical-align:middle">NEW GAME</span>` (visible even when collapsed)
 - The v3.0.0 block has a **View Instructions** button (`onclick="DJFav.showIntro()"`) that re-shows the favorites intro modal
 
-### 11. Game-Specific CSS
+### 12. Game-Specific CSS
 - Add game-specific styles to `/assets/css/styles.css` under a clearly commented section (e.g., `/* ── New Game ── */`)
 - Use existing CSS variable names for colors
 - Follow existing animation patterns (shake for errors, fade-up for entrances, pulse-glow for active states)
 
-### 12. Game-Specific JavaScript
+### 13. Game-Specific JavaScript
 - Place game JS in `/assets/js/<game-slug>.js`
 - Use `America/Chicago` timezone for daily puzzle rotation (DST-safe)
 - Store game state in localStorage with a unique prefix (e.g., `ng_stats`, `ng_today`)
@@ -323,7 +356,8 @@ gameid: { title: 'Game Name', url: 'https://example.com/', ext: true },
 │   │   ├── blackjackdle.js       # BlackJackdle game logic
 │   │   ├── spelldle.js           # Spelldle game logic
 │   │   ├── roulettedle.js        # Roulettedle game logic
-│   │   └── holdle.js             # Holdle game logic
+│   │   ├── holdle.js             # Holdle game logic
+│   │   └── liarsdice.js          # Liar's Dice game logic
 │   ├── data/
 │   │   ├── chainlink-puzzles.json  # Chain Link puzzle data
 │   │   └── spelldle-spells.json    # Spelldle spell data
@@ -331,7 +365,7 @@ gameid: { title: 'Game Name', url: 'https://example.com/', ext: true },
 │   └── img/
 │       └── favicon.png           # Site favicon
 ├── themedle/index.html           # Game pages (also chainlink, blackjackdle,
-├── ...                           #   spelldle, roulettedle, holdle)
+├── ...                           #   spelldle, roulettedle, holdle, liarsdice)
 ├── about/index.html              # About page
 ├── releases/index.html           # Release notes page
 ├── terms/index.html              # Terms of Service page
@@ -349,7 +383,7 @@ gameid: { title: 'Game Name', url: 'https://example.com/', ext: true },
 - **Share format**: Copy-to-clipboard with game name, puzzle number, score, and emoji grid
 - **Share buttons**: game-over result panels have two side-by-side buttons — **Share Results** (green, `bg-green-700`) and **See Stats** (purple, `bg-purple-600`). Stats modals have a separate **Share Stats** button (green).
 - **Streaks**: Track current streak, best streak, total games played
-- **localStorage key convention**: stats keys use a `_v2` suffix (`td_stats_v2`, `cl_stats_v2`, `spd_stats_v2`, `bj_stats_v2`, `bj_alltime_v2`, `rl_stats_v2`, `rl_alltime_v2`). Daily state keys have no suffix (`themedleDailyState`, `cl_today`, `spd_today`, `bj_today`, `rl_today`). Bump the suffix when resetting stats site-wide.
+- **localStorage key convention**: stats keys use a `_v2` suffix (`td_stats_v2`, `cl_stats_v2`, `spd_stats_v2`, `bj_stats_v2`, `bj_alltime_v2`, `rl_stats_v2`, `rl_alltime_v2`). Daily state keys have no suffix (`themedleDailyState`, `cl_today`, `spd_today`, `bj_today`, `rl_today`, `hd_today`, `bf_today`). Bump the suffix when resetting stats site-wide.
 - **Site-wide localStorage keys** (not game-specific): `dj_cookie_ok` (cookie consent), `dj_favorites` (favorites list), `dj_seen_favs_intro` (favorites intro modal dismissed)
 - **How to Play**: Show modal on first visit (check localStorage flag), include animated demo
 - **Mobile**: 16px minimum font on inputs (prevents iOS zoom), use `viewport-fit=cover` for notch support
@@ -529,6 +563,26 @@ Texas Hold'em poker game. Player faces 3 randomly selected AI opponents each day
 **Card highlighting**: `getRelevantCards(combo)` strips kicker cards from the best 5-card combo, returning only the cards that form the named hand (e.g. for "Pair of Aces" - returns only the 2 aces, not the 3 kickers).
 
 **Sequential dealing**: `dealHoleCardsSequentially()` deals in poker order (P, AI0, AI1, AI2, P, AI0, AI1, AI2) with 190ms gaps. `dealFlop()` deals 3 community cards with 220ms gaps.
+
+---
+
+### Liar's Dice (`/assets/js/liarsdice.js`)
+
+Page lives at `/liarsdice/`; favorites catalog id is `liarsdice`. Internal identifiers keep the original `bf` prefix (localStorage `bf_*`, DOM ids `bf-*`, CSS `.bf-*`, `window.BFGame`) - renaming those would reset playtester stats for no user-visible gain.
+
+Daily Liar's Dice. Player + 3 daily AI opponents (same 7-character cast as Holdle, date-seeded via `getDailyAIIndexes`), 5 dice each, **no wilds**, **sudden death** - one lost challenge eliminates you entirely.
+
+**localStorage keys**: `bf_stats_v2`, `bf_today`, `bf_seen_howto`
+
+**Rules implemented**: bids are (quantity, face) claims about ALL dice on the table. A raise must be `q > curQ` (any face) or `q == curQ && f > curF`. Quantity is capped at total dice on the table; if the current bid is at max (q == totalDice, f == 6) the next player is forced to challenge. Challenge reveals all dice: bid true → challenger out; bid false → bidder out. Player elimination ends the day immediately (AIs do not finish the table). After each elimination, survivors reshake and a new round starts with the seat after the eliminated one; round 1 opens with the player.
+
+**Determinism / anti-refresh**: dice for round r come from `mulberry32(dateSeed + r * 7919)`; AI decisions use `mulberry32(dateSeed + round * 7919 + 131 + turnCount * 97)`. Full game state is saved to `bf_today` after every action and restored mid-round on reload (including mid-reveal).
+
+**AI personalities** (params on `AI_DEFS`: `challenge` = call-liar probability threshold on P(bid true), `bluff` = chance of bidding a face they barely hold, `jump` = chance of a +2 quantity jump): David bluffs heavily and rarely calls; Peter calls early and never bluffs; Jon plays the exact binomial probabilities; Caleb pushes his best face; Mandy is balanced with noise; Madelyn is chaotic with random Liar calls; Josh is a light semi-bluffer. Probability engine is `probAtLeast(need, n)` = P(Binomial(n, 1/6) >= need) over the dice the AI cannot see. All AIs get more suspicious when a bid exceeds half the table's dice.
+
+**Stats** (`bf_stats_v2`): played, wins, streaks, `place[0..3]` (finishes indexed by AIs outlasted; 3 = won the table), and `hh` head-to-head records - only challenges the player was part of count (player eliminated an AI, or an AI eliminated the player).
+
+**Dice rendering**: `makeDie(face, cls)` builds a 3x3 CSS grid with pip cells (`.bf-die`, size variants `bf-die-sm/-bid/-pick`, hidden AI dice use `.bf-die-hidden` with a "?"). Public API on `window.BFGame`: `showStats`, `closeStats`, `shareStats`, `showModal`, `closeModal`.
 
 ---
 
