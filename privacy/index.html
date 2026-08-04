@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Privacy Policy | DailyJamm</title>
-  <meta name="description" content="Privacy Policy for DailyJamm - how we handle data, cookies, and advertising." />
+  <meta name="description" content="Privacy Policy for DailyJamm - how we handle data, cookies, and analytics." />
   <meta name="robots" content="index,follow">
   <link rel="canonical" href="https://dailyjamm.com/privacy/" />
   <link rel="icon" type="image/png" href="/assets/img/favicon.png">
@@ -24,7 +24,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; img-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com; font-src 'self' https://cdn.tailwindcss.com;" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://cdn.tailwindcss.com https://www.clarity.ms; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; img-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://*.clarity.ms; font-src 'self' https://cdn.tailwindcss.com;" />
 
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XLRXG28EZV"></script>
@@ -33,6 +33,19 @@
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
     if (localStorage.getItem('dj_cookie_ok') && location.hostname === 'dailyjamm.com') { gtag('config', 'G-XLRXG28EZV'); }
+  </script>
+
+  <!-- Microsoft Clarity - production only, gated on cookie consent -->
+  <script>
+    function djClarity(){
+      if (location.hostname !== 'dailyjamm.com' || window.clarity) return;
+      (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "xxc7006o2j");
+    }
+    if (localStorage.getItem('dj_cookie_ok')) djClarity();
   </script>
 
   <!-- Tailwind -->
@@ -80,7 +93,7 @@
       <a class="menu-link" href="/spelldle/">Spelldle</a>
       <a class="menu-link" href="/roulettedle/">Roulettedle</a>
       <a class="menu-link" href="/holdle/">Holdle</a>
-      <a class="menu-link" href="/bluffdle/">Bluffdle</a>
+      <a class="menu-link" href="/liarsdice/">Liar's Dice</a>
     </div>
     <div class="menu-sec">
       <div class="menu-title">Our Favorite Games</div>
@@ -117,7 +130,7 @@
   <div class="page-wrap">
     <a class="back" href="/">← Back to DailyJamm</a>
     <h1>Privacy Policy</h1>
-    <p class="updated">Last updated: March 28, 2026</p>
+    <p class="updated">Last updated: August 4, 2026</p>
 
     <p>This Privacy Policy describes how DailyJamm ("we", "us", or "our") handles information when you visit dailyjamm.com. We take your privacy seriously and keep things simple.</p>
 
@@ -127,7 +140,9 @@
 
     <h2>Cookies &amp; Analytics</h2>
     <p>We use <strong style="color:#fff">Google Analytics</strong> to understand aggregate traffic patterns (page views, general geography, device types). Google Analytics may set cookies in your browser. This data is anonymized and we do not use it to identify individuals.</p>
-    <p>You can opt out of Google Analytics by installing the <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener noreferrer">Google Analytics Opt-out Browser Add-on</a>.</p>
+    <p>We also use <strong style="color:#fff">Microsoft Clarity</strong> to see how the site is actually used - which parts of a page people click and scroll to, and aggregated session replays of on-page interactions. Clarity may set cookies in your browser. We use it to find confusing layouts and broken flows, not to identify individuals, and we do not sell or share this data.</p>
+    <p>Both tools load <strong style="color:#fff">only after you accept the cookie notice</strong>, and only on dailyjamm.com. If you have not accepted, neither one runs. You can clear the consent at any time by clearing this site's data in your browser.</p>
+    <p>You can opt out of Google Analytics by installing the <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener noreferrer">Google Analytics Opt-out Browser Add-on</a>. Microsoft describes how Clarity handles data in the <a href="https://privacy.microsoft.com/privacystatement" target="_blank" rel="noopener noreferrer">Microsoft Privacy Statement</a>.</p>
 
     <h2>Third-Party Links</h2>
     <p>DailyJamm includes links to third-party game sites (Wordle, Connections, Heardle, etc.). We are not responsible for the privacy practices of those sites. We encourage you to review their privacy policies before interacting with them.</p>
@@ -152,8 +167,8 @@
 
   <!-- Cookie consent -->
   <div id="dj-cookie-bar" style="display:none">
-    <span>We use cookies for analytics and advertising. <a href="/privacy/">Privacy Policy</a></span>
-    <button onclick="document.getElementById('dj-cookie-bar').style.display='none';localStorage.setItem('dj_cookie_ok','1')">Got it</button>
+    <span>We use cookies for analytics. <a href="/privacy/">Privacy Policy</a></span>
+    <button onclick="document.getElementById('dj-cookie-bar').style.display='none';localStorage.setItem('dj_cookie_ok','1');djClarity()">Got it</button>
   </div>
   <script>if(!localStorage.getItem('dj_cookie_ok'))document.getElementById('dj-cookie-bar').style.display='flex';</script>
 </body>
