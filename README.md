@@ -195,15 +195,16 @@ Full release notes are also available at [dailyjamm.com/releases](https://dailyj
 
 ### v3.1.0 - 2026-07-31
 
-**New Game: Bluffdle** - Daily Liar's Dice.
+**New Game: Liar's Dice** - Bid, bluff, and call Liar.
 
-- Launched **Bluffdle** - daily Liar's Dice against 3 AI opponents
+- Launched **Liar's Dice** - the classic dice bluffing game against 3 AI opponents, once a day
 - Everyone shakes a cup of 5 dice and you only see your own; players take turns bidding on how many dice of one face are on the whole table
 - Each bid must raise the last: a higher quantity of any face, or the same quantity of a higher face (ones are not wild)
 - Call LIAR! to challenge a bid - all dice are revealed, and whoever was wrong is out for the day
 - Sudden death: survive every challenge and outlast all 3 opponents to win the table, then come back tomorrow for a new lineup
 - The daily opponents are drawn from the same 7 characters as Holdle - each with their own dice personality, from relentless bluffers to cautious mathematicians; the lineup is date-seeded so everyone faces the same table each day
 - Full stats with finishes breakdown (won the table, out 2nd/3rd/4th), streaks, head-to-head records for challenges involving you, and share-to-clipboard results
+- Added Microsoft Clarity on dailyjamm.com to see how pages are actually used - it loads only after you accept the cookie notice, and never on test or dev builds ([Privacy Policy](https://dailyjamm.com/privacy/))
 
 ### v3.0.0 - 2026-07-31
 

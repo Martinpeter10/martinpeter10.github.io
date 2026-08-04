@@ -357,7 +357,7 @@ gameid: { title: 'Game Name', url: 'https://example.com/', ext: true },
 │   │   ├── spelldle.js           # Spelldle game logic
 │   │   ├── roulettedle.js        # Roulettedle game logic
 │   │   ├── holdle.js             # Holdle game logic
-│   │   └── bluffdle.js           # Bluffdle game logic
+│   │   └── liarsdice.js          # Liar's Dice game logic
 │   ├── data/
 │   │   ├── chainlink-puzzles.json  # Chain Link puzzle data
 │   │   └── spelldle-spells.json    # Spelldle spell data
@@ -365,7 +365,7 @@ gameid: { title: 'Game Name', url: 'https://example.com/', ext: true },
 │   └── img/
 │       └── favicon.png           # Site favicon
 ├── themedle/index.html           # Game pages (also chainlink, blackjackdle,
-├── ...                           #   spelldle, roulettedle, holdle, bluffdle)
+├── ...                           #   spelldle, roulettedle, holdle, liarsdice)
 ├── about/index.html              # About page
 ├── releases/index.html           # Release notes page
 ├── terms/index.html              # Terms of Service page
@@ -566,7 +566,9 @@ Texas Hold'em poker game. Player faces 3 randomly selected AI opponents each day
 
 ---
 
-### Bluffdle (`/assets/js/bluffdle.js`)
+### Liar's Dice (`/assets/js/liarsdice.js`)
+
+Page lives at `/liarsdice/`; favorites catalog id is `liarsdice`. Internal identifiers keep the original `bf` prefix (localStorage `bf_*`, DOM ids `bf-*`, CSS `.bf-*`, `window.BFGame`) - renaming those would reset playtester stats for no user-visible gain.
 
 Daily Liar's Dice. Player + 3 daily AI opponents (same 7-character cast as Holdle, date-seeded via `getDailyAIIndexes`), 5 dice each, **no wilds**, **sudden death** - one lost challenge eliminates you entirely.
 
