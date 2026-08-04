@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Bluffdle | DailyJamm</title>
-  <meta name="description" content="Play Bluffdle on DailyJamm - daily Liar's Dice against 3 AI opponents. Bid, bluff, and call Liar to be the last one standing.">
+  <title>Liar's Dice | DailyJamm</title>
+  <meta name="description" content="Play Liar's Dice on DailyJamm - the classic dice bluffing game against 3 AI opponents. Bid, bluff, and call Liar to be the last one standing.">
   <meta name="robots" content="index,follow">
-  <link rel="canonical" href="https://dailyjamm.com/bluffdle/">
+  <link rel="canonical" href="https://dailyjamm.com/liarsdice/">
   <link rel="icon" type="image/png" href="/assets/img/favicon.png">
   <link rel="stylesheet" href="/assets/css/styles.css?v=20260801">
 
   <!-- Open Graph -->
   <meta property="og:site_name" content="DailyJamm" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://dailyjamm.com/bluffdle/" />
-  <meta property="og:title" content="Bluffdle | DailyJamm" />
-  <meta property="og:description" content="Daily Liar's Dice - bid, bluff, and call Liar against 3 AI opponents. One wrong call and you're out for the day." />
+  <meta property="og:url" content="https://dailyjamm.com/liarsdice/" />
+  <meta property="og:title" content="Liar's Dice | DailyJamm" />
+  <meta property="og:description" content="A new table every day - bid, bluff, and call Liar against 3 AI opponents. One wrong call and you're out for the day." />
   <meta property="og:image" content="https://dailyjamm.com/assets/img/favicon.png" />
 
   <!-- Theme color -->
@@ -25,7 +25,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; img-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com; font-src 'self' https://cdn.tailwindcss.com;" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://cdn.tailwindcss.com https://www.clarity.ms; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; img-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://*.clarity.ms; font-src 'self' https://cdn.tailwindcss.com;" />
 
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XLRXG28EZV"></script>
@@ -34,6 +34,19 @@
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
     if (localStorage.getItem('dj_cookie_ok') && location.hostname === 'dailyjamm.com') { gtag('config', 'G-XLRXG28EZV'); }
+  </script>
+
+  <!-- Microsoft Clarity - production only, gated on cookie consent -->
+  <script>
+    function djClarity(){
+      if (location.hostname !== 'dailyjamm.com' || window.clarity) return;
+      (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "xxc7006o2j");
+    }
+    if (localStorage.getItem('dj_cookie_ok')) djClarity();
   </script>
 
   <!-- Tailwind -->
@@ -46,11 +59,11 @@
   {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    "name": "Bluffdle",
-    "url": "https://dailyjamm.com/bluffdle/",
+    "name": "Liar's Dice",
+    "url": "https://dailyjamm.com/liarsdice/",
     "applicationCategory": "GameApplication",
     "operatingSystem": "Web",
-    "description": "Daily Liar's Dice against 3 AI opponents. Bid, bluff, and call Liar to be the last one standing.",
+    "description": "The classic dice bluffing game, daily against 3 AI opponents. Bid, bluff, and call Liar to be the last one standing.",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
     "author": { "@type": "Organization", "name": "DailyJamm", "url": "https://dailyjamm.com" }
   }
@@ -70,7 +83,7 @@
       </span>
     </button>
     <a href="/" class="site-brand">DailyJamm</a>
-    <h1 class="sr-only">Bluffdle</h1>
+    <h1 class="sr-only">Liar's Dice</h1>
     <div class="flex-1"></div>
     <button id="bf-stats-btn" aria-label="Stats"
       class="w-8 h-8 rounded-full border border-gray-600 bg-transparent text-gray-400 hover:border-gray-400 hover:text-white transition-colors flex items-center justify-center mr-1">
@@ -97,7 +110,7 @@
       <a class="menu-link" href="/spelldle/">Spelldle</a>
       <a class="menu-link" href="/roulettedle/">Roulettedle</a>
       <a class="menu-link" href="/holdle/">Holdle</a>
-      <a class="menu-link" href="/bluffdle/">Bluffdle</a>
+      <a class="menu-link" href="/liarsdice/">Liar's Dice</a>
     </div>
     <div class="menu-sec">
       <div class="menu-title">Our Favorite Games</div>
@@ -212,7 +225,7 @@
   <!-- Results panel -->
       <div id="bf-results" class="bf-results hidden">
         <div class="bf-results-inner">
-          <h2 id="bf-result-title" class="text-lg font-black">Bluffdle Complete!</h2>
+          <h2 id="bf-result-title" class="text-lg font-black">Liar's Dice Complete!</h2>
           <p id="bf-result-sub" class="text-sm text-gray-400 mt-1"></p>
           <div id="bf-result-dots" class="text-xl mt-2 flex gap-1 justify-center"></div>
           <div class="flex gap-2 mt-3 w-full justify-center">
@@ -258,7 +271,7 @@
          onclick="event.stopPropagation()"
          style="-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:calc(1.25rem + env(safe-area-inset-bottom,0px))">
       <h2 class="text-xl font-black text-center mb-0.5">How to Play</h2>
-      <p class="text-xs text-gray-400 text-center mb-3">Daily Liar's Dice - outlast 3 opponents to win the table.</p>
+      <p class="text-xs text-gray-400 text-center mb-3">A new table every day - outlast 3 opponents to win it.</p>
 
       <div class="mb-4">
         <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">Rules</h3>
@@ -297,7 +310,7 @@
   </div>
 
   <script src="/assets/js/utils.js" defer></script>
-  <script src="/assets/js/bluffdle.js?v=20260801" defer></script>
+  <script src="/assets/js/liarsdice.js?v=20260801" defer></script>
 
 </body>
 </html>

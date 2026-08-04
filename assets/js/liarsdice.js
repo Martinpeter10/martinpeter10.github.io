@@ -1,4 +1,4 @@
-// Bluffdle - daily Liar's Dice on DailyJamm
+// Liar's Dice - daily dice bluffing game on DailyJamm
 // Player + 3 daily AI opponents, 5 dice each, no wilds, sudden-death challenges.
 (function () {
   'use strict';
@@ -608,9 +608,9 @@
     for (let i = 0; i < outcome.aisBeaten; i++) dots += '🟢';
     if (!outcome.win) dots += '🔴';
     const names = todayAIs.map(a => a.name).join(', ');
-    return 'Bluffdle ' + chicagoDate() + '\nvs ' + names + '\n🎲 ' + dots +
+    return "Liar's Dice " + chicagoDate() + '\nvs ' + names + '\n🎲 ' + dots +
       (outcome.win ? ' 🏆 ' : ' ') + placeLabel(outcome.aisBeaten, outcome.win) +
-      '\ndailyjamm.com/bluffdle/';
+      '\ndailyjamm.com/liarsdice/';
   }
 
   function startCountdown(id) {
@@ -699,8 +699,8 @@
   function shareStats() {
     const stats = loadStats();
     const winRate = stats.played ? Math.round((stats.wins / stats.played) * 100) + '%' : '-';
-    const text = 'Bluffdle Stats\n🎲 Played: ' + stats.played + '\n🏆 Tables won: ' + stats.wins +
-      ' (' + winRate + ')\n🔥 Streak: ' + stats.curStreak + ' (best ' + stats.bestStreak + ')\ndailyjamm.com/bluffdle/';
+    const text = "Liar's Dice Stats" + '\n🎲 Played: ' + stats.played + '\n🏆 Tables won: ' + stats.wins +
+      ' (' + winRate + ')\n🔥 Streak: ' + stats.curStreak + ' (best ' + stats.bestStreak + ')\ndailyjamm.com/liarsdice/';
     DJUtils.clipboardShare(text, $('bf-stats-share-btn'), 'Share Stats');
   }
 
