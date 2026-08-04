@@ -24,7 +24,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; img-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com; font-src 'self' https://cdn.tailwindcss.com;" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://cdn.tailwindcss.com https://www.clarity.ms; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; img-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://*.clarity.ms; font-src 'self' https://cdn.tailwindcss.com;" />
 
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XLRXG28EZV"></script>
@@ -33,6 +33,19 @@
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
     if (localStorage.getItem('dj_cookie_ok') && location.hostname === 'dailyjamm.com') { gtag('config', 'G-XLRXG28EZV'); }
+  </script>
+
+  <!-- Microsoft Clarity - production only, gated on cookie consent -->
+  <script>
+    function djClarity(){
+      if (location.hostname !== 'dailyjamm.com' || window.clarity) return;
+      (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "xxc7006o2j");
+    }
+    if (localStorage.getItem('dj_cookie_ok')) djClarity();
   </script>
 
   <!-- Tailwind -->
@@ -95,7 +108,7 @@
       <a class="menu-link" href="/spelldle/">Spelldle</a>
       <a class="menu-link" href="/roulettedle/">Roulettedle</a>
       <a class="menu-link" href="/holdle/">Holdle</a>
-      <a class="menu-link" href="/bluffdle/">Bluffdle</a>
+      <a class="menu-link" href="/liarsdice/">Liar's Dice</a>
       <a class="menu-link" href="/shutthebox/">Shut the Box</a>
       <a class="menu-link" href="/sabaac/">Sabaac</a>
     </div>
@@ -138,15 +151,16 @@
 
     <div class="release-block">
       <h2>v3.1.0 <span class="version-date">July 31, 2026</span> <span style="background:#10b981;color:#000;font-size:.7em;font-weight:800;padding:2px 8px;border-radius:6px;vertical-align:middle">NEW GAME</span></h2>
-      <h3>Bluffdle</h3>
+      <h3>Liar's Dice</h3>
       <ul>
-        <li>Launched <strong style="color:#fff">Bluffdle</strong> - daily Liar's Dice against 3 AI opponents</li>
+        <li>Launched <strong style="color:#fff">Liar's Dice</strong> - the classic dice bluffing game against 3 AI opponents, once a day</li>
         <li>Everyone shakes a cup of 5 dice and you only see your own; players take turns bidding on how many dice of one face are on the whole table</li>
         <li>Each bid must raise the last: a higher quantity of any face, or the same quantity of a higher face (ones are not wild)</li>
         <li>Call LIAR! to challenge a bid - all dice are revealed, and whoever was wrong is out for the day</li>
         <li>Sudden death: survive every challenge and outlast all 3 opponents to win the table, then come back tomorrow for a new lineup</li>
         <li>The daily opponents are drawn from the same 7 characters as Holdle - each with their own dice personality, from relentless bluffers to cautious mathematicians; the lineup is date-seeded so everyone faces the same table each day</li>
         <li>Full stats with finishes breakdown, streaks, head-to-head records for challenges involving you, and share-to-clipboard results</li>
+        <li>Added Microsoft Clarity on dailyjamm.com to see how pages are actually used - it loads only after you accept the cookie notice, and never on test or dev builds (see our <a href="/privacy/">Privacy Policy</a>)</li>
       </ul>
     </div>
 
@@ -349,7 +363,7 @@
   <!-- Cookie consent -->
   <div id="dj-cookie-bar" style="display:none">
     <span>We use cookies for analytics. <a href="/privacy/">Privacy Policy</a></span>
-    <button onclick="document.getElementById('dj-cookie-bar').style.display='none';localStorage.setItem('dj_cookie_ok','1')">Got it</button>
+    <button onclick="document.getElementById('dj-cookie-bar').style.display='none';localStorage.setItem('dj_cookie_ok','1');djClarity()">Got it</button>
   </div>
   <script>if(!localStorage.getItem('dj_cookie_ok'))document.getElementById('dj-cookie-bar').style.display='flex';</script>
 </body>

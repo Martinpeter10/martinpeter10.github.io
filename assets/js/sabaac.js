@@ -8,7 +8,7 @@
   const HAND_MAX = 5;
   const ROUNDS = 3;
 
-  /* ── AI cast (shared names with Holdle / Bluffdle) ── */
+  /* ── AI cast (shared names with Holdle / Liar's Dice) ── */
   // standAt: stand when |total| is at or under this
   // swapGain: minimum |total| improvement to bother swapping
   // drawP: base chance of drawing when unhappy, chaos: chance of a random action
