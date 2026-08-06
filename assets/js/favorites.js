@@ -49,6 +49,12 @@ window.DJFav = (function () {
   };
   var DEFAULT_ICON = 'star';
 
+  // Only ever return ICONS' own properties - a crafted localStorage value
+  // like 'constructor' must not reach innerHTML via the prototype chain.
+  function ownIcon(key) {
+    return Object.prototype.hasOwnProperty.call(ICONS, key) ? ICONS[key] : null;
+  }
+
   /* ── storage ─────────────────────────────────────────────── */
 
   function safeUrl(u) {
@@ -103,7 +109,7 @@ window.DJFav = (function () {
       id: 'c' + Date.now() + Math.floor(Math.random() * 1000),
       title: cleanTitle,
       url: cleanUrl,
-      icon: ICONS[icon] ? icon : DEFAULT_ICON
+      icon: ownIcon(icon) ? icon : DEFAULT_ICON
     });
     save(list);
     renderAll();
@@ -232,7 +238,7 @@ window.DJFav = (function () {
       if (src) { wrap.appendChild(src.cloneNode(true)); return wrap; }
     }
     // Custom link (or site card not found): preset icon. Static strings only.
-    wrap.innerHTML = ICONS[it.icon] || ICONS[DEFAULT_ICON];
+    wrap.innerHTML = ownIcon(it.icon) || ICONS[DEFAULT_ICON];
     return wrap;
   }
 

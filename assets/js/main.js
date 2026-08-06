@@ -362,7 +362,7 @@ function restoreGameState() {
       guessSlot.innerHTML = `<span class="text-red-300">${escHtml(guess.text)}</span><span class="text-sm text-red-400">${escHtml(String(guess.clipLength))}s</span>`;
     } else if (guess.type === 'skipped') {
       guessSlot.classList.add('border-yellow-500', 'bg-yellow-900/30');
-      guessSlot.innerHTML = `<span class="text-yellow-300">Skipped</span><span class="text-sm text-yellow-400">${guess.clipLength}s</span>`;
+      guessSlot.innerHTML = `<span class="text-yellow-300">Skipped</span><span class="text-sm text-yellow-400">${escHtml(String(guess.clipLength))}s</span>`;
     }
   });
 }
