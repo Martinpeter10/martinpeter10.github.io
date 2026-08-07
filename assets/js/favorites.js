@@ -15,6 +15,7 @@ window.DJFav = (function () {
     roulettedle:  { title: 'Roulettedle',         url: '/roulettedle/' },
     holdle:       { title: 'Holdle',              url: '/holdle/' },
     liarsdice:    { title: "Liar's Dice",         url: '/liarsdice/' },
+    yacht:        { title: 'Yacht',               url: '/yacht/' },
     shutthebox:   { title: 'Shut the Box',        url: '/shutthebox/' },
     sabaac:       { title: 'Sabaac',              url: '/sabaac/' },
     akari:        { title: 'Akari',               url: 'https://dailyakari.com/', ext: true },
