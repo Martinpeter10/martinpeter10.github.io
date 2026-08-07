@@ -84,6 +84,8 @@
   let scores = {};               // catId -> points (only filled boxes)
   let done = false;
   let countdownTimer = null;
+  let rolling = false;        // true while dice are tumbling
+  let dieEls = [];            // [{ btn, cube }] built once at boot
 
   const chicagoDate = () => DJUtils.getChicagoDate();
 
@@ -129,6 +131,17 @@
   }
 
   /* ── Dice rendering ────────────────────────────────────────── */
+  // Same 3D cube treatment as Shut the Box: opposite faces sum to 7.
+  const FACE_PLACE = {
+    1: '', 6: 'rotateY(180deg)', 3: 'rotateY(90deg)', 4: 'rotateY(-90deg)',
+    2: 'rotateX(90deg)', 5: 'rotateX(-90deg)'
+  };
+  // Cube rotation that brings each face to the front
+  const FACE_SHOW = {
+    1: [0, 0], 6: [0, 180], 3: [0, -90], 4: [0, 90], 2: [-90, 0], 5: [90, 0]
+  };
+  const ROLL_MS = 1060;
+
   const PIPS = {
     1: [4],
     2: [0, 8],
@@ -138,40 +151,83 @@
     6: [0, 2, 3, 5, 6, 8]
   };
 
-  function makeDie(face, isHeld, idx) {
-    const die = document.createElement('button');
-    die.className = 'yc-die' + (isHeld ? ' yc-die-held' : '');
-    die.type = 'button';
-    die.setAttribute('aria-label',
-      'Die ' + (idx + 1) + ', showing ' + face + (isHeld ? ', held' : ''));
-    die.setAttribute('aria-pressed', isHeld ? 'true' : 'false');
-    const spots = PIPS[face] || [];
-    for (let i = 0; i < 9; i++) {
-      const cell = document.createElement('span');
-      cell.className = 'yc-pip-cell';
-      if (spots.indexOf(i) !== -1) {
-        const pip = document.createElement('span');
-        pip.className = 'yc-pip';
-        cell.appendChild(pip);
+  function prefersReduced() {
+    return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  }
+
+  function buildCube(cube) {
+    cube.textContent = '';
+    for (let f = 1; f <= 6; f++) {
+      const face = document.createElement('div');
+      face.className = 'yc-cface';
+      face.style.transform = FACE_PLACE[f] + ' translateZ(var(--yc-die-z))';
+      for (let i = 0; i < 9; i++) {
+        const cell = document.createElement('span');
+        cell.className = 'yc-cell' + (PIPS[f].indexOf(i) >= 0 ? ' yc-pip' : '');
+        face.appendChild(cell);
       }
-      die.appendChild(cell);
+      cube.appendChild(face);
     }
-    die.addEventListener('click', function () { toggleHold(idx); });
-    return die;
   }
 
-  function makeBlankDie(idx) {
-    const die = document.createElement('div');
-    die.className = 'yc-die yc-die-empty';
-    die.setAttribute('aria-label', 'Die ' + (idx + 1) + ', not rolled yet');
-    return die;
-  }
-
-  function renderDice() {
+  // Dice elements are built once and reused - rebuilding them would throw
+  // away the transition mid-tumble.
+  function buildDice() {
     const wrap = $('yc-dice');
     wrap.textContent = '';
+    dieEls = [];
     for (let i = 0; i < DICE_COUNT; i++) {
-      wrap.appendChild(dice.length ? makeDie(dice[i], held[i], i) : makeBlankDie(i));
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'yc-die';
+      const cube = document.createElement('div');
+      cube.className = 'yc-cube';
+      buildCube(cube);
+      btn.appendChild(cube);
+      btn.addEventListener('click', (function (idx) {
+        return function () { toggleHold(idx); };
+      })(i));
+      wrap.appendChild(btn);
+      dieEls.push({ btn: btn, cube: cube });
+    }
+  }
+
+  function setFace(cube, face, instant) {
+    const show = FACE_SHOW[face];
+    if (instant) {
+      cube.style.transition = 'none';
+      cube.style.transform = 'rotateX(' + show[0] + 'deg) rotateY(' + show[1] + 'deg)';
+      return;
+    }
+    // Reset without transition, force reflow, then tumble two full turns
+    cube.style.transition = 'none';
+    cube.style.transform = 'rotateX(0deg) rotateY(0deg)';
+    void cube.offsetWidth;
+    cube.style.transition = 'transform 1s cubic-bezier(.2,.7,.3,1.05)';
+    cube.style.transform = 'rotateX(' + (720 + show[0]) + 'deg) rotateY(' + (720 + show[1]) + 'deg)';
+  }
+
+  // tumbling: array of die indexes to animate, or null to settle instantly
+  function paintDice(tumbling) {
+    const instantAll = !tumbling || prefersReduced();
+    const empty = !dice.length;
+    for (let i = 0; i < DICE_COUNT; i++) {
+      const d = dieEls[i];
+      const isHeld = !empty && held[i];
+      d.btn.classList.toggle('yc-die-empty', empty);
+      d.btn.classList.toggle('yc-die-held', isHeld);
+      d.btn.setAttribute('aria-pressed', isHeld ? 'true' : 'false');
+      d.btn.setAttribute('aria-label', empty
+        ? 'Die ' + (i + 1) + ', not rolled yet'
+        : 'Die ' + (i + 1) + ', showing ' + dice[i] + (isHeld ? ', held' : ''));
+      if (empty) continue;
+      const animate = !instantAll && tumbling.indexOf(i) !== -1;
+      setFace(d.cube, dice[i], !animate);
+      d.btn.classList.remove('yc-die-rolling');
+      if (animate) {
+        void d.btn.offsetWidth;   // restart the hop even on a repeat roll
+        d.btn.classList.add('yc-die-rolling');
+      }
     }
   }
 
@@ -228,7 +284,7 @@
         row.disabled = true;
         return;
       }
-      if (done || !rolledThisTurn) {
+      if (done || rolling || !rolledThisTurn) {
         val.textContent = '-';
         row.disabled = true;
         return;
@@ -253,28 +309,44 @@
   }
 
   function doRoll() {
-    if (done || rollsLeft <= 0) return;
+    if (done || rolling || rollsLeft <= 0) return;
     if (!dice.length) dice = new Array(DICE_COUNT).fill(1);
+    const moved = [];
     for (let i = 0; i < DICE_COUNT; i++) {
-      if (!held[i]) dice[i] = rollDie();
+      if (!held[i]) { dice[i] = rollDie(); moved.push(i); }
     }
     rollsLeft--;
     rolledThisTurn = true;
     saveToday();                 // persist before painting - refresh cannot reroll
-    renderDice();
+
+    if (prefersReduced()) {
+      paintDice(null);
+      renderCard();
+      renderControls();
+      return;
+    }
+
+    rolling = true;              // scorecard stays locked while dice are in the air
+    paintDice(moved);
     renderCard();
     renderControls();
+    setTimeout(function () {
+      rolling = false;
+      dieEls.forEach(function (d) { d.btn.classList.remove('yc-die-rolling'); });
+      renderCard();
+      renderControls();
+    }, ROLL_MS);
   }
 
   function toggleHold(idx) {
-    if (done || !rolledThisTurn || rollsLeft === 0) return;
+    if (done || rolling || !rolledThisTurn || rollsLeft === 0) return;
     held[idx] = !held[idx];
     saveToday();
-    renderDice();
+    paintDice(null);
   }
 
   function assign(catId) {
-    if (done || !rolledThisTurn) return;
+    if (done || rolling || !rolledThisTurn) return;
     if (Object.prototype.hasOwnProperty.call(scores, catId)) return;
     scores[catId] = scoreFor(catId, dice);
 
@@ -282,7 +354,7 @@
       done = true;
       saveToday();
       recordStats();
-      renderDice();
+      paintDice(null);
       renderCard();
       renderControls();
       showResults();
@@ -295,7 +367,7 @@
     rollsLeft = ROLLS_PER_TURN;
     rolledThisTurn = false;
     saveToday();
-    renderDice();
+    paintDice(null);
     renderCard();
     renderControls();
   }
@@ -303,6 +375,12 @@
   function renderControls() {
     const btn = $('yc-roll-btn');
     const hint = $('yc-hold-hint');
+    if (rolling) {
+      btn.disabled = true;
+      btn.textContent = 'Rolling...';
+      hint.textContent = '\u00a0';
+      return;
+    }
     if (done) {
       btn.disabled = true;
       btn.textContent = 'All boxes filled';
@@ -436,11 +514,12 @@
 
   document.addEventListener('DOMContentLoaded', function () {
     buildCard();
+    buildDice();
 
     const saved = loadToday();
     if (saved) restore(saved);
 
-    renderDice();
+    paintDice(null);
     renderCard();
     renderControls();
     if (done) showResults();
