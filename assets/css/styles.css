@@ -2499,7 +2499,10 @@ input[type=range].slider::-moz-range-thumb {
 .sb-ai-seat.sb-active{box-shadow:0 0 0 2px #45b7d1}
 .sb-ai-name{font-size:.8rem;font-weight:800;color:#fff}
 .sb-ai-bubble{display:block;font-size:.66rem;color:#d8b4fe;min-height:1.05em;margin:2px 0 4px}
-.sb-ai-cards{display:flex;gap:3px;justify-content:center;flex-wrap:wrap;min-height:52px}
+/* Cards overlap into a fan rather than wrapping - a 4th or 5th card used to
+   drop onto a second row and read as if the hand had only two cards. */
+.sb-ai-cards{display:flex;gap:0;justify-content:center;flex-wrap:nowrap;min-height:52px;padding-left:14px}
+.sb-ai-cards .sb-card{margin-left:-14px;box-shadow:-2px 2px 5px rgba(0,0,0,.5)}
 .sb-ai-total{font-size:.8rem;font-weight:900;margin-top:4px;min-height:1.1em}
 .sb-total-plain{color:#e5e7eb}
 .sb-total-good{color:#4ade80}
@@ -2515,6 +2518,8 @@ input[type=range].slider::-moz-range-thumb {
 .sb-card-back{background:repeating-linear-gradient(45deg,#5b21b6,#5b21b6 4px,#7c3aed 4px,#7c3aed 8px);border:2px solid #c4b5fd}
 @keyframes sb-deal{from{opacity:0;transform:translateY(-16px) scale(.7)}to{opacity:1;transform:none}}
 .sb-dealt{animation:sb-deal .38s ease both}
+/* Applied to just-arrived cards so taking a card is visible at the seat */
+.sb-arrive{animation:sb-deal .3s ease both}
 #sb-player-cards .sb-card{cursor:pointer}
 #sb-player-cards .sb-card:hover{transform:translateY(-4px)}
 .sb-card.sb-cardsel{transform:translateY(-8px);box-shadow:0 0 0 2px #2ecc71,0 8px 16px rgba(0,0,0,.5)}
@@ -2523,7 +2528,10 @@ input[type=range].slider::-moz-range-thumb {
 .sb-round-label{font-size:.78rem;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:.06em}
 .sb-deck-count{font-size:.72rem;color:#c4b5fd}
 .sb-msg{font-size:.8rem;color:#e9d5ff;min-height:1.1em;text-align:center}
-.sb-dice{display:flex;gap:10px}
+/* The dice sit in a fixed-width slot that is always reserved, so showing or
+   hiding them never nudges the draw pile or the face-up card sideways. */
+.sb-dice{display:flex;gap:10px;justify-content:center;min-width:88px;transition:opacity .25s}
+.sb-dice.sb-dice-off{visibility:hidden;opacity:0}
 .sb-die{width:34px;height:34px;background:linear-gradient(145deg,#fdfdfd,#dde2ec);border:1px solid #b8bfce;border-radius:7px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);padding:5px}
 .sb-cell{display:flex;align-items:center;justify-content:center}
 .sb-pip{background:radial-gradient(circle at 35% 35%,#3d4451,#111827);border-radius:50%;width:70%;height:70%;margin:auto}
@@ -2536,7 +2544,9 @@ input[type=range].slider::-moz-range-thumb {
 .sb-label{font-size:.72rem;font-weight:800;color:#c4b5fd;text-transform:uppercase;letter-spacing:.07em}
 .sb-player-bubble{flex:1;font-size:.7rem;color:#d8b4fe;min-height:1em}
 .sb-player-total{font-size:.85rem;font-weight:900}
-.sb-player-cards{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;min-height:82px}
+.sb-player-cards{display:flex;gap:8px;justify-content:center;flex-wrap:nowrap;min-height:82px}
+@media (max-width:400px){.sb-player-cards{gap:0;padding-left:16px}
+  .sb-player-cards .sb-card{margin-left:-16px}}
 .sb-turn-note{text-align:center;color:#9ca3af;font-size:.8rem;margin-top:12px}
 .sb-controls{background:#111827;border:1px solid #1f2937;border-radius:14px;padding:12px;margin-top:12px}
 .sb-controls.hidden{display:none}
@@ -2566,4 +2576,4 @@ input[type=range].slider::-moz-range-thumb {
 .sb-fly{position:absolute;z-index:6;pointer-events:none;transition:transform .38s cubic-bezier(.3,.7,.4,1);transform:translate(-50%,-50%);margin:0}
 @keyframes sb-nudge{0%,100%{translate:0 0}25%{translate:-5px 0}50%{translate:5px 0}75%{translate:-3px 0}}
 .sb-nudge{animation:sb-nudge .35s ease}
-@media (prefers-reduced-motion: reduce){.sb-dealt,.sb-die-roll,.sb-shift-banner,.sb-deck-ready .sb-deck-c3,.sb-upcard-ready,.sb-nudge{animation:none}.sb-fly{transition:none}}
+@media (prefers-reduced-motion: reduce){.sb-dealt,.sb-die-roll,.sb-shift-banner,.sb-deck-ready .sb-deck-c3,.sb-upcard-ready,.sb-nudge,.sb-arrive{animation:none}.sb-fly{transition:none}}
