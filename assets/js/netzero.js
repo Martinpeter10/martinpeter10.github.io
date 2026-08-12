@@ -58,7 +58,13 @@
   // fully dealt" and is the normal state for every other code path.
   let revealCount = Infinity;
   let pendingDeal = false;   // deal is waiting for the how-to modal to close
-  const DEAL_GAP = 190;      // ms between cards leaving the deck
+  // Animation timing. FLY_MS must match --sb-fly in styles.css; the gaps are
+  // deliberately longer than the flight so cards land one at a time instead
+  // of three being in the air at once.
+  const FLY_MS = 520;        // card flight, mirrors --sb-fly
+  const DEAL_GAP = 300;      // ms between cards leaving the deck
+  const AI_THINK = 1150;     // pause before an opponent acts
+  const DICE_TICK = 110;     // ms per face change while the dice tumble
   let discard = [];
   let reshuffles = 0;
   let hands = [[], [], [], []];
@@ -238,7 +244,7 @@
       cb();
       return;
     }
-    setTimeout(() => { ghost.remove(); cb(); }, 400);
+    setTimeout(() => { ghost.remove(); cb(); }, FLY_MS + 60);
   }
 
   /* ── Dice rendering ── */
@@ -457,7 +463,7 @@
       scheduleAITurn();
     } else {
       setAISeatActive(-1);
-      setTimeout(endOfRound, 700);
+      setTimeout(endOfRound, 850);
     }
   }
 
@@ -466,7 +472,7 @@
     setTimeout(() => {
       applyAction(turnSeat, aiDecide(turnSeat));
       advanceSeat();
-    }, 900 + Math.random() * 450);
+    }, AI_THINK + Math.random() * 400);
   }
 
   /* ── Dice / round transitions ── */
@@ -488,7 +494,7 @@
     const dice = diceForRound(round);
     const d0 = $('sb-die-0'), d1 = $('sb-die-1');
     const area = $('sb-dice');
-    area.classList.remove('hidden', 'sb-dice-off');
+    area.classList.remove('sb-dice-idle');
     setMessage('Rolling the dice...');
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let ticks = 0;
@@ -498,8 +504,8 @@
       ticks++;
       setDieFace(d0, 1 + Math.floor(Math.random() * 6));
       setDieFace(d1, 1 + Math.floor(Math.random() * 6));
-      if (ticks >= 9) { clearInterval(iv); settle(); }
-    }, 90);
+      if (ticks >= 11) { clearInterval(iv); settle(); }
+    }, DICE_TICK);
     if (reduced) settle();
     function settle() {
       d0.classList.remove('sb-die-roll');
@@ -511,9 +517,9 @@
           doShift();
         } else {
           setMessage('No doubles - hands are safe.');
-          setTimeout(nextRound, 1100);
+          setTimeout(nextRound, 1300);
         }
-      }, 550);
+      }, 700);
     }
   }
 
@@ -549,7 +555,6 @@
     actionLocked = false;
     clearBubbles();
     setMessage('');
-    $('sb-dice').classList.add('sb-dice-off');
     renderMid();
     saveToday();
     renderControls();
@@ -606,7 +611,7 @@
       el.classList.add('sb-winner');
     });
     setMessage(showdownLine(winnerSeats, keys));
-    setTimeout(showResults, 1400);
+    setTimeout(showResults, 1600);
   }
 
   function seatName(s) { return s === 0 ? 'You' : todayAIs[s - 1].name; }
@@ -709,6 +714,23 @@
     if (pendingDeal) dealOut();
   }
 
+  // The dice are always on the table. Before the first roll of the day they sit
+  // dimmed on a resting face; after that they keep showing the last result.
+  function initDice() {
+    const last = Math.min(round - 1, ROUNDS - 1);
+    const area = $('sb-dice');
+    if (last >= 1) {
+      const d = diceForRound(last);
+      setDieFace($('sb-die-0'), d[0]);
+      setDieFace($('sb-die-1'), d[1]);
+      area.classList.remove('sb-dice-idle');
+    } else {
+      setDieFace($('sb-die-0'), 1);
+      setDieFace($('sb-die-1'), 1);
+      area.classList.add('sb-dice-idle');
+    }
+  }
+
   /* ── Boot / restore ── */
   function freshGame(dateStr, defer) {
     deck = shuffleWith(freshDeck(), mulberry32(dateToSeed(dateStr) + 913));
@@ -788,6 +810,8 @@
     } else {
       freshGame(dateStr, firstVisit);
     }
+
+    initDice();
 
     if (firstVisit) showModal();
 
