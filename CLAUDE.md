@@ -357,7 +357,8 @@ gameid: { title: 'Game Name', url: 'https://example.com/', ext: true },
 │   │   ├── spelldle.js           # Spelldle game logic
 │   │   ├── roulettedle.js        # Roulettedle game logic
 │   │   ├── holdle.js             # Holdle game logic
-│   │   └── liarsdice.js          # Liar's Dice game logic
+│   │   ├── liarsdice.js          # Liar's Dice game logic
+│   │   └── netzero.js            # Net Zero game logic
 │   ├── data/
 │   │   ├── chainlink-puzzles.json  # Chain Link puzzle data
 │   │   └── spelldle-spells.json    # Spelldle spell data
@@ -365,7 +366,7 @@ gameid: { title: 'Game Name', url: 'https://example.com/', ext: true },
 │   └── img/
 │       └── favicon.png           # Site favicon
 ├── themedle/index.html           # Game pages (also chainlink, blackjackdle,
-├── ...                           #   spelldle, roulettedle, holdle, liarsdice)
+├── ...                           #   spelldle, roulettedle, holdle, liarsdice, netzero)
 ├── about/index.html              # About page
 ├── releases/index.html           # Release notes page
 ├── terms/index.html              # Terms of Service page
@@ -585,6 +586,34 @@ Daily Liar's Dice. Player + 3 daily AI opponents (same 7-character cast as Holdl
 **Dice rendering**: `makeDie(face, cls)` builds a 3x3 CSS grid with pip cells (`.bf-die`, size variants `bf-die-sm/-bid/-pick`, hidden AI dice use `.bf-die-hidden` with a "?"). Public API on `window.BFGame`: `showStats`, `closeStats`, `shareStats`, `showModal`, `closeModal`.
 
 ---
+
+### Net Zero (`/assets/js/netzero.js`)
+
+Page lives at `/netzero/`; favorites catalog id is `netzero`. Internal identifiers keep the original
+`sb` prefix (localStorage `sb_*`, DOM ids `sb-*`, CSS `.sb-*`, `window.SBGame`) - the game was built
+as "Sabaac" and renamed before it ever shipped, so renaming internals would only churn code.
+
+Daily closest-to-zero card game. Player + 3 daily AI opponents (same 7-character cast as Holdle,
+date-seeded via `getDailyAIIndexes`), 3 rounds, then a showdown.
+
+**localStorage keys**: `sb_stats_v2`, `sb_today`, `sb_seen_howto`
+
+**Cards**: A through 10 in all four suits, no face cards. Black (♠ ♣) adds its value, red (♥ ♦)
+subtracts. Hand total is the sum; closest to zero wins. Ties go to a positive total, then to more
+cards. Exactly zero is a "Pure Net Zero".
+
+**The face-up card**: exactly one card sits face up on the table (`upCard`), dealt from the deck
+during `freshGame` and persisted in `sb_today`. **Swap exchanges a hand card with `upCard`** - the
+player takes the face-up card and the card they gave up becomes the new face-up card for everyone.
+Swap never touches the deck; only Draw does. `aiDecide` evaluates swaps against the actual `upCard`
+value rather than guessing, and a Shift discards the face-up card and deals a fresh one. On restore,
+a save with no `upCard` (from before the mechanic existed) deals one so swapping cannot be dead for
+the rest of the day.
+
+**Rounds**: everyone starts with 2 cards; each turn is Stand, Draw (up to `HAND_MAX`), or Swap.
+After rounds 1 and 2 two dice are rolled - **doubles trigger a Shift**, throwing out and redrawing
+every hand. Do not call these "spike dice" in player-facing copy; they are just "the dice".
+
 
 ## Security Practices
 
