@@ -254,15 +254,17 @@
   }
 
   /* ── Rendering ── */
-  function renderSeats(reveal, dealAnim) {
+  function renderSeats(reveal, dealAnim, arriveSeat) {
     for (let s = 1; s < SEATS; s++) {
       const seat = $('sb-ai-seat-' + (s - 1));
       seat.querySelector('.sb-ai-name').textContent = todayAIs[s - 1].name;
       const row = seat.querySelector('.sb-ai-cards');
       row.textContent = '';
-      hands[s].slice(0, visibleCount(s)).forEach((c, i) => {
+      const shown = hands[s].slice(0, visibleCount(s));
+      shown.forEach((c, i) => {
         const el = reveal ? makeCard(c, true) : makeCardBack(true);
         if (dealAnim) { el.classList.add('sb-dealt'); el.style.animationDelay = (i * 90) + 'ms'; }
+        else if (arriveSeat === s && i === shown.length - 1) el.classList.add('sb-arrive');
         row.appendChild(el);
       });
       const totEl = seat.querySelector('.sb-ai-total');
@@ -276,13 +278,15 @@
     }
   }
 
-  function renderPlayerHand(dealAnim) {
+  function renderPlayerHand(dealAnim, arrive) {
     const row = $('sb-player-cards');
     row.textContent = '';
-    hands[0].slice(0, visibleCount(0)).forEach((c, i) => {
+    const mine = hands[0].slice(0, visibleCount(0));
+    mine.forEach((c, i) => {
       const el = makeCard(c, false);
       if (i === selCard) el.classList.add('sb-cardsel');
       if (dealAnim) { el.classList.add('sb-dealt'); el.style.animationDelay = (i * 110) + 'ms'; }
+      else if (arrive && i === mine.length - 1) el.classList.add('sb-arrive');
       el.addEventListener('click', () => onCardTap(i));
       row.appendChild(el);
     });
@@ -395,8 +399,8 @@
     }
     turnCount++;
     const finish = () => {
-      if (seat === 0) { selCard = -1; renderPlayerHand(fromDeck); }
-      else renderSeats(false, fromDeck);
+      if (seat === 0) { selCard = -1; renderPlayerHand(false, fromDeck); }
+      else renderSeats(false, false, fromDeck ? seat : -1);
       renderMid();
     };
     if (fromDeck) {
@@ -484,7 +488,7 @@
     const dice = diceForRound(round);
     const d0 = $('sb-die-0'), d1 = $('sb-die-1');
     const area = $('sb-dice');
-    area.classList.remove('hidden');
+    area.classList.remove('hidden', 'sb-dice-off');
     setMessage('Rolling the dice...');
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let ticks = 0;
@@ -545,7 +549,7 @@
     actionLocked = false;
     clearBubbles();
     setMessage('');
-    $('sb-dice').classList.add('hidden');
+    $('sb-dice').classList.add('sb-dice-off');
     renderMid();
     saveToday();
     renderControls();
