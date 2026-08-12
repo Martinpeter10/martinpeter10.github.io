@@ -204,6 +204,13 @@ Full release notes are also available at [dailyjamm.com/releases](https://dailyj
 - Between rounds the dice come out - **doubles trigger a Shift** and every hand at the table is thrown out and redrawn
 - Land exactly zero for a Pure Net Zero, and play the same 3 daily opponents as the rest of the table
 
+**Under the Hood**
+
+- Pinned the styling library our game pages load to one exact version, so an update on their end can never change what your browser runs
+- Added the security headers a site like this should have - protection against the site being framed by someone else, stricter file-type handling, and a locked-down permissions policy
+- Our test and preview builds are now hidden from search engines, so you will only ever find the real site
+- Tightened two spots where saved data was written straight to the page - one in your favorites list, one in Themedle's guess history
+
 ### v3.1.0 - 2026-08-04
 
 **New Game: Liar's Dice** - Bid, bluff, and call Liar.
