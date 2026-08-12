@@ -202,6 +202,7 @@ Full release notes are also available at [dailyjamm.com/releases](https://dailyj
 - Everyone starts with 2 cards and gets 3 rounds to improve - each round you Stand, Draw from the deck, or Swap
 - There is always one **face-up card** on the table: tap one of your cards and then the face-up card to trade them, and the card you gave up becomes the new face-up card for everyone
 - Between rounds the dice come out - **doubles trigger a Shift** and every hand at the table is thrown out and redrawn
+- Closest to zero wins. If two hands tie, the positive total takes it, then the hand with more cards - and if they still match, the win is shared
 - Land exactly zero for a Pure Net Zero, and play the same 3 daily opponents as the rest of the table
 
 ### v3.1.0 - 2026-08-04
