@@ -599,8 +599,13 @@ date-seeded via `getDailyAIIndexes`), 3 rounds, then a showdown.
 **localStorage keys**: `sb_stats_v2`, `sb_today`, `sb_seen_howto`
 
 **Cards**: A through 10 in all four suits, no face cards. Black (♠ ♣) adds its value, red (♥ ♦)
-subtracts. Hand total is the sum; closest to zero wins. Ties go to a positive total, then to more
-cards. Exactly zero is a "Pure Net Zero".
+subtracts. Hand total is the sum; closest to zero wins. Exactly zero is a "Pure Net Zero".
+
+**Tie-breaking** (`betterKey`, applied in order): smaller absolute total wins; then a positive
+total beats a negative one of the same size (+2 beats -2); then the hand with **more cards** wins.
+If two hands match on all three, neither beats the other and `showdown` puts both in
+`outcome.winnerSeats` - **the win is shared**, and the player counts as a winner if they are in
+that list. Keep the how-to modal's tie wording in sync with this order.
 
 **The face-up card**: exactly one card sits face up on the table (`upCard`), dealt from the deck
 during `freshGame` and persisted in `sb_today`. **Swap exchanges a hand card with `upCard`** - the

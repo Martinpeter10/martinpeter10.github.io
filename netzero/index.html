@@ -187,9 +187,12 @@
             <button id="sb-upcard" class="sb-upcard" type="button" aria-label="Face-up card - swap it with a card from your hand"></button>
             <span class="sb-pile-label">Face up</span>
           </div>
-          <div id="sb-dice" class="sb-dice sb-dice-off">
-            <span class="sb-die" id="sb-die-0"></span>
-            <span class="sb-die" id="sb-die-1"></span>
+          <div class="sb-pile">
+            <div id="sb-dice" class="sb-dice sb-dice-idle">
+              <span class="sb-die" id="sb-die-0"></span>
+              <span class="sb-die" id="sb-die-1"></span>
+            </div>
+            <span class="sb-pile-label">Dice</span>
           </div>
         </div>
         <div id="sb-msg" class="sb-msg"></div>
@@ -282,7 +285,8 @@
           <li>Each round you either <strong class="text-white">Stand</strong> (keep your hand), <strong class="text-white">Draw</strong> (take a card off the deck, up to 5), or <strong class="text-white">Swap</strong>.</li>
           <li>There is always one <strong class="text-white">face-up card</strong> on the table. To swap, tap one of your cards and then the face-up card - you take it, and the card you gave up becomes the new face-up card for everyone.</li>
           <li>After rounds 1 and 2 the <strong class="text-white">dice</strong> are rolled. <strong class="text-yellow-300">Doubles trigger a Shift</strong>: every hand is thrown out and redrawn!</li>
-          <li>After round 3 all hands are revealed. Ties go to a <strong class="text-white">positive total</strong>, then to <strong class="text-white">more cards</strong>.</li>
+          <li>After round 3 all hands are revealed and the total closest to zero wins.</li>
+          <li><strong class="text-white">If two hands tie</strong>, the win goes to the <strong class="text-white">positive</strong> total first - so +2 beats -2. Still level? The hand with <strong class="text-white">more cards</strong> takes it. If the hands match on all three, the win is <strong class="text-white">shared</strong>.</li>
           <li>Hit <strong class="text-white">exactly zero</strong> and you've made a Pure Net Zero. 🌟</li>
         </ul>
       </div>
