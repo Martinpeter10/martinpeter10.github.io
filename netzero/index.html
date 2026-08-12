@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Sabaac | DailyJamm</title>
-  <meta name="description" content="Play Sabaac on DailyJamm - a daily card game where black cards count up, red cards count down, and the hand closest to zero wins. Beware the spike dice!">
+  <title>Net Zero | DailyJamm</title>
+  <meta name="description" content="Play Net Zero on DailyJamm - a daily card game where black cards count up, red cards count down, and the hand closest to zero wins. Beware the dice!">
   <meta name="robots" content="index,follow">
-  <link rel="canonical" href="https://dailyjamm.com/sabaac/">
+  <link rel="canonical" href="https://dailyjamm.com/netzero/">
   <link rel="icon" type="image/png" href="/assets/img/favicon.png">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=20260807">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=20260811">
 
   <!-- Open Graph -->
   <meta property="og:site_name" content="DailyJamm" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://dailyjamm.com/sabaac/" />
-  <meta property="og:title" content="Sabaac | DailyJamm" />
-  <meta property="og:description" content="Daily Sabaac - draw, swap, and stand to land your hand closest to zero against 3 opponents. Doubles on the spike dice throw every hand out!" />
+  <meta property="og:url" content="https://dailyjamm.com/netzero/" />
+  <meta property="og:title" content="Net Zero | DailyJamm" />
+  <meta property="og:description" content="Daily Net Zero - draw, swap, and stand to land your hand closest to zero against 3 opponents. Doubles on the dice throw every hand out!" />
   <meta property="og:image" content="https://dailyjamm.com/assets/img/favicon.png" />
 
   <!-- Theme color -->
@@ -56,11 +56,11 @@
   {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    "name": "Sabaac",
-    "url": "https://dailyjamm.com/sabaac/",
+    "name": "Net Zero",
+    "url": "https://dailyjamm.com/netzero/",
     "applicationCategory": "GameApplication",
     "operatingSystem": "Web",
-    "description": "Daily Sabaac - draw, swap, and stand to land your hand closest to zero against 3 AI opponents.",
+    "description": "Daily Net Zero - draw, swap, and stand to land your hand closest to zero against 3 AI opponents.",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
     "author": { "@type": "Organization", "name": "DailyJamm", "url": "https://dailyjamm.com" }
   }
@@ -80,7 +80,7 @@
       </span>
     </button>
     <a href="/" class="site-brand">DailyJamm</a>
-    <h1 class="sr-only">Sabaac</h1>
+    <h1 class="sr-only">Net Zero</h1>
     <div class="flex-1"></div>
     <button id="sb-stats-btn" aria-label="Stats"
       class="w-8 h-8 rounded-full border border-gray-600 bg-transparent text-gray-400 hover:border-gray-400 hover:text-white transition-colors flex items-center justify-center mr-1">
@@ -110,7 +110,7 @@
       <a class="menu-link" href="/liarsdice/">Liar's Dice</a>
       <a class="menu-link" href="/yacht/">Yacht</a>
       <a class="menu-link" href="/shutthebox/">Shut the Box</a>
-      <a class="menu-link" href="/sabaac/">Sabaac</a>
+      <a class="menu-link" href="/netzero/">Net Zero</a>
     </div>
     <div class="menu-sec">
       <div class="menu-title">Our Favorite Games</div>
@@ -170,25 +170,32 @@
         </div>
       </div>
 
-      <!-- Mid: round info, draw pile, spike dice, messages -->
+      <!-- Mid: round info, draw pile, dice, messages -->
       <div class="sb-mid">
         <div class="sb-midline">
           <span id="sb-round-label" class="sb-round-label">Round 1 of 3</span>
           <span id="sb-deck-count" class="sb-deck-count">32 cards in deck</span>
         </div>
         <div class="sb-center-row">
-          <button id="sb-deck" class="sb-deck" type="button" aria-label="Draw pile">
-            <span class="sb-card sb-card-back sb-card-sm sb-deck-c sb-deck-c1"></span>
-            <span class="sb-card sb-card-back sb-card-sm sb-deck-c sb-deck-c2"></span>
-            <span class="sb-card sb-card-back sb-card-sm sb-deck-c sb-deck-c3"></span>
-          </button>
+          <div class="sb-pile">
+            <button id="sb-deck" class="sb-deck" type="button" aria-label="Draw pile - take a new card">
+              <span class="sb-card sb-card-back sb-card-sm sb-deck-c sb-deck-c1"></span>
+              <span class="sb-card sb-card-back sb-card-sm sb-deck-c sb-deck-c2"></span>
+              <span class="sb-card sb-card-back sb-card-sm sb-deck-c sb-deck-c3"></span>
+            </button>
+            <span class="sb-pile-label">Draw</span>
+          </div>
+          <div class="sb-pile">
+            <button id="sb-upcard" class="sb-upcard" type="button" aria-label="Face-up card - swap it with a card from your hand"></button>
+            <span class="sb-pile-label">Face up</span>
+          </div>
           <div id="sb-dice" class="sb-dice hidden">
             <span class="sb-die" id="sb-die-0"></span>
             <span class="sb-die" id="sb-die-1"></span>
           </div>
         </div>
         <div id="sb-msg" class="sb-msg"></div>
-        <div id="sb-shift-banner" class="sb-shift-banner hidden">SABAAC SHIFT!</div>
+        <div id="sb-shift-banner" class="sb-shift-banner hidden">SHIFT!</div>
       </div>
 
       <!-- Player -->
@@ -259,7 +266,7 @@
          onclick="event.stopPropagation()"
          style="-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:calc(1.25rem + env(safe-area-inset-bottom,0px))">
       <h2 class="text-xl font-black text-center mb-0.5">How to Play</h2>
-      <p class="text-xs text-gray-400 text-center mb-3">Daily Sabaac - land your hand closest to zero. One deal per day.</p>
+      <p class="text-xs text-gray-400 text-center mb-3">Daily Net Zero - land your hand closest to zero. One deal per day.</p>
 
       <div class="mb-4">
         <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">The Cards</h3>
@@ -274,10 +281,11 @@
         <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">The Play</h3>
         <ul class="text-xs text-gray-300 leading-relaxed space-y-1.5 list-disc pl-4">
           <li>Everyone starts with <strong class="text-white">2 cards</strong> and gets <strong class="text-white">3 rounds</strong> to improve.</li>
-          <li>Each round you either <strong class="text-white">Stand</strong> (keep your hand), <strong class="text-white">Draw</strong> (take a card, up to 5), or <strong class="text-white">Swap</strong> (trade one card for a new one).</li>
-          <li>After rounds 1 and 2 the <strong class="text-white">spike dice</strong> are rolled. <strong class="text-yellow-300">Doubles trigger a Sabaac Shift</strong>: every hand is thrown out and redrawn!</li>
+          <li>Each round you either <strong class="text-white">Stand</strong> (keep your hand), <strong class="text-white">Draw</strong> (take a card off the deck, up to 5), or <strong class="text-white">Swap</strong>.</li>
+          <li>There is always one <strong class="text-white">face-up card</strong> on the table. To swap, tap one of your cards and then the face-up card - you take it, and the card you gave up becomes the new face-up card for everyone.</li>
+          <li>After rounds 1 and 2 the <strong class="text-white">dice</strong> are rolled. <strong class="text-yellow-300">Doubles trigger a Shift</strong>: every hand is thrown out and redrawn!</li>
           <li>After round 3 all hands are revealed. Ties go to a <strong class="text-white">positive total</strong>, then to <strong class="text-white">more cards</strong>.</li>
-          <li>Hit <strong class="text-white">exactly zero</strong> and you've made a Pure Sabaac. 🌟</li>
+          <li>Hit <strong class="text-white">exactly zero</strong> and you've made a Pure Net Zero. 🌟</li>
         </ul>
       </div>
 
@@ -295,7 +303,7 @@
   </div>
 
   <script src="/assets/js/utils.js" defer></script>
-  <script src="/assets/js/sabaac.js?v=20260811" defer></script>
+  <script src="/assets/js/netzero.js?v=20260810" defer></script>
 
 </body>
 </html>

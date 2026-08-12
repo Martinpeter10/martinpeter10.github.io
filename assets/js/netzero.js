@@ -1,6 +1,6 @@
-// Sabaac - daily card + dice game on DailyJamm
+// Net Zero - daily card + dice game on DailyJamm
 // Standard playing cards: black suits count plus, red suits count minus.
-// Player + 3 daily AI opponents, 3 draw rounds, spike dice, closest to zero wins.
+// Player + 3 daily AI opponents, 3 draw rounds, dice, closest to zero wins.
 (function () {
   'use strict';
 
@@ -8,7 +8,7 @@
   const HAND_MAX = 5;
   const ROUNDS = 3;
 
-  /* ── AI cast (shared names with Holdle / Liar's Dice) ── */
+  /* ── AI cast (shared names with Holdle / Bluffdle) ── */
   // standAt: stand when |total| is at or under this
   // swapGain: minimum |total| improvement to bother swapping
   // drawP: base chance of drawing when unhappy, chaos: chance of a random action
@@ -53,6 +53,7 @@
   /* ── State ── */
   let todayAIs = [];
   let deck = [];        // draw from the end (deck.pop())
+  let upCard = null;    // the single face-up card on the table
   let discard = [];
   let reshuffles = 0;
   let hands = [[], [], [], []];
@@ -110,7 +111,7 @@
     DJUtils.saveJSON(todayKey, {
       date: chicagoDate(),
       ais: todayAIs.map(a => a.id),
-      deck, discard, reshuffles, hands, round, turnSeat, turnCount,
+      deck, discard, upCard, reshuffles, hands, round, turnSeat, turnCount,
       phase, shiftCount, outcome,
     });
   }
@@ -145,8 +146,12 @@
 
   // Animate a card back flying from the draw pile to a card row
   function flyFromDeck(targetEl, small, cb) {
+    flyFrom($('sb-deck'), targetEl, small, cb);
+  }
+
+  function flyFrom(sourceEl, targetEl, small, cb) {
     const table = document.querySelector('.sb-table');
-    const deckEl = $('sb-deck');
+    const deckEl = sourceEl;
     if (!table || !deckEl || !targetEl ||
         window.matchMedia('(prefers-reduced-motion: reduce)').matches) { cb(); return; }
     let ghost = null;
@@ -226,6 +231,21 @@
   function renderMid() {
     $('sb-round-label').textContent = phase === 'done' ? 'Showdown' : 'Round ' + round + ' of ' + ROUNDS;
     $('sb-deck-count').textContent = deck.length + ' cards in deck';
+    renderUpCard();
+  }
+
+  function renderUpCard() {
+    const slot = $('sb-upcard');
+    if (!slot) return;
+    slot.textContent = '';
+    if (upCard) {
+      slot.appendChild(makeCard(upCard, true));
+      slot.setAttribute('aria-label',
+        'Face-up card ' + rankLabel(upCard.r) + SUIT_CHAR[upCard.s] +
+        ', worth ' + fmtTotal(cardValue(upCard)) + ' - swap it with a card from your hand');
+    } else {
+      slot.setAttribute('aria-label', 'No face-up card');
+    }
   }
 
   function setBubble(seat, text) {
@@ -253,9 +273,12 @@
     $('sb-turn-note').classList.toggle('hidden', myTurn || phase !== 'act');
     if (!myTurn) return;
     $('sb-btn-draw').disabled = hands[0].length >= HAND_MAX;
-    $('sb-btn-swap').disabled = false;
-    $('sb-btn-swap').textContent = selCard >= 0 ? 'Swap ' + rankLabel(hands[0][selCard].r) + SUIT_CHAR[hands[0][selCard].s] : 'Swap';
-    $('sb-deck').classList.toggle('sb-deck-ready', selCard >= 0);
+    $('sb-btn-swap').disabled = !upCard;
+    $('sb-btn-swap').textContent = (selCard >= 0 && upCard)
+      ? 'Swap for ' + rankLabel(upCard.r) + SUIT_CHAR[upCard.s]
+      : 'Swap';
+    $('sb-deck').classList.toggle('sb-deck-ready', hands[0].length < HAND_MAX);
+    $('sb-upcard').classList.toggle('sb-upcard-ready', selCard >= 0 && !!upCard);
   }
 
   /* ── AI decision ── */
@@ -268,19 +291,22 @@
     if (rng() < def.chaos) {
       const roll = rng();
       if (roll < 0.34 && hand.length < HAND_MAX) return { action: 'draw' };
-      if (roll < 0.67) return { action: 'swap', idx: Math.floor(rng() * hand.length) };
+      if (roll < 0.67 && upCard) return { action: 'swap', idx: Math.floor(rng() * hand.length) };
       return { action: 'stand' };
     }
 
     if (Math.abs(t) <= def.standAt) return { action: 'stand' };
 
-    // Best card to ditch: the one whose removal lands the total closest to zero
+    // Swapping is now a known quantity: trade card i for the face-up card.
     let bi = 0, bestAfter = Infinity;
-    hand.forEach((c, i) => {
-      const after = Math.abs(t - cardValue(c));
-      if (after < bestAfter) { bestAfter = after; bi = i; }
-    });
-    const gain = Math.abs(t) - bestAfter;
+    if (upCard) {
+      const up = cardValue(upCard);
+      hand.forEach((c, i) => {
+        const after = Math.abs(t - cardValue(c) + up);
+        if (after < bestAfter) { bestAfter = after; bi = i; }
+      });
+    }
+    const gain = upCard ? Math.abs(t) - bestAfter : -Infinity;
 
     if (gain >= def.swapGain) return { action: 'swap', idx: bi };
     if (hand.length < HAND_MAX && rng() < def.drawP + (Math.abs(t) >= 6 ? 0.25 : 0)) return { action: 'draw' };
@@ -295,9 +321,11 @@
       hands[seat].push(drawCard());
       setBubble(seat, seat === 0 ? 'You draw a card' : 'draws a card');
     } else if (dec.action === 'swap') {
-      discard.push(hands[seat][dec.idx]);
-      hands[seat][dec.idx] = drawCard();
-      setBubble(seat, seat === 0 ? 'You swap a card' : 'swaps a card');
+      // Trade the chosen card for the face-up card; yours becomes the new face-up.
+      const mine = hands[seat][dec.idx];
+      hands[seat][dec.idx] = upCard;
+      upCard = mine;
+      setBubble(seat, seat === 0 ? 'You take the face-up card' : 'takes the face-up card');
     } else {
       setBubble(seat, seat === 0 ? 'You stand' : 'stands');
     }
@@ -310,7 +338,8 @@
     if (fromDeck) {
       const target = seat === 0 ? $('sb-player-cards')
         : $('sb-ai-seat-' + (seat - 1)).querySelector('.sb-ai-cards');
-      flyFromDeck(target, seat !== 0, finish);
+      const source = dec.action === 'swap' ? $('sb-upcard') : $('sb-deck');
+      flyFrom(source, target, seat !== 0, finish);
     } else {
       finish();
     }
@@ -326,8 +355,9 @@
   function onPlayerAction(type) {
     if (phase !== 'act' || turnSeat !== 0 || actionLocked || outcome) return;
     if (type === 'draw' && hands[0].length >= HAND_MAX) return;
+    if (type === 'swap' && !upCard) return;
     if (type === 'swap' && selCard < 0) {
-      setMessage('Tap one of your cards first - then Swap trades it for the top card of the pile.');
+      setMessage('Tap one of your cards first - then Swap trades it for the face-up card.');
       const row = $('sb-player-cards');
       row.classList.remove('sb-nudge');
       void row.offsetWidth;
@@ -340,11 +370,15 @@
     advanceSeat();
   }
 
-  // Tapping the draw pile: completes a swap if a card is selected, otherwise draws
+  // The draw pile always draws; the face-up card always swaps.
   function onDeckTap() {
     if (phase !== 'act' || turnSeat !== 0 || actionLocked || outcome) return;
-    if (selCard >= 0) onPlayerAction('swap');
-    else if (hands[0].length < HAND_MAX) onPlayerAction('draw');
+    if (hands[0].length < HAND_MAX) onPlayerAction('draw');
+  }
+
+  function onUpCardTap() {
+    if (phase !== 'act' || turnSeat !== 0 || actionLocked || outcome) return;
+    onPlayerAction('swap');
   }
 
   function advanceSeat() {
@@ -367,7 +401,7 @@
     }, 900 + Math.random() * 450);
   }
 
-  /* ── Spike dice / round transitions ── */
+  /* ── Dice / round transitions ── */
   function endOfRound() {
     if (round >= ROUNDS) { showdown(); return; }
     phase = 'dice';
@@ -387,7 +421,7 @@
     const d0 = $('sb-die-0'), d1 = $('sb-die-1');
     const area = $('sb-dice');
     area.classList.remove('hidden');
-    setMessage('Rolling the spike dice...');
+    setMessage('Rolling the dice...');
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let ticks = 0;
     d0.classList.add('sb-die-roll');
@@ -427,6 +461,8 @@
         hands[s] = [];
         for (let i = 0; i < n; i++) hands[s].push(drawCard());
       }
+      if (upCard) discard.push(upCard);
+      upCard = drawCard();
       selCard = -1;
       renderSeats(false, true);
       renderPlayerHand(true);
@@ -511,7 +547,7 @@
     const names = winnerSeats.map(seatName).join(' & ');
     const wt = keys[winnerSeats[0]].t;
     return names + (winnerSeats.length === 1 && winnerSeats[0] !== 0 ? ' takes' : ' take') +
-      ' the hand at ' + fmtTotal(wt) + (wt === 0 ? ' - Pure Sabaac!' : '');
+      ' the hand at ' + fmtTotal(wt) + (wt === 0 ? ' - Pure Net Zero!' : '');
   }
 
   function placeLabel(p) { return ['1st', '2nd', '3rd', '4th'][p - 1] + ' place'; }
@@ -520,7 +556,7 @@
     const panel = $('sb-results');
     panel.classList.remove('hidden');
     $('sb-result-title').textContent = outcome.win
-      ? (outcome.pure ? 'Pure Sabaac! 🌟' : 'You Win! 🏆')
+      ? (outcome.pure ? 'Pure Net Zero! 🌟' : 'You Win! 🏆')
       : placeLabel(outcome.place);
     $('sb-result-sub').textContent = outcome.win
       ? 'Your hand of ' + fmtTotal(outcome.total) + ' was the closest to zero at the table.' +
@@ -533,9 +569,9 @@
   function shareText() {
     const names = todayAIs.map(a => a.name).join(', ');
     const line = outcome.win
-      ? '🏆 Won with ' + fmtTotal(outcome.total) + (outcome.pure ? ' - Pure Sabaac! 🌟' : '')
+      ? '🏆 Won with ' + fmtTotal(outcome.total) + (outcome.pure ? ' - Pure Net Zero! 🌟' : '')
       : '🃏 Final hand: ' + fmtTotal(outcome.total) + ' - ' + placeLabel(outcome.place);
-    return 'Sabaac ' + chicagoDate() + '\nvs ' + names + '\n' + line + '\ndailyjamm.com/sabaac/';
+    return 'Net Zero ' + chicagoDate() + '\nvs ' + names + '\n' + line + '\ndailyjamm.com/netzero/';
   }
 
   function startCountdown(id) {
@@ -559,7 +595,7 @@
       { label: 'Games Played', value: stats.played },
       { label: 'Hands Won', value: stats.wins, color: '#4ade80' },
       { label: 'Win Rate', value: winRate },
-      { label: 'Pure Sabaacs (exactly 0)', value: stats.pure, color: '#fbbf24' },
+      { label: 'Pure Net Zeros (exactly 0)', value: stats.pure, color: '#fbbf24' },
       { label: 'Closest Finish', value: stats.bestAbs === null ? '-' : stats.bestAbs },
       { label: 'Current Streak', value: stats.curStreak, color: '#fbbf24' },
       { label: 'Best Streak', value: stats.bestStreak, color: '#fbbf24' },
@@ -573,9 +609,9 @@
   function shareStats() {
     const stats = loadStats();
     const winRate = stats.played ? Math.round((stats.wins / stats.played) * 100) + '%' : '-';
-    const text = 'Sabaac Stats\n🃏 Played: ' + stats.played + '\n🏆 Won: ' + stats.wins + ' (' + winRate + ')' +
-      '\n🌟 Pure Sabaacs: ' + stats.pure + '\n🔥 Streak: ' + stats.curStreak + ' (best ' + stats.bestStreak + ')' +
-      '\ndailyjamm.com/sabaac/';
+    const text = 'Net Zero Stats\n🃏 Played: ' + stats.played + '\n🏆 Won: ' + stats.wins + ' (' + winRate + ')' +
+      '\n🌟 Pure Net Zeros: ' + stats.pure + '\n🔥 Streak: ' + stats.curStreak + ' (best ' + stats.bestStreak + ')' +
+      '\ndailyjamm.com/netzero/';
     DJUtils.clipboardShare(text, $('sb-stats-share-btn'), 'Share Stats');
   }
 
@@ -611,6 +647,7 @@
     reshuffles = 0;
     hands = [[], [], [], []];
     for (let k = 0; k < 2; k++) for (let s = 0; s < SEATS; s++) hands[s].push(drawCard());
+    upCard = drawCard();          // one card face up on the table from the start
     round = 1;
     turnSeat = 0;
     turnCount = 0;
@@ -637,6 +674,10 @@
       todayAIs = today.ais.map(id => AI_DEFS.find(a => a.id === id)).filter(Boolean);
       deck = today.deck;
       discard = today.discard || [];
+      upCard = today.upCard || null;
+      // A save from before the face-up card existed would leave swapping dead
+      // for the rest of the day - deal one so the table is always complete.
+      if (!upCard && today.phase !== 'done') upCard = drawCard();
       reshuffles = today.reshuffles || 0;
       hands = today.hands;
       round = today.round;
@@ -678,6 +719,7 @@
     $('sb-btn-draw').addEventListener('click', () => onPlayerAction('draw'));
     $('sb-btn-swap').addEventListener('click', () => onPlayerAction('swap'));
     $('sb-deck').addEventListener('click', onDeckTap);
+    $('sb-upcard').addEventListener('click', onUpCardTap);
     $('sb-share-btn').addEventListener('click', () => {
       DJUtils.clipboardShare(shareText(), $('sb-share-btn'), 'Share Results');
     });
