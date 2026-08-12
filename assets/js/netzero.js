@@ -54,6 +54,11 @@
   let todayAIs = [];
   let deck = [];        // draw from the end (deck.pop())
   let upCard = null;    // the single face-up card on the table
+  // Cards revealed so far during the opening deal. Infinity means "table is
+  // fully dealt" and is the normal state for every other code path.
+  let revealCount = Infinity;
+  let pendingDeal = false;   // deal is waiting for the how-to modal to close
+  const DEAL_GAP = 190;      // ms between cards leaving the deck
   let discard = [];
   let reshuffles = 0;
   let hands = [[], [], [], []];
@@ -121,6 +126,65 @@
       played: 0, wins: 0, pure: 0, curStreak: 0, bestStreak: 0,
       bestAbs: null, place: [0, 0, 0, 0],
     });
+  }
+
+  /* ── Opening deal ── */
+  // Cards go out one per seat, round the table, twice - so seat s receives its
+  // k-th card on step k * SEATS + s.
+  function visibleCount(seat) {
+    if (revealCount === Infinity) return hands[seat].length;
+    return Math.max(0, Math.min(hands[seat].length, Math.ceil((revealCount - seat) / SEATS)));
+  }
+
+  function upCardVisible() {
+    return revealCount === Infinity || revealCount >= SEATS * 2 + 1;
+  }
+
+  function renderTable() {
+    renderSeats(false, false);
+    renderPlayerHand(false);
+    renderMid();
+  }
+
+  function dealTarget(i) {
+    if (i >= SEATS * 2) return $('sb-upcard');
+    const seat = i % SEATS;
+    return seat === 0 ? $('sb-player-cards')
+      : $('sb-ai-seat-' + (seat - 1)).querySelector('.sb-ai-cards');
+  }
+
+  function dealOut() {
+    pendingDeal = false;
+    const total = SEATS * 2 + 1;          // 8 hand cards, then the face-up card
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      revealCount = Infinity;
+      actionLocked = false;
+      renderTable();
+      renderControls();
+      return;
+    }
+    revealCount = 0;
+    actionLocked = true;
+    renderTable();
+    renderControls();
+    setMessage('Dealing...');
+    for (let i = 0; i < total; i++) {
+      (function (idx) {
+        setTimeout(function () {
+          flyFrom($('sb-deck'), dealTarget(idx), idx % SEATS !== 0 || idx >= SEATS * 2, function () {
+            if (idx + 1 > revealCount) revealCount = idx + 1;
+            renderTable();
+            if (idx === total - 1) {
+              revealCount = Infinity;
+              actionLocked = false;
+              setMessage('');
+              renderTable();
+              renderControls();
+            }
+          });
+        }, idx * DEAL_GAP);
+      })(i);
+    }
   }
 
   /* ── Card rendering ── */
@@ -196,7 +260,7 @@
       seat.querySelector('.sb-ai-name').textContent = todayAIs[s - 1].name;
       const row = seat.querySelector('.sb-ai-cards');
       row.textContent = '';
-      hands[s].forEach((c, i) => {
+      hands[s].slice(0, visibleCount(s)).forEach((c, i) => {
         const el = reveal ? makeCard(c, true) : makeCardBack(true);
         if (dealAnim) { el.classList.add('sb-dealt'); el.style.animationDelay = (i * 90) + 'ms'; }
         row.appendChild(el);
@@ -215,14 +279,14 @@
   function renderPlayerHand(dealAnim) {
     const row = $('sb-player-cards');
     row.textContent = '';
-    hands[0].forEach((c, i) => {
+    hands[0].slice(0, visibleCount(0)).forEach((c, i) => {
       const el = makeCard(c, false);
       if (i === selCard) el.classList.add('sb-cardsel');
       if (dealAnim) { el.classList.add('sb-dealt'); el.style.animationDelay = (i * 110) + 'ms'; }
       el.addEventListener('click', () => onCardTap(i));
       row.appendChild(el);
     });
-    const t = handTotal(hands[0]);
+    const t = handTotal(hands[0].slice(0, visibleCount(0)));
     const totEl = $('sb-player-total');
     totEl.textContent = 'Your total: ' + fmtTotal(t);
     totEl.className = 'sb-player-total ' + (t === 0 ? 'sb-total-zero' : (Math.abs(t) <= 2 ? 'sb-total-good' : 'sb-total-plain'));
@@ -238,7 +302,7 @@
     const slot = $('sb-upcard');
     if (!slot) return;
     slot.textContent = '';
-    if (upCard) {
+    if (upCard && upCardVisible()) {
       slot.appendChild(makeCard(upCard, true));
       slot.setAttribute('aria-label',
         'Face-up card ' + rankLabel(upCard.r) + SUIT_CHAR[upCard.s] +
@@ -638,10 +702,11 @@
   function closeModal() {
     $('sb-modal').classList.add('hidden');
     localStorage.setItem(howtoKey, '1');
+    if (pendingDeal) dealOut();
   }
 
   /* ── Boot / restore ── */
-  function freshGame(dateStr) {
+  function freshGame(dateStr, defer) {
     deck = shuffleWith(freshDeck(), mulberry32(dateToSeed(dateStr) + 913));
     discard = [];
     reshuffles = 0;
@@ -655,16 +720,23 @@
     shiftCount = 0;
     outcome = null;
     selCard = -1;
-    actionLocked = false;
-    renderSeats(false, true);
-    renderPlayerHand(true);
-    renderMid();
-    renderControls();
+    actionLocked = true;
     saveToday();
+    if (defer) {
+      // Hold the deal until the how-to modal is dismissed, so a first-time
+      // player actually sees it instead of it playing behind the overlay.
+      pendingDeal = true;
+      revealCount = 0;
+      renderTable();
+      renderControls();
+    } else {
+      dealOut();
+    }
   }
 
   function boot() {
     const dateStr = chicagoDate();
+    const firstVisit = !localStorage.getItem(howtoKey);
     todayAIs = getDailyAIIndexes(dateStr).map(i => AI_DEFS[i]);
 
     let today = null;
@@ -710,10 +782,10 @@
         else if (turnSeat >= SEATS) setTimeout(endOfRound, 500);
       }
     } else {
-      freshGame(dateStr);
+      freshGame(dateStr, firstVisit);
     }
 
-    if (!localStorage.getItem(howtoKey)) showModal();
+    if (firstVisit) showModal();
 
     $('sb-btn-stand').addEventListener('click', () => onPlayerAction('stand'));
     $('sb-btn-draw').addEventListener('click', () => onPlayerAction('draw'));
@@ -726,7 +798,7 @@
     $('sb-stats-btn').addEventListener('click', showStats);
     $('sb-help-btn').addEventListener('click', showModal);
     document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') { closeStats(); $('sb-modal').classList.add('hidden'); }
+      if (e.key === 'Escape') { closeStats(); closeModal(); }
     });
   }
 
