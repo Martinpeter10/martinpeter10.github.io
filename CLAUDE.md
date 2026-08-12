@@ -604,6 +604,27 @@ DailyJamm does **not** use Google AdSense or any other ad network. The only thir
 - `innerHTML` is acceptable only for clearing a container (`el.innerHTML = ''` → prefer `el.textContent = ''`) or static strings with no variable interpolation.
 - The existing `escHtml()` utility in `main.js` is available for Themedle-specific escaping needs.
 
+### Security Headers
+
+The CSP ships as a `<meta http-equiv>` tag on every page. That covers script/style/connect/img
+sources, but **`frame-ancestors` is ignored in a meta tag** - framing protection can only come
+from a real response header.
+
+- **Test / dev (Cloudflare Workers):** the repo's `_headers` file supplies `X-Robots-Tag: noindex`
+  plus `nosniff`, `Referrer-Policy`, `X-Frame-Options`, `frame-ancestors 'none'`, and a
+  `Permissions-Policy`. Keep `_headers` out of `.assetsignore` or Cloudflare will not see it.
+- **Production (GitHub Pages behind Cloudflare):** Pages cannot set custom headers and **ignores
+  `_headers` entirely**. Prod headers must be added as a Cloudflare **Transform Rule ->
+  Modify Response Header** on dailyjamm.com. Do not add `X-Robots-Tag: noindex` there.
+- If production ever moves onto a Cloudflare Worker, **delete the `X-Robots-Tag` line from
+  `_headers` first** - otherwise the live site is deindexed on the next deploy.
+
+**Subresource Integrity:** `cdn.tailwindcss.com` does not send CORS headers, so `integrity` is
+not usable on it - adding one forces a CORS-mode fetch whose opaque response fails validation
+and blocks the script. The Tailwind URL is therefore **version-pinned** (`/3.4.17`) instead, so a
+CDN-side version bump cannot silently change what every page executes. Re-pin deliberately when
+upgrading.
+
 ### Content Security Policy
 All pages include a `<meta http-equiv="Content-Security-Policy">` tag. The CSP allows:
 - Scripts only from `'self'`, `googletagmanager.com`, and `cdn.tailwindcss.com`
