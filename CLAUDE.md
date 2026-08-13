@@ -683,6 +683,12 @@ All pages include `<meta name="referrer" content="strict-origin-when-cross-origi
 - **Header inner wrapper**: Do not add a wrapper `<div>` inside `<header class="site-header">`. The header is a flex container itself — all children (hamburger, brand link, spacer, buttons) are direct flex children.
 - **iOS safe areas**: Always include `viewport-fit=cover` and `apple-mobile-web-app-status-bar-style` metas.
 - **GitHub Pages cache mismatch**: After pushing JS + data file changes together, Pages may serve a stale JS with the new data (or vice versa), causing JS errors caught as "Failed to load puzzle." If this happens, a hard refresh or waiting a few minutes resolves it. Ensure JS and data changes are compatible in both old and new states when possible.
+- **Version EVERY asset, not just `styles.css`**: all `/assets/js/*.js` and `/assets/css/*.css` tags
+  carry a `?v=YYYYMMDD` query. Production serves these with `cache-control: max-age=14400`, so an
+  unversioned file can sit in a browser for four hours after a release - long enough for a new game
+  to be missing from the favorites catalog while the page that references it is already live. The
+  test and dev Workers send `max-age=0, must-revalidate`, so **this class of bug is invisible on
+  test and only ever appears in production**. Bump every asset's version together when releasing.
 - **`styles.css` cache busting**: All pages link to `styles.css` with a version query string (currently `?v=20260731`). Whenever `styles.css` gains new rules (e.g. adding a new game), bump this version on ALL pages — otherwise mobile and desktop browsers serve the old cached CSS and new game elements render unstyled. Update the version in all 12 pages: `index.html`, `404.html`, all game pages, and all info pages.
 - **New external resources**: If you add a new CDN, font, or API endpoint, update the CSP meta on every affected page. Forgetting this will silently block the resource in supporting browsers.
 - **Bare `JSON.parse` aborts boot**: Never call `JSON.parse(localStorage.getItem(...))` without a try/catch at the top level of a boot function. A malformed stored value will throw, silently aborting `boot()` mid-execution — game state never restores, result panels stay empty, and there is no visible error. Always wrap in try/catch or use `DJUtils.loadJSON()` which handles this safely.
