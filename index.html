@@ -27,18 +27,18 @@
     if (localStorage.getItem('dj_cookie_ok')) djClarity();
   </script>
 
-  <meta name="description" content="DailyJamm is your hub for daily mini-games. Play Themedle, Chain Link, BlackJackdle, Spelldle, Roulettedle, Holdle, and Liar's Dice - our original daily games - and discover other daily games we love. Star games and add your own links to build your personal favorites list." />
+  <meta name="description" content="Your hub for daily mini-games. Play Net Zero, Liar's Dice, Themedle, Chain Link and more original games, plus a curated list of the daily games we love." />
   <meta name="robots" content="index,follow">
   <link rel="canonical" href="https://dailyjamm.com/" />
   <link rel="icon" type="image/png" href="/assets/img/favicon.png">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=20260801">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=20260812c">
 
   <!-- Open Graph -->
   <meta property="og:site_name" content="DailyJamm" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://dailyjamm.com/" />
   <meta property="og:title" content="DailyJamm - Daily Games Hub" />
-  <meta property="og:description" content="DailyJamm is your hub for daily mini-games. Play Themedle, Chain Link, BlackJackdle, Spelldle, Roulettedle, Holdle, and Liar's Dice - our original daily games - and discover other daily games we love. Star games and add your own links to build your personal favorites list." />
+  <meta property="og:description" content="Your hub for daily mini-games. Play Net Zero, Liar's Dice, Themedle, Chain Link and more original games, plus a curated list of the daily games we love." />
   <meta property="og:image" content="https://dailyjamm.com/assets/img/favicon.png" />
 
   <!-- THEME COLOR FIXES FOR iOS SAFARI: set to site background so overscroll/toolbar areas aren't green -->
@@ -141,7 +141,7 @@
     "@type": "WebSite",
     "name": "DailyJamm",
     "url": "https://dailyjamm.com/",
-    "description": "Your hub for daily mini-games. Play Themedle, Chain Link, BlackJackdle, Spelldle, Roulettedle, Holdle, and Liar's Dice - plus a curated collection of the best daily games.",
+    "description": "Your hub for daily mini-games. Play Net Zero, Liar's Dice, Themedle, Chain Link and more original games, plus a curated collection of the best daily games.",
     "author": { "@type": "Organization", "name": "DailyJamm", "url": "https://dailyjamm.com" }
   }
   </script>
@@ -171,6 +171,7 @@
       <a class="menu-link" href="/roulettedle/">Roulettedle</a>
       <a class="menu-link" href="/holdle/">Holdle</a>
       <a class="menu-link" href="/liarsdice/">Liar's Dice</a>
+      <a class="menu-link" href="/netzero/">Net Zero</a>
     </div>
     <div class="menu-sec">
       <div class="menu-title">Our Favorite Games</div>
@@ -209,7 +210,7 @@
       <div class="brandmark">
         <h1>DailyJamm</h1>
       </div>
-      <p class="tag">DailyJamm is your dose of daily games. Play <strong>Themedle</strong>, <strong>Chain Link</strong>, <strong>BlackJackdle</strong>, <strong>Spelldle</strong>, <strong>Roulettedle</strong>, <strong>Holdle</strong>, and <strong>Liar's Dice</strong> - our original daily games - plus a curated collection of our favorite daily games. Star any game or add your own links to build your own list!</p>
+      <p class="tag">DailyJamm is your dose of daily games. Play <strong>Themedle</strong>, <strong>Chain Link</strong>, <strong>BlackJackdle</strong>, <strong>Spelldle</strong>, <strong>Roulettedle</strong>, <strong>Holdle</strong>, <strong>Liar's Dice</strong>, and <strong>Net Zero</strong> - our original daily games - plus a curated collection of our favorite daily games. Star any game or add your own links to build your own list!</p>
     </header>
 
     <section class="section">
@@ -318,8 +319,20 @@
           <h3>Holdle</h3>
           <p>Daily Texas Hold'em. Face 3 AI opponents and try to chip up.</p>
         </article>
-        <article class="card our" data-fav-id="liarsdice" onclick="goto('/liarsdice/')" role="button" tabindex="0" aria-label="Play Liar's Dice">
+        <article class="card our" data-fav-id="netzero" onclick="goto('/netzero/')" role="button" tabindex="0" aria-label="Play Net Zero">
           <span class="badge">New</span>
+          <div class="icon our">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="2.5" y="5" width="12" height="15" rx="2" fill="none" stroke="white" stroke-width="1.8"/>
+              <rect x="9.5" y="5" width="12" height="15" rx="2" fill="none" stroke="white" stroke-width="1.8" opacity=".55"/>
+              <path d="M5.4 12.5h6.2" stroke="white" stroke-width="2" stroke-linecap="round"/>
+              <path d="M8.5 9.4v6.2" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3>Net Zero</h3>
+          <p>Black adds, red subtracts - land your hand closest to zero.</p>
+        </article>
+        <article class="card our" data-fav-id="liarsdice" onclick="goto('/liarsdice/')" role="button" tabindex="0" aria-label="Play Liar's Dice">
           <div class="icon our">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <rect x="4" y="4" width="16" height="16" rx="3" fill="none" stroke="white" stroke-width="2"/>

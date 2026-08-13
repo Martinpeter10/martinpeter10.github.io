@@ -15,6 +15,7 @@ window.DJFav = (function () {
     roulettedle:  { title: 'Roulettedle',         url: '/roulettedle/' },
     holdle:       { title: 'Holdle',              url: '/holdle/' },
     liarsdice:    { title: "Liar's Dice",         url: '/liarsdice/' },
+    netzero:      { title: 'Net Zero',            url: '/netzero/' },
     akari:        { title: 'Akari',               url: 'https://dailyakari.com/', ext: true },
     bandle:       { title: 'Bandle',              url: 'https://bandle.app/', ext: true },
     circuits:     { title: 'Circuits',            url: 'https://www.puzzmo.com/play/circuits/', ext: true },
@@ -48,6 +49,12 @@ window.DJFav = (function () {
     trophy: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v6a5 5 0 0 1-10 0V4z" fill="none" stroke="white" stroke-width="2" stroke-linejoin="round"/><path d="M7 6H4v2a4 4 0 0 0 3 3.87M17 6h3v2a4 4 0 0 1-3 3.87" fill="none" stroke="white" stroke-width="2"/></svg>'
   };
   var DEFAULT_ICON = 'star';
+
+  // Only ever return ICONS' own properties - a crafted localStorage value
+  // like 'constructor' must not reach innerHTML via the prototype chain.
+  function ownIcon(key) {
+    return Object.prototype.hasOwnProperty.call(ICONS, key) ? ICONS[key] : null;
+  }
 
   /* ── storage ─────────────────────────────────────────────── */
 
@@ -103,7 +110,7 @@ window.DJFav = (function () {
       id: 'c' + Date.now() + Math.floor(Math.random() * 1000),
       title: cleanTitle,
       url: cleanUrl,
-      icon: ICONS[icon] ? icon : DEFAULT_ICON
+      icon: ownIcon(icon) ? icon : DEFAULT_ICON
     });
     save(list);
     renderAll();
@@ -232,7 +239,7 @@ window.DJFav = (function () {
       if (src) { wrap.appendChild(src.cloneNode(true)); return wrap; }
     }
     // Custom link (or site card not found): preset icon. Static strings only.
-    wrap.innerHTML = ICONS[it.icon] || ICONS[DEFAULT_ICON];
+    wrap.innerHTML = ownIcon(it.icon) || ICONS[DEFAULT_ICON];
     return wrap;
   }
 

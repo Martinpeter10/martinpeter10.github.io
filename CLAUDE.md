@@ -357,7 +357,8 @@ gameid: { title: 'Game Name', url: 'https://example.com/', ext: true },
 │   │   ├── spelldle.js           # Spelldle game logic
 │   │   ├── roulettedle.js        # Roulettedle game logic
 │   │   ├── holdle.js             # Holdle game logic
-│   │   └── liarsdice.js          # Liar's Dice game logic
+│   │   ├── liarsdice.js          # Liar's Dice game logic
+│   │   └── netzero.js            # Net Zero game logic
 │   ├── data/
 │   │   ├── chainlink-puzzles.json  # Chain Link puzzle data
 │   │   └── spelldle-spells.json    # Spelldle spell data
@@ -365,7 +366,7 @@ gameid: { title: 'Game Name', url: 'https://example.com/', ext: true },
 │   └── img/
 │       └── favicon.png           # Site favicon
 ├── themedle/index.html           # Game pages (also chainlink, blackjackdle,
-├── ...                           #   spelldle, roulettedle, holdle, liarsdice)
+├── ...                           #   spelldle, roulettedle, holdle, liarsdice, netzero)
 ├── about/index.html              # About page
 ├── releases/index.html           # Release notes page
 ├── terms/index.html              # Terms of Service page
@@ -586,6 +587,40 @@ Daily Liar's Dice. Player + 3 daily AI opponents (same 7-character cast as Holdl
 
 ---
 
+### Net Zero (`/assets/js/netzero.js`)
+
+Page lives at `/netzero/`; favorites catalog id is `netzero`. Internal identifiers keep the original
+`sb` prefix (localStorage `sb_*`, DOM ids `sb-*`, CSS `.sb-*`, `window.SBGame`) - the game was built
+as "Sabaac" and renamed before it ever shipped, so renaming internals would only churn code.
+
+Daily closest-to-zero card game. Player + 3 daily AI opponents (same 7-character cast as Holdle,
+date-seeded via `getDailyAIIndexes`), 3 rounds, then a showdown.
+
+**localStorage keys**: `sb_stats_v2`, `sb_today`, `sb_seen_howto`
+
+**Cards**: A through 10 in all four suits, no face cards. Black (♠ ♣) adds its value, red (♥ ♦)
+subtracts. Hand total is the sum; closest to zero wins. Exactly zero is a "Pure Net Zero".
+
+**Tie-breaking** (`betterKey`, applied in order): smaller absolute total wins; then a positive
+total beats a negative one of the same size (+2 beats -2); then the hand with **more cards** wins;
+then the **highest single positive card** (`seatKey.hi` via `topPositive`) - a pair of 7s and a pair
+of 3s both total zero, and the 7s take it. If two hands match on all four, neither beats the other
+and `showdown` puts both in `outcome.winnerSeats` - **the win is shared**, and the player counts as
+a winner if they are in that list. Keep the how-to modal's tie wording in sync with this order.
+
+**The face-up card**: exactly one card sits face up on the table (`upCard`), dealt from the deck
+during `freshGame` and persisted in `sb_today`. **Swap exchanges a hand card with `upCard`** - the
+player takes the face-up card and the card they gave up becomes the new face-up card for everyone.
+Swap never touches the deck; only Draw does. `aiDecide` evaluates swaps against the actual `upCard`
+value rather than guessing, and a Shift discards the face-up card and deals a fresh one. On restore,
+a save with no `upCard` (from before the mechanic existed) deals one so swapping cannot be dead for
+the rest of the day.
+
+**Rounds**: everyone starts with 2 cards; each turn is Stand, Draw (up to `HAND_MAX`), or Swap.
+After rounds 1 and 2 two dice are rolled - **doubles trigger a Shift**, throwing out and redrawing
+every hand. Do not call these "spike dice" in player-facing copy; they are just "the dice".
+
+
 ## Security Practices
 
 ### No Advertising (AdSense removed)
@@ -603,6 +638,27 @@ DailyJamm does **not** use Google AdSense or any other ad network. The only thir
 - For suggestion dropdowns and result dots, use `document.createElement` + `textContent`.
 - `innerHTML` is acceptable only for clearing a container (`el.innerHTML = ''` → prefer `el.textContent = ''`) or static strings with no variable interpolation.
 - The existing `escHtml()` utility in `main.js` is available for Themedle-specific escaping needs.
+
+### Security Headers
+
+The CSP ships as a `<meta http-equiv>` tag on every page. That covers script/style/connect/img
+sources, but **`frame-ancestors` is ignored in a meta tag** - framing protection can only come
+from a real response header.
+
+- **Test / dev (Cloudflare Workers):** the repo's `_headers` file supplies `X-Robots-Tag: noindex`
+  plus `nosniff`, `Referrer-Policy`, `X-Frame-Options`, `frame-ancestors 'none'`, and a
+  `Permissions-Policy`. Keep `_headers` out of `.assetsignore` or Cloudflare will not see it.
+- **Production (GitHub Pages behind Cloudflare):** Pages cannot set custom headers and **ignores
+  `_headers` entirely**. Prod headers must be added as a Cloudflare **Transform Rule ->
+  Modify Response Header** on dailyjamm.com. Do not add `X-Robots-Tag: noindex` there.
+- If production ever moves onto a Cloudflare Worker, **delete the `X-Robots-Tag` line from
+  `_headers` first** - otherwise the live site is deindexed on the next deploy.
+
+**Subresource Integrity:** `cdn.tailwindcss.com` does not send CORS headers, so `integrity` is
+not usable on it - adding one forces a CORS-mode fetch whose opaque response fails validation
+and blocks the script. The Tailwind URL is therefore **version-pinned** (`/3.4.17`) instead, so a
+CDN-side version bump cannot silently change what every page executes. Re-pin deliberately when
+upgrading.
 
 ### Content Security Policy
 All pages include a `<meta http-equiv="Content-Security-Policy">` tag. The CSP allows:
