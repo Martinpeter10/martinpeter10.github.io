@@ -58,6 +58,8 @@
   // fully dealt" and is the normal state for every other code path.
   let revealCount = Infinity;
   let pendingDeal = false;   // deal is waiting for the how-to modal to close
+  // A card that already occupies its slot in the hand but is still in flight.
+  let pending = null;        // { seat, idx } | null
   // Animation timing. FLY_MS must match --sb-fly in styles.css; the gaps are
   // deliberately longer than the flight so cards land one at a time instead
   // of three being in the air at once.
@@ -146,17 +148,19 @@
     return revealCount === Infinity || revealCount >= SEATS * 2 + 1;
   }
 
-  function renderTable() {
-    renderSeats(false, false);
-    renderPlayerHand(false);
+  function renderTable(arriveSeat, arriveIdx) {
+    renderSeats(false, false, arriveSeat, arriveIdx);
+    renderPlayerHand(false, arriveSeat === 0 ? arriveIdx : -1);
     renderMid();
   }
 
   function dealTarget(i) {
     if (i >= SEATS * 2) return $('sb-upcard');
     const seat = i % SEATS;
-    return seat === 0 ? $('sb-player-cards')
+    const row = seat === 0 ? $('sb-player-cards')
       : $('sb-ai-seat-' + (seat - 1)).querySelector('.sb-ai-cards');
+    // Aim at the slot this card will occupy, not the middle of the row
+    return row.children[Math.floor(i / SEATS)] || row;
   }
 
   function dealOut() {
@@ -179,12 +183,12 @@
         setTimeout(function () {
           flyFrom($('sb-deck'), dealTarget(idx), idx % SEATS !== 0 || idx >= SEATS * 2, function () {
             if (idx + 1 > revealCount) revealCount = idx + 1;
-            renderTable();
+            const seat = idx < SEATS * 2 ? idx % SEATS : -1;
+            renderTable(seat, seat >= 0 ? Math.floor(idx / SEATS) : -1);
             if (idx === total - 1) {
               revealCount = Infinity;
               actionLocked = false;
               setMessage('');
-              renderTable();
               renderControls();
             }
           });
@@ -260,17 +264,24 @@
   }
 
   /* ── Rendering ── */
-  function renderSeats(reveal, dealAnim, arriveSeat) {
+  function renderSeats(reveal, dealAnim, arriveSeat, arriveIdx) {
     for (let s = 1; s < SEATS; s++) {
       const seat = $('sb-ai-seat-' + (s - 1));
       seat.querySelector('.sb-ai-name').textContent = todayAIs[s - 1].name;
       const row = seat.querySelector('.sb-ai-cards');
       row.textContent = '';
-      const shown = hands[s].slice(0, visibleCount(s));
-      shown.forEach((c, i) => {
+      const upto = visibleCount(s);
+      hands[s].forEach((c, i) => {
         const el = reveal ? makeCard(c, true) : makeCardBack(true);
-        if (dealAnim) { el.classList.add('sb-dealt'); el.style.animationDelay = (i * 90) + 'ms'; }
-        else if (arriveSeat === s && i === shown.length - 1) el.classList.add('sb-arrive');
+        // Every card in the hand is laid out from the start; ones that have not
+        // arrived yet are merely invisible, so the others never slide around.
+        if (i >= upto || (pending && pending.seat === s && pending.idx === i)) {
+          el.classList.add('sb-card-pending');
+        } else if (dealAnim) {
+          el.classList.add('sb-dealt'); el.style.animationDelay = (i * 90) + 'ms';
+        } else if (arriveSeat === s && i === arriveIdx) {
+          el.classList.add('sb-arrive');
+        }
         row.appendChild(el);
       });
       const totEl = seat.querySelector('.sb-ai-total');
@@ -284,19 +295,25 @@
     }
   }
 
-  function renderPlayerHand(dealAnim, arrive) {
+  function renderPlayerHand(dealAnim, arriveIdx) {
     const row = $('sb-player-cards');
     row.textContent = '';
-    const mine = hands[0].slice(0, visibleCount(0));
-    mine.forEach((c, i) => {
+    const upto = visibleCount(0);
+    hands[0].forEach((c, i) => {
       const el = makeCard(c, false);
       if (i === selCard) el.classList.add('sb-cardsel');
-      if (dealAnim) { el.classList.add('sb-dealt'); el.style.animationDelay = (i * 110) + 'ms'; }
-      else if (arrive && i === mine.length - 1) el.classList.add('sb-arrive');
+      if (i >= upto || (pending && pending.seat === 0 && pending.idx === i)) {
+        el.classList.add('sb-card-pending');
+      } else if (dealAnim) {
+        el.classList.add('sb-dealt'); el.style.animationDelay = (i * 110) + 'ms';
+      } else if (arriveIdx === i) {
+        el.classList.add('sb-arrive');
+      }
       el.addEventListener('click', () => onCardTap(i));
       row.appendChild(el);
     });
-    const t = handTotal(hands[0].slice(0, visibleCount(0)));
+    const t = handTotal(hands[0].slice(0, Math.min(upto, hands[0].length))
+      .filter((c, i) => !(pending && pending.seat === 0 && pending.idx === i)));
     const totEl = $('sb-player-total');
     totEl.textContent = 'Your total: ' + fmtTotal(t);
     totEl.className = 'sb-player-total ' + (t === 0 ? 'sb-total-zero' : (Math.abs(t) <= 2 ? 'sb-total-good' : 'sb-total-plain'));
@@ -404,19 +421,33 @@
       setBubble(seat, seat === 0 ? 'You stand' : 'stands');
     }
     turnCount++;
-    const finish = () => {
-      if (seat === 0) { selCard = -1; renderPlayerHand(false, fromDeck); }
-      else renderSeats(false, false, fromDeck ? seat : -1);
+
+    if (!fromDeck) {
+      if (seat === 0) { selCard = -1; renderPlayerHand(false, -1); }
+      else renderSeats(false, false, -1, -1);
       renderMid();
-    };
-    if (fromDeck) {
-      const target = seat === 0 ? $('sb-player-cards')
-        : $('sb-ai-seat-' + (seat - 1)).querySelector('.sb-ai-cards');
-      const source = dec.action === 'swap' ? $('sb-upcard') : $('sb-deck');
-      flyFrom(source, target, seat !== 0, finish);
-    } else {
-      finish();
+      return;
     }
+
+    // Lay the card into its slot first (hidden), so the hand settles before
+    // anything flies. The card then travels to exactly where it will sit
+    // rather than to the middle of the row.
+    const idx = dec.action === 'swap' ? dec.idx : hands[seat].length - 1;
+    pending = { seat, idx };
+    if (seat === 0) { selCard = -1; renderPlayerHand(false, -1); }
+    else renderSeats(false, false, -1, -1);
+    renderMid();
+
+    const row = seat === 0 ? $('sb-player-cards')
+      : $('sb-ai-seat-' + (seat - 1)).querySelector('.sb-ai-cards');
+    const target = row.children[idx] || row;
+    const source = dec.action === 'swap' ? $('sb-upcard') : $('sb-deck');
+    flyFrom(source, target, seat !== 0, () => {
+      pending = null;
+      if (seat === 0) renderPlayerHand(false, idx);
+      else renderSeats(false, false, seat, idx);
+      renderMid();
+    });
   }
 
   function onCardTap(i) {
@@ -561,9 +592,20 @@
   }
 
   /* ── Showdown ── */
+  // Highest single positive card in a hand (0 if the hand is all red)
+  function topPositive(hand) {
+    return hand.reduce((m, c) => {
+      const v = cardValue(c);
+      return v > m ? v : m;
+    }, 0);
+  }
+
   function seatKey(s) {
     const t = handTotal(hands[s]);
-    return { abs: Math.abs(t), sign: t >= 0 ? 0 : 1, n: hands[s].length, t };
+    return {
+      abs: Math.abs(t), sign: t >= 0 ? 0 : 1, n: hands[s].length,
+      hi: topPositive(hands[s]), t
+    };
   }
 
   // Strictly better hand: closer to zero; ties go positive over negative, then more cards
@@ -571,6 +613,9 @@
     if (a.abs !== b.abs) return a.abs < b.abs;
     if (a.sign !== b.sign) return a.sign < b.sign;
     if (a.n !== b.n) return a.n > b.n;
+    // Two hands can reach the same total with different cards - a pair of 7s
+    // and a pair of 3s both make zero. The bigger card takes it.
+    if (a.hi !== b.hi) return a.hi > b.hi;
     return false;
   }
 

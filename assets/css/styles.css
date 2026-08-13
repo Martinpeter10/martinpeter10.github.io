@@ -2421,6 +2421,9 @@ input[type=range].slider::-moz-range-thumb {
 .sb-card-back{background:repeating-linear-gradient(45deg,#5b21b6,#5b21b6 4px,#7c3aed 4px,#7c3aed 8px);border:2px solid #c4b5fd}
 @keyframes sb-deal{from{opacity:0;transform:translateY(-14px) scale(.86)}to{opacity:1;transform:none}}
 @keyframes sb-settle{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+/* Cards that are laid out but not yet turned up. They hold their slot so the
+   rest of the hand never shuffles sideways as cards arrive. */
+.sb-card-pending{visibility:hidden}
 .sb-dealt{animation:sb-deal .42s var(--sb-ease) both}
 /* Applied to just-arrived cards so taking a card is visible at the seat */
 .sb-arrive{animation:sb-settle .28s var(--sb-ease) both}
