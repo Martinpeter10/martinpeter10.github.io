@@ -63,8 +63,8 @@
   // Animation timing. FLY_MS must match --sb-fly in styles.css; the gaps are
   // deliberately longer than the flight so cards land one at a time instead
   // of three being in the air at once.
-  const FLY_MS = 520;        // card flight, mirrors --sb-fly
-  const DEAL_GAP = 300;      // ms between cards leaving the deck
+  const FLY_MS = 440;        // card flight, mirrors --sb-fly
+  const DEAL_GAP = 380;      // > FLY_MS so cards are dealt one at a time
   const AI_THINK = 1150;     // pause before an opponent acts
   const DICE_TICK = 110;     // ms per face change while the dice tumble
   let discard = [];
@@ -237,12 +237,17 @@
       ghost.classList.add('sb-fly');
       ghost.style.left = (dr.left - tr.left + dr.width / 2) + 'px';
       ghost.style.top = (dr.top - tr.top + dr.height / 2) + 'px';
+      ghost.style.transition = 'none';
+      ghost.style.transform = 'translate(-50%, -50%)';
       table.appendChild(ghost);
       const dx = (gr.left + gr.width / 2) - (dr.left + dr.width / 2);
       const dy = (gr.top + gr.height / 2) - (dr.top + dr.height / 2);
-      requestAnimationFrame(() => {
-        ghost.style.transform = 'translate(calc(-50% + ' + dx + 'px), calc(-50% + ' + dy + 'px)) rotate(360deg)';
-      });
+      // Force the browser to resolve the starting position before the target is
+      // set. Without this the two land in the same style pass and the card
+      // teleports instead of travelling - which is why only some cards flew.
+      void ghost.offsetWidth;
+      ghost.style.transition = '';
+      ghost.style.transform = 'translate(calc(-50% + ' + dx + 'px), calc(-50% + ' + dy + 'px))';
     } catch (e) {
       if (ghost) ghost.remove();
       cb();
