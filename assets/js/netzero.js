@@ -181,6 +181,11 @@
     for (let i = 0; i < total; i++) {
       (function (idx) {
         setTimeout(function () {
+          const dealSeat = idx < SEATS * 2 ? idx % SEATS : -1;
+          // The player's cards and the face-up card land face up, so the ghost
+          // carries the real face and the swap at the end is invisible.
+          const dealFace = dealSeat === 0 ? hands[0][Math.floor(idx / SEATS)]
+            : (idx >= SEATS * 2 ? upCard : null);
           flyFrom($('sb-deck'), dealTarget(idx), idx % SEATS !== 0 || idx >= SEATS * 2, function () {
             if (idx + 1 > revealCount) revealCount = idx + 1;
             const seat = idx < SEATS * 2 ? idx % SEATS : -1;
@@ -191,7 +196,7 @@
               setMessage('');
               renderControls();
             }
-          });
+          }, dealFace);
         }, idx * DEAL_GAP);
       })(i);
     }
@@ -223,7 +228,7 @@
     flyFrom($('sb-deck'), targetEl, small, cb);
   }
 
-  function flyFrom(sourceEl, targetEl, small, cb) {
+  function flyFrom(sourceEl, targetEl, small, cb, faceCard) {
     const table = document.querySelector('.sb-table');
     const deckEl = sourceEl;
     if (!table || !deckEl || !targetEl ||
@@ -233,7 +238,7 @@
       const tr = table.getBoundingClientRect();
       const dr = deckEl.getBoundingClientRect();
       const gr = targetEl.getBoundingClientRect();
-      ghost = makeCardBack(small);
+      ghost = faceCard ? makeCard(faceCard, small) : makeCardBack(small);
       ghost.classList.add('sb-fly');
       ghost.style.left = (dr.left - tr.left + dr.width / 2) + 'px';
       ghost.style.top = (dr.top - tr.top + dr.height / 2) + 'px';
@@ -253,7 +258,13 @@
       cb();
       return;
     }
-    setTimeout(() => { ghost.remove(); cb(); }, FLY_MS + 60);
+    // Reveal the card underneath first and only then drop the ghost, so there
+    // is never a frame with neither on screen. Removing the ghost first left a
+    // blank gap that read as a flash.
+    setTimeout(() => {
+      cb();
+      requestAnimationFrame(() => { if (ghost) ghost.remove(); });
+    }, FLY_MS + 30);
   }
 
   /* ── Dice rendering ── */
@@ -284,8 +295,6 @@
           el.classList.add('sb-card-pending');
         } else if (dealAnim) {
           el.classList.add('sb-dealt'); el.style.animationDelay = (i * 90) + 'ms';
-        } else if (arriveSeat === s && i === arriveIdx) {
-          el.classList.add('sb-arrive');
         }
         row.appendChild(el);
       });
@@ -311,8 +320,6 @@
         el.classList.add('sb-card-pending');
       } else if (dealAnim) {
         el.classList.add('sb-dealt'); el.style.animationDelay = (i * 110) + 'ms';
-      } else if (arriveIdx === i) {
-        el.classList.add('sb-arrive');
       }
       el.addEventListener('click', () => onCardTap(i));
       row.appendChild(el);
@@ -452,7 +459,7 @@
       if (seat === 0) renderPlayerHand(false, idx);
       else renderSeats(false, false, seat, idx);
       renderMid();
-    });
+    }, seat === 0 ? hands[seat][idx] : null);
   }
 
   function onCardTap(i) {

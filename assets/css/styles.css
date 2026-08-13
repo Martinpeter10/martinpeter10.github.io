@@ -2420,13 +2420,10 @@ input[type=range].slider::-moz-range-thumb {
 .sb-card-sm .sb-center{font-size:.85rem}
 .sb-card-back{background:repeating-linear-gradient(45deg,#5b21b6,#5b21b6 4px,#7c3aed 4px,#7c3aed 8px);border:2px solid #c4b5fd}
 @keyframes sb-deal{from{opacity:0;transform:translateY(-14px) scale(.86)}to{opacity:1;transform:none}}
-@keyframes sb-settle{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
 /* Cards that are laid out but not yet turned up. They hold their slot so the
    rest of the hand never shuffles sideways as cards arrive. */
 .sb-card-pending{visibility:hidden}
 .sb-dealt{animation:sb-deal .42s var(--sb-ease) both}
-/* Applied to just-arrived cards so taking a card is visible at the seat */
-.sb-arrive{animation:sb-settle .28s var(--sb-ease) both}
 #sb-player-cards .sb-card{cursor:pointer}
 #sb-player-cards .sb-card:hover{transform:translateY(-4px)}
 .sb-card.sb-cardsel{transform:translateY(-8px);box-shadow:0 0 0 2px #2ecc71,0 8px 16px rgba(0,0,0,.5)}
@@ -2483,4 +2480,4 @@ input[type=range].slider::-moz-range-thumb {
 .sb-fly{position:absolute;z-index:6;pointer-events:none;transition:transform var(--sb-fly) var(--sb-ease);transform:translate(-50%,-50%);margin:0}
 @keyframes sb-nudge{0%,100%{translate:0 0}25%{translate:-5px 0}50%{translate:5px 0}75%{translate:-3px 0}}
 .sb-nudge{animation:sb-nudge .35s ease}
-@media (prefers-reduced-motion: reduce){.sb-dealt,.sb-die-roll,.sb-shift-banner,.sb-deck-ready .sb-deck-c3,.sb-upcard-ready,.sb-nudge,.sb-arrive{animation:none}.sb-fly{transition:none}}
+@media (prefers-reduced-motion: reduce){.sb-dealt,.sb-die-roll,.sb-shift-banner,.sb-deck-ready .sb-deck-c3,.sb-upcard-ready,.sb-nudge{animation:none}.sb-fly{transition:none}}
