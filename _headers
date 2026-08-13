@@ -1,0 +1,19 @@
+# Response headers for the Cloudflare Workers static-asset sites
+# (dailyjammtest from `tst`, dailyjammdev from `dev`).
+#
+# GitHub Pages IGNORES this file, so it has no effect on production
+# dailyjamm.com. Production headers must be set with a Cloudflare Transform
+# Rule - see the Security Headers section in CLAUDE.md.
+#
+# WARNING: the X-Robots-Tag line below keeps the test and dev sites out of
+# search results. It is safe here only because production is served by
+# GitHub Pages, which never reads this file. If production is ever moved to
+# a Cloudflare Worker, delete that line first or the live site is deindexed.
+
+/*
+  X-Robots-Tag: noindex, nofollow
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY
+  Content-Security-Policy: frame-ancestors 'none'
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), usb=()

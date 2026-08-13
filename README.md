@@ -193,6 +193,18 @@ Press `Ctrl+C` in the terminal to stop the server.
 
 Full release notes are also available at [dailyjamm.com/releases](https://dailyjamm.com/releases/).
 
+### v3.2.0 - 2026-08-11
+
+**New Game: Net Zero** - Closest to zero wins.
+
+- Launched **Net Zero** - a daily card game where the hand closest to zero wins
+- The deck runs A through 10 in all four suits: **black cards add** their value and **red cards subtract** theirs, so every card pulls your total one way or the other
+- Everyone starts with 2 cards and gets 3 rounds to improve - each round you Stand, Draw from the deck, or Swap
+- There is always one **face-up card** on the table: tap one of your cards and then the face-up card to trade them, and the card you gave up becomes the new face-up card for everyone
+- Between rounds the dice come out - **doubles trigger a Shift** and every hand at the table is thrown out and redrawn
+- Closest to zero wins. If two hands tie, the positive total takes it, then more cards, then the highest single card - so a pair of 7s beats a pair of 3s even though both make zero
+- Land exactly zero for a Pure Net Zero, and play the same 3 daily opponents as the rest of the table
+
 ### v3.1.0 - 2026-08-04
 
 **New Game: Liar's Dice** - Bid, bluff, and call Liar.
