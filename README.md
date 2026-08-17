@@ -193,6 +193,17 @@ Press `Ctrl+C` in the terminal to stop the server.
 
 Full release notes are also available at [dailyjamm.com/releases](https://dailyjamm.com/releases/).
 
+### v3.3.0 - 2026-08-17
+
+**New Game: Shut the Box** - Flip every tile.
+
+- Launched **Shut the Box** - the classic pub dice game, one box a day
+- Tiles 1 through 9 start standing. Roll two dice and flip down any tiles that add up to your roll
+- The combination is **your choice** - rolled a 7? Take the 7, or 3 and 4, or 1, 2 and 4, whichever leaves the box in better shape
+- Pick your tiles, unpick any you change your mind about, then press **Shut** to flip them down
+- Once 7, 8 and 9 are all down you may roll a single die instead of two
+- When no combination matches your roll the box closes - the tiles left standing are your score, so lower is better, and flipping all nine is a perfect 0
+
 ### v3.2.0 - 2026-08-11
 
 **New Game: Net Zero** - Closest to zero wins.

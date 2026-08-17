@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Net Zero | DailyJamm</title>
-  <meta name="description" content="Play Net Zero on DailyJamm - a daily card game where black cards count up, red cards count down, and the hand closest to zero wins. Beware the dice!">
+  <title>Shut the Box | DailyJamm</title>
+  <meta name="description" content="Play Shut the Box on DailyJamm - roll the dice and flip down tiles that add up to your roll. Shut all 9 tiles for a perfect game. One box per day.">
   <meta name="robots" content="index,follow">
-  <link rel="canonical" href="https://dailyjamm.com/netzero/">
+  <link rel="canonical" href="https://dailyjamm.com/shutthebox/">
   <link rel="icon" type="image/png" href="/assets/img/favicon.png">
   <link rel="stylesheet" href="/assets/css/styles.css?v=20260817">
 
   <!-- Open Graph -->
   <meta property="og:site_name" content="DailyJamm" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://dailyjamm.com/netzero/" />
-  <meta property="og:title" content="Net Zero | DailyJamm" />
-  <meta property="og:description" content="Daily Net Zero - draw, swap, and stand to land your hand closest to zero against 3 opponents. Doubles on the dice throw every hand out!" />
+  <meta property="og:url" content="https://dailyjamm.com/shutthebox/" />
+  <meta property="og:title" content="Shut the Box | DailyJamm" />
+  <meta property="og:description" content="Daily Shut the Box - roll the dice, flip down tiles that add up to your roll, and try to shut all 9. One box per day." />
   <meta property="og:image" content="https://dailyjamm.com/assets/img/favicon.png" />
 
   <!-- Theme color -->
@@ -56,11 +56,11 @@
   {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    "name": "Net Zero",
-    "url": "https://dailyjamm.com/netzero/",
+    "name": "Shut the Box",
+    "url": "https://dailyjamm.com/shutthebox/",
     "applicationCategory": "GameApplication",
     "operatingSystem": "Web",
-    "description": "Daily Net Zero - draw, swap, and stand to land your hand closest to zero against 3 AI opponents.",
+    "description": "Daily Shut the Box - roll the dice, flip down tiles that add up to your roll, and try to shut all 9 tiles.",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
     "author": { "@type": "Organization", "name": "DailyJamm", "url": "https://dailyjamm.com" }
   }
@@ -80,9 +80,9 @@
       </span>
     </button>
     <a href="/" class="site-brand">DailyJamm</a>
-    <h1 class="sr-only">Net Zero</h1>
+    <h1 class="sr-only">Shut the Box</h1>
     <div class="flex-1"></div>
-    <button id="sb-stats-btn" aria-label="Stats"
+    <button id="stb-stats-btn" aria-label="Stats"
       class="w-8 h-8 rounded-full border border-gray-600 bg-transparent text-gray-400 hover:border-gray-400 hover:text-white transition-colors flex items-center justify-center mr-1">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <line x1="18" y1="20" x2="18" y2="10"/>
@@ -90,7 +90,7 @@
         <line x1="6"  y1="20" x2="6"  y2="14"/>
       </svg>
     </button>
-    <button id="sb-help-btn" aria-label="How to play"
+    <button id="stb-help-btn" aria-label="How to play"
       class="w-8 h-8 rounded-full border border-gray-600 bg-transparent text-gray-400 text-sm font-bold hover:border-gray-400 hover:text-white transition-colors">
       ?
     </button>
@@ -144,118 +144,60 @@
   </nav>
 
   <!-- Game area -->
-  <div class="sb-wrap">
-    <div class="sb-table">
+  <div class="stb-wrap">
 
-      <!-- Opponents -->
-      <div class="sb-ai-row">
-        <div class="sb-ai-seat" id="sb-ai-seat-0">
-          <div class="sb-ai-name">-</div>
-          <div class="sb-ai-bubble"></div>
-          <div class="sb-ai-cards"></div>
-          <div class="sb-ai-total"></div>
+    <!-- The box -->
+    <div class="stb-box" id="stb-box">
+      <div class="stb-tiles" id="stb-tiles"></div>
+      <div class="stb-felt">
+        <div class="stb-statusline">
+          <div id="stb-status" class="stb-status">All 9 tiles up</div>
+          <div id="stb-substatus" class="stb-substatus">Roll the dice to start!</div>
         </div>
-        <div class="sb-ai-seat" id="sb-ai-seat-1">
-          <div class="sb-ai-name">-</div>
-          <div class="sb-ai-bubble"></div>
-          <div class="sb-ai-cards"></div>
-          <div class="sb-ai-total"></div>
+        <div class="stb-dice">
+          <div class="stb-die" id="stb-die-0"><div class="stb-cube" id="stb-cube-0"></div></div>
+          <div class="stb-die" id="stb-die-1"><div class="stb-cube" id="stb-cube-1"></div></div>
         </div>
-        <div class="sb-ai-seat" id="sb-ai-seat-2">
-          <div class="sb-ai-name">-</div>
-          <div class="sb-ai-bubble"></div>
-          <div class="sb-ai-cards"></div>
-          <div class="sb-ai-total"></div>
+        <div class="stb-btn-row">
+          <button id="stb-roll1-btn" class="stb-btn stb-btn-alt hidden">Roll 1 Die</button>
+          <button id="stb-roll-btn" class="stb-btn">Roll Dice</button>
+          <button id="stb-shut-btn" class="stb-btn hidden" disabled>Shut</button>
         </div>
-      </div>
-
-      <!-- Mid: round info, draw pile, dice, messages -->
-      <div class="sb-mid">
-        <div class="sb-midline">
-          <span id="sb-round-label" class="sb-round-label">Round 1 of 3</span>
-          <span id="sb-deck-count" class="sb-deck-count">32 cards in deck</span>
-        </div>
-        <div class="sb-center-row">
-          <div class="sb-pile">
-            <button id="sb-deck" class="sb-deck" type="button" aria-label="Draw pile - take a new card">
-              <span class="sb-card sb-card-back sb-card-sm sb-deck-c sb-deck-c1"></span>
-              <span class="sb-card sb-card-back sb-card-sm sb-deck-c sb-deck-c2"></span>
-              <span class="sb-card sb-card-back sb-card-sm sb-deck-c sb-deck-c3"></span>
-            </button>
-            <span class="sb-pile-label">Draw</span>
-          </div>
-          <div class="sb-pile">
-            <button id="sb-upcard" class="sb-upcard" type="button" aria-label="Face-up card - swap it with a card from your hand"></button>
-            <span class="sb-pile-label">Face up</span>
-          </div>
-          <div class="sb-pile">
-            <div id="sb-dice" class="sb-dice sb-dice-idle">
-              <span class="sb-die" id="sb-die-0"></span>
-              <span class="sb-die" id="sb-die-1"></span>
-            </div>
-            <span class="sb-pile-label">Dice</span>
-          </div>
-        </div>
-        <div id="sb-msg" class="sb-msg"></div>
-        <div id="sb-shift-banner" class="sb-shift-banner hidden">SHIFT!</div>
-      </div>
-
-      <!-- Player -->
-      <div class="sb-player-area" id="sb-player-area">
-        <div class="sb-player-head">
-          <span class="sb-label">Your Hand</span>
-          <span id="sb-player-bubble" class="sb-player-bubble"></span>
-          <span id="sb-player-total" class="sb-player-total">Your total: 0</span>
-        </div>
-        <div id="sb-player-cards" class="sb-player-cards"></div>
-      </div>
-
-    </div><!-- /sb-table -->
-
-    <p id="sb-turn-note" class="sb-turn-note hidden">Waiting for opponents...</p>
-
-    <!-- Player controls -->
-    <div id="sb-controls" class="sb-controls">
-      <div class="sb-your-turn">Your Turn</div>
-      <p class="sb-help-line">Get close to 0: Stand to keep your hand, Draw to take a card from the pile, or tap one of your cards then Swap to trade it for the top of the pile.</p>
-      <div class="sb-action-row">
-        <button id="sb-btn-stand" class="sb-btn sb-btn-ghost">Stand</button>
-        <button id="sb-btn-draw" class="sb-btn sb-btn-alt">Draw</button>
-        <button id="sb-btn-swap" class="sb-btn sb-btn-primary">Swap</button>
       </div>
     </div>
 
     <!-- Results panel -->
-    <div id="sb-results" class="bg-gray-800/60 border border-gray-700 rounded-xl p-4 mt-4 text-center flex flex-col items-center gap-2 hidden">
-      <h2 id="sb-result-title" class="text-lg font-black">Showdown</h2>
-      <p id="sb-result-sub" class="text-sm text-gray-400"></p>
+    <div id="stb-results" class="bg-gray-800/60 border border-gray-700 rounded-xl p-4 mt-4 text-center flex flex-col items-center gap-2 hidden">
+      <h2 id="stb-result-title" class="text-lg font-black">Box Score</h2>
+      <p id="stb-result-sub" class="text-sm text-gray-400"></p>
+      <div id="stb-result-tiles" class="text-xl tracking-wide"></div>
       <div class="flex gap-2 mt-1 w-full justify-center">
-        <button id="sb-share-btn"
+        <button id="stb-share-btn"
           class="flex-1 px-5 py-2 bg-green-700 hover:bg-green-600 text-white text-xs font-bold rounded-lg transition-colors">
           Share Results
         </button>
-        <button onclick="SBGame.showStats()"
+        <button onclick="STBGame.showStats()"
           class="flex-1 px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg transition-colors">
           See Stats
         </button>
       </div>
-      <p class="text-xs text-gray-500">Next deal in: <span id="sb-countdown" class="font-mono text-yellow-300 tabular-nums">--:--:--</span></p>
+      <p class="text-xs text-gray-500">Next box in: <span id="stb-countdown" class="font-mono text-yellow-300 tabular-nums">--:--:--</span></p>
     </div>
 
   </div>
 
   <!-- Stats modal -->
-  <div id="sb-stats-modal" class="fixed inset-0 bg-black/80 flex items-end justify-center z-50 hidden" onclick="SBGame.closeStats()">
+  <div id="stb-stats-modal" class="fixed inset-0 bg-black/80 flex items-end justify-center z-50 hidden" onclick="STBGame.closeStats()">
     <div class="bg-gray-900 border border-gray-700 rounded-t-2xl p-5 max-w-sm w-full max-h-[80vh] overflow-y-auto"
          onclick="event.stopPropagation()"
          style="-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:calc(1.25rem + env(safe-area-inset-bottom,0px))">
       <h2 class="text-xl font-black text-center mb-4">My Stats</h2>
-      <div id="sb-stats-content"></div>
-      <button id="sb-stats-share-btn" onclick="SBGame.shareStats()"
+      <div id="stb-stats-content"></div>
+      <button id="stb-stats-share-btn" onclick="STBGame.shareStats()"
         class="w-full mt-4 py-2.5 bg-green-700 hover:bg-green-600 text-white text-sm font-bold rounded-lg transition-colors">
         Share Stats
       </button>
-      <button onclick="SBGame.closeStats()"
+      <button onclick="STBGame.closeStats()"
         class="w-full mt-2 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-sm font-bold rounded-lg transition-colors">
         Close
       </button>
@@ -263,42 +205,38 @@
   </div>
 
   <!-- How to Play modal -->
-  <div id="sb-modal" class="fixed inset-0 bg-black/80 flex items-end justify-center z-50 hidden" onclick="SBGame.closeModal()">
+  <div id="stb-modal" class="fixed inset-0 bg-black/80 flex items-end justify-center z-50 hidden" onclick="STBGame.closeModal()">
     <div class="bg-gray-900 border border-gray-700 rounded-t-2xl p-5 max-w-sm w-full max-h-[92vh] overflow-y-auto"
          onclick="event.stopPropagation()"
          style="-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:calc(1.25rem + env(safe-area-inset-bottom,0px))">
       <h2 class="text-xl font-black text-center mb-0.5">How to Play</h2>
-      <p class="text-xs text-gray-400 text-center mb-3">Daily Net Zero - land your hand closest to zero. One deal per day.</p>
+      <p class="text-xs text-gray-400 text-center mb-3">The classic pub game - flip every tile to shut the box.</p>
 
       <div class="mb-4">
-        <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">The Cards</h3>
+        <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">Rules</h3>
         <ul class="text-xs text-gray-300 leading-relaxed space-y-1.5 list-disc pl-4">
-          <li>The deck is A through 10 in all four suits (no face cards).</li>
-          <li><strong class="text-white">Black cards (♠ ♣) add</strong> their value; <strong class="text-red-400">red cards (♥ ♦) subtract</strong> theirs. An ace counts as 1.</li>
-          <li>Your hand's total is the sum of all your cards. <strong class="text-white">Closest to zero wins.</strong></li>
+          <li>The box starts with tiles <strong class="text-white">1 through 9</strong> standing up.</li>
+          <li>Roll the dice, then tap tiles that <strong class="text-white">add up exactly to your roll</strong>. Rolled a 7? Flip the 7, or 3 + 4, or 1 + 2 + 4 - your choice. Tap a tile again to unpick it, then press <strong class="text-white">Shut</strong> to flip them down.</li>
+          <li>Once tiles are down, they stay down. Keep rolling and flipping.</li>
+          <li>Once <strong class="text-white">7, 8 and 9</strong> are all shut, you may roll just <strong class="text-white">one die</strong> instead of two.</li>
+          <li>When no combination of standing tiles matches your roll, the game ends. Your <strong class="text-white">score is the sum of tiles left standing</strong> - lower is better.</li>
+          <li>Flip all 9 and you've <strong class="text-white">Shut the Box</strong> - a perfect 0!</li>
         </ul>
       </div>
 
       <div class="mb-4">
-        <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">The Play</h3>
-        <ul class="text-xs text-gray-300 leading-relaxed space-y-1.5 list-disc pl-4">
-          <li>Everyone starts with <strong class="text-white">2 cards</strong> and gets <strong class="text-white">3 rounds</strong> to improve.</li>
-          <li>Each round you either <strong class="text-white">Stand</strong> (keep your hand), <strong class="text-white">Draw</strong> (take a card off the deck, up to 5), or <strong class="text-white">Swap</strong>.</li>
-          <li>There is always one <strong class="text-white">face-up card</strong> on the table. To swap, tap one of your cards and then the face-up card - you take it, and the card you gave up becomes the new face-up card for everyone.</li>
-          <li>After rounds 1 and 2 the <strong class="text-white">dice</strong> are rolled. <strong class="text-yellow-300">Doubles trigger a Shift</strong>: every hand is thrown out and redrawn!</li>
-          <li>After round 3 all hands are revealed and the total closest to zero wins.</li>
-          <li><strong class="text-white">If two hands tie</strong>, the win goes to the <strong class="text-white">positive</strong> total first - so +2 beats -2. Still level? The hand with <strong class="text-white">more cards</strong> takes it, and after that the hand holding the <strong class="text-white">single highest card</strong> - a pair of 7s beats a pair of 3s even though both make zero. Only if everything matches is the win <strong class="text-white">shared</strong>.</li>
-          <li>Hit <strong class="text-white">exactly zero</strong> and you've made a Pure Net Zero. 🌟</li>
-        </ul>
+        <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">Example</h3>
+        <div class="text-xs text-gray-300 leading-relaxed space-y-1">
+          <p>🎲 You roll <strong class="text-white">4 + 5 = 9</strong></p>
+          <p>👆 You tap <strong class="text-white">2</strong> and <strong class="text-white">7</strong> (2 + 7 = 9) - both flip down</p>
+          <p>🎲 You roll <strong class="text-white">8</strong>, but only 1, 3 and 5 are standing - no combo makes 8</p>
+          <p>📦 Game over: 1 + 3 + 5 = <strong class="text-white">9 points</strong></p>
+        </div>
       </div>
 
-      <div class="mb-4">
-        <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">Today's Opponents</h3>
-        <div id="sb-howto-ai-list" class="space-y-2"></div>
-        <p class="text-xs text-gray-300 leading-relaxed mt-2">Each opponent plays their own way - some chase zero recklessly, some stand pat early. Same table for everyone today.</p>
-      </div>
+      <p class="text-xs text-gray-400 mb-4">One box per day - everyone gets the same dice. Tomorrow the box resets.</p>
 
-      <button onclick="SBGame.closeModal()"
+      <button onclick="STBGame.closeModal()"
         class="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-sm font-bold rounded-lg transition-colors">
         Let's Play
       </button>
@@ -306,7 +244,7 @@
   </div>
 
   <script src="/assets/js/utils.js?v=20260817" defer></script>
-  <script src="/assets/js/netzero.js?v=20260817" defer></script>
+  <script src="/assets/js/shutthebox.js?v=20260817" defer></script>
 
 </body>
 </html>
