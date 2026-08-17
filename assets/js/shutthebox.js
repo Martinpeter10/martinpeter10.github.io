@@ -193,10 +193,19 @@
   function renderControls() {
     const rollBtn = $('stb-roll-btn');
     const roll1Btn = $('stb-roll1-btn');
+    const shutBtn = $('stb-shut-btn');
     const showRoll = phase === 'roll' && !outcome;
+    const picking = phase === 'pick' && !outcome;
     rollBtn.classList.toggle('hidden', !showRoll);
     roll1Btn.classList.toggle('hidden', !(showRoll && oneDieAllowed()));
     rollBtn.textContent = (showRoll && oneDieAllowed()) ? 'Roll 2 Dice' : 'Roll Dice';
+    // Shut only confirms an exact match, so the player keeps the choice between
+    // flipping one tile or a combination that makes the same total.
+    shutBtn.classList.toggle('hidden', !picking);
+    shutBtn.disabled = !picking || !curRoll || selSum() !== curRoll.target;
+    shutBtn.textContent = (picking && selected.length)
+      ? 'Shut ' + selected.slice().sort((a, b) => a - b).join(' + ')
+      : 'Shut';
   }
 
   function renderPickStatus() {
@@ -230,6 +239,7 @@
         selected = [];
         renderTiles();
         renderPickStatus();
+        renderControls();
         saveToday();
       }
     });
@@ -251,6 +261,7 @@
       selected.splice(idx, 1);
       renderTiles();
       renderPickStatus();
+      renderControls();
       return;
     }
     if (selSum() + n > curRoll.target) {
@@ -263,7 +274,7 @@
     selected.push(n);
     renderTiles();
     renderPickStatus();
-    if (selSum() === curRoll.target) setTimeout(commitSelection, 260);
+    renderControls();
   }
 
   function commitSelection() {
@@ -456,6 +467,7 @@
 
     $('stb-roll-btn').addEventListener('click', () => onRoll(false));
     $('stb-roll1-btn').addEventListener('click', () => onRoll(true));
+    $('stb-shut-btn').addEventListener('click', commitSelection);
     $('stb-share-btn').addEventListener('click', () => {
       DJUtils.clipboardShare(shareText(), $('stb-share-btn'), 'Share Results');
     });

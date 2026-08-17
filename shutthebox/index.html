@@ -8,7 +8,7 @@
   <meta name="robots" content="index,follow">
   <link rel="canonical" href="https://dailyjamm.com/shutthebox/">
   <link rel="icon" type="image/png" href="/assets/img/favicon.png">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=20260813">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=20260817">
 
   <!-- Open Graph -->
   <meta property="og:site_name" content="DailyJamm" />
@@ -65,8 +65,8 @@
     "author": { "@type": "Organization", "name": "DailyJamm", "url": "https://dailyjamm.com" }
   }
   </script>
-  <script src="/assets/js/menu.js?v=20260813" defer></script>
-  <script src="/assets/js/favorites.js?v=20260813" defer></script>
+  <script src="/assets/js/menu.js?v=20260817" defer></script>
+  <script src="/assets/js/favorites.js?v=20260817" defer></script>
 </head>
 <body class="bg-gray-900 text-white">
 
@@ -108,9 +108,9 @@
       <a class="menu-link" href="/roulettedle/">Roulettedle</a>
       <a class="menu-link" href="/holdle/">Holdle</a>
       <a class="menu-link" href="/liarsdice/">Liar's Dice</a>
-      <a class="menu-link" href="/yacht/">Yacht</a>
-      <a class="menu-link" href="/shutthebox/">Shut the Box</a>
       <a class="menu-link" href="/netzero/">Net Zero</a>
+      <a class="menu-link" href="/shutthebox/">Shut the Box</a>
+      <a class="menu-link" href="/yacht/">Yacht</a>
     </div>
     <div class="menu-sec">
       <div class="menu-title">Our Favorite Games</div>
@@ -162,6 +162,7 @@
         <div class="stb-btn-row">
           <button id="stb-roll1-btn" class="stb-btn stb-btn-alt hidden">Roll 1 Die</button>
           <button id="stb-roll-btn" class="stb-btn">Roll Dice</button>
+          <button id="stb-shut-btn" class="stb-btn hidden" disabled>Shut</button>
         </div>
       </div>
     </div>
@@ -216,7 +217,7 @@
         <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">Rules</h3>
         <ul class="text-xs text-gray-300 leading-relaxed space-y-1.5 list-disc pl-4">
           <li>The box starts with tiles <strong class="text-white">1 through 9</strong> standing up.</li>
-          <li>Roll the dice, then tap tiles that <strong class="text-white">add up exactly to your roll</strong>. Rolled a 7? Flip the 7, or 3 + 4, or 1 + 2 + 4 - your choice.</li>
+          <li>Roll the dice, then tap tiles that <strong class="text-white">add up exactly to your roll</strong>. Rolled a 7? Flip the 7, or 3 + 4, or 1 + 2 + 4 - your choice. Tap a tile again to unpick it, then press <strong class="text-white">Shut</strong> to flip them down.</li>
           <li>Once tiles are down, they stay down. Keep rolling and flipping.</li>
           <li>Once <strong class="text-white">7, 8 and 9</strong> are all shut, you may roll just <strong class="text-white">one die</strong> instead of two.</li>
           <li>When no combination of standing tiles matches your roll, the game ends. Your <strong class="text-white">score is the sum of tiles left standing</strong> - lower is better.</li>
@@ -243,8 +244,8 @@
     </div>
   </div>
 
-  <script src="/assets/js/utils.js?v=20260813" defer></script>
-  <script src="/assets/js/shutthebox.js?v=20260813" defer></script>
+  <script src="/assets/js/utils.js?v=20260817" defer></script>
+  <script src="/assets/js/shutthebox.js?v=20260817" defer></script>
 
 </body>
 </html>
