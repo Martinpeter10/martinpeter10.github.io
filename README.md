@@ -193,7 +193,7 @@ Press `Ctrl+C` in the terminal to stop the server.
 
 Full release notes are also available at [dailyjamm.com/releases](https://dailyjamm.com/releases/).
 
-### v3.3.0 - 2026-08-17
+### v3.3.0 - 2026-08-21
 
 **New Game: Shut the Box** - Flip every tile.
 
