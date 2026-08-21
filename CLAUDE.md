@@ -269,8 +269,17 @@ Add a description paragraph in the "Our Games" section, following the same patte
 <p><strong style="color:#fff">Game Name</strong> - One sentence describing the game and what makes it fun to play.</p>
 ```
 
-### 9. Update Home Page Meta Description
-If the new game is notable, update the `<meta name="description">` and `og:description` on `index.html` to mention it.
+### 9. Update Home Page Copy - ALL FOUR PLACES
+The home page names the games in **four separate spots**, and they drift apart easily. Update every
+one of them, not just the meta tag:
+
+1. `<meta name="description">` - keep it under ~160 chars and lead with the newest game
+2. `<meta property="og:description">` - same text as above
+3. The JSON-LD `"description"` field in the `<script type="application/ld+json">` block
+4. **The visible hero paragraph** (`<p class="tag">`) - this one spells out every game by name, so a
+   new game is obvious by its absence. It has been the one missed most often.
+
+Search `index.html` for the previous newest game's name; every hit is a place that needs the new one.
 
 ### 10. Verify on Dev, Then Pass Both Approval Gates (REQUIRED)
 Every game is built on its `game/<slug>` branch and verified on the dev site first. It only reaches the `tst` branch after the user explicitly approves it for testing (gate 1), and only reaches `main` after the playtest is explicitly approved (gate 2). See "Release Workflow" at the top of this file.
