@@ -358,7 +358,8 @@ gameid: { title: 'Game Name', url: 'https://example.com/', ext: true },
 │   │   ├── roulettedle.js        # Roulettedle game logic
 │   │   ├── holdle.js             # Holdle game logic
 │   │   ├── liarsdice.js          # Liar's Dice game logic
-│   │   └── netzero.js            # Net Zero game logic
+│   │   ├── netzero.js            # Net Zero game logic
+│   │   └── shutthebox.js         # Shut the Box game logic
 │   ├── data/
 │   │   ├── chainlink-puzzles.json  # Chain Link puzzle data
 │   │   └── spelldle-spells.json    # Spelldle spell data
@@ -366,7 +367,7 @@ gameid: { title: 'Game Name', url: 'https://example.com/', ext: true },
 │   └── img/
 │       └── favicon.png           # Site favicon
 ├── themedle/index.html           # Game pages (also chainlink, blackjackdle,
-├── ...                           #   spelldle, roulettedle, holdle, liarsdice, netzero)
+├── ...                           #   spelldle, roulettedle, holdle, liarsdice, netzero, shutthebox)
 ├── about/index.html              # About page
 ├── releases/index.html           # Release notes page
 ├── terms/index.html              # Terms of Service page
@@ -619,6 +620,32 @@ the rest of the day.
 **Rounds**: everyone starts with 2 cards; each turn is Stand, Draw (up to `HAND_MAX`), or Swap.
 After rounds 1 and 2 two dice are rolled - **doubles trigger a Shift**, throwing out and redrawing
 every hand. Do not call these "spike dice" in player-facing copy; they are just "the dice".
+
+
+---
+
+### Shut the Box (`/assets/js/shutthebox.js`)
+
+Page lives at `/shutthebox/`; favorites catalog id is `shutthebox`. Internal identifiers use the
+`stb` prefix (localStorage `stb_*`, DOM ids `stb-*`, CSS `.stb-*`).
+
+Daily solo dice game. Tiles 1-9 start standing; roll two dice and flip down any set of standing
+tiles summing exactly to the roll. Dice are date-seeded via `drawDice(rollIndex)` so the sequence of
+rolls is the same for everyone and a refresh cannot re-roll.
+
+**localStorage keys**: `stb_stats_v2`, `stb_today`, `stb_seen_howto`
+
+**Choosing tiles**: any subset that sums to the roll is legal - a 7 can be the 7, or 3+4, or 1+2+4.
+`canMake(target)` does a proper subset-sum over the standing tiles to decide whether the roll is
+playable at all; a roll with no valid subset ends the game. **Selection is confirmed explicitly with
+the Shut button** (`#stb-shut-btn`), enabled only when `selSum() === curRoll.target`. Do not
+auto-commit when the running total happens to match - that silently robs the player of the choice
+between one tile and an equivalent combination.
+
+**One die**: once 7, 8 and 9 are all shut (`oneDieAllowed()`), the player may roll a single die.
+
+**Scoring**: the sum of tiles left standing when no move is possible; lower is better, and shutting
+all nine is a perfect 0.
 
 
 ## Security Practices
