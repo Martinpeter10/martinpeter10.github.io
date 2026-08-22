@@ -269,8 +269,17 @@ Add a description paragraph in the "Our Games" section, following the same patte
 <p><strong style="color:#fff">Game Name</strong> - One sentence describing the game and what makes it fun to play.</p>
 ```
 
-### 9. Update Home Page Meta Description
-If the new game is notable, update the `<meta name="description">` and `og:description` on `index.html` to mention it.
+### 9. Update Home Page Copy - ALL FOUR PLACES
+The home page names the games in **four separate spots**, and they drift apart easily. Update every
+one of them, not just the meta tag:
+
+1. `<meta name="description">` - keep it under ~160 chars and lead with the newest game
+2. `<meta property="og:description">` - same text as above
+3. The JSON-LD `"description"` field in the `<script type="application/ld+json">` block
+4. **The visible hero paragraph** (`<p class="tag">`) - this one spells out every game by name, so a
+   new game is obvious by its absence. It has been the one missed most often.
+
+Search `index.html` for the previous newest game's name; every hit is a place that needs the new one.
 
 ### 10. Verify on Dev, Then Pass Both Approval Gates (REQUIRED)
 Every game is built on its `game/<slug>` branch and verified on the dev site first. It only reaches the `tst` branch after the user explicitly approves it for testing (gate 1), and only reaches `main` after the playtest is explicitly approved (gate 2). See "Release Workflow" at the top of this file.
@@ -358,7 +367,8 @@ gameid: { title: 'Game Name', url: 'https://example.com/', ext: true },
 │   │   ├── roulettedle.js        # Roulettedle game logic
 │   │   ├── holdle.js             # Holdle game logic
 │   │   ├── liarsdice.js          # Liar's Dice game logic
-│   │   └── netzero.js            # Net Zero game logic
+│   │   ├── netzero.js            # Net Zero game logic
+│   │   └── shutthebox.js         # Shut the Box game logic
 │   ├── data/
 │   │   ├── chainlink-puzzles.json  # Chain Link puzzle data
 │   │   └── spelldle-spells.json    # Spelldle spell data
@@ -366,7 +376,7 @@ gameid: { title: 'Game Name', url: 'https://example.com/', ext: true },
 │   └── img/
 │       └── favicon.png           # Site favicon
 ├── themedle/index.html           # Game pages (also chainlink, blackjackdle,
-├── ...                           #   spelldle, roulettedle, holdle, liarsdice, netzero)
+├── ...                           #   spelldle, roulettedle, holdle, liarsdice, netzero, shutthebox)
 ├── about/index.html              # About page
 ├── releases/index.html           # Release notes page
 ├── terms/index.html              # Terms of Service page
@@ -619,6 +629,32 @@ the rest of the day.
 **Rounds**: everyone starts with 2 cards; each turn is Stand, Draw (up to `HAND_MAX`), or Swap.
 After rounds 1 and 2 two dice are rolled - **doubles trigger a Shift**, throwing out and redrawing
 every hand. Do not call these "spike dice" in player-facing copy; they are just "the dice".
+
+
+---
+
+### Shut the Box (`/assets/js/shutthebox.js`)
+
+Page lives at `/shutthebox/`; favorites catalog id is `shutthebox`. Internal identifiers use the
+`stb` prefix (localStorage `stb_*`, DOM ids `stb-*`, CSS `.stb-*`).
+
+Daily solo dice game. Tiles 1-9 start standing; roll two dice and flip down any set of standing
+tiles summing exactly to the roll. Dice are date-seeded via `drawDice(rollIndex)` so the sequence of
+rolls is the same for everyone and a refresh cannot re-roll.
+
+**localStorage keys**: `stb_stats_v2`, `stb_today`, `stb_seen_howto`
+
+**Choosing tiles**: any subset that sums to the roll is legal - a 7 can be the 7, or 3+4, or 1+2+4.
+`canMake(target)` does a proper subset-sum over the standing tiles to decide whether the roll is
+playable at all; a roll with no valid subset ends the game. **Selection is confirmed explicitly with
+the Shut button** (`#stb-shut-btn`), enabled only when `selSum() === curRoll.target`. Do not
+auto-commit when the running total happens to match - that silently robs the player of the choice
+between one tile and an equivalent combination.
+
+**One die**: once 7, 8 and 9 are all shut (`oneDieAllowed()`), the player may roll a single die.
+
+**Scoring**: the sum of tiles left standing when no move is possible; lower is better, and shutting
+all nine is a perfect 0.
 
 
 ## Security Practices

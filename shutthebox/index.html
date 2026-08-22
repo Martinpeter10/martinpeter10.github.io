@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Liar's Dice | DailyJamm</title>
-  <meta name="description" content="Play Liar's Dice on DailyJamm - the classic dice bluffing game against 3 AI opponents. Bid, bluff, and call Liar to be the last one standing.">
+  <title>Shut the Box | DailyJamm</title>
+  <meta name="description" content="Play Shut the Box on DailyJamm - roll the dice and flip down tiles that add up to your roll. Shut all 9 tiles for a perfect game. One box per day.">
   <meta name="robots" content="index,follow">
-  <link rel="canonical" href="https://dailyjamm.com/liarsdice/">
+  <link rel="canonical" href="https://dailyjamm.com/shutthebox/">
   <link rel="icon" type="image/png" href="/assets/img/favicon.png">
   <link rel="stylesheet" href="/assets/css/styles.css?v=20260821">
 
   <!-- Open Graph -->
   <meta property="og:site_name" content="DailyJamm" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://dailyjamm.com/liarsdice/" />
-  <meta property="og:title" content="Liar's Dice | DailyJamm" />
-  <meta property="og:description" content="A new table every day - bid, bluff, and call Liar against 3 AI opponents. One wrong call and you're out for the day." />
+  <meta property="og:url" content="https://dailyjamm.com/shutthebox/" />
+  <meta property="og:title" content="Shut the Box | DailyJamm" />
+  <meta property="og:description" content="Daily Shut the Box - roll the dice, flip down tiles that add up to your roll, and try to shut all 9. One box per day." />
   <meta property="og:image" content="https://dailyjamm.com/assets/img/favicon.png" />
 
   <!-- Theme color -->
@@ -52,18 +52,15 @@
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
 
-  <style>
-    body { overflow: hidden; }
-  </style>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    "name": "Liar's Dice",
-    "url": "https://dailyjamm.com/liarsdice/",
+    "name": "Shut the Box",
+    "url": "https://dailyjamm.com/shutthebox/",
     "applicationCategory": "GameApplication",
     "operatingSystem": "Web",
-    "description": "The classic dice bluffing game, daily against 3 AI opponents. Bid, bluff, and call Liar to be the last one standing.",
+    "description": "Daily Shut the Box - roll the dice, flip down tiles that add up to your roll, and try to shut all 9 tiles.",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
     "author": { "@type": "Organization", "name": "DailyJamm", "url": "https://dailyjamm.com" }
   }
@@ -83,9 +80,9 @@
       </span>
     </button>
     <a href="/" class="site-brand">DailyJamm</a>
-    <h1 class="sr-only">Liar's Dice</h1>
+    <h1 class="sr-only">Shut the Box</h1>
     <div class="flex-1"></div>
-    <button id="bf-stats-btn" aria-label="Stats"
+    <button id="stb-stats-btn" aria-label="Stats"
       class="w-8 h-8 rounded-full border border-gray-600 bg-transparent text-gray-400 hover:border-gray-400 hover:text-white transition-colors flex items-center justify-center mr-1">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <line x1="18" y1="20" x2="18" y2="10"/>
@@ -93,7 +90,7 @@
         <line x1="6"  y1="20" x2="6"  y2="14"/>
       </svg>
     </button>
-    <button id="bf-help-btn" aria-label="How to play"
+    <button id="stb-help-btn" aria-label="How to play"
       class="w-8 h-8 rounded-full border border-gray-600 bg-transparent text-gray-400 text-sm font-bold hover:border-gray-400 hover:text-white transition-colors">
       ?
     </button>
@@ -147,120 +144,60 @@
   </nav>
 
   <!-- Game area -->
-  <div class="bf-game-wrap">
-    <div class="bf-container">
+  <div class="stb-wrap">
 
-      <!-- Felt table -->
-      <div class="bf-table">
-
-        <!-- Opponents -->
-        <div class="bf-ai-row">
-          <div class="bf-ai-seat" id="bf-ai-seat-0">
-            <div class="bf-ai-name">-</div>
-            <div class="bf-ai-bubble"></div>
-            <div class="bf-ai-dicearea"></div>
-          </div>
-          <div class="bf-ai-seat" id="bf-ai-seat-1">
-            <div class="bf-ai-name">-</div>
-            <div class="bf-ai-bubble"></div>
-            <div class="bf-ai-dicearea"></div>
-          </div>
-          <div class="bf-ai-seat" id="bf-ai-seat-2">
-            <div class="bf-ai-name">-</div>
-            <div class="bf-ai-bubble"></div>
-            <div class="bf-ai-dicearea"></div>
-          </div>
+    <!-- The box -->
+    <div class="stb-box" id="stb-box">
+      <div class="stb-tiles" id="stb-tiles"></div>
+      <div class="stb-felt">
+        <div class="stb-statusline">
+          <div id="stb-status" class="stb-status">All 9 tiles up</div>
+          <div id="stb-substatus" class="stb-substatus">Roll the dice to start!</div>
         </div>
-
-        <!-- Round info + current bid -->
-        <div class="bf-mid">
-          <div class="bf-topline">
-            <span id="bf-round-label" class="bf-round-label">Round 1</span>
-            <span id="bf-total-dice" class="bf-total-dice">20 dice on the table</span>
-          </div>
-          <div id="bf-current-bid" class="bf-current-bid"></div>
+        <div class="stb-dice">
+          <div class="stb-die" id="stb-die-0"><div class="stb-cube" id="stb-cube-0"></div></div>
+          <div class="stb-die" id="stb-die-1"><div class="stb-cube" id="stb-cube-1"></div></div>
         </div>
-
-        <!-- Player dice -->
-        <div class="bf-player-area">
-          <div class="bf-player-head">
-            <span class="bf-label">Your Dice</span>
-            <span id="bf-player-bubble" class="bf-player-bubble"></span>
-          </div>
-          <div id="bf-player-dice" class="bf-player-dice"></div>
-        </div>
-
-      </div><!-- /bf-table -->
-
-      <p id="bf-turn-note" class="bf-turn-note hidden">Waiting for opponents...</p>
-
-      <!-- Reveal panel -->
-      <div id="bf-reveal-panel" class="bf-reveal-panel hidden">
-        <div id="bf-reveal-title" class="bf-reveal-title"></div>
-        <div id="bf-reveal-count" class="bf-reveal-count"></div>
-        <div id="bf-reveal-verdict" class="bf-reveal-verdict"></div>
-        <button id="bf-continue-btn" class="bf-btn bf-btn-primary">Continue</button>
-      </div>
-
-      <!-- Player controls -->
-      <div id="bf-controls" class="bf-controls hidden">
-        <div class="bf-your-turn">Your Turn</div>
-        <p class="bf-help-line">Raise the bid (more dice, or same dice with a higher face) - or call LIAR!</p>
-        <div class="bf-ctl-row">
-          <span class="bf-ctl-label">How many</span>
-          <div class="bf-qty">
-            <button id="bf-qty-minus" class="bf-qty-btn" aria-label="Fewer dice">−</button>
-            <span id="bf-qty-val" class="bf-qty-val">2</span>
-            <button id="bf-qty-plus" class="bf-qty-btn" aria-label="More dice">+</button>
-          </div>
-        </div>
-        <div class="bf-ctl-row">
-          <span class="bf-ctl-label">Of which face</span>
-          <div id="bf-face-row" class="bf-face-row"></div>
-        </div>
-        <div class="bf-action-row">
-          <button id="bf-btn-liar" class="bf-btn bf-btn-danger">LIAR!</button>
-          <button id="bf-btn-bid" class="bf-btn bf-btn-primary">Bid</button>
+        <div class="stb-btn-row">
+          <button id="stb-roll1-btn" class="stb-btn stb-btn-alt hidden">Roll 1 Die</button>
+          <button id="stb-roll-btn" class="stb-btn">Roll Dice</button>
+          <button id="stb-shut-btn" class="stb-btn hidden" disabled>Shut</button>
         </div>
       </div>
-
-  <!-- Results panel -->
-      <div id="bf-results" class="bf-results hidden">
-        <div class="bf-results-inner">
-          <h2 id="bf-result-title" class="text-lg font-black">Liar's Dice Complete!</h2>
-          <p id="bf-result-sub" class="text-sm text-gray-400 mt-1"></p>
-          <div id="bf-result-dots" class="text-xl mt-2 flex gap-1 justify-center"></div>
-          <div class="flex gap-2 mt-3 w-full justify-center">
-            <button id="bf-share-btn"
-              class="flex-1 px-5 py-2 bg-green-700 hover:bg-green-600 text-white text-xs font-bold rounded-lg transition-colors">
-              Share Results
-            </button>
-            <button onclick="BFGame.showStats()"
-              class="flex-1 px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg transition-colors">
-              See Stats
-            </button>
-          </div>
-          <p class="text-xs text-gray-500 mt-2">Next table in: <span id="bf-countdown" class="font-mono text-yellow-300 tabular-nums">--:--:--</span></p>
-        </div>
-      </div>
-
     </div>
+
+    <!-- Results panel -->
+    <div id="stb-results" class="bg-gray-800/60 border border-gray-700 rounded-xl p-4 mt-4 text-center flex flex-col items-center gap-2 hidden">
+      <h2 id="stb-result-title" class="text-lg font-black">Box Score</h2>
+      <p id="stb-result-sub" class="text-sm text-gray-400"></p>
+      <div id="stb-result-tiles" class="text-xl tracking-wide"></div>
+      <div class="flex gap-2 mt-1 w-full justify-center">
+        <button id="stb-share-btn"
+          class="flex-1 px-5 py-2 bg-green-700 hover:bg-green-600 text-white text-xs font-bold rounded-lg transition-colors">
+          Share Results
+        </button>
+        <button onclick="STBGame.showStats()"
+          class="flex-1 px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg transition-colors">
+          See Stats
+        </button>
+      </div>
+      <p class="text-xs text-gray-500">Next box in: <span id="stb-countdown" class="font-mono text-yellow-300 tabular-nums">--:--:--</span></p>
+    </div>
+
   </div>
 
   <!-- Stats modal -->
-  <div id="bf-stats-modal" class="fixed inset-0 bg-black/80 flex items-end justify-center z-50 hidden" onclick="BFGame.closeStats()">
+  <div id="stb-stats-modal" class="fixed inset-0 bg-black/80 flex items-end justify-center z-50 hidden" onclick="STBGame.closeStats()">
     <div class="bg-gray-900 border border-gray-700 rounded-t-2xl p-5 max-w-sm w-full max-h-[80vh] overflow-y-auto"
          onclick="event.stopPropagation()"
          style="-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:calc(1.25rem + env(safe-area-inset-bottom,0px))">
       <h2 class="text-xl font-black text-center mb-4">My Stats</h2>
-      <div id="bf-stats-content"></div>
-      <div id="bf-place-section"></div>
-      <div id="bf-hh-section"></div>
-      <button id="bf-stats-share-btn" onclick="BFGame.shareStats()"
+      <div id="stb-stats-content"></div>
+      <button id="stb-stats-share-btn" onclick="STBGame.shareStats()"
         class="w-full mt-4 py-2.5 bg-green-700 hover:bg-green-600 text-white text-sm font-bold rounded-lg transition-colors">
         Share Stats
       </button>
-      <button onclick="BFGame.closeStats()"
+      <button onclick="STBGame.closeStats()"
         class="w-full mt-2 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-sm font-bold rounded-lg transition-colors">
         Close
       </button>
@@ -268,43 +205,38 @@
   </div>
 
   <!-- How to Play modal -->
-  <div id="bf-modal" class="fixed inset-0 bg-black/80 flex items-end justify-center z-50 hidden" onclick="BFGame.closeModal()">
+  <div id="stb-modal" class="fixed inset-0 bg-black/80 flex items-end justify-center z-50 hidden" onclick="STBGame.closeModal()">
     <div class="bg-gray-900 border border-gray-700 rounded-t-2xl p-5 max-w-sm w-full max-h-[92vh] overflow-y-auto"
          onclick="event.stopPropagation()"
          style="-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:calc(1.25rem + env(safe-area-inset-bottom,0px))">
       <h2 class="text-xl font-black text-center mb-0.5">How to Play</h2>
-      <p class="text-xs text-gray-400 text-center mb-3">A new table every day - outlast 3 opponents to win it.</p>
+      <p class="text-xs text-gray-400 text-center mb-3">The classic pub game - flip every tile to shut the box.</p>
 
       <div class="mb-4">
         <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">Rules</h3>
         <ul class="text-xs text-gray-300 leading-relaxed space-y-1.5 list-disc pl-4">
-          <li>Everyone shakes a cup of <strong class="text-white">5 dice</strong>. You only see your own.</li>
-          <li>Players take turns bidding on how many dice of one face are on the <strong class="text-white">whole table</strong> - for example "four 3s" means at least four 3s among ALL dice.</li>
-          <li>Each bid must raise the last one: either a <strong class="text-white">higher quantity</strong> (any face), or the <strong class="text-white">same quantity with a higher face</strong>.</li>
-          <li>Ones are <strong class="text-white">not wild</strong> - every face only counts as itself.</li>
-          <li>Instead of bidding, you can call <strong class="text-white">LIAR!</strong> All dice are revealed: if the bid was good, the caller is out - if it was a bluff, the bidder is out.</li>
-          <li><strong class="text-white">One wrong call and you're out for the day.</strong> Survive every challenge and be the last one standing to win.</li>
-          <li>After each elimination the remaining players reshake and a new round begins.</li>
+          <li>The box starts with tiles <strong class="text-white">1 through 9</strong> standing up.</li>
+          <li>Roll the dice, then tap tiles that <strong class="text-white">add up exactly to your roll</strong>. Rolled a 7? Flip the 7, or 3 + 4, or 1 + 2 + 4 - your choice. Tap a tile again to unpick it, then press <strong class="text-white">Shut</strong> to flip them down.</li>
+          <li>Once tiles are down, they stay down. Keep rolling and flipping.</li>
+          <li>Once <strong class="text-white">7, 8 and 9</strong> are all shut, you may roll just <strong class="text-white">one die</strong> instead of two.</li>
+          <li>When no combination of standing tiles matches your roll, the game ends. Your <strong class="text-white">score is the sum of tiles left standing</strong> - lower is better.</li>
+          <li>Flip all 9 and you've <strong class="text-white">Shut the Box</strong> - a perfect 0!</li>
         </ul>
       </div>
 
       <div class="mb-4">
         <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">Example</h3>
-        <div class="bf-demo-lines text-xs text-gray-300 leading-relaxed space-y-1">
-          <p class="bf-demo-1">Jon bids <strong class="text-white">three 4s</strong></p>
-          <p class="bf-demo-2">You raise to <strong class="text-white">three 5s</strong> (same amount, higher face)</p>
-          <p class="bf-demo-3">David raises to <strong class="text-white">five 2s</strong> (higher amount, any face)</p>
-          <p class="bf-demo-4"><strong class="text-red-400">You call LIAR!</strong> Only three 2s show up - David was bluffing and is out!</p>
+        <div class="text-xs text-gray-300 leading-relaxed space-y-1">
+          <p>🎲 You roll <strong class="text-white">4 + 5 = 9</strong></p>
+          <p>👆 You tap <strong class="text-white">2</strong> and <strong class="text-white">7</strong> (2 + 7 = 9) - both flip down</p>
+          <p>🎲 You roll <strong class="text-white">8</strong>, but only 1, 3 and 5 are standing - no combo makes 8</p>
+          <p>📦 Game over: 1 + 3 + 5 = <strong class="text-white">9 points</strong></p>
         </div>
       </div>
 
-      <div class="mb-4">
-        <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">Today's Opponents</h3>
-        <div id="bf-howto-ai-list" class="space-y-2"></div>
-        <p class="text-xs text-gray-300 leading-relaxed mt-2">Each opponent has their own style - some bluff constantly, some only bid what they can see. Learn their tells!</p>
-      </div>
+      <p class="text-xs text-gray-400 mb-4">One box per day - everyone gets the same dice. Tomorrow the box resets.</p>
 
-      <button onclick="BFGame.closeModal()"
+      <button onclick="STBGame.closeModal()"
         class="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-sm font-bold rounded-lg transition-colors">
         Let's Play
       </button>
@@ -312,7 +244,7 @@
   </div>
 
   <script src="/assets/js/utils.js?v=20260821" defer></script>
-  <script src="/assets/js/liarsdice.js?v=20260821" defer></script>
+  <script src="/assets/js/shutthebox.js?v=20260821" defer></script>
 
 </body>
 </html>
