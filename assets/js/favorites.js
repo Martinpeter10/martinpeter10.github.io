@@ -17,6 +17,7 @@ window.DJFav = (function () {
     liarsdice:    { title: "Liar's Dice",         url: '/liarsdice/' },
     netzero:      { title: 'Net Zero',            url: '/netzero/' },
     shutthebox:   { title: 'Shut the Box',        url: '/shutthebox/' },
+    yachtdle:     { title: 'Yachtdle',            url: '/yachtdle/' },
     akari:        { title: 'Akari',               url: 'https://dailyakari.com/', ext: true },
     bandle:       { title: 'Bandle',              url: 'https://bandle.app/', ext: true },
     circuits:     { title: 'Circuits',            url: 'https://www.puzzmo.com/play/circuits/', ext: true },

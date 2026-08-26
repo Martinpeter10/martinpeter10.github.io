@@ -193,6 +193,18 @@ Press `Ctrl+C` in the terminal to stop the server.
 
 Full release notes are also available at [dailyjamm.com/releases](https://dailyjamm.com/releases/).
 
+### v3.4.0 - 2026-08-26
+
+**New Game: Yachtdle** - Thirteen boxes, one scorecard a day.
+
+- Launched **Yachtdle** - the classic five-dice game, one scorecard a day
+- Thirteen turns, one for each box. Roll five dice, tap any you want to keep, and reroll up to twice
+- Commit the hand to any box you have not used yet - and once a box is filled it is locked, so a bad roll sometimes means deliberately taking a zero somewhere
+- Every box shows what it would score before you commit, so you can weigh a safe 20 against holding out for something better
+- Score **63 or more** in the upper section for a **+35 bonus**, and five of a kind is a 50-point Yacht
+- The dice tumble in 3D as they roll, and held dice sit out while the rest come up
+- One scorecard per day. Fill the last box and that is your score - stats track your best, your average and your streak
+
 ### v3.3.0 - 2026-08-21
 
 **New Game: Shut the Box** - Flip every tile.

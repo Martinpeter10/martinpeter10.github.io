@@ -368,7 +368,8 @@ gameid: { title: 'Game Name', url: 'https://example.com/', ext: true },
 │   │   ├── holdle.js             # Holdle game logic
 │   │   ├── liarsdice.js          # Liar's Dice game logic
 │   │   ├── netzero.js            # Net Zero game logic
-│   │   └── shutthebox.js         # Shut the Box game logic
+│   │   ├── shutthebox.js         # Shut the Box game logic
+│   │   └── yachtdle.js           # Yachtdle game logic
 │   ├── data/
 │   │   ├── chainlink-puzzles.json  # Chain Link puzzle data
 │   │   └── spelldle-spells.json    # Spelldle spell data
@@ -376,7 +377,8 @@ gameid: { title: 'Game Name', url: 'https://example.com/', ext: true },
 │   └── img/
 │       └── favicon.png           # Site favicon
 ├── themedle/index.html           # Game pages (also chainlink, blackjackdle,
-├── ...                           #   spelldle, roulettedle, holdle, liarsdice, netzero, shutthebox)
+├── ...                           #   spelldle, roulettedle, holdle, liarsdice, netzero,
+├── ...                           #   shutthebox, yachtdle)
 ├── about/index.html              # About page
 ├── releases/index.html           # Release notes page
 ├── terms/index.html              # Terms of Service page
@@ -655,6 +657,38 @@ between one tile and an equivalent combination.
 
 **Scoring**: the sum of tiles left standing when no move is possible; lower is better, and shutting
 all nine is a perfect 0.
+
+
+---
+
+### Yachtdle (`/assets/js/yachtdle.js`)
+
+Page lives at `/yachtdle/`; favorites catalog id is `yachtdle`. Internal identifiers use the `yc`
+prefix (localStorage `yc_*`, DOM ids `yc-*`, CSS `.yc-*`, `window.YCGame`). The game was built as
+"Yacht" and renamed before it shipped, so internals were left alone.
+
+**The game is Yachtdle; the 50-point hand is still a "Yacht"** - same relationship Yahtzee has with
+its own jackpot roll. `CATEGORIES` keeps `{ id: 'yacht', label: 'Yacht' }` and the stats row reads
+"Yachts Rolled". Do not blanket-rename these.
+
+Classic five-dice scorecard, 13 turns. Each turn allows up to 3 rolls with holds, then the hand must
+be committed to one of the 13 boxes; a used box is locked, so a bad turn may mean scoring a zero.
+
+**localStorage keys**: `yc_stats_v2`, `yc_today`, `yc_seen_howto`
+
+**Dice are rolled per player, not date-seeded.** Full state is therefore persisted after every roll,
+hold and assignment - `saveToday()` runs *before* anything paints, so a refresh restores the exact
+dice on the table rather than granting a fresh roll. Do not move that save later.
+
+**Scoring**: upper section Ones-Sixes with a **+35 bonus at 63**; lower section three/four of a kind
+(sum of dice), full house 25, small straight 30, large straight 40, Yacht 50, chance (sum). Five of a
+kind does **not** count as a full house. Max possible is 375.
+
+**Dice rendering**: each die is a 6-face CSS cube (`FACE_PLACE` / `FACE_SHOW`, opposites sum to 7) that
+tumbles two full turns onto its face, the same treatment Shut the Box uses. Dice elements are built
+once at boot and reused - rebuilding them mid-tumble throws away the transition. Only dice that
+actually moved animate, so held dice sit still, and the scorecard stays locked while dice are in the
+air so previews cannot be read early.
 
 
 ## Security Practices

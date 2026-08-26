@@ -27,18 +27,18 @@
     if (localStorage.getItem('dj_cookie_ok')) djClarity();
   </script>
 
-  <meta name="description" content="Your hub for daily mini-games. Play Shut the Box, Net Zero, Liar's Dice, Themedle and more original games, plus a curated list of the daily games we love." />
+  <meta name="description" content="Your hub for daily mini-games. Play Yachtdle, Shut the Box, Net Zero, Liar's Dice and more original games, plus a curated list of the daily games we love." />
   <meta name="robots" content="index,follow">
   <link rel="canonical" href="https://dailyjamm.com/" />
   <link rel="icon" type="image/png" href="/assets/img/favicon.png">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=20260821">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=20260826">
 
   <!-- Open Graph -->
   <meta property="og:site_name" content="DailyJamm" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://dailyjamm.com/" />
   <meta property="og:title" content="DailyJamm - Daily Games Hub" />
-  <meta property="og:description" content="Your hub for daily mini-games. Play Shut the Box, Net Zero, Liar's Dice, Themedle and more original games, plus a curated list of the daily games we love." />
+  <meta property="og:description" content="Your hub for daily mini-games. Play Yachtdle, Shut the Box, Net Zero, Liar's Dice and more original games, plus a curated list of the daily games we love." />
   <meta property="og:image" content="https://dailyjamm.com/assets/img/favicon.png" />
 
   <!-- THEME COLOR FIXES FOR iOS SAFARI: set to site background so overscroll/toolbar areas aren't green -->
@@ -141,12 +141,12 @@
     "@type": "WebSite",
     "name": "DailyJamm",
     "url": "https://dailyjamm.com/",
-    "description": "Your hub for daily mini-games. Play Shut the Box, Net Zero, Liar's Dice, Themedle and more original games, plus a curated collection of the best daily games.",
+    "description": "Your hub for daily mini-games. Play Yachtdle, Shut the Box, Net Zero, Liar's Dice and more original games, plus a curated collection of the best daily games.",
     "author": { "@type": "Organization", "name": "DailyJamm", "url": "https://dailyjamm.com" }
   }
   </script>
-  <script src="/assets/js/menu.js?v=20260821" defer></script>
-  <script src="/assets/js/favorites.js?v=20260821" defer></script>
+  <script src="/assets/js/menu.js?v=20260826" defer></script>
+  <script src="/assets/js/favorites.js?v=20260826" defer></script>
 </head>
 <body>
   <header class="site-header">
@@ -173,6 +173,7 @@
       <a class="menu-link" href="/liarsdice/">Liar's Dice</a>
       <a class="menu-link" href="/netzero/">Net Zero</a>
       <a class="menu-link" href="/shutthebox/">Shut the Box</a>
+      <a class="menu-link" href="/yachtdle/">Yachtdle</a>
     </div>
     <div class="menu-sec">
       <div class="menu-title">Our Favorite Games</div>
@@ -211,7 +212,7 @@
       <div class="brandmark">
         <h1>DailyJamm</h1>
       </div>
-      <p class="tag">DailyJamm is your dose of daily games. Play <strong>Themedle</strong>, <strong>Chain Link</strong>, <strong>BlackJackdle</strong>, <strong>Spelldle</strong>, <strong>Roulettedle</strong>, <strong>Holdle</strong>, <strong>Liar's Dice</strong>, <strong>Net Zero</strong>, and <strong>Shut the Box</strong> - our original daily games - plus a curated collection of our favorite daily games. Star any game or add your own links to build your own list!</p>
+      <p class="tag">DailyJamm is your dose of daily games. Play <strong>Themedle</strong>, <strong>Chain Link</strong>, <strong>BlackJackdle</strong>, <strong>Spelldle</strong>, <strong>Roulettedle</strong>, <strong>Holdle</strong>, <strong>Liar's Dice</strong>, <strong>Net Zero</strong>, <strong>Shut the Box</strong>, and <strong>Yachtdle</strong> - our original daily games - plus a curated collection of our favorite daily games. Star any game or add your own links to build your own list!</p>
     </header>
 
     <section class="section">
@@ -351,7 +352,6 @@
           <p>Daily card game - black adds, red subtracts. Land closest to zero.</p>
         </article>
         <article class="card our" data-fav-id="shutthebox" onclick="goto('/shutthebox/')" role="button" tabindex="0" aria-label="Play Shut the Box">
-          <span class="badge">New</span>
           <div class="icon our">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <rect x="3" y="3" width="18" height="8" rx="1.5" fill="none" stroke="white" stroke-width="1.6"/>
@@ -367,6 +367,21 @@
           </div>
           <h3>Shut the Box</h3>
           <p>Roll the dice and flip down tiles. Shut all 9 for a perfect game.</p>
+        </article>
+        <article class="card our" data-fav-id="yachtdle" onclick="goto('/yachtdle/')" role="button" tabindex="0" aria-label="Play Yachtdle">
+          <span class="badge">New</span>
+          <div class="icon our">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="3" y="9" width="12" height="12" rx="2.5" fill="none" stroke="white" stroke-width="2"/>
+              <circle cx="6.6" cy="12.6" r="1.15" fill="white"/>
+              <circle cx="11.4" cy="15" r="1.15" fill="white"/>
+              <circle cx="6.6" cy="17.4" r="1.15" fill="white"/>
+              <path d="M9.5 6.2 14 3.2l4.4 3v5.2L14 14.4 9.5 11.4z" fill="none" stroke="white" stroke-width="1.8" stroke-linejoin="round"/>
+              <circle cx="14" cy="8.8" r="1.15" fill="white"/>
+            </svg>
+          </div>
+          <h3>Yachtdle</h3>
+          <p>One scorecard a day. Roll, hold, and fill all 13 boxes.</p>
         </article>
       </div>
     </section>
