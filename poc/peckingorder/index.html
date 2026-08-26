@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<title>Pecking Order (POC) | DailyJamm</title>
+<meta name="description" content="Prototype of Pecking Order, a daily ranking game. Not a released DailyJamm game.">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/png" href="/assets/img/favicon.png">
+
+<meta name="theme-color" content="#1a1a2e" />
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1a1a2e" />
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#1a1a2e" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+<meta name="referrer" content="strict-origin-when-cross-origin" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self';" />
+
+<style>
+  :root{
+    --bg:#1a1a2e; --panel:#16213e; --brand:#2ecc71; --brand2:#45b7d1;
+    --ink:#fff; --muted:#b8b8d1;
+    --line:rgba(255,255,255,.10);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;
+    -webkit-text-size-adjust:100%;
+    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+  .wrap{max-width:520px;margin:0 auto;padding:18px 16px 40px}
+
+  .brand{
+    font-weight:800;font-size:15px;letter-spacing:.2px;
+    background:linear-gradient(90deg,var(--brand2),var(--brand));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  h1{font-size:26px;margin:4px 0 2px;letter-spacing:.3px}
+  .sub{margin:0 0 18px;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:1.2px}
+
+  .prompt{
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:14px 16px;margin:0 0 10px;font-size:16px;line-height:1.45;
+    box-shadow:0 6px 18px rgba(0,0,0,.28);
+  }
+  .hint{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.4}
+
+  .list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+  .row{
+    display:flex;align-items:center;gap:10px;
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:8px 8px 8px 10px;min-height:60px;
+    cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;
+    transition:border-color .15s,box-shadow .15s,transform .15s,background .15s;
+  }
+  .row:focus-visible{outline:2px solid var(--brand2);outline-offset:2px}
+  .rank{
+    flex:0 0 30px;width:30px;height:30px;border-radius:9px;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(69,183,209,.14);color:var(--brand2);
+    font-weight:800;font-size:14px;font-variant-numeric:tabular-nums;
+  }
+  .name{flex:1;min-width:0;font-size:16px;font-weight:600;line-height:1.25}
+  .arrows{flex:0 0 auto;display:flex;gap:2px}
+  .arrow{
+    width:44px;height:44px;border-radius:10px;
+    border:1px solid var(--line);background:rgba(255,255,255,.04);
+    color:var(--muted);font-size:13px;line-height:1;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;-webkit-tap-highlight-color:transparent;
+    transition:color .15s,border-color .15s,background .15s;
+  }
+  .arrow:hover:not(:disabled){color:var(--ink);border-color:rgba(255,255,255,.28)}
+  .arrow:disabled{opacity:.28;cursor:not-allowed}
+
+  .row.selected{
+    border-color:var(--brand2);
+    box-shadow:0 0 0 1px var(--brand2),0 0 16px rgba(69,183,209,.28);
+    background:rgba(69,183,209,.08);
+  }
+  .row.locked{
+    cursor:default;
+    border-color:rgba(46,204,113,.55);
+    background:rgba(46,204,113,.10);
+  }
+  .row.locked .rank{background:rgba(46,204,113,.18);color:var(--brand)}
+  .row.locked .name{color:var(--brand)}
+
+  .shake{animation:shake .34s cubic-bezier(.36,.07,.19,.97)}
+  @keyframes shake{
+    10%,90%{transform:translateX(-2px)}
+    20%,80%{transform:translateX(4px)}
+    30%,50%,70%{transform:translateX(-6px)}
+    40%,60%{transform:translateX(6px)}
+  }
+  .fade-up{animation:fadeUp .35s ease both}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){
+    .shake,.fade-up{animation:none}
+  }
+
+  .foot{margin-top:18px;display:flex;flex-direction:column;align-items:center;gap:10px}
+  .submit{
+    width:100%;min-height:48px;border:0;border-radius:12px;
+    background:linear-gradient(90deg,var(--brand2),var(--brand));
+    color:#06121a;font-weight:800;font-size:15px;letter-spacing:.3px;
+    cursor:pointer;-webkit-tap-highlight-color:transparent;
+  }
+  .status{margin:0;min-height:18px;color:var(--muted);font-size:13px;text-align:center}
+  .phase{
+    margin:22px 0 0;padding-top:14px;border-top:1px solid var(--line);
+    color:var(--muted);font-size:12px;line-height:1.5;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">DailyJamm</div>
+    <h1>Pecking Order</h1>
+    <p class="sub">Prototype - phase 1</p>
+  </header>
+
+  <p class="prompt" id="po-prompt"></p>
+  <p class="hint">Tap a row to pick it up, then tap another to swap the two. The arrows nudge a row one place at a time.</p>
+
+  <ol class="list" id="po-list" aria-label="Your ranking"></ol>
+
+  <div class="foot">
+    <button class="submit" id="po-submit" type="button">Submit ranking</button>
+    <p class="status" id="po-status" role="status"></p>
+  </div>
+
+  <p class="phase">Phase 1 build: reordering only. Scoring, locking, the reveal and stats arrive in later phases.</p>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ── Puzzle data ────────────────────────────────────────────────────────
+     Items are listed in CORRECT order: index 0 is rank 1.
+     This array stands in for /assets/data/peckingorder-puzzles.json later. */
+  var PUZZLES = [
+    {
+      id: 1,
+      prompt: 'Rank these countries by land area, largest first.',
+      items: [
+        { name: 'Canada',    value: '9.98M km2' },
+        { name: 'China',     value: '9.60M km2' },
+        { name: 'Brazil',    value: '8.52M km2' },
+        { name: 'Australia', value: '7.69M km2' },
+        { name: 'India',     value: '3.29M km2' }
+      ]
+    },
+    {
+      id: 2,
+      prompt: 'Rank these planets by diameter, largest first.',
+      items: [
+        { name: 'Jupiter', value: '139,820 km' },
+        { name: 'Saturn',  value: '116,460 km' },
+        { name: 'Uranus',  value: '50,724 km' },
+        { name: 'Neptune', value: '49,244 km' },
+        { name: 'Earth',   value: '12,742 km' }
+      ]
+    },
+    {
+      id: 3,
+      prompt: 'Rank these films by worldwide box office, highest first.',
+      items: [
+        { name: 'Avatar',                      value: '$2.92B' },
+        { name: 'Avengers: Endgame',           value: '$2.80B' },
+        { name: 'Avatar: The Way of Water',    value: '$2.32B' },
+        { name: 'Titanic',                     value: '$2.26B' },
+        { name: 'Star Wars: The Force Awakens', value: '$2.07B' }
+      ]
+    },
+    {
+      id: 4,
+      prompt: 'Rank these animals by top speed, fastest first.',
+      items: [
+        { name: 'Peregrine falcon', value: '240 mph' },
+        { name: 'Cheetah',          value: '70 mph' },
+        { name: 'Pronghorn',        value: '55 mph' },
+        { name: 'Lion',             value: '50 mph' },
+        { name: 'Greyhound',        value: '43 mph' }
+      ]
+    },
+    {
+      id: 5,
+      prompt: 'Rank these elements by atomic number, highest first.',
+      items: [
+        { name: 'Gold',    value: '79' },
+        { name: 'Silver',  value: '47' },
+        { name: 'Iron',    value: '26' },
+        { name: 'Calcium', value: '20' },
+        { name: 'Carbon',  value: '6' }
+      ]
+    },
+    {
+      id: 6,
+      prompt: 'Rank these US national parks by yearly visitors, most first.',
+      items: [
+        { name: 'Great Smoky Mountains', value: '13.3M visitors' },
+        { name: 'Grand Canyon',          value: '4.7M visitors' },
+        { name: 'Zion',                  value: '4.6M visitors' },
+        { name: 'Yellowstone',           value: '4.5M visitors' },
+        { name: 'Yosemite',              value: '3.9M visitors' }
+      ]
+    },
+    {
+      id: 7,
+      prompt: 'Rank these programming languages by first release, oldest first.',
+      items: [
+        { name: 'Fortran', value: '1957' },
+        { name: 'C',       value: '1972' },
+        { name: 'Python',  value: '1991' },
+        { name: 'Java',    value: '1995' },
+        { name: 'Rust',    value: '2015' }
+      ]
+    },
+    {
+      id: 8,
+      prompt: 'Rank these mountains by height above sea level, tallest first.',
+      items: [
+        { name: 'Everest',      value: '8,849 m' },
+        { name: 'K2',           value: '8,611 m' },
+        { name: 'Kangchenjunga', value: '8,586 m' },
+        { name: 'Lhotse',       value: '8,516 m' },
+        { name: 'Makalu',       value: '8,485 m' }
+      ]
+    }
+  ];
+
+  /* ── Daily seeding ─────────────────────────────────────────────────────── */
+
+  // Deterministic PRNG so every player sees the same starting arrangement.
+  function mulberry32(a){
+    return function(){
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      var t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  // Chicago-local date, DST safe.
+  function chicagoParts(){
+    var f = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/Chicago', year: 'numeric', month: '2-digit', day: '2-digit'
+    }).formatToParts(new Date());
+    var o = {};
+    f.forEach(function(p){ o[p.type] = p.value; });
+    return { y: +o.year, m: +o.month, d: +o.day };
+  }
+
+  function dayOfYear(){
+    var p = chicagoParts();
+    var start = Date.UTC(p.y, 0, 1);
+    var today = Date.UTC(p.y, p.m - 1, p.d);
+    return Math.round((today - start) / 86400000) + 1;
+  }
+
+  function shuffled(n, rnd){
+    var a = [], i, j, t;
+    for (i = 0; i < n; i++) a.push(i);
+    for (i = n - 1; i > 0; i--){
+      j = Math.floor(rnd() * (i + 1));
+      t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function fixedPoints(a){
+    var n = 0;
+    for (var i = 0; i < a.length; i++) if (a[i] === i) n++;
+    return n;
+  }
+
+  // Swap this for a JSON fetch once the puzzle bank moves out of the file.
+  function getPuzzle(){
+    var doy = dayOfYear();
+    var puzzle = PUZZLES[(doy - 1) % PUZZLES.length];
+    var rnd = mulberry32(doy * 1000 + puzzle.id);
+    // Insist on a derangement so nobody opens the day with a free green.
+    // Roughly 37% of 5-item shuffles qualify, so this lands in a few tries.
+    var order = shuffled(puzzle.items.length, rnd);
+    var guard = 0;
+    while (fixedPoints(order) > 0 && guard++ < 50) order = shuffled(puzzle.items.length, rnd);
+    return { puzzle: puzzle, dayOfYear: doy, startOrder: order };
+  }
+
+  /* ── State ─────────────────────────────────────────────────────────────── */
+
+  var daily   = getPuzzle();
+  var items   = daily.puzzle.items;
+  var order   = daily.startOrder.slice();  // order[slot] = index into items
+  var locked  = [];                        // slot indices frozen by a green result
+  var selected = null;
+
+  for (var i = 0; i < order.length; i++) locked.push(false);
+
+  var listEl   = document.getElementById('po-list');
+  var statusEl = document.getElementById('po-status');
+
+  function setStatus(msg){ statusEl.textContent = msg || ''; }
+
+  function shake(el){
+    if (!el) return;
+    el.classList.remove('shake');
+    void el.offsetWidth;
+    el.classList.add('shake');
+  }
+
+  function rowAt(slot){ return listEl.children[slot] || null; }
+
+  /* ── Rendering ─────────────────────────────────────────────────────────── */
+
+  function render(){
+    listEl.textContent = '';
+    order.forEach(function(itemIdx, slot){
+      var item = items[itemIdx];
+
+      var li = document.createElement('li');
+      li.className = 'row' + (locked[slot] ? ' locked' : '') + (selected === slot ? ' selected' : '');
+      li.dataset.slot = String(slot);
+      if (!locked[slot]){
+        li.setAttribute('role', 'button');
+        li.tabIndex = 0;
+        li.setAttribute('aria-pressed', selected === slot ? 'true' : 'false');
+        li.setAttribute('aria-label', item.name + ', position ' + (slot + 1) + ' of ' + order.length);
+      } else {
+        li.setAttribute('aria-label', item.name + ', locked in position ' + (slot + 1));
+      }
+
+      var rank = document.createElement('span');
+      rank.className = 'rank';
+      rank.textContent = String(slot + 1);
+
+      var name = document.createElement('span');
+      name.className = 'name';
+      name.textContent = item.name;
+
+      var arrows = document.createElement('span');
+      arrows.className = 'arrows';
+      arrows.appendChild(makeArrow(slot, -1, 'Move ' + item.name + ' up'));
+      arrows.appendChild(makeArrow(slot,  1, 'Move ' + item.name + ' down'));
+
+      li.appendChild(rank);
+      li.appendChild(name);
+      li.appendChild(arrows);
+      listEl.appendChild(li);
+    });
+  }
+
+  function makeArrow(slot, dir, label){
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'arrow';
+    b.textContent = dir < 0 ? '▲' : '▼';
+    b.setAttribute('aria-label', label);
+    var target = slot + dir;
+    b.disabled = locked[slot] || target < 0 || target >= order.length || locked[target];
+    b.addEventListener('click', function(e){
+      e.stopPropagation();
+      move(slot, dir);
+    });
+    return b;
+  }
+
+  /* ── Reordering ────────────────────────────────────────────────────────── */
+
+  function swap(a, b){
+    if (a === b) return false;
+    if (locked[a] || locked[b]) return false;
+    var t = order[a]; order[a] = order[b]; order[b] = t;
+    return true;
+  }
+
+  function move(slot, dir){
+    var target = slot + dir;
+    if (target < 0 || target >= order.length || locked[slot] || locked[target]){
+      shake(rowAt(slot));
+      return;
+    }
+    swap(slot, target);
+    selected = null;
+    render();
+    var moved = rowAt(target);
+    if (moved) moved.classList.add('fade-up');
+    setStatus('');
+  }
+
+  function pick(slot){
+    if (locked[slot]){
+      shake(rowAt(slot));
+      return;
+    }
+    if (selected === null){
+      selected = slot;
+      render();
+      setStatus('Picked up ' + items[order[slot]].name + '. Tap another row to swap.');
+      return;
+    }
+    if (selected === slot){
+      selected = null;
+      render();
+      setStatus('');
+      return;
+    }
+    var from = selected;
+    if (!swap(from, slot)){
+      shake(rowAt(slot));
+      return;
+    }
+    selected = null;
+    render();
+    var a = rowAt(from), b = rowAt(slot);
+    if (a) a.classList.add('fade-up');
+    if (b) b.classList.add('fade-up');
+    setStatus('');
+  }
+
+  listEl.addEventListener('click', function(e){
+    var row = e.target.closest('.row');
+    if (!row) return;
+    pick(Number(row.dataset.slot));
+  });
+
+  listEl.addEventListener('keydown', function(e){
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    var row = e.target.closest('.row');
+    if (!row) return;
+    e.preventDefault();
+    pick(Number(row.dataset.slot));
+  });
+
+  document.getElementById('po-submit').addEventListener('click', function(){
+    // Phase 2 replaces this with grading, colour feedback and the 3-attempt limit.
+    setStatus('Scoring arrives in phase 2.');
+  });
+
+  /* ── Boot ──────────────────────────────────────────────────────────────── */
+
+  document.getElementById('po-prompt').textContent = daily.puzzle.prompt;
+  document.title = 'Pecking Order #' + daily.dayOfYear + ' (POC) | DailyJamm';
+  render();
+})();
+</script>
+</body>
+</html>

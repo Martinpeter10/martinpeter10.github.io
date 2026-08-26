@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<title>Alibi (POC) | DailyJamm</title>
+<meta name="description" content="Prototype of Alibi, a daily logic-grid mystery. Not a released DailyJamm game.">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/png" href="/assets/img/favicon.png">
+
+<meta name="theme-color" content="#1a1a2e" />
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1a1a2e" />
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#1a1a2e" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+<meta name="referrer" content="strict-origin-when-cross-origin" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self';" />
+
+<style>
+  :root{
+    --bg:#1a1a2e; --panel:#16213e; --brand:#2ecc71; --brand2:#45b7d1;
+    --ink:#fff; --muted:#b8b8d1;
+    --line:rgba(255,255,255,.10);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;
+    -webkit-text-size-adjust:100%;
+    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+  .wrap{max-width:520px;margin:0 auto;padding:18px 16px 40px}
+
+  .brand{
+    font-weight:800;font-size:15px;letter-spacing:.2px;
+    background:linear-gradient(90deg,var(--brand2),var(--brand));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  h1{font-size:26px;margin:4px 0 2px;letter-spacing:.3px}
+  .sub{margin:0 0 18px;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:1.2px}
+
+  h2{
+    font-size:12px;text-transform:uppercase;letter-spacing:1.4px;
+    color:var(--muted);margin:22px 0 8px;font-weight:700;
+  }
+
+  .card{
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:14px 16px;box-shadow:0 6px 18px rgba(0,0,0,.28);
+  }
+  .intro{margin:0;font-size:15px;line-height:1.5}
+  .condition{
+    margin:12px 0 0;padding-top:12px;border-top:1px solid var(--line);
+    font-size:14px;line-height:1.45;color:var(--brand2);font-weight:600;
+  }
+
+  .clues{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px}
+  .clues li{font-size:14px;line-height:1.45;color:var(--ink)}
+  .clues li::marker{color:var(--brand2);font-weight:700}
+
+  /* ── Logic grid ─────────────────────────────────────────────────────── */
+  .grid{
+    display:grid;
+    grid-template-columns:62px repeat(4,1fr);
+    gap:4px;
+  }
+  .gcorner{background:transparent}
+  .ghead,.gside{
+    display:flex;align-items:center;justify-content:center;
+    font-size:11px;font-weight:800;letter-spacing:.6px;color:var(--muted);
+    text-transform:uppercase;
+  }
+  .gside{justify-content:flex-start;padding-right:4px;font-size:12px;letter-spacing:.2px}
+  .ghead{padding-bottom:2px}
+  .cell{
+    aspect-ratio:1/1;min-height:48px;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    color:var(--muted);font-size:19px;line-height:1;font-weight:700;
+    cursor:pointer;user-select:none;
+    -webkit-tap-highlight-color:transparent;touch-action:manipulation;
+    transition:background .12s,border-color .12s,color .12s;
+    padding:0;font-family:inherit;
+  }
+  .cell:hover{border-color:rgba(255,255,255,.26)}
+  .cell:focus-visible{outline:2px solid var(--brand2);outline-offset:2px}
+  .cell.x{color:#e8674f}
+  .cell.o{
+    color:var(--brand);background:rgba(46,204,113,.12);
+    border-color:rgba(46,204,113,.5);
+  }
+
+  .legend{
+    margin:10px 0 0;display:flex;flex-wrap:wrap;gap:4px 14px;
+    color:var(--muted);font-size:12px;line-height:1.4;
+  }
+  .legend b{color:var(--ink);font-weight:700;letter-spacing:.5px}
+
+  .phase{
+    margin:24px 0 0;padding-top:14px;border-top:1px solid var(--line);
+    color:var(--muted);font-size:12px;line-height:1.5;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">DailyJamm</div>
+    <h1>Alibi</h1>
+    <p class="sub">Prototype - phase 1</p>
+  </header>
+
+  <div class="card">
+    <p class="intro" id="al-intro"></p>
+    <p class="condition" id="al-condition"></p>
+  </div>
+
+  <h2>Clues</h2>
+  <ol class="clues" id="al-clues"></ol>
+
+  <h2>Who was where</h2>
+  <p class="legend" id="al-hint" style="margin:0 0 10px">Tap a square to cycle it: blank, then <b style="color:#e8674f">✗</b>, then <b style="color:#2ecc71">●</b>.</p>
+  <div class="grid" id="al-grid-room" role="group" aria-label="Suspect by room grid"></div>
+  <p class="legend" id="al-legend-room"></p>
+
+  <p class="phase">Phase 1 build: the Suspect-by-Room grid only. The Suspect-by-Time grid, the Check button, culprit selection and stats arrive in later phases.</p>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ── Puzzle data ────────────────────────────────────────────────────────
+     Every clue set below was machine-checked by brute force over all 576
+     (room-permutation x time-permutation) assignments: each yields exactly
+     one solution, that solution is the one recorded here, and exactly one
+     suspect satisfies the culprit condition. The forced deduction order is
+     noted per puzzle so the chain can be re-checked by hand. */
+  var PUZZLES = [
+    {
+      id: 1,
+      intro: 'The silver trophy went missing from the Study at 9pm. Four people were in the house that evening, each in a different room and each seen at a different time. Work out who was where and you will know who took it.',
+      condition: 'The thief was in the Study at 9pm.',
+      suspects: ['Ada', 'Boone', 'Clay', 'Delia'],
+      rooms: ['Study', 'Kitchen', 'Garden', 'Cellar'],
+      times: ['7pm', '8pm', '9pm', '10pm'],
+      clues: [
+        'Ada was in the Kitchen.',
+        'Boone was never in the Cellar.',
+        'Delia was in neither the Study nor the Garden.',
+        'Whoever was in the Garden was seen exactly one hour before Ada.',
+        'Boone was the first person seen that evening.',
+        'Ada was seen before Clay, and Clay before whoever was in the Cellar.'
+      ],
+      // Forced order: clue 6 plus clue 5 fixes the whole time column
+      // (Boone 7, Ada 8, Clay 9, Delia 10). Clue 1 gives Ada the Kitchen,
+      // clue 3 gives Delia the Cellar, clue 4 makes the 7pm person (Boone)
+      // the Garden visitor, and clue 2 leaves Clay the Study.
+      solution: [
+        { suspect: 'Ada',   room: 'Kitchen', time: '8pm' },
+        { suspect: 'Boone', room: 'Garden',  time: '7pm' },
+        { suspect: 'Clay',  room: 'Study',   time: '9pm' },
+        { suspect: 'Delia', room: 'Cellar',  time: '10pm' }
+      ],
+      culprit: 'Clay'
+    },
+    {
+      id: 2,
+      intro: 'A letter was taken from the Attic at 8pm while the household was still awake. Four people were seen that evening, each in a different room and each at a different hour.',
+      condition: 'The thief was in the Attic at 8pm.',
+      suspects: ['Iris', 'Jonah', 'Kell', 'Mara'],
+      rooms: ['Library', 'Pantry', 'Attic', 'Porch'],
+      times: ['6pm', '7pm', '8pm', '9pm'],
+      clues: [
+        'Mara was in the Pantry.',
+        'Iris was seen before anyone else.',
+        'Jonah was seen later than Kell.',
+        'Whoever was on the Porch was the first person seen.',
+        'Mara was seen exactly one hour after Iris.',
+        'Whoever was in the Library was the last person seen.'
+      ],
+      // Forced order: clue 2 puts Iris at 6pm, clue 4 makes her the Porch
+      // visitor, clue 5 puts Mara at 7pm, clue 3 splits the remaining hours
+      // (Kell 8, Jonah 9), clue 6 hands Jonah the Library and clue 1 gives
+      // Mara the Pantry, leaving Kell the Attic.
+      solution: [
+        { suspect: 'Iris',  room: 'Porch',   time: '6pm' },
+        { suspect: 'Jonah', room: 'Library', time: '9pm' },
+        { suspect: 'Kell',  room: 'Attic',   time: '8pm' },
+        { suspect: 'Mara',  room: 'Pantry',  time: '7pm' }
+      ],
+      culprit: 'Kell'
+    },
+    {
+      id: 3,
+      intro: 'The gallery ledger was lifted from the Office at 10pm, late on a long evening. Four people were in the building, each in a different room and each seen at a different hour.',
+      condition: 'The thief was in the Office at 10pm.',
+      suspects: ['Neve', 'Omar', 'Pia', 'Rhett'],
+      rooms: ['Gallery', 'Cellar', 'Terrace', 'Office'],
+      times: ['8pm', '9pm', '10pm', '11pm'],
+      clues: [
+        'Rhett was in the Cellar.',
+        'Neve was seen before Rhett.',
+        'Whoever was on the Terrace was the first person seen.',
+        'Pia was the last person seen.',
+        'Omar was seen exactly one hour after Rhett.',
+        'Pia was not in the Office.'
+      ],
+      // Forced order: clue 4 puts Pia at 11pm, then clues 2 and 5 leave only
+      // Neve 8, Rhett 9, Omar 10. Clue 3 makes Neve the Terrace visitor,
+      // clue 1 gives Rhett the Cellar, and clue 6 leaves Pia the Gallery and
+      // Omar the Office.
+      solution: [
+        { suspect: 'Neve',  room: 'Terrace', time: '8pm' },
+        { suspect: 'Omar',  room: 'Office',  time: '10pm' },
+        { suspect: 'Pia',   room: 'Gallery', time: '11pm' },
+        { suspect: 'Rhett', room: 'Cellar',  time: '9pm' }
+      ],
+      culprit: 'Omar'
+    }
+  ];
+
+  /* ── Daily seeding ─────────────────────────────────────────────────────── */
+
+  function chicagoParts(){
+    var parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/Chicago', year: 'numeric', month: '2-digit', day: '2-digit'
+    }).formatToParts(new Date());
+    var o = {};
+    parts.forEach(function(p){ o[p.type] = p.value; });
+    return { y: +o.year, m: +o.month, d: +o.day };
+  }
+
+  function dayOfYear(){
+    var p = chicagoParts();
+    return Math.round((Date.UTC(p.y, p.m - 1, p.d) - Date.UTC(p.y, 0, 1)) / 86400000) + 1;
+  }
+
+  // Swap for a JSON fetch once the puzzle bank moves out of the file.
+  function getPuzzle(){
+    var doy = dayOfYear();
+    return { puzzle: PUZZLES[(doy - 1) % PUZZLES.length], dayOfYear: doy };
+  }
+
+  /* ── Column abbreviations ──────────────────────────────────────────────
+     Three letters keeps the grid legible at 375px. Extend on collision so a
+     future puzzle with two rooms sharing a prefix still reads correctly. */
+  function abbreviate(labels){
+    var len = 3, out, seen, ok, i;
+    while (len <= 8){
+      out = labels.map(function(l){ return l.slice(0, len).toUpperCase(); });
+      seen = {}; ok = true;
+      for (i = 0; i < out.length; i++){
+        if (seen[out[i]]) { ok = false; break; }
+        seen[out[i]] = true;
+      }
+      if (ok) return out;
+      len++;
+    }
+    return labels.map(function(l){ return l.toUpperCase(); });
+  }
+
+  /* ── State ─────────────────────────────────────────────────────────────
+     One structure holds both grids so phase 2 only has to render the second.
+     marks.room[suspectIndex][roomIndex] is '' | 'x' | 'o'. */
+  var daily   = getPuzzle();
+  var puzzle  = daily.puzzle;
+  var CYCLE   = ['', 'x', 'o'];
+  var GLYPH   = { x: '✗', o: '●' };
+
+  var state = { marks: { room: blankGrid(), time: blankGrid() } };
+
+  function blankGrid(){
+    var g = [], r, c;
+    for (r = 0; r < puzzle.suspects.length; r++){
+      g.push([]);
+      for (c = 0; c < puzzle.rooms.length; c++) g[r].push('');
+    }
+    return g;
+  }
+
+  /* ── Rendering ─────────────────────────────────────────────────────────── */
+
+  function renderIntro(){
+    document.getElementById('al-intro').textContent = puzzle.intro;
+    document.getElementById('al-condition').textContent = puzzle.condition;
+
+    var list = document.getElementById('al-clues');
+    list.textContent = '';
+    puzzle.clues.forEach(function(clue){
+      var li = document.createElement('li');
+      li.textContent = clue;
+      list.appendChild(li);
+    });
+  }
+
+  function renderGrid(which, cols, containerId, legendId){
+    var abbr = abbreviate(cols);
+    var host = document.getElementById(containerId);
+    host.textContent = '';
+
+    var corner = document.createElement('div');
+    corner.className = 'gcorner';
+    host.appendChild(corner);
+
+    abbr.forEach(function(a, c){
+      var h = document.createElement('div');
+      h.className = 'ghead';
+      h.textContent = a;
+      h.title = cols[c];
+      host.appendChild(h);
+    });
+
+    puzzle.suspects.forEach(function(suspect, r){
+      var side = document.createElement('div');
+      side.className = 'gside';
+      side.textContent = suspect;
+      host.appendChild(side);
+
+      cols.forEach(function(col, c){
+        var mark = state.marks[which][r][c];
+        var cell = document.createElement('button');
+        cell.type = 'button';
+        cell.className = 'cell' + (mark ? ' ' + mark : '');
+        cell.textContent = GLYPH[mark] || '';
+        cell.dataset.row = String(r);
+        cell.dataset.col = String(c);
+        cell.setAttribute('aria-label', suspect + ', ' + col + ': ' + describe(mark));
+        cell.addEventListener('click', function(){ cycle(which, r, c, cell, suspect, col); });
+        host.appendChild(cell);
+      });
+    });
+
+    var legend = document.getElementById(legendId);
+    legend.textContent = '';
+    cols.forEach(function(col, c){
+      var span = document.createElement('span');
+      var b = document.createElement('b');
+      b.textContent = abbr[c];
+      span.appendChild(b);
+      span.appendChild(document.createTextNode(' = ' + col));
+      legend.appendChild(span);
+    });
+  }
+
+  function describe(mark){
+    if (mark === 'x') return 'ruled out';
+    if (mark === 'o') return 'placed';
+    return 'blank';
+  }
+
+  function cycle(which, r, c, cell, suspect, col){
+    // Deliberately does NOT auto-eliminate the rest of the row or column -
+    // the player does their own bookkeeping.
+    var next = CYCLE[(CYCLE.indexOf(state.marks[which][r][c]) + 1) % CYCLE.length];
+    state.marks[which][r][c] = next;
+    // Repaint just this cell so keyboard focus survives the tap.
+    cell.className = 'cell' + (next ? ' ' + next : '');
+    cell.textContent = GLYPH[next] || '';
+    cell.setAttribute('aria-label', suspect + ', ' + col + ': ' + describe(next));
+  }
+
+  /* ── Boot ──────────────────────────────────────────────────────────────── */
+
+  document.title = 'Alibi #' + daily.dayOfYear + ' (POC) | DailyJamm';
+  renderIntro();
+  renderGrid('room', puzzle.rooms, 'al-grid-room', 'al-legend-room');
+})();
+</script>
+</body>
+</html>

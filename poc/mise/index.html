@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<title>Mise (POC) | DailyJamm</title>
+<meta name="description" content="Prototype of Mise, a daily ingredient reveal game. Not a released DailyJamm game.">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/png" href="/assets/img/favicon.png">
+
+<meta name="theme-color" content="#1a1a2e" />
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1a1a2e" />
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#1a1a2e" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+<meta name="referrer" content="strict-origin-when-cross-origin" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self';" />
+
+<style>
+  :root{
+    --bg:#1a1a2e; --panel:#16213e; --brand:#2ecc71; --brand2:#45b7d1;
+    --ink:#fff; --muted:#b8b8d1;
+    --line:rgba(255,255,255,.10);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;
+    -webkit-text-size-adjust:100%;
+    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+  .wrap{max-width:520px;margin:0 auto;padding:18px 16px 40px}
+
+  .brand{
+    font-weight:800;font-size:15px;letter-spacing:.2px;
+    background:linear-gradient(90deg,var(--brand2),var(--brand));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  h1{font-size:26px;margin:4px 0 2px;letter-spacing:.3px}
+  .sub{margin:0 0 18px;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:1.2px}
+
+  .meta{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+  .counter{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:1.2px;font-weight:700}
+  .worth{
+    background:rgba(46,204,113,.14);color:var(--brand);
+    border:1px solid rgba(46,204,113,.4);border-radius:999px;
+    padding:4px 12px;font-size:12px;font-weight:800;letter-spacing:.4px;
+  }
+
+  .stack{list-style:none;margin:0 0 18px;padding:0;display:flex;flex-direction:column;gap:8px}
+  .ing{
+    display:flex;align-items:center;gap:12px;
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;box-shadow:0 6px 18px rgba(0,0,0,.24);
+    animation:fadeUp .38s ease both;
+  }
+  .ing-n{
+    flex:0 0 26px;width:26px;height:26px;border-radius:8px;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(69,183,209,.14);color:var(--brand2);
+    font-weight:800;font-size:12px;font-variant-numeric:tabular-nums;
+  }
+  .ing-name{font-size:16px;font-weight:600;line-height:1.3}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .shake{animation:shake .34s cubic-bezier(.36,.07,.19,.97)}
+  @keyframes shake{
+    10%,90%{transform:translateX(-2px)}
+    20%,80%{transform:translateX(4px)}
+    30%,50%,70%{transform:translateX(-6px)}
+    40%,60%{transform:translateX(6px)}
+  }
+  @media (prefers-reduced-motion:reduce){ .ing,.shake{animation:none} }
+
+  /* ── Guess box ──────────────────────────────────────────────────────── */
+  .guessbox{position:relative}
+  #mi-input{
+    width:100%;min-height:50px;
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    color:var(--ink);font-family:inherit;
+    font-size:16px;            /* 16px minimum stops iOS zooming on focus */
+    padding:12px 14px;
+  }
+  #mi-input::placeholder{color:var(--muted);opacity:.8}
+  #mi-input:focus{outline:none;border-color:var(--brand2);box-shadow:0 0 0 1px var(--brand2)}
+
+  .ac{
+    position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:20;
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    box-shadow:0 12px 30px rgba(0,0,0,.45);
+    overflow:hidden auto;max-height:236px;
+    display:none;
+  }
+  .ac.open{display:block}
+  .ac-item{
+    display:block;width:100%;text-align:left;
+    background:transparent;border:0;border-bottom:1px solid var(--line);
+    color:var(--ink);font-family:inherit;font-size:15px;
+    padding:0 14px;min-height:46px;cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .ac-item:last-child{border-bottom:0}
+  .ac-item:hover,.ac-item.active{background:rgba(69,183,209,.14);color:var(--brand2)}
+  .ac-empty{padding:14px;color:var(--muted);font-size:14px}
+
+  .actions{display:flex;gap:8px;margin-top:10px}
+  .btn{
+    flex:1;min-height:48px;border-radius:12px;border:1px solid var(--line);
+    font-family:inherit;font-size:15px;font-weight:800;letter-spacing:.3px;
+    cursor:pointer;-webkit-tap-highlight-color:transparent;
+  }
+  .btn-primary{
+    border:0;background:linear-gradient(90deg,var(--brand2),var(--brand));color:#06121a;
+  }
+  .btn-ghost{background:rgba(255,255,255,.04);color:var(--muted)}
+  .btn-ghost:hover{color:var(--ink);border-color:rgba(255,255,255,.28)}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+
+  .status{margin:12px 0 0;min-height:18px;color:var(--muted);font-size:13px;text-align:center}
+  .phase{
+    margin:24px 0 0;padding-top:14px;border-top:1px solid var(--line);
+    color:var(--muted);font-size:12px;line-height:1.5;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">DailyJamm</div>
+    <h1>Mise</h1>
+    <p class="sub">Prototype - phase 1</p>
+  </header>
+
+  <div class="meta">
+    <span class="counter" id="mi-counter">Ingredient 1 of 6</span>
+    <span class="worth" id="mi-worth">Worth 6 pts</span>
+  </div>
+
+  <ul class="stack" id="mi-stack" aria-label="Revealed ingredients" aria-live="polite"></ul>
+
+  <div class="guessbox">
+    <input id="mi-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off"
+           spellcheck="false" role="combobox" aria-expanded="false" aria-autocomplete="list"
+           aria-controls="mi-ac" aria-label="Name the dish" placeholder="Name the dish...">
+    <div class="ac" id="mi-ac" role="listbox" aria-label="Dish suggestions"></div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-primary" id="mi-guess" type="button">Guess</button>
+    <button class="btn btn-ghost" id="mi-skip" type="button">Skip</button>
+  </div>
+
+  <p class="status" id="mi-status" role="status"></p>
+
+  <p class="phase">Phase 1 build: the first ingredient and the autocomplete input. The guess and skip loop, progressive reveal, scoring, results and stats arrive in later phases.</p>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ── Puzzle data ────────────────────────────────────────────────────────
+     Ingredients run MOST OBSCURE FIRST. The opener should be a real clue for
+     someone who cooks without giving the dish away; the last one should make
+     it nearly obvious. This array stands in for a JSON file later. */
+  var PUZZLES = [
+    { id: 1,  dish: 'Carbonara',
+      ingredients: ['Guanciale', 'Pecorino Romano', 'Egg yolk', 'Black pepper', 'Salt', 'Spaghetti'] },
+    { id: 2,  dish: 'Pad Thai',
+      ingredients: ['Tamarind paste', 'Dried shrimp', 'Palm sugar', 'Fish sauce', 'Peanuts', 'Rice noodles'] },
+    { id: 3,  dish: 'Guacamole',
+      ingredients: ['Serrano chile', 'Cilantro', 'White onion', 'Lime', 'Salt', 'Avocado'] },
+    { id: 4,  dish: 'Borscht',
+      ingredients: ['Smetana', 'Dill', 'Bay leaf', 'Cabbage', 'Potato', 'Beetroot'] },
+    { id: 5,  dish: 'Tiramisu',
+      ingredients: ['Marsala wine', 'Mascarpone', 'Egg yolk', 'Cocoa powder', 'Espresso', 'Ladyfingers'] },
+    { id: 6,  dish: 'Ratatouille',
+      ingredients: ['Herbes de Provence', 'Olive oil', 'Bell pepper', 'Courgette', 'Tomato', 'Aubergine'] },
+    { id: 7,  dish: 'Chicken Tikka Masala',
+      ingredients: ['Kasuri methi', 'Garam masala', 'Yoghurt', 'Tomato', 'Double cream', 'Chicken'] },
+    { id: 8,  dish: 'California Roll',
+      ingredients: ['Tobiko', 'Kewpie mayonnaise', 'Nori', 'Avocado', 'Imitation crab', 'Sushi rice'] },
+    { id: 9,  dish: 'Pho',
+      ingredients: ['Star anise', 'Charred ginger', 'Cinnamon bark', 'Fish sauce', 'Beef brisket', 'Rice noodles'] },
+    { id: 10, dish: 'Moussaka',
+      ingredients: ['Nutmeg', 'Cinnamon', 'Bechamel', 'Lamb mince', 'Potato', 'Aubergine'] },
+    { id: 11, dish: 'Paella',
+      ingredients: ['Saffron', 'Smoked paprika', 'Sofrito', 'Bomba rice', 'Mussels', 'Prawns'] },
+    { id: 12, dish: 'Banoffee Pie',
+      ingredients: ['Dulce de leche', 'Digestive biscuits', 'Butter', 'Toffee', 'Double cream', 'Banana'] }
+  ];
+
+  var MAX_REVEALS = 6;
+
+  /* ── Daily seeding ─────────────────────────────────────────────────────── */
+
+  function chicagoParts(){
+    var parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/Chicago', year: 'numeric', month: '2-digit', day: '2-digit'
+    }).formatToParts(new Date());
+    var o = {};
+    parts.forEach(function(p){ o[p.type] = p.value; });
+    return { y: +o.year, m: +o.month, d: +o.day };
+  }
+
+  function dayOfYear(){
+    var p = chicagoParts();
+    return Math.round((Date.UTC(p.y, p.m - 1, p.d) - Date.UTC(p.y, 0, 1)) / 86400000) + 1;
+  }
+
+  // Swap for a JSON fetch once the dish bank moves out of the file.
+  function getPuzzle(){
+    var doy = dayOfYear();
+    return { puzzle: PUZZLES[(doy - 1) % PUZZLES.length], dayOfYear: doy };
+  }
+
+  /* ── Guess normalisation ───────────────────────────────────────────────
+     Lowercase, drop punctuation, collapse whitespace, drop a leading "the".
+     Phase 2 adds levenshtein() on top of this for near-miss acceptance. */
+  function normalize(s){
+    return String(s)
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .replace(/^the\s+/, '');
+  }
+
+  /* ── State ─────────────────────────────────────────────────────────────── */
+
+  var daily    = getPuzzle();
+  var puzzle   = daily.puzzle;
+  var DISHES   = PUZZLES.map(function(p){ return p.dish; }).sort();
+  var revealed = 1;      // ingredients on screen
+  var active   = -1;     // highlighted autocomplete row
+
+  var inputEl  = document.getElementById('mi-input');
+  var acEl     = document.getElementById('mi-ac');
+  var stackEl  = document.getElementById('mi-stack');
+  var statusEl = document.getElementById('mi-status');
+
+  /* ── Rendering ─────────────────────────────────────────────────────────── */
+
+  function renderStack(){
+    stackEl.textContent = '';
+    for (var i = 0; i < revealed; i++){
+      var li = document.createElement('li');
+      li.className = 'ing';
+
+      var n = document.createElement('span');
+      n.className = 'ing-n';
+      n.textContent = String(i + 1);
+
+      var name = document.createElement('span');
+      name.className = 'ing-name';
+      name.textContent = puzzle.ingredients[i];
+
+      li.appendChild(n);
+      li.appendChild(name);
+      stackEl.appendChild(li);
+    }
+
+    document.getElementById('mi-counter').textContent =
+      'Ingredient ' + revealed + ' of ' + MAX_REVEALS;
+    document.getElementById('mi-worth').textContent =
+      'Worth ' + (MAX_REVEALS - revealed + 1) + ' pts';
+  }
+
+  /* ── Autocomplete ──────────────────────────────────────────────────────── */
+
+  function matches(q){
+    var n = normalize(q);
+    if (!n) return [];
+    return DISHES.filter(function(d){ return normalize(d).indexOf(n) !== -1; }).slice(0, 6);
+  }
+
+  function closeAc(){
+    acEl.classList.remove('open');
+    acEl.textContent = '';
+    inputEl.setAttribute('aria-expanded', 'false');
+    active = -1;
+  }
+
+  function renderAc(){
+    var list = matches(inputEl.value);
+    acEl.textContent = '';
+
+    if (!inputEl.value.trim()){ closeAc(); return; }
+
+    if (!list.length){
+      var empty = document.createElement('div');
+      empty.className = 'ac-empty';
+      empty.textContent = 'No dish by that name.';
+      acEl.appendChild(empty);
+      acEl.classList.add('open');
+      inputEl.setAttribute('aria-expanded', 'true');
+      active = -1;
+      return;
+    }
+
+    list.forEach(function(dish, i){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'ac-item' + (i === active ? ' active' : '');
+      b.textContent = dish;
+      b.setAttribute('role', 'option');
+      b.setAttribute('aria-selected', i === active ? 'true' : 'false');
+      // mousedown fires before the input's blur, so the pick is never lost.
+      b.addEventListener('mousedown', function(e){ e.preventDefault(); });
+      b.addEventListener('click', function(){ choose(dish); });
+      acEl.appendChild(b);
+    });
+
+    acEl.classList.add('open');
+    inputEl.setAttribute('aria-expanded', 'true');
+  }
+
+  function choose(dish){
+    inputEl.value = dish;
+    closeAc();
+    inputEl.focus();
+  }
+
+  function moveActive(delta){
+    var rows = acEl.querySelectorAll('.ac-item');
+    if (!rows.length) return;
+    // Slot 0 is the input itself, so active cycles through -1..rows.length-1.
+    var slot = (active + 1 + delta + rows.length + 1) % (rows.length + 1);
+    active = slot - 1;
+    for (var i = 0; i < rows.length; i++){
+      rows[i].classList.toggle('active', i === active);
+      rows[i].setAttribute('aria-selected', i === active ? 'true' : 'false');
+    }
+    if (active >= 0) rows[active].scrollIntoView({ block: 'nearest' });
+  }
+
+  inputEl.addEventListener('input', function(){
+    active = -1;
+    renderAc();
+    statusEl.textContent = '';
+  });
+
+  inputEl.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowDown'){ e.preventDefault(); moveActive(1); return; }
+    if (e.key === 'ArrowUp'){ e.preventDefault(); moveActive(-1); return; }
+    if (e.key === 'Escape'){ closeAc(); return; }
+    if (e.key === 'Enter'){
+      e.preventDefault();
+      var rows = acEl.querySelectorAll('.ac-item');
+      if (active >= 0 && rows[active]) { choose(rows[active].textContent); return; }
+      submitGuess();
+    }
+  });
+
+  inputEl.addEventListener('blur', function(){
+    // Delay so a tap on a suggestion still lands.
+    setTimeout(closeAc, 120);
+  });
+
+  /* ── Guess / skip (stubbed until phase 2) ─────────────────────────────── */
+
+  function submitGuess(){
+    var guess = inputEl.value.trim();
+    if (!guess){
+      inputEl.classList.remove('shake');
+      void inputEl.offsetWidth;
+      inputEl.classList.add('shake');
+      return;
+    }
+    closeAc();
+    statusEl.textContent = 'Guessing "' + guess + '". The scoring loop arrives in phase 2.';
+  }
+
+  document.getElementById('mi-guess').addEventListener('click', submitGuess);
+  document.getElementById('mi-skip').addEventListener('click', function(){
+    statusEl.textContent = 'Skip advances the reveal in phase 2.';
+  });
+
+  /* ── Boot ──────────────────────────────────────────────────────────────── */
+
+  document.title = 'Mise #' + daily.dayOfYear + ' (POC) | DailyJamm';
+  renderStack();
+})();
+</script>
+</body>
+</html>

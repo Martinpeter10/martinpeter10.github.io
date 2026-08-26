@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<title>Snug generator (POC) | DailyJamm</title>
+<meta name="description" content="Prototype of the Snug polyomino generator. Not a released DailyJamm game.">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/png" href="/assets/img/favicon.png">
+
+<meta name="theme-color" content="#1a1a2e" />
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1a1a2e" />
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#1a1a2e" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+<meta name="referrer" content="strict-origin-when-cross-origin" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self';" />
+
+<style>
+  :root{
+    --bg:#1a1a2e; --panel:#16213e; --brand:#2ecc71; --brand2:#45b7d1;
+    --ink:#fff; --muted:#b8b8d1;
+    --line:rgba(255,255,255,.10);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;
+    -webkit-text-size-adjust:100%;
+    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+  .wrap{max-width:520px;margin:0 auto;padding:18px 16px 40px}
+
+  .brand{
+    font-weight:800;font-size:15px;letter-spacing:.2px;
+    background:linear-gradient(90deg,var(--brand2),var(--brand));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  h1{font-size:26px;margin:4px 0 2px;letter-spacing:.3px}
+  .sub{margin:0 0 18px;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:1.2px}
+  h2{
+    font-size:12px;text-transform:uppercase;letter-spacing:1.4px;
+    color:var(--muted);margin:24px 0 10px;font-weight:700;
+  }
+
+  /* ── Day stepper ────────────────────────────────────────────────────── */
+  .stepper{display:flex;align-items:center;gap:8px}
+  .step{
+    width:44px;height:44px;border-radius:12px;
+    border:1px solid var(--line);background:rgba(255,255,255,.04);
+    color:var(--muted);font-size:15px;font-family:inherit;
+    cursor:pointer;-webkit-tap-highlight-color:transparent;
+  }
+  .step:hover{color:var(--ink);border-color:rgba(255,255,255,.28)}
+  .daylabel{
+    flex:1;text-align:center;font-size:15px;font-weight:700;
+    font-variant-numeric:tabular-nums;
+  }
+  .daylabel small{display:block;color:var(--muted);font-size:11px;font-weight:600;letter-spacing:.6px;text-transform:uppercase}
+  .today{
+    min-height:44px;padding:0 16px;border-radius:12px;border:0;
+    background:linear-gradient(90deg,var(--brand2),var(--brand));
+    color:#06121a;font-family:inherit;font-size:13px;font-weight:800;
+    cursor:pointer;-webkit-tap-highlight-color:transparent;
+  }
+
+  /* ── Board preview ──────────────────────────────────────────────────── */
+  .board{
+    display:grid;grid-template-columns:repeat(5,1fr);gap:4px;
+    max-width:260px;margin:0 auto;
+  }
+  .bcell{aspect-ratio:1/1;border-radius:8px;background:var(--panel);border:1px solid var(--line)}
+
+  /* ── Tray ───────────────────────────────────────────────────────────── */
+  .tray{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .piece{
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:12px 8px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;
+    min-height:112px;justify-content:center;
+  }
+  .shape{display:grid;gap:3px}
+  .scell{width:15px;height:15px;border-radius:4px}
+  .scell.off{background:transparent}
+  .plabel{color:var(--muted);font-size:10px;letter-spacing:.8px;text-transform:uppercase;font-weight:700}
+
+  /* ── Report ─────────────────────────────────────────────────────────── */
+  .report{
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:14px 16px;box-shadow:0 6px 18px rgba(0,0,0,.28);
+  }
+  .rrow{
+    display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+    padding:7px 0;border-bottom:1px solid var(--line);font-size:14px;
+  }
+  .rrow:last-child{border-bottom:0}
+  .rrow span:first-child{color:var(--muted)}
+  .rrow span:last-child{font-weight:700;font-variant-numeric:tabular-nums;text-align:right}
+  .ok{color:var(--brand)}
+  .bad{color:#e8674f}
+
+  .note{color:var(--muted);font-size:12px;line-height:1.5;margin:10px 0 0}
+  .phase{
+    margin:24px 0 0;padding-top:14px;border-top:1px solid var(--line);
+    color:var(--muted);font-size:12px;line-height:1.5;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">DailyJamm</div>
+    <h1>Snug</h1>
+    <p class="sub">Prototype - phase 1, generator only</p>
+  </header>
+
+  <div class="stepper">
+    <button class="step" id="sn-prev" type="button" aria-label="Previous day">&#9664;</button>
+    <div class="daylabel" id="sn-day"></div>
+    <button class="step" id="sn-next" type="button" aria-label="Next day">&#9654;</button>
+    <button class="today" id="sn-today" type="button">Today</button>
+  </div>
+
+  <h2>Solution layout</h2>
+  <div class="board" id="sn-board" aria-label="Generated partition of the board"></div>
+  <p class="note">This is the partition the generator produced. The player never sees it - it is here so the shapes can be judged.</p>
+
+  <h2>Tray pieces</h2>
+  <div class="tray" id="sn-tray" aria-label="Generated pieces"></div>
+  <p class="note">Each piece is normalised to its bounding box, then randomly rotated and flipped, so a tray shape will usually not match its orientation on the board above.</p>
+
+  <h2>Validity check</h2>
+  <div class="report" id="sn-report"></div>
+  <p class="note">The same checks are written to the browser console on every generation.</p>
+
+  <p class="phase">Phase 1 build: generation only. The board, tray, placement, rotation, solve detection and stats arrive in later phases.</p>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  var ROWS = 6, COLS = 5, CELLS = ROWS * COLS;
+  var PIECE_SIZE = 5, PIECE_COUNT = 6;
+  var MAX_ATTEMPTS = 200;
+
+  // Six hues, all legible against the #16213e panel.
+  var COLORS = ['#2ecc71', '#45b7d1', '#f2c14e', '#e8674f', '#b07cf0', '#f291c4'];
+
+  // Used only if 200 partition attempts all strand a region. Verified below to
+  // tile the board exactly, and picked because its six shapes are all different.
+  var FALLBACK = [
+    [0, 1, 2, 5, 10],
+    [3, 4, 9, 14, 19],
+    [6, 7, 8, 11, 12],
+    [13, 17, 18, 23, 24],
+    [15, 16, 20, 21, 25],
+    [22, 26, 27, 28, 29]
+  ];
+
+  /* ── Seeded PRNG ───────────────────────────────────────────────────────── */
+
+  function mulberry32(a){
+    return function(){
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      var t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  /* ── Daily seeding ─────────────────────────────────────────────────────── */
+
+  function chicagoParts(){
+    var parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/Chicago', year: 'numeric', month: '2-digit', day: '2-digit'
+    }).formatToParts(new Date());
+    var o = {};
+    parts.forEach(function(p){ o[p.type] = p.value; });
+    return { y: +o.year, m: +o.month, d: +o.day };
+  }
+
+  function dayOfYear(){
+    var p = chicagoParts();
+    return Math.round((Date.UTC(p.y, p.m - 1, p.d) - Date.UTC(p.y, 0, 1)) / 86400000) + 1;
+  }
+
+  function seedFor(doy){ return doy * 7919 + 17; }
+
+  /* ── Board geometry ────────────────────────────────────────────────────── */
+
+  var NEIGHBOURS = (function(){
+    var all = [], i, r, c, list;
+    for (i = 0; i < CELLS; i++){
+      r = Math.floor(i / COLS); c = i % COLS;
+      list = [];
+      if (r > 0) list.push(i - COLS);
+      if (r < ROWS - 1) list.push(i + COLS);
+      if (c > 0) list.push(i - 1);
+      if (c < COLS - 1) list.push(i + 1);
+      all.push(list);
+    }
+    return all;
+  })();
+
+  /* ── Partitioner ───────────────────────────────────────────────────────
+     Grows PIECE_COUNT contiguous regions of PIECE_SIZE by seeded random
+     growth. Returns null if a region strands below full size. */
+  function partitionOnce(rnd){
+    var owner = new Array(CELLS).fill(-1);
+    var regions = [], rid, free, i, seed, cells, cand, k, nb, pick;
+
+    for (rid = 0; rid < PIECE_COUNT; rid++){
+      free = [];
+      for (i = 0; i < CELLS; i++) if (owner[i] === -1) free.push(i);
+
+      seed = free[Math.floor(rnd() * free.length)];
+      owner[seed] = rid;
+      cells = [seed];
+
+      while (cells.length < PIECE_SIZE){
+        cand = [];
+        for (i = 0; i < cells.length; i++){
+          for (k = 0; k < NEIGHBOURS[cells[i]].length; k++){
+            nb = NEIGHBOURS[cells[i]][k];
+            if (owner[nb] === -1 && cand.indexOf(nb) === -1) cand.push(nb);
+          }
+        }
+        if (!cand.length) return null;   // stranded - caller retries
+        pick = cand[Math.floor(rnd() * cand.length)];
+        owner[pick] = rid;
+        cells.push(pick);
+      }
+      regions.push(cells);
+    }
+    return regions;
+  }
+
+  function partition(seed){
+    var rnd = mulberry32(seed), attempt, regions;
+    for (attempt = 1; attempt <= MAX_ATTEMPTS; attempt++){
+      regions = partitionOnce(rnd);
+      if (regions) return { regions: regions, attempts: attempt, fallback: false, rnd: rnd };
+    }
+    return {
+      regions: FALLBACK.map(function(r){ return r.slice(); }),
+      attempts: MAX_ATTEMPTS, fallback: true, rnd: rnd
+    };
+  }
+
+  /* ── Shapes ────────────────────────────────────────────────────────────
+     A shape is a normalised, sorted list of [row, col] offsets. */
+
+  function toOffsets(cells){
+    return cells.map(function(i){ return [Math.floor(i / COLS), i % COLS]; });
+  }
+
+  function normalise(offs){
+    var minR = Math.min.apply(null, offs.map(function(o){ return o[0]; }));
+    var minC = Math.min.apply(null, offs.map(function(o){ return o[1]; }));
+    return offs
+      .map(function(o){ return [o[0] - minR, o[1] - minC]; })
+      .sort(function(a, b){ return a[0] - b[0] || a[1] - b[1]; });
+  }
+
+  function rotate(offs){
+    var maxR = Math.max.apply(null, offs.map(function(o){ return o[0]; }));
+    return normalise(offs.map(function(o){ return [o[1], maxR - o[0]]; }));
+  }
+
+  function flip(offs){
+    var maxC = Math.max.apply(null, offs.map(function(o){ return o[1]; }));
+    return normalise(offs.map(function(o){ return [o[0], maxC - o[1]]; }));
+  }
+
+  function key(offs){
+    return offs.map(function(o){ return o[0] + ',' + o[1]; }).join(' ');
+  }
+
+  // Canonical form over all 8 rotations and reflections, so two shapes can be
+  // compared regardless of how they were turned.
+  function canonical(offs){
+    var best = null, cur = normalise(offs), i, k;
+    for (i = 0; i < 4; i++){
+      k = key(cur);        if (best === null || k < best) best = k;
+      k = key(flip(cur));  if (k < best) best = k;
+      cur = rotate(cur);
+    }
+    return best;
+  }
+
+  function shuffle(arr, rnd){
+    var i, j, t;
+    for (i = arr.length - 1; i > 0; i--){
+      j = Math.floor(rnd() * (i + 1));
+      t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+    }
+    return arr;
+  }
+
+  function buildPieces(regions, rnd){
+    var pieces = regions.map(function(cells, idx){
+      var offs = normalise(toOffsets(cells)), turns = Math.floor(rnd() * 4), t;
+      for (t = 0; t < turns; t++) offs = rotate(offs);
+      if (rnd() < 0.5) offs = flip(offs);
+      return { region: idx, cells: cells.slice(), offsets: offs, color: COLORS[idx] };
+    });
+    return shuffle(pieces, rnd);
+  }
+
+  function generate(doy){
+    var res = partition(seedFor(doy));
+    return {
+      dayOfYear: doy,
+      regions: res.regions,
+      attempts: res.attempts,
+      fallback: res.fallback,
+      pieces: buildPieces(res.regions, res.rnd)
+    };
+  }
+
+  /* ── Validity check ────────────────────────────────────────────────────── */
+
+  function contiguous(cells){
+    var seen = [cells[0]], queue = [cells[0]], cur, i, nb;
+    while (queue.length){
+      cur = queue.pop();
+      for (i = 0; i < NEIGHBOURS[cur].length; i++){
+        nb = NEIGHBOURS[cur][i];
+        if (cells.indexOf(nb) !== -1 && seen.indexOf(nb) === -1){
+          seen.push(nb); queue.push(nb);
+        }
+      }
+    }
+    return seen.length === cells.length;
+  }
+
+  function validate(gen){
+    var counts = new Array(CELLS).fill(0);
+    gen.regions.forEach(function(reg){
+      reg.forEach(function(cell){ if (cell >= 0 && cell < CELLS) counts[cell]++; });
+    });
+
+    var covered = counts.filter(function(n){ return n === 1; }).length;
+    var gaps    = counts.filter(function(n){ return n === 0; }).length;
+    var overlap = counts.filter(function(n){ return n > 1; }).length;
+
+    var sizesOk = gen.regions.every(function(r){ return r.length === PIECE_SIZE; });
+    var contigOk = gen.regions.every(contiguous);
+
+    // Every tray piece must still be the same shape as its region.
+    var piecesOk = gen.pieces.every(function(p){
+      return p.offsets.length === PIECE_SIZE &&
+             canonical(p.offsets) === canonical(toOffsets(gen.regions[p.region]));
+    });
+
+    var distinct = {}, n = 0;
+    gen.regions.forEach(function(r){
+      var c = canonical(toOffsets(r));
+      if (!distinct[c]) { distinct[c] = true; n++; }
+    });
+
+    return {
+      cellsCoveredExactlyOnce: covered,
+      gaps: gaps,
+      overlaps: overlap,
+      allPiecesFiveCells: sizesOk,
+      allRegionsContiguous: contigOk,
+      trayShapesMatchRegions: piecesOk,
+      distinctShapes: n,
+      attempts: gen.attempts,
+      usedFallback: gen.fallback,
+      pass: covered === CELLS && gaps === 0 && overlap === 0 && sizesOk && contigOk && piecesOk
+    };
+  }
+
+  /* ── Rendering ─────────────────────────────────────────────────────────── */
+
+  function renderBoard(gen){
+    var host = document.getElementById('sn-board');
+    host.textContent = '';
+
+    var colorOf = new Array(CELLS).fill(null);
+    gen.regions.forEach(function(reg, idx){
+      reg.forEach(function(cell){ colorOf[cell] = COLORS[idx]; });
+    });
+
+    for (var i = 0; i < CELLS; i++){
+      var d = document.createElement('div');
+      d.className = 'bcell';
+      if (colorOf[i]){
+        d.style.background = colorOf[i];
+        d.style.borderColor = colorOf[i];
+        d.style.opacity = '.88';
+      }
+      host.appendChild(d);
+    }
+  }
+
+  function renderTray(gen){
+    var host = document.getElementById('sn-tray');
+    host.textContent = '';
+
+    gen.pieces.forEach(function(piece, i){
+      var w = Math.max.apply(null, piece.offsets.map(function(o){ return o[1]; })) + 1;
+      var h = Math.max.apply(null, piece.offsets.map(function(o){ return o[0]; })) + 1;
+
+      var card = document.createElement('div');
+      card.className = 'piece';
+
+      var shape = document.createElement('div');
+      shape.className = 'shape';
+      shape.style.gridTemplateColumns = 'repeat(' + w + ', 15px)';
+
+      var filled = {};
+      piece.offsets.forEach(function(o){ filled[o[0] + ',' + o[1]] = true; });
+
+      for (var r = 0; r < h; r++){
+        for (var c = 0; c < w; c++){
+          var cell = document.createElement('div');
+          var on = !!filled[r + ',' + c];
+          cell.className = 'scell' + (on ? '' : ' off');
+          if (on) cell.style.background = piece.color;
+          shape.appendChild(cell);
+        }
+      }
+
+      var label = document.createElement('div');
+      label.className = 'plabel';
+      label.textContent = 'Piece ' + (i + 1);
+
+      card.appendChild(shape);
+      card.appendChild(label);
+      card.setAttribute('aria-label', 'Piece ' + (i + 1) + ', 5 cells');
+      host.appendChild(card);
+    });
+  }
+
+  function renderReport(check){
+    var host = document.getElementById('sn-report');
+    host.textContent = '';
+
+    var rows = [
+      ['Cells covered exactly once', check.cellsCoveredExactlyOnce + ' of ' + CELLS, check.cellsCoveredExactlyOnce === CELLS],
+      ['Gaps', String(check.gaps), check.gaps === 0],
+      ['Overlaps', String(check.overlaps), check.overlaps === 0],
+      ['Every piece is 5 cells', check.allPiecesFiveCells ? 'yes' : 'no', check.allPiecesFiveCells],
+      ['Every region contiguous', check.allRegionsContiguous ? 'yes' : 'no', check.allRegionsContiguous],
+      ['Tray shapes match regions', check.trayShapesMatchRegions ? 'yes' : 'no', check.trayShapesMatchRegions],
+      ['Distinct shapes', check.distinctShapes + ' of 6', null],
+      ['Partition attempts', String(check.attempts), null],
+      ['Used fallback layout', check.usedFallback ? 'yes' : 'no', !check.usedFallback]
+    ];
+
+    rows.forEach(function(row){
+      var div = document.createElement('div');
+      div.className = 'rrow';
+      var a = document.createElement('span');
+      a.textContent = row[0];
+      var b = document.createElement('span');
+      b.textContent = row[1];
+      if (row[2] === true) b.className = 'ok';
+      if (row[2] === false) b.className = 'bad';
+      div.appendChild(a);
+      div.appendChild(b);
+      host.appendChild(div);
+    });
+
+    var verdict = document.createElement('div');
+    verdict.className = 'rrow';
+    var va = document.createElement('span');
+    va.textContent = 'Result';
+    var vb = document.createElement('span');
+    vb.textContent = check.pass ? 'PASS' : 'FAIL';
+    vb.className = check.pass ? 'ok' : 'bad';
+    verdict.appendChild(va);
+    verdict.appendChild(vb);
+    host.appendChild(verdict);
+  }
+
+  /* ── Day stepper ───────────────────────────────────────────────────────── */
+
+  var TODAY = dayOfYear();
+  var viewing = TODAY;
+
+  function show(doy){
+    viewing = ((doy - 1) % 366 + 366) % 366 + 1;
+
+    var gen = generate(viewing);
+    var check = validate(gen);
+
+    var label = document.getElementById('sn-day');
+    label.textContent = '';
+    label.appendChild(document.createTextNode('Day ' + viewing));
+    var small = document.createElement('small');
+    small.textContent = viewing === TODAY ? 'today' : 'preview';
+    label.appendChild(small);
+
+    renderBoard(gen);
+    renderTray(gen);
+    renderReport(check);
+
+    console.log('Snug day ' + viewing + ' - ' + (check.pass ? 'PASS' : 'FAIL'), check);
+    console.log('  regions:', gen.regions.map(function(r){ return r.join(','); }));
+  }
+
+  document.getElementById('sn-prev').addEventListener('click', function(){ show(viewing - 1); });
+  document.getElementById('sn-next').addEventListener('click', function(){ show(viewing + 1); });
+  document.getElementById('sn-today').addEventListener('click', function(){ show(TODAY); });
+
+  /* ── Boot ──────────────────────────────────────────────────────────────── */
+
+  document.title = 'Snug #' + TODAY + ' generator (POC) | DailyJamm';
+  show(TODAY);
+
+  // One-off sanity sweep so a bad generator cannot hide behind a good day.
+  (function sweep(){
+    var bad = [], fallbacks = [], total = 0, d, g, c;
+    for (d = 1; d <= 366; d++){
+      g = generate(d);
+      c = validate(g);
+      total += c.attempts;
+      if (!c.pass) bad.push(d);
+      if (c.fallback || c.usedFallback) fallbacks.push(d);
+    }
+    console.log('Snug sweep of all 366 days: ' + (bad.length ? 'FAILED on ' + bad.join(',') : 'all PASS') +
+                ', mean attempts ' + (total / 366).toFixed(1) +
+                ', fallback days ' + (fallbacks.length ? fallbacks.join(',') : 'none'));
+  })();
+})();
+</script>
+</body>
+</html>
