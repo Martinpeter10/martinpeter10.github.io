@@ -2534,14 +2534,19 @@ input[type=range].slider::-moz-range-thumb {
 /* Dice tray */
 .yc-tray{background:radial-gradient(ellipse at 50% 30%, #1a5c2a 0%, #14472a 45%, #0d3320 100%);border:2px solid #2a1a0a;border-radius:14px;box-shadow:inset 0 0 40px rgba(0,0,0,.4),0 3px 14px rgba(0,0,0,.45);padding:14px 12px 12px;display:flex;flex-direction:column;align-items:center;gap:9px;margin-bottom:12px}
 .yc-dice{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;min-height:52px;--yc-die-size:52px;--yc-die-z:26px}
-.yc-die{width:var(--yc-die-size);height:var(--yc-die-size);perspective:420px;background:none;border:none;padding:0;flex-shrink:0;cursor:pointer;transition:transform .12s}
+.yc-die{width:var(--yc-die-size);height:var(--yc-die-size);perspective:420px;background:none;border:none;border-radius:8px;padding:0;flex-shrink:0;cursor:pointer;transition:transform .12s}
 .yc-die:disabled{cursor:default}
 .yc-cube{width:100%;height:100%;position:relative;transform-style:preserve-3d}
 .yc-cface{position:absolute;inset:0;background:#f9fafb;border-radius:8px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);padding:14%;gap:1px;box-shadow:0 2px 4px rgba(0,0,0,.4)}
 .yc-cell{display:flex;align-items:center;justify-content:center}
 .yc-pip{background:#111827;border-radius:50%;width:78%;height:78%;margin:auto}
-.yc-die-held{transform:translateY(5px)}
-.yc-die-held .yc-cface{box-shadow:0 0 0 2.5px #2ecc71,0 2px 6px rgba(0,0,0,.4)}
+/* The hold ring goes on the wrapper, not on .yc-cface - a ring on the faces is
+   drawn on all six of them, and the five that are edge-on or behind poke their
+   rings out past the corners of the visible face. outline-offset compensates for
+   the perspective: the front face sits at translateZ(26px) under a 420px
+   perspective, so it projects ~6.6% larger than the wrapper, about 1.7px a side. */
+.yc-die-held{transform:translateY(5px);outline:2.5px solid #2ecc71;outline-offset:1.7px}
+.yc-die-held .yc-cface{box-shadow:0 3px 8px rgba(0,0,0,.45)}
 .yc-die-empty{cursor:default;border:2px dashed rgba(255,255,255,.18);border-radius:10px;background:rgba(255,255,255,.05)}
 .yc-die-empty .yc-cube{display:none}
 /* Dice hop while the cube tumbles - same feel as Shut the Box */
