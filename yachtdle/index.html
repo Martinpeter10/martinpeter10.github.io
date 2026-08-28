@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Shut the Box | DailyJamm</title>
-  <meta name="description" content="Play Shut the Box on DailyJamm - roll the dice and flip down tiles that add up to your roll. Shut all 9 tiles for a perfect game. One box per day.">
+  <title>Yachtdle | DailyJamm</title>
+  <meta name="description" content="Play Yachtdle on DailyJamm - the classic five-dice game, one scorecard a day. Roll, hold, and fill all 13 boxes for the highest score you can.">
   <meta name="robots" content="index,follow">
-  <link rel="canonical" href="https://dailyjamm.com/shutthebox/">
+  <link rel="canonical" href="https://dailyjamm.com/yachtdle/">
   <link rel="icon" type="image/png" href="/assets/img/favicon.png">
   <link rel="stylesheet" href="/assets/css/styles.css?v=20260828">
 
   <!-- Open Graph -->
   <meta property="og:site_name" content="DailyJamm" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://dailyjamm.com/shutthebox/" />
-  <meta property="og:title" content="Shut the Box | DailyJamm" />
-  <meta property="og:description" content="Daily Shut the Box - roll the dice, flip down tiles that add up to your roll, and try to shut all 9. One box per day." />
+  <meta property="og:url" content="https://dailyjamm.com/yachtdle/" />
+  <meta property="og:title" content="Yachtdle | DailyJamm" />
+  <meta property="og:description" content="One scorecard a day. Roll five dice, hold what you like, and fill all 13 boxes for the highest score you can." />
   <meta property="og:image" content="https://dailyjamm.com/assets/img/favicon.png" />
 
   <!-- Theme color -->
@@ -56,11 +56,11 @@
   {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    "name": "Shut the Box",
-    "url": "https://dailyjamm.com/shutthebox/",
+    "name": "Yachtdle",
+    "url": "https://dailyjamm.com/yachtdle/",
     "applicationCategory": "GameApplication",
     "operatingSystem": "Web",
-    "description": "Daily Shut the Box - roll the dice, flip down tiles that add up to your roll, and try to shut all 9 tiles.",
+    "description": "The classic five-dice game, one scorecard a day. Roll, hold, and fill all 13 boxes for the highest score you can.",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
     "author": { "@type": "Organization", "name": "DailyJamm", "url": "https://dailyjamm.com" }
   }
@@ -80,9 +80,9 @@
       </span>
     </button>
     <a href="/" class="site-brand">DailyJamm</a>
-    <h1 class="sr-only">Shut the Box</h1>
+    <h1 class="sr-only">Yachtdle</h1>
     <div class="flex-1"></div>
-    <button id="stb-stats-btn" aria-label="Stats"
+    <button id="yc-stats-btn" aria-label="Stats"
       class="w-8 h-8 rounded-full border border-gray-600 bg-transparent text-gray-400 hover:border-gray-400 hover:text-white transition-colors flex items-center justify-center mr-1">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <line x1="18" y1="20" x2="18" y2="10"/>
@@ -90,7 +90,7 @@
         <line x1="6"  y1="20" x2="6"  y2="14"/>
       </svg>
     </button>
-    <button id="stb-help-btn" aria-label="How to play"
+    <button id="yc-help-btn" aria-label="How to play"
       class="w-8 h-8 rounded-full border border-gray-600 bg-transparent text-gray-400 text-sm font-bold hover:border-gray-400 hover:text-white transition-colors">
       ?
     </button>
@@ -145,60 +145,81 @@
   </nav>
 
   <!-- Game area -->
-  <div class="stb-wrap">
+  <div class="yc-wrap">
+    <div class="yc-container">
 
-    <!-- The box -->
-    <div class="stb-box" id="stb-box">
-      <div class="stb-tiles" id="stb-tiles"></div>
-      <div class="stb-felt">
-        <div class="stb-statusline">
-          <div id="stb-status" class="stb-status">All 9 tiles up</div>
-          <div id="stb-substatus" class="stb-substatus">Roll the dice to start!</div>
+      <!-- Top bar: turn + running total -->
+      <div class="yc-topbar">
+        <div class="yc-topbar-cell">
+          <span class="yc-topbar-label">Turn</span>
+          <span id="yc-turn-val" class="yc-topbar-val">1<span class="yc-topbar-of">/13</span></span>
         </div>
-        <div class="stb-dice">
-          <div class="stb-die" id="stb-die-0"><div class="stb-cube" id="stb-cube-0"></div></div>
-          <div class="stb-die" id="stb-die-1"><div class="stb-cube" id="stb-cube-1"></div></div>
-        </div>
-        <div class="stb-btn-row">
-          <button id="stb-roll1-btn" class="stb-btn stb-btn-alt hidden">Roll 1 Die</button>
-          <button id="stb-roll-btn" class="stb-btn">Roll Dice</button>
-          <button id="stb-shut-btn" class="stb-btn hidden" disabled>Shut</button>
+        <div class="yc-topbar-cell">
+          <span class="yc-topbar-label">Total</span>
+          <span id="yc-total-val" class="yc-topbar-val yc-accent">0</span>
         </div>
       </div>
-    </div>
 
-    <!-- Results panel -->
-    <div id="stb-results" class="bg-gray-800/60 border border-gray-700 rounded-xl p-4 mt-4 text-center flex flex-col items-center gap-2 hidden">
-      <h2 id="stb-result-title" class="text-lg font-black">Box Score</h2>
-      <p id="stb-result-sub" class="text-sm text-gray-400"></p>
-      <div id="stb-result-tiles" class="text-xl tracking-wide"></div>
-      <div class="flex gap-2 mt-1 w-full justify-center">
-        <button id="stb-share-btn"
-          class="flex-1 px-5 py-2 bg-green-700 hover:bg-green-600 text-white text-xs font-bold rounded-lg transition-colors">
-          Share Results
-        </button>
-        <button onclick="STBGame.showStats()"
-          class="flex-1 px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg transition-colors">
-          See Stats
-        </button>
+      <!-- Dice tray -->
+      <div class="yc-tray">
+        <div id="yc-dice" class="yc-dice"></div>
+        <p id="yc-hold-hint" class="yc-hold-hint">Tap a die to hold it</p>
+        <button id="yc-roll-btn" class="yc-roll-btn">Roll Dice</button>
       </div>
-      <p class="text-xs text-gray-500">Next box in: <span id="stb-countdown" class="font-mono text-yellow-300 tabular-nums">--:--:--</span></p>
-    </div>
 
+      <!-- Scorecard -->
+      <div class="yc-card">
+        <div class="yc-card-sec">
+          <div class="yc-card-head">
+            <span>Upper</span>
+            <span id="yc-upper-progress" class="yc-card-head-note">0 / 63</span>
+          </div>
+          <div id="yc-upper-rows"></div>
+          <div class="yc-subtotal">
+            <span>Bonus at 63+</span>
+            <span id="yc-bonus-val" class="yc-subtotal-val">0</span>
+          </div>
+        </div>
+
+        <div class="yc-card-sec">
+          <div class="yc-card-head"><span>Lower</span></div>
+          <div id="yc-lower-rows"></div>
+        </div>
+      </div>
+
+      <!-- Results panel -->
+      <div id="yc-results" class="yc-results hidden">
+        <h2 class="text-lg font-black">Scorecard Complete!</h2>
+        <p id="yc-result-score" class="yc-result-score">0</p>
+        <p id="yc-result-sub" class="text-sm text-gray-400"></p>
+        <div class="flex gap-2 mt-1 w-full justify-center">
+          <button id="yc-share-btn"
+            class="flex-1 px-5 py-2 bg-green-700 hover:bg-green-600 text-white text-xs font-bold rounded-lg transition-colors">
+            Share Results
+          </button>
+          <button onclick="YCGame.showStats()"
+            class="flex-1 px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg transition-colors">
+            See Stats
+          </button>
+        </div>
+        <p class="text-xs text-gray-500">Next scorecard in: <span id="yc-countdown" class="font-mono text-yellow-300 tabular-nums">--:--:--</span></p>
+      </div>
+
+    </div>
   </div>
 
   <!-- Stats modal -->
-  <div id="stb-stats-modal" class="fixed inset-0 bg-black/80 flex items-end justify-center z-50 hidden" onclick="STBGame.closeStats()">
+  <div id="yc-stats-modal" class="fixed inset-0 bg-black/80 flex items-end justify-center z-50 hidden" onclick="YCGame.closeStats()">
     <div class="bg-gray-900 border border-gray-700 rounded-t-2xl p-5 max-w-sm w-full max-h-[80vh] overflow-y-auto"
          onclick="event.stopPropagation()"
          style="-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:calc(1.25rem + env(safe-area-inset-bottom,0px))">
       <h2 class="text-xl font-black text-center mb-4">My Stats</h2>
-      <div id="stb-stats-content"></div>
-      <button id="stb-stats-share-btn" onclick="STBGame.shareStats()"
+      <div id="yc-stats-content"></div>
+      <button id="yc-stats-share-btn" onclick="YCGame.shareStats()"
         class="w-full mt-4 py-2.5 bg-green-700 hover:bg-green-600 text-white text-sm font-bold rounded-lg transition-colors">
         Share Stats
       </button>
-      <button onclick="STBGame.closeStats()"
+      <button onclick="YCGame.closeStats()"
         class="w-full mt-2 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-sm font-bold rounded-lg transition-colors">
         Close
       </button>
@@ -206,46 +227,46 @@
   </div>
 
   <!-- How to Play modal -->
-  <div id="stb-modal" class="fixed inset-0 bg-black/80 flex items-end justify-center z-50 hidden" onclick="STBGame.closeModal()">
+  <div id="yc-modal" class="fixed inset-0 bg-black/80 flex items-end justify-center z-50 hidden" onclick="YCGame.closeModal()">
     <div class="bg-gray-900 border border-gray-700 rounded-t-2xl p-5 max-w-sm w-full max-h-[92vh] overflow-y-auto"
          onclick="event.stopPropagation()"
          style="-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:calc(1.25rem + env(safe-area-inset-bottom,0px))">
       <h2 class="text-xl font-black text-center mb-0.5">How to Play</h2>
-      <p class="text-xs text-gray-400 text-center mb-3">The classic pub game - flip every tile to shut the box.</p>
+      <p class="text-xs text-gray-400 text-center mb-3">One scorecard a day - make every box count.</p>
 
       <div class="mb-4">
         <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">Rules</h3>
         <ul class="text-xs text-gray-300 leading-relaxed space-y-1.5 list-disc pl-4">
-          <li>The box starts with tiles <strong class="text-white">1 through 9</strong> standing up.</li>
-          <li>Roll the dice, then tap tiles that <strong class="text-white">add up exactly to your roll</strong>. Rolled a 7? Flip the 7, or 3 + 4, or 1 + 2 + 4 - your choice. Tap a tile again to unpick it, then press <strong class="text-white">Shut</strong> to flip them down.</li>
-          <li>Once tiles are down, they stay down. Keep rolling and flipping.</li>
-          <li>Once <strong class="text-white">7, 8 and 9</strong> are all shut, you may roll just <strong class="text-white">one die</strong> instead of two.</li>
-          <li>When no combination of standing tiles matches your roll, the game ends. Your <strong class="text-white">score is the sum of tiles left standing</strong> - lower is better.</li>
-          <li>Flip all 9 and you've <strong class="text-white">Shut the Box</strong> - a perfect 0!</li>
+          <li>You get <strong class="text-white">13 turns</strong> - one for each box on the scorecard.</li>
+          <li>Each turn you roll 5 dice, then may <strong class="text-white">reroll twice</strong>. Tap any die to hold it between rolls.</li>
+          <li>When you are happy - or out of rolls - pick a box to score into. <strong class="text-white">Every box must be filled</strong>, so a bad roll sometimes means taking a zero.</li>
+          <li>Once a box is used it is locked for the day.</li>
+          <li>Score <strong class="text-white">63 or more</strong> in the Upper section for a <strong class="text-white">+35 bonus</strong>.</li>
+          <li><strong class="text-white">One scorecard per day.</strong> When the last box is filled, that is your score - come back tomorrow for a fresh card.</li>
         </ul>
       </div>
 
       <div class="mb-4">
-        <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">Example</h3>
-        <div class="text-xs text-gray-300 leading-relaxed space-y-1">
-          <p>🎲 You roll <strong class="text-white">4 + 5 = 9</strong></p>
-          <p>👆 You tap <strong class="text-white">2</strong> and <strong class="text-white">7</strong> (2 + 7 = 9) - both flip down</p>
-          <p>🎲 You roll <strong class="text-white">8</strong>, but only 1, 3 and 5 are standing - no combo makes 8</p>
-          <p>📦 Game over: 1 + 3 + 5 = <strong class="text-white">9 points</strong></p>
-        </div>
+        <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">Scoring</h3>
+        <ul class="text-xs text-gray-300 leading-relaxed space-y-1 list-disc pl-4">
+          <li><strong class="text-white">Ones - Sixes:</strong> add up only that number</li>
+          <li><strong class="text-white">Three / Four of a Kind:</strong> total of all 5 dice</li>
+          <li><strong class="text-white">Full House:</strong> 25 (three of one, two of another)</li>
+          <li><strong class="text-white">Small Straight:</strong> 30 (four in a row)</li>
+          <li><strong class="text-white">Large Straight:</strong> 40 (five in a row)</li>
+          <li><strong class="text-white">Yacht:</strong> 50 (all five the same)</li>
+          <li><strong class="text-white">Chance:</strong> total of all 5 dice</li>
+        </ul>
       </div>
 
-      <p class="text-xs text-gray-400 mb-4">One box per day - everyone gets the same dice. Tomorrow the box resets.</p>
-
-      <button onclick="STBGame.closeModal()"
+      <button onclick="YCGame.closeModal()"
         class="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-sm font-bold rounded-lg transition-colors">
-        Let's Play
+        Let's Roll
       </button>
     </div>
   </div>
 
   <script src="/assets/js/utils.js?v=20260828" defer></script>
-  <script src="/assets/js/shutthebox.js?v=20260828" defer></script>
-
+  <script src="/assets/js/yachtdle.js?v=20260828" defer></script>
 </body>
 </html>
