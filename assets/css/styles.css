@@ -2545,7 +2545,10 @@ input[type=range].slider::-moz-range-thumb {
    rings out past the corners of the visible face. outline-offset compensates for
    the perspective: the front face sits at translateZ(26px) under a 420px
    perspective, so it projects ~6.6% larger than the wrapper, about 1.7px a side. */
-.yc-die-held{transform:translateY(5px);outline:2.5px solid #2ecc71;outline-offset:1.7px}
+/* Ring plus glow, the same pattern .stb-tile.stb-sel uses. The box-shadow is
+   painted behind the cube faces, so only the halo outside the die shows - the
+   inner part is covered by the face itself. */
+.yc-die-held{transform:translateY(5px);outline:2.5px solid #2ecc71;outline-offset:1.7px;box-shadow:0 0 0 6px rgba(46,204,113,.22),0 0 24px 7px rgba(46,204,113,.55)}
 .yc-die-held .yc-cface{box-shadow:0 3px 8px rgba(0,0,0,.45)}
 .yc-die-empty{cursor:default;border:2px dashed rgba(255,255,255,.18);border-radius:10px;background:rgba(255,255,255,.05)}
 .yc-die-empty .yc-cube{display:none}
