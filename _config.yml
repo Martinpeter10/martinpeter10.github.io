@@ -1,0 +1,21 @@
+# GitHub Pages (Jekyll) build config.
+#
+# Everything in this repo is PUBLIC on dailyjamm.com unless excluded here.
+# Jekyll already drops dot-files and _-prefixed paths (that is why /_headers
+# 404s), but ordinary files like CLAUDE.md were being served verbatim.
+#
+# Cloudflare (test/dev) uses .assetsignore for the same job - keep the two
+# lists in sync when adding non-site files.
+
+exclude:
+  - CLAUDE.md          # internal architecture notes
+  - README.md          # release notes source
+  - server.py          # local dev server
+  - wrangler.jsonc     # Cloudflare worker config
+  - supabase           # migrations + Edge Functions (backend, never served)
+  - .assetsignore
+  - .claude
+
+# The site is plain HTML - no Jekyll templating, no Markdown pages to render.
+markdown: kramdown
+plugins: []

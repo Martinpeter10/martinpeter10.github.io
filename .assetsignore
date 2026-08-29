@@ -7,3 +7,5 @@ wrangler.jsonc
 server.py
 CLAUDE.md
 README.md
+supabase
+_config.yml
