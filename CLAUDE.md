@@ -178,6 +178,8 @@ Every page also loads the shared scripts (in this order, both `defer`):
 
 Every game page **must** have two icon buttons in the **top-right of the fixed header**, to the left of the hamburger menu area. The standard order is: **Stats button** (bar-chart icon) → **? button** (How to Play), both sitting after the `<div class="flex-1"></div>` spacer.
 
+A third control, the **account button**, sits to the right of both - but it is **injected at runtime by `account.js`**, not written into the page. Do not hardcode it anywhere. Full order as rendered: stats → help → account.
+
 ```html
 <!-- Place these immediately after <div class="flex-1"></div> inside the header -->
 <button id="XX-stats-btn" aria-label="Stats"
@@ -397,7 +399,7 @@ gameid: { title: 'Game Name', url: 'https://example.com/', ext: true },
 - **Share buttons**: game-over result panels have two side-by-side buttons — **Share Results** (green, `bg-green-700`) and **See Stats** (purple, `bg-purple-600`). Stats modals have a separate **Share Stats** button (green).
 - **Streaks**: Track current streak, best streak, total games played
 - **localStorage key convention**: stats keys use a `_v2` suffix (`td_stats_v2`, `cl_stats_v2`, `spd_stats_v2`, `bj_stats_v2`, `bj_alltime_v2`, `rl_stats_v2`, `rl_alltime_v2`). Daily state keys have no suffix (`themedleDailyState`, `cl_today`, `spd_today`, `bj_today`, `rl_today`, `hd_today`, `bf_today`). Bump the suffix when resetting stats site-wide.
-- **Site-wide localStorage keys** (not game-specific): `dj_cookie_ok` (cookie consent), `dj_favorites` (favorites list), `dj_seen_favs_intro` (favorites intro modal dismissed)
+- **Site-wide localStorage keys** (not game-specific): `dj_cookie_ok` (cookie consent), `dj_favorites` (favorites list), `dj_seen_favs_intro` (favorites intro modal dismissed), `dj_account` (cached username for fast header paint - not the session; supabase-js owns the auth token under its own project-scoped key)
 - **How to Play**: Show modal on first visit (check localStorage flag), include animated demo
 - **Mobile**: 16px minimum font on inputs (prevents iOS zoom), use `viewport-fit=cover` for notch support
 - **Accessibility**: ARIA labels on interactive elements, keyboard navigation (Enter activates role="button", ESC closes modals), screen-reader-only helper text via `.sr-only` class
@@ -414,6 +416,44 @@ Three sections, in this order (added in v3.0.0 "Your Games, Your Way"):
 **Section help popovers**: each section heading sits in a `.sec-head` with a `.sec-help` "?" button and a hidden `.sec-desc` popover (absolutely positioned, no layout shift). Behavior is device-aware via `matchMedia('(hover: hover) and (pointer: fine)')`: hover opens/closes on mouse devices; tap toggles on touch, and tapping elsewhere dismisses. Only one popover open at a time. Logic is inline in `index.html`.
 
 **First-visit intro**: on the home page, `favorites.js` auto-shows the favorites intro modal 600ms after load if `dj_seen_favs_intro` is unset. Any dismissal sets the flag.
+
+---
+
+## Account System (`/assets/js/account.js`)
+
+Loaded on every page except `404.html` (which has no `site-header` to attach to), after
+`favorites.js`. Load order matters and all three are `defer`:
+`vendor/supabase.js` → `dj-config.js` → `account.js`.
+
+**Backend**: Supabase. The SQL schema and the username Edge Function live in `/supabase/`,
+which is excluded from the GitHub Pages build by `_config.yml` and from the Cloudflare
+upload by `.assetsignore`. Nothing under `/supabase/` is ever served.
+
+**Keys - the one thing to get right**: `dj-config.js` holds the **publishable** key
+(`sb_publishable_...`), which is meant to be public and ships in every page. It is safe only
+because every table has RLS on with **no client-writable policy** - the browser cannot insert,
+update or delete anything. All writes go through `security definer` SQL functions. The
+**secret** key (`sb_secret_...`) must never appear in this repo, in `/assets`, or in a commit;
+it lives only in Supabase Edge Function secrets, injected automatically.
+
+**Environments**: `dj-config.js` resolves project + Postgres schema from `location.hostname`,
+mirroring the Google Analytics gate - `dailyjamm.com` → prod/`public`,
+`dailyjammtest*` → nonprod/`app_tst`, everything else (including localhost) → nonprod/`app_dev`.
+An unrecognised host falls through to dev on purpose, so it can never touch production data.
+
+**Usernames** are moderated in the `username` Edge Function, never in the browser. `profiles`
+has no insert policy, so that function is the only door - a client-side filter would be
+bypassable with one `curl`, and shipping a wordlist in `/assets/js` would put it in view-source.
+The function derives its target schema from the `Origin` header, never from the request body.
+Shape rule is `^[A-Za-z0-9_]{3,16}$`, which rejects masked names like `@$$` at the character set
+before any wordlist runs; digit substitution (`a55`, `sh1t`, `f_u_c_k`) is caught by normalising
+to a match key first. See `/supabase/README.md` for the test cases.
+
+**Graceful degradation is required.** If `DJConfig` is unconfigured, the vendored bundle fails
+to load, or the network is down, `account.js` removes its own button and every game keeps
+working exactly as before. Never let an account failure break a game.
+
+**Public API** (`window.DJAccount`): `open`, `close`, `username()`.
 
 ---
 

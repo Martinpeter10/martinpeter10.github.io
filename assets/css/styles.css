@@ -2589,3 +2589,44 @@ input[type=range].slider::-moz-range-thumb {
 .yc-result-score{font-size:40px;font-weight:900;line-height:1;background:linear-gradient(135deg,#45b7d1,#2ecc71);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 @media (prefers-reduced-motion: reduce){.yc-die,.yc-cube{transition:none!important}.yc-die-rolling{animation:none}}
 
+
+/* ── Account (used by account.js on all pages) ── */
+/* Literal brand colours, not vars: game pages redefine --brand for their own themes. */
+.dj-acct-btn{width:32px;height:32px;border-radius:999px;border:1px solid #4b5563;background:transparent;color:#9ca3af;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;margin-left:4px;padding:0;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;font-size:.85rem;font-weight:800;transition:border-color .2s,color .2s,background .2s}
+.dj-acct-btn:hover{border-color:#9ca3af;color:#fff}
+.dj-acct-btn:focus-visible{outline:2px solid #45b7d1;outline-offset:2px}
+.dj-acct-btn.is-signed-in{background:linear-gradient(135deg,#45b7d1,#2ecc71);border-color:transparent;color:#06231a}
+.dj-acct-btn.is-signed-in:hover{filter:brightness(1.12);color:#06231a}
+
+.dj-acct-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;z-index:1100}
+.dj-acct-backdrop.open{display:block}
+.dj-acct-modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(400px,calc(100% - 2rem));background:linear-gradient(180deg,#111a33,#0f1b2d);border:1px solid rgba(255,255,255,.12);border-radius:16px;box-shadow:0 20px 50px rgba(0,0,0,.5);color:#fff;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;z-index:1101;display:none;max-height:calc(100vh - 2rem);overflow-y:auto}
+.dj-acct-modal.open{display:block}
+.dj-acct-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1.25rem 1.5rem .5rem}
+.dj-acct-head h2{margin:0;font-size:1.2rem;font-weight:800;letter-spacing:-.01em;background:linear-gradient(135deg,#45b7d1,#2ecc71);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.dj-acct-close{background:transparent;border:none;color:#b8b8d1;font-size:1.6rem;line-height:1;cursor:pointer;padding:0 .25rem}
+.dj-acct-close:hover{color:#fff}
+.dj-acct-body{padding:0 1.5rem 1.5rem;display:flex;flex-direction:column;gap:.75rem}
+
+.dj-acct-lede{color:#b8b8d1;font-size:.88rem;margin:0;line-height:1.5}
+.dj-acct-fine{color:#7b7b96;font-size:.75rem;margin:0;line-height:1.45}
+.dj-acct-field{display:flex;flex-direction:column;gap:.35rem}
+.dj-acct-field label{font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#7b7b96}
+/* 16px minimum keeps iOS from zooming the page on focus. */
+.dj-acct-field input{width:100%;font-size:16px;padding:.6rem .75rem;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:rgba(0,0,0,.28);color:#fff;font-family:inherit}
+.dj-acct-field input:focus{outline:none;border-color:#45b7d1}
+
+.dj-acct-msg{margin:0;font-size:.8rem;min-height:1.1em;color:#b8b8d1}
+.dj-acct-msg.is-good{color:#2ecc71}
+.dj-acct-msg.is-bad{color:#f0656f}
+
+.dj-acct-primary{width:100%;padding:.7rem 1rem;border:none;border-radius:10px;background:linear-gradient(135deg,#45b7d1,#2ecc71);color:#06231a;font-family:inherit;font-size:.9rem;font-weight:800;cursor:pointer}
+.dj-acct-primary:disabled{opacity:.4;cursor:not-allowed}
+.dj-acct-secondary{width:100%;padding:.6rem 1rem;border:1px solid rgba(255,255,255,.16);border-radius:10px;background:transparent;color:#b8b8d1;font-family:inherit;font-size:.85rem;font-weight:700;cursor:pointer}
+.dj-acct-secondary:hover{color:#fff;border-color:rgba(255,255,255,.32)}
+
+.dj-acct-badge{width:56px;height:56px;border-radius:999px;background:linear-gradient(135deg,#45b7d1,#2ecc71);color:#06231a;display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:900;margin:.25rem auto 0}
+.dj-acct-name-big{text-align:center;font-size:1.15rem;font-weight:800;margin:0}
+.dj-acct-warn{border:1px solid rgba(240,180,41,.35);background:rgba(240,180,41,.08);border-radius:10px;padding:.7rem .85rem}
+.dj-acct-warn p{margin:0;font-size:.78rem;color:#f0c96b;line-height:1.5}
+.dj-acct-note p{margin:0;font-size:.85rem;color:#b8b8d1;line-height:1.5}
