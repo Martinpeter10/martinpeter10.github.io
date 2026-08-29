@@ -144,6 +144,17 @@ Shell_Game
 Hasselhoff
 ```
 
+Run the unit tests before deploying - they cover both failure modes, a masked
+name getting through and an innocent name being rejected:
+
+```bash
+cd supabase/functions/username
+deno test --allow-net --allow-env --allow-read moderation_test.ts
+```
+
+The logic lives in `moderation.ts` precisely so it can be tested without a
+server. `index.ts` is only the HTTP handler.
+
 Test against the deployed function:
 
 ```bash
