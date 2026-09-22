@@ -18,8 +18,8 @@ window.DJConfig = (function () {
   // ── Fill these in after Phase 0 ─────────────────────────────────────────
   // Supabase dashboard -> Settings -> API
   var PROD = {
-    url: 'https://REPLACE_ME_PROD.supabase.co',
-    key: 'sb_publishable_REPLACE_ME_PROD'
+    url: 'https://desvghzavijzffjhqshe.supabase.co',
+    key: 'sb_publishable_L_z-FQxvwOUcy4JVeuPT7A_OLUicuiY'
   };
   var NONPROD = {
     url: 'https://uyvozabvhhaqhypnquzd.supabase.co',
