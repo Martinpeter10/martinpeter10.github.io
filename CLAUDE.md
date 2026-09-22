@@ -178,7 +178,14 @@ Every page also loads the shared scripts (in this order, both `defer`):
 
 Every game page **must** have two icon buttons in the **top-right of the fixed header**, to the left of the hamburger menu area. The standard order is: **Stats button** (bar-chart icon) → **? button** (How to Play), both sitting after the `<div class="flex-1"></div>` spacer.
 
-A third control, the **account button**, sits to the right of both - but it is **injected at runtime by `account.js`**, not written into the page. Do not hardcode it anywhere. Full order as rendered: stats → help → account.
+Two further controls sit to the right of both, and **neither is written into the page** - they are
+injected at runtime. Do not hardcode either one anywhere. Full order as rendered:
+**stats → help → bell → account**.
+
+- The **account button** is injected by `account.js` and is always present (when the backend is reachable).
+- The **release bell** is injected by `notify.js` and exists *only* while the player has an unread
+  release, so most of the time the header keeps three controls. That is deliberate: four round
+  buttons plus the brand overflow a 375px header.
 
 ```html
 <!-- Place these immediately after <div class="flex-1"></div> inside the header -->
@@ -292,6 +299,9 @@ Every release — whether a new game, feature update, or notable fix — must be
 
 1. **`README.md`** — add a new `### vX.Y.Z - YYYY-MM-DD` section at the top of the `## Releases` block
 2. **`/releases/index.html`** — add a matching `<div class="release-block">` at the top of the page content (before the previous release's block)
+3. **`/assets/js/notify.js`** — bump the `RELEASE` object (`version`, `title`, `summary`). This is what
+   drives the header bell. All three places must agree, or the bell announces a version the releases
+   page does not mention.
 
 The two should stay in sync with identical content. Release notes should be player-facing (describe the "what" and "why" users care about, not internal implementation details).
 
@@ -399,7 +409,7 @@ gameid: { title: 'Game Name', url: 'https://example.com/', ext: true },
 - **Share buttons**: game-over result panels have two side-by-side buttons — **Share Results** (green, `bg-green-700`) and **See Stats** (purple, `bg-purple-600`). Stats modals have a separate **Share Stats** button (green).
 - **Streaks**: Track current streak, best streak, total games played
 - **localStorage key convention**: stats keys use a `_v2` suffix (`td_stats_v2`, `cl_stats_v2`, `spd_stats_v2`, `bj_stats_v2`, `bj_alltime_v2`, `rl_stats_v2`, `rl_alltime_v2`). Daily state keys have no suffix (`themedleDailyState`, `cl_today`, `spd_today`, `bj_today`, `rl_today`, `hd_today`, `bf_today`). Bump the suffix when resetting stats site-wide.
-- **Site-wide localStorage keys** (not game-specific): `dj_cookie_ok` (cookie consent), `dj_favorites` (favorites list), `dj_seen_favs_intro` (favorites intro modal dismissed), `dj_account` (cached username for fast header paint - not the session; supabase-js owns the auth token under its own project-scoped key)
+- **Site-wide localStorage keys** (not game-specific): `dj_cookie_ok` (cookie consent), `dj_favorites` (favorites list), `dj_seen_favs_intro` (favorites intro modal dismissed), `dj_account` (cached username for fast header paint - not the session; supabase-js owns the auth token under its own project-scoped key), `dj_seen_release` (last release version the player acknowledged via the bell)
 - **How to Play**: Show modal on first visit (check localStorage flag), include animated demo
 - **Mobile**: 16px minimum font on inputs (prevents iOS zoom), use `viewport-fit=cover` for notch support
 - **Accessibility**: ARIA labels on interactive elements, keyboard navigation (Enter activates role="button", ESC closes modals), screen-reader-only helper text via `.sr-only` class
@@ -454,6 +464,29 @@ to load, or the network is down, `account.js` removes its own button and every g
 working exactly as before. Never let an account failure break a game.
 
 **Public API** (`window.DJAccount`): `open`, `close`, `username()`.
+
+---
+
+## Release Bell (`/assets/js/notify.js`)
+
+Loaded on every page with a `site-header`, after `account.js` (so it can insert itself to the
+left of the account button). No backend - it is a localStorage version comparison.
+
+**Single source of truth** is the `RELEASE` object at the top of the file. Bump it in the same
+commit as the release notes; see step 11 of the new-game checklist.
+
+**The bell only exists when there is unread news.** `isUnread()` compares `dj_seen_release`
+against `RELEASE.version`. When they match, nothing is injected at all and the header keeps its
+usual three controls.
+
+**First-visit handling**: a browser with no `dj_seen_release` is ambiguous - it could be a
+returning player who predates the bell, or someone brand new. `hasPlayedBefore()` checks for any
+existing DailyJamm key (`dj_cookie_ok`, `dj_favorites`, any `*_stats_v2`). A returning player gets
+the notification; a genuinely new visitor is silently brought up to date, because announcing a
+release that predates them is noise.
+
+**Public API** (`window.DJNotify`): `version`, `show()` (force the panel open), `reset()` (clear
+the seen flag so the bell returns - useful for testing from the console).
 
 ---
 
