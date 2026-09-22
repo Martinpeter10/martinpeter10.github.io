@@ -22,8 +22,8 @@ window.DJConfig = (function () {
     key: 'sb_publishable_REPLACE_ME_PROD'
   };
   var NONPROD = {
-    url: 'https://REPLACE_ME_NONPROD.supabase.co',
-    key: 'sb_publishable_REPLACE_ME_NONPROD'
+    url: 'https://uyvozabvhhaqhypnquzd.supabase.co',
+    key: 'sb_publishable_F9mTPasPg_nUDirR-9OZLw_3Rh988g2'
   };
   // ────────────────────────────────────────────────────────────────────────
 
