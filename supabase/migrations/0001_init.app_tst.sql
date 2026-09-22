@@ -1,7 +1,11 @@
+-- GENERATED FROM 0001_init.sql - DO NOT EDIT BY HAND.
+-- Target schema: app_tst
+-- Regenerate with ./generate.sh after changing the template.
+
 -- ═══════════════════════════════════════════════════════════════════════════
 -- DailyJamm accounts + leaderboards - initial schema
 --
--- THIS IS A TEMPLATE, NOT A RUNNABLE FILE. __SCHEMA__ must be substituted.
+-- THIS IS A TEMPLATE, NOT A RUNNABLE FILE. app_tst must be substituted.
 -- Do not paste this into the SQL editor - use the generated files beside it:
 --
 --   0001_init.public.sql    prod project
@@ -34,10 +38,10 @@
 -- a schema you create does NOT, and without it every API call into app_tst or
 -- app_dev fails with a permission error that looks like a missing table.
 
-create schema if not exists __SCHEMA__;
-grant usage on schema __SCHEMA__ to anon, authenticated;
+create schema if not exists app_tst;
+grant usage on schema app_tst to anon, authenticated;
 
-set search_path = __SCHEMA__;
+set search_path = app_tst;
 
 -- ── Game registry ─────────────────────────────────────────────────────────
 -- Adding a game to the leaderboards is a row here, not a code change.
@@ -201,7 +205,7 @@ create or replace function submit_score(
 returns jsonb
 language plpgsql
 security definer
-set search_path = __SCHEMA__, pg_temp
+set search_path = app_tst, pg_temp
 as $$
 declare
   v_user  uuid := auth.uid();
@@ -295,7 +299,7 @@ returns table (
 )
 language sql
 security definer
-set search_path = __SCHEMA__, pg_temp
+set search_path = app_tst, pg_temp
 stable
 as $$
   with cfg as (
@@ -327,7 +331,7 @@ create or replace function get_my_rank(p_game text, p_day date default null)
 returns jsonb
 language sql
 security definer
-set search_path = __SCHEMA__, pg_temp
+set search_path = app_tst, pg_temp
 stable
 as $$
   with cfg as (

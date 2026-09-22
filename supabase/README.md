@@ -49,13 +49,25 @@ create schema if not exists app_dev;
 
 ### 2. Migration
 
-Run `migrations/0001_init.sql` three times:
+`0001_init.sql` is a **template** and will not run - it contains a `__SCHEMA__`
+token. Use the generated files beside it, which need no editing:
 
-| Project | Before running |
-|---|---|
-| prod | nothing - it targets `public` |
-| nonprod | `set search_path = app_tst;` |
-| nonprod | `set search_path = app_dev;` |
+| Project | Paste this file | Creates |
+|---|---|---|
+| prod | `0001_init.public.sql` | `public` |
+| nonprod | `0001_init.app_tst.sql` | `app_tst` |
+| nonprod | `0001_init.app_dev.sql` | `app_dev` |
+
+Each generated file creates its own schema, grants `usage` on it to `anon` and
+`authenticated`, and pins every function's `search_path` to that schema.
+
+**Why generated instead of a session `set search_path`:** a `security definer`
+function's `search_path` must be a literal, so it cannot inherit the session's.
+A function created in `app_tst` carrying `search_path = public` resolves
+`scores` and `profiles` to the **production** tables. Substituting the name
+mechanically is the only way to be certain that never happens.
+
+After editing the template, regenerate with `./supabase/migrations/generate.sh`.
 
 Then expose the non-public schemas to the API:
 **Settings → API → Exposed schemas** must list `app_tst` and `app_dev`.
