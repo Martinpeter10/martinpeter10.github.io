@@ -193,6 +193,15 @@ Press `Ctrl+C` in the terminal to stop the server.
 
 Full release notes are also available at [dailyjamm.com/releases](https://dailyjamm.com/releases/).
 
+### v3.5.0 - 2026-09-22
+
+**Player accounts and the release bell**
+
+- **Sign in with Google.** Every game is still completely free to play without an account. Signing in is optional and saves your scores, keeps your streaks on every device, and puts you on the daily leaderboards. We never see your password, and your email is never shown to other players.
+- **Pick a username.** Your username is the only thing other players see. Names are checked automatically, including attempts to disguise words with numbers or symbols.
+- **A bell in the header** appears when there is a new release and links you here. It only shows up when there is something you have not seen.
+- Privacy Policy and Terms of Service updated to cover accounts, usernames and leaderboards.
+
 ### v3.4.0 - 2026-08-26
 
 **New Game: Yachtdle** - Thirteen boxes, one scorecard a day.
