@@ -534,6 +534,13 @@ case - returning from Google without a username yet - so the round trip is not w
 visible only to its owner in their own profile view, and is never stored in `profiles` (it lives
 in `auth.users` and is read from the session). Do not duplicate it into a public table.
 
+**CORS: `apikey` must stay in the Edge Function's `Access-Control-Allow-Headers`.** Both
+supabase-js and `account.js` send it, and a header missing from that list makes the browser block
+the request before it leaves - the fetch throws and reads like a rejected username. **curl ignores
+CORS entirely**, so this class of bug passes every command-line test and fails only in a real
+browser. Test the preflight explicitly:
+`curl -X OPTIONS <fn-url> -H "Origin: https://dev.dailyjamm.com" -H "Access-Control-Request-Headers: content-type,apikey,authorization"`
+
 **Graceful degradation is required.** If `DJConfig` is unconfigured, the vendored bundle fails
 to load, or the network is down, `account.js` removes its own button and every game keeps
 working exactly as before. Never let an account failure break a game.

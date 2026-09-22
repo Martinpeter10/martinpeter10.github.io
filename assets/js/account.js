@@ -323,12 +323,21 @@ window.DJAccount = (function () {
         setMsg(v + ' is available', 'good');
         setBusy(false);
       } else {
+        // The server distinguishes "taken" from "not allowed"; it deliberately
+        // does not say WHY a name is not allowed, because explaining the filter
+        // teaches people how to beat it.
         setMsg((res && res.message) || "That name isn't available - try another.", 'bad');
         setBusy(true);
       }
-    }).catch(function () {
+    }).catch(function (err) {
       if (lastChecked !== v) return;
-      setMsg('Could not check that name. Try again.', 'bad');
+      // A thrown fetch is a connectivity or CORS problem, never a verdict on
+      // the name. Say so, and leave a breadcrumb in the console - this branch
+      // previously swallowed a CORS failure and read as a rejection.
+      if (window.console && console.warn) {
+        console.warn('[DJAccount] username check failed:', err);
+      }
+      setMsg('Could not reach the server. Check your connection and try again.', 'bad');
       setBusy(true);
     });
   }

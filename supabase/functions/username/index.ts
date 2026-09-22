@@ -80,7 +80,12 @@ function schemaFor(origin: string | null): string | null {
 function corsHeaders(origin: string | null) {
   return {
     'Access-Control-Allow-Origin': origin ?? '',
-    'Access-Control-Allow-Headers': 'authorization, content-type',
+    // `apikey` is not optional: supabase-js and our own fetch both send it, and
+    // a header missing from this list makes the browser block the request
+    // before it leaves. curl ignores CORS entirely, so this class of bug
+    // passes every command-line test and fails only in a real browser.
+    // x-client-info is added by supabase-js on its own calls.
+    'Access-Control-Allow-Headers': 'authorization, content-type, apikey, x-client-info',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Vary': 'Origin',
   };
@@ -148,7 +153,8 @@ Deno.serve(async (req) => {
 
   if (action === 'check') {
     return taken
-      ? json({ available: false, message: "That name isn't available - try another." }, 200, origin)
+      ? json({ available: false, reason: 'taken',
+               message: 'That name is already taken - try another.' }, 200, origin)
       : json({ available: true }, 200, origin);
   }
 
@@ -164,7 +170,8 @@ Deno.serve(async (req) => {
   const userId = userData.user.id;
 
   if (taken) {
-    return json({ available: false, message: "That name isn't available - try another." }, 200, origin);
+    return json({ available: false, reason: 'taken',
+                  message: 'That name is already taken - try another.' }, 200, origin);
   }
 
   const { error: insertErr } = await db
@@ -176,7 +183,8 @@ Deno.serve(async (req) => {
     // this account already has a profile. Both are "pick another / you're
     // already set up", not a server fault.
     if (insertErr.code === '23505') {
-      return json({ available: false, message: "That name isn't available - try another." }, 200, origin);
+      return json({ available: false, reason: 'taken',
+                    message: 'That name is already taken - try another.' }, 200, origin);
     }
     return json({ error: 'server_error' }, 500, origin);
   }
