@@ -39,7 +39,7 @@
 -- app_dev fails with a permission error that looks like a missing table.
 
 create schema if not exists app_tst;
-grant usage on schema app_tst to anon, authenticated;
+grant usage on schema app_tst to anon, authenticated, service_role;
 
 set search_path = app_tst;
 
@@ -356,6 +356,31 @@ $$;
 
 
 -- ── Grants ────────────────────────────────────────────────────────────────
+--
+-- RLS decides WHICH ROWS a role may see. A GRANT decides whether it may touch
+-- the table at all. Both are required and they are not substitutes: with
+-- policies but no grant, PostgREST answers "permission denied for table"; with
+-- a grant but no policy, it returns zero rows.
+--
+-- In `public`, Supabase's default privileges hand these out invisibly. A schema
+-- you create inherits nothing, so every grant below has to be explicit. As of
+-- the 2026 Data API change this is the model in `public` too.
+--
+-- Note what is NOT here: no INSERT, UPDATE or DELETE to anon or authenticated,
+-- on any table. Every write goes through the definer functions. That is what
+-- makes shipping the publishable key in the browser safe.
+
+grant select on game_defs  to anon, authenticated;   -- public, drives the boards
+grant select on profiles   to authenticated;         -- policy narrows to own row
+grant select on scores     to authenticated;         -- policy narrows to own rows
+grant select on game_stats to authenticated;         -- policy narrows to own rows
+-- name_reports: deliberately no grant to anyone. Moderation is dashboard-only.
+
+-- The Edge Function holds the secret key, which maps to service_role. It
+-- bypasses RLS but still needs ordinary table privileges in a custom schema.
+grant all on all tables in schema app_tst to service_role;
+grant all on all sequences in schema app_tst to service_role;
+
 -- Revoke from PUBLIC first: functions are executable by everyone by default,
 -- which is the single easiest way to leave a definer function wide open.
 

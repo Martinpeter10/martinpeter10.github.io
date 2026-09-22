@@ -69,8 +69,17 @@ mechanically is the only way to be certain that never happens.
 
 After editing the template, regenerate with `./supabase/migrations/generate.sh`.
 
-Then expose the non-public schemas to the API:
-**Settings → API → Exposed schemas** must list `app_tst` and `app_dev`.
+Then expose the non-public schemas to the API. The dashboard split the old API
+page in two, so this is **not** on the API Keys screen:
+
+> **Project Settings → Data API → Exposed schemas** (or Integrations → Data API)
+> must list `app_tst` and `app_dev`.
+>
+> Direct link: `supabase.com/dashboard/project/<ref>/settings/api`
+
+Exposing a schema and granting on its tables are two different things and you
+need both. The migration handles the grants; this handles PostgREST's view of
+the world.
 
 ### 3. Auth - Google sign-in
 
