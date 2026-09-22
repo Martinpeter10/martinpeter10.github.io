@@ -451,6 +451,13 @@ mirroring the Google Analytics gate - `dailyjamm.com` → prod/`public`,
 `dailyjammtest*` → nonprod/`app_tst`, everything else (including localhost) → nonprod/`app_dev`.
 An unrecognised host falls through to dev on purpose, so it can never touch production data.
 
+**`DJ_SCHEMAS` is a required Edge Function secret**, set per project:
+`public` on prod, `app_tst,app_dev` on nonprod. The function's origin map is shared by both
+deployments, so without it a localhost origin can reach the *production* function and ask for
+`app_dev`. The function refuses everything when the secret is missing, so a misconfigured deploy
+fails loudly rather than cross-wiring environments. Set it with
+`supabase secrets set DJ_SCHEMAS=... --project-ref <ref>`.
+
 **Usernames** are moderated in the `username` Edge Function, never in the browser. `profiles`
 has no insert policy, so that function is the only door - a client-side filter would be
 bypassable with one `curl`, and shipping a wordlist in `/assets/js` would put it in view-source.

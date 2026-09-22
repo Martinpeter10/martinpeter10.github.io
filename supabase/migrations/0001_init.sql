@@ -372,6 +372,15 @@ grant select on scores     to authenticated;         -- policy narrows to own ro
 grant select on game_stats to authenticated;         -- policy narrows to own rows
 -- name_reports: deliberately no grant to anyone. Moderation is dashboard-only.
 
+-- In `public`, Supabase's default privileges have ALREADY granted select on
+-- these to anon before this migration runs, so granting above is not enough -
+-- the inherited grant has to come off. RLS already returns no rows to anon, so
+-- this is defence in depth: it means a future permissive policy cannot
+-- accidentally expose them. In a created schema there is nothing to revoke and
+-- this is a harmless no-op, which is exactly why it lives in the shared
+-- template rather than only in the public file.
+revoke select on profiles, scores, game_stats from anon;
+
 -- The Edge Function holds the secret key, which maps to service_role. It
 -- bypasses RLS but still needs ordinary table privileges in a custom schema.
 grant all on all tables in schema __SCHEMA__ to service_role;

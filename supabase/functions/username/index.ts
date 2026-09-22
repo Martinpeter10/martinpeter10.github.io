@@ -39,13 +39,37 @@ const ORIGIN_PREFIX: Array<[string, string]> = [
   ['http://127.0.0.1', 'app_dev'],
 ];
 
+// The map above is shared by both deployments, so on its own it would let a
+// localhost Origin reach the PRODUCTION function and ask for app_dev - a schema
+// that does not exist there. That failed safe (a server error, no data) but it
+// is the wrong answer: an origin from another environment should be refused
+// outright, not fail deep in a query.
+//
+// DJ_SCHEMAS is set per project as a Supabase secret and lists the schemas that
+// deployment is allowed to touch:
+//   prod    -> "public"
+//   nonprod -> "app_tst,app_dev"
+// If the secret is missing we refuse everything rather than guess, so a
+// misconfigured deploy is loud instead of quietly cross-wired.
+const ALLOWED_SCHEMAS = new Set(
+  (Deno.env.get('DJ_SCHEMAS') ?? '').split(',').map((s) => s.trim()).filter(Boolean),
+);
+
 function schemaFor(origin: string | null): string | null {
   if (!origin) return null;
-  if (ORIGIN_SCHEMA[origin]) return ORIGIN_SCHEMA[origin];
-  for (const [prefix, schema] of ORIGIN_PREFIX) {
-    if (origin.startsWith(prefix)) return schema;
+
+  let schema: string | null = null;
+  if (ORIGIN_SCHEMA[origin]) {
+    schema = ORIGIN_SCHEMA[origin];
+  } else {
+    for (const [prefix, s] of ORIGIN_PREFIX) {
+      if (origin.startsWith(prefix)) { schema = s; break; }
+    }
   }
-  return null;
+  if (!schema) return null;
+
+  // Right shape of origin, wrong environment.
+  return ALLOWED_SCHEMAS.has(schema) ? schema : null;
 }
 
 function corsHeaders(origin: string | null) {
