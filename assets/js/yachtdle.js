@@ -536,6 +536,15 @@
 
     const saved = loadToday();
     if (saved) restore(saved);
+    if (done) {
+      // Also report on restore - recordStats() returns early once the day is
+      // counted, so it is not a second chance to submit. One row per day
+      // server-side makes repeating this harmless.
+      djSubmit(grandTotal(), {
+        yachts_total:  scores.yacht ? 1 : 0,
+        bonuses_total: bonusEarned() ? 1 : 0
+      });
+    }
 
     paintDice(null);
     renderCard();

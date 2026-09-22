@@ -458,6 +458,13 @@ differs per game is only which metrics are worth showing, and that lives in `BOA
 score on guesses, Shut the Box on tiles left and Net Zero on distance from zero - all four are
 **lower is better** and carry `sort_mult = -1`.
 
+**Every game submits on TWO paths: completion and restore.** Each game records its result inside
+a "not yet recorded today" guard, so first completion is the only moment the score is known. A day
+finished before signing in would otherwise never reach the boards. `submit_score` keeps one row per
+player per game per day and returns early on a duplicate *without touching extras*, so repeating
+the call is a genuine no-op - which is what makes the restore call safe. When adding a game, wire
+both paths or it will silently under-report.
+
 **Submission is fire and forget.** Each game calls `djSubmit()` at its existing completion point.
 No game awaits it or branches on the result, so a leaderboard outage can never affect play.
 `DJAccount.submitScore` no-ops without an account and queues to `dj_score_queue` when the network

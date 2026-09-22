@@ -441,6 +441,12 @@
       selected = [];
       if (today.phase === 'done' && outcome) {
         phase = 'done';
+        // Also report on restore. Each game records its result once, on first
+        // completion - so a day finished before signing in could never reach the
+        // boards. submit_score keeps one row per player per game per day and
+        // returns early on a duplicate without touching extras, so repeating
+        // this is a genuine no-op.
+        djSubmit(outcome.score, outcome.shut ? { shut_total: 1 } : {});
         renderTiles();
         renderControls();
         if (outcome.shut) {

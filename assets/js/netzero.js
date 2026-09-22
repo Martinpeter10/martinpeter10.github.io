@@ -863,6 +863,15 @@
 
       renderMid();
       if (phase === 'done' && outcome) {
+        // Also report on restore. Each game records its result once, on first
+        // completion - so a day finished before signing in could never reach the
+        // boards. submit_score keeps one row per player per game per day and
+        // returns early on a duplicate without touching extras, so repeating
+        // this is a genuine no-op.
+        djSubmit(Math.min(Math.abs(outcome.total), 100), {
+          pure_total: outcome.pure ? 1 : 0,
+          wins_total: outcome.win ? 1 : 0
+        });
         renderSeats(true, false);
         renderPlayerHand(false);
         renderControls();

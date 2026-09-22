@@ -589,6 +589,15 @@
 
     if (gameOver) {
       showResults(true, null, null);
+      // Also report on restore. Each game records its result once, on first
+      // completion - so a day finished before signing in could never reach the
+      // boards. submit_score keeps one row per player per game per day and
+      // returns early on a duplicate without touching extras, so repeating
+      // this is a genuine no-op.
+      // Decide win/loss exactly the way showResults does - a guess entry is
+      // { spellName, results }, so the verdict comes from isWin(results).
+      var djWon = guesses.length > 0 && isWin(guesses[guesses.length - 1].results);
+      djSubmit(djWon ? guesses.length : MAX_GUESSES + 1, djWon ? { wins_total: 1 } : {});
     } else {
       if (!localStorage.getItem(SEEN_KEY)) {
         localStorage.setItem(SEEN_KEY, '1');

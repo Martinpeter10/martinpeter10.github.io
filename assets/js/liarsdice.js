@@ -770,6 +770,12 @@
       renderBid();
       if (phase === 'done' && outcome) {
         showResults();
+        // Also report on restore. Each game records its result once, on first
+        // completion - so a day finished before signing in could never reach the
+        // boards. submit_score keeps one row per player per game per day and
+        // returns early on a duplicate without touching extras, so repeating
+        // this is a genuine no-op.
+        djSubmit(outcome.aisBeaten, outcome.win ? { table_wins_total: 1 } : {});
       } else if (phase === 'reveal' && revealInfo) {
         curBid = revealInfo.bid;
         renderBid();

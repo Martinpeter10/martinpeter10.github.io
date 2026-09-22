@@ -942,6 +942,12 @@ function boot() {
   if (hasPlayedToday && dailyGameState.completed) {
     gameOver = true;
     restoreGameState();
+    // Also report on restore. The result is recorded once, on first completion,
+    // so a day finished before signing in could never reach the boards.
+    // submit_score keeps one row per player per game per day, so repeating this
+    // is a no-op.
+    djSubmit(dailyGameState.won ? currentGuess : 7,
+             dailyGameState.won ? { wins_total: 1 } : {});
     disableGameControls();
     if (clipLengthSpan) clipLengthSpan.textContent = '15 seconds';
     if (maxClipIndicator) maxClipIndicator.style.width = '100%';
