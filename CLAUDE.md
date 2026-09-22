@@ -459,11 +459,26 @@ Shape rule is `^[A-Za-z0-9_]{3,16}$`, which rejects masked names like `@$$` at t
 before any wordlist runs; digit substitution (`a55`, `sh1t`, `f_u_c_k`) is caught by normalising
 to a match key first. See `/supabase/README.md` for the test cases.
 
+**Identity is a Google account.** DailyJamm sends no email and stores no password, so there is
+no SMTP provider and no sending domain - the address arrives verified and unique from Google.
+`detectSessionInUrl` must stay **true** in `dj-config.js`: the OAuth round trip returns the
+session in the URL fragment, and setting it false breaks sign-in silently, with no error.
+`signInWithOAuth` uses `redirectTo: location.href`, so every origin must be on the Supabase
+redirect allowlist with a `/**` wildcard - players sign in from game pages, not just the root.
+
+**Playing is never gated.** Every game is free without an account; signing in buys saved scores,
+cross-device streaks, and a place on the leaderboards. The modal opens on its own in exactly one
+case - returning from Google without a username yet - so the round trip is not wasted.
+
+**Username is separate from email.** The username is the only thing shown publicly; the email is
+visible only to its owner in their own profile view, and is never stored in `profiles` (it lives
+in `auth.users` and is read from the session). Do not duplicate it into a public table.
+
 **Graceful degradation is required.** If `DJConfig` is unconfigured, the vendored bundle fails
 to load, or the network is down, `account.js` removes its own button and every game keeps
 working exactly as before. Never let an account failure break a game.
 
-**Public API** (`window.DJAccount`): `open`, `close`, `username()`.
+**Public API** (`window.DJAccount`): `open`, `close`, `username()`, `isReady()`.
 
 ---
 

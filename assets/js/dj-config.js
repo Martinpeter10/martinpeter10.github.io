@@ -58,11 +58,14 @@ window.DJConfig = (function () {
     client = window.supabase.createClient(project.url, project.key, {
       db: { schema: schema },
       auth: {
-        // Anonymous sessions must survive a reload, so persistence is on.
-        // The token lives in localStorage under a project-scoped key.
+        // Sessions survive a reload; the token lives in localStorage under a
+        // project-scoped key that supabase-js owns.
         persistSession: true,
         autoRefreshToken: true,
-        detectSessionInUrl: false
+        // REQUIRED for Google sign-in. The OAuth round trip comes back with the
+        // session in the URL fragment, and this is what reads it and cleans the
+        // address bar. Setting it false silently breaks sign-in with no error.
+        detectSessionInUrl: true
       }
     });
     return client;

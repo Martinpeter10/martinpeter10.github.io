@@ -1,14 +1,26 @@
-// DailyJamm accounts: player profile with a moderated username.
+// DailyJamm accounts: sign in with Google, then claim a public username.
 //
-// Runs on every page (after menu.js and favorites.js). Injects the account
-// button as the rightmost child of the site header and owns the profile modal.
+// Runs on every page with a site-header (after favorites.js). Injects the
+// account button as the rightmost header child and owns the profile modal.
 //
-// Phase 1 scope: anonymous sign-in, username creation, sign out. Score
-// submission and leaderboards land in Phase 2 - deliberately not here.
+// Playing is FREE and never gated. An account buys you saved scores, streaks
+// that follow you between devices, and a place on the daily leaderboards -
+// so the modal is only ever opened deliberately, never forced in front of a
+// puzzle.
+//
+// Identity is a Google account, which means the email is verified and unique
+// without DailyJamm ever sending an email or storing a password. The username
+// is separate: it is the only thing shown publicly, and the email is never
+// displayed to anyone but its owner.
+//
+// Three states:
+//   no session              -> viewSignIn     "Sign in with Google"
+//   session, no profile     -> viewUsername   "Pick your leaderboard name"
+//   session + profile       -> viewProfile    name, email, sign out
 //
 // Degrades to nothing: if DJConfig is unconfigured, supabase-js failed to load,
-// or the network is down, the button simply does not appear and every game
-// keeps working exactly as it does today.
+// or the network is down, the button removes itself and every game keeps
+// working exactly as it does today.
 window.DJAccount = (function () {
   'use strict';
 
@@ -22,6 +34,15 @@ window.DJAccount = (function () {
     '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" ' +
     'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
     '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+
+  // Google's four-colour mark. Static, and the only place brand colours that
+  // are not DailyJamm's appear in the site.
+  var ICON_GOOGLE =
+    '<svg viewBox="0 0 18 18" width="17" height="17" aria-hidden="true">' +
+    '<path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.91c1.7-1.57 2.69-3.88 2.69-6.62z"/>' +
+    '<path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.91-2.26c-.81.54-1.84.86-3.05.86-2.35 0-4.34-1.58-5.05-3.71H.96v2.33A9 9 0 0 0 9 18z"/>' +
+    '<path fill="#FBBC05" d="M3.95 10.71a5.41 5.41 0 0 1 0-3.42V4.96H.96a9 9 0 0 0 0 8.08l2.99-2.33z"/>' +
+    '<path fill="#EA4335" d="M9 3.58c1.32 0 2.51.45 3.44 1.35l2.58-2.59C13.46.89 11.43 0 9 0A9 9 0 0 0 .96 4.96l2.99 2.33C4.66 5.16 6.65 3.58 9 3.58z"/></svg>';
 
   var MODAL_HTML =
     '<div class="dj-acct-backdrop" id="dj-acct-backdrop"></div>' +
@@ -61,6 +82,10 @@ window.DJAccount = (function () {
     return n;
   }
 
+  function email() {
+    return (session && session.user && session.user.email) || '';
+  }
+
   // ── Header button ────────────────────────────────────────────────────────
 
   function injectButton() {
@@ -73,7 +98,7 @@ window.DJAccount = (function () {
     btn.className = 'dj-acct-btn';
     btn.setAttribute('aria-label', 'Account');
     btn.addEventListener('click', open);
-    header.appendChild(btn);   // rightmost, after stats and help where present
+    header.appendChild(btn);   // rightmost, after stats, help and the bell
     paintButton();
   }
 
@@ -128,8 +153,9 @@ window.DJAccount = (function () {
     if (!body) return;
     body.textContent = '';
     if (!client) body.appendChild(viewUnavailable());
-    else if (profile) body.appendChild(viewProfile());
-    else body.appendChild(viewCreate());
+    else if (!session) body.appendChild(viewSignIn());
+    else if (!profile) body.appendChild(viewUsername());
+    else body.appendChild(viewProfile());
   }
 
   function viewUnavailable() {
@@ -139,11 +165,34 @@ window.DJAccount = (function () {
     return w;
   }
 
-  function viewCreate() {
+  function viewSignIn() {
     var w = document.createDocumentFragment();
 
     w.appendChild(make('p', 'dj-acct-lede',
-      'Pick a name to save your scores and appear on the daily leaderboards. No email needed.'));
+      'Every game is free to play without an account. Sign in to save your scores, keep your streaks on every device, and appear on the daily leaderboards.'));
+
+    var btn = make('button', 'dj-acct-google');
+    btn.type = 'button';
+    btn.innerHTML = ICON_GOOGLE;                  // static string
+    btn.appendChild(make('span', null, 'Sign in with Google'));
+    btn.addEventListener('click', doSignIn);
+    w.appendChild(btn);
+
+    var err = make('p', 'dj-acct-msg');
+    err.id = 'dj-acct-msg';
+    w.appendChild(err);
+
+    w.appendChild(make('p', 'dj-acct-fine',
+      'We use Google only to confirm it is you. Your email address is never shown to other players - you pick a separate public name next.'));
+
+    return w;
+  }
+
+  function viewUsername() {
+    var w = document.createDocumentFragment();
+
+    w.appendChild(make('p', 'dj-acct-lede',
+      'You are signed in. Pick the name other players will see on the leaderboards.'));
 
     var field = make('div', 'dj-acct-field');
     var label = make('label', null, 'Username');
@@ -163,14 +212,14 @@ window.DJAccount = (function () {
     msg.id = 'dj-acct-msg';
     w.appendChild(msg);
 
-    var btn = make('button', 'dj-acct-primary', 'Create profile');
+    var btn = make('button', 'dj-acct-primary', 'Save name');
     btn.id = 'dj-acct-create';
     btn.type = 'button';
     btn.disabled = true;
     w.appendChild(btn);
 
     w.appendChild(make('p', 'dj-acct-fine',
-      'Your name is public on leaderboards. Keep it clean - names are checked.'));
+      'This is public on leaderboards. Keep it clean - names are checked. Choose carefully; renaming is not available yet.'));
 
     input.addEventListener('input', function () { onNameInput(input.value); });
     btn.addEventListener('click', function () { doClaim(input.value.trim()); });
@@ -185,19 +234,20 @@ window.DJAccount = (function () {
   function viewProfile() {
     var w = document.createDocumentFragment();
 
-    var badge = make('div', 'dj-acct-badge', profile.username.charAt(0).toUpperCase());
-    w.appendChild(badge);
+    w.appendChild(make('div', 'dj-acct-badge', profile.username.charAt(0).toUpperCase()));
     w.appendChild(make('p', 'dj-acct-name-big', profile.username));
 
-    w.appendChild(make('p', 'dj-acct-lede',
-      'Your scores are saved to your profile from now on.'));
+    var em = email();
+    if (em) {
+      var row = make('p', 'dj-acct-email');
+      row.appendChild(make('span', null, em));
+      w.appendChild(row);
+      w.appendChild(make('p', 'dj-acct-fine',
+        'Only you can see this. Other players see ' + profile.username + '.'));
+    }
 
-    // Phase 4 replaces this with a real "link an account" flow.
-    var warn = make('div', 'dj-acct-warn');
-    warn.appendChild(make('p', null,
-      'This profile lives on this device only. Clearing your browser will lose it. ' +
-      'Signing in with an email or Google is coming soon.'));
-    w.appendChild(warn);
+    w.appendChild(make('p', 'dj-acct-lede',
+      'Your scores are saved to your account. Sign in with the same Google account on any device to pick up your streaks.'));
 
     var out = make('button', 'dj-acct-secondary', 'Sign out');
     out.type = 'button';
@@ -220,7 +270,7 @@ window.DJAccount = (function () {
     var b = document.getElementById('dj-acct-create');
     if (!b) return;
     b.disabled = busy;
-    b.textContent = label || 'Create profile';
+    b.textContent = label || 'Save name';
   }
 
   function onNameInput(raw) {
@@ -284,37 +334,42 @@ window.DJAccount = (function () {
 
   // ── Auth ─────────────────────────────────────────────────────────────────
 
-  function doClaim(v) {
-    if (!SHAPE.test(v) || !client) return;
-    setBusy(true, 'Creating...');
+  /**
+   * Hand off to Google. This navigates away; the browser comes back to the
+   * same page with the session in the URL fragment, which supabase-js reads
+   * because dj-config.js sets detectSessionInUrl.
+   */
+  function doSignIn() {
+    if (!client) return;
     setMsg('', null);
-
-    ensureSession()
-      .then(function () { return callFn('claim', v); })
-      .then(function (res) {
-        if (res && res.ok) {
-          profile = { username: res.username };
-          cache(profile);
-          paintButton();
-          render();
-        } else {
-          setMsg((res && res.message) || 'Could not create that profile.', 'bad');
-          setBusy(true);
-        }
-      })
-      .catch(function () {
-        setMsg('Something went wrong. Try again.', 'bad');
-        setBusy(true);
-      });
+    client.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: location.href }
+    }).then(function (res) {
+      if (res.error) setMsg('Could not reach Google. Try again.', 'bad');
+    }).catch(function () {
+      setMsg('Could not reach Google. Try again.', 'bad');
+    });
   }
 
-  /** Create an anonymous auth user if there is not already a session. */
-  function ensureSession() {
-    if (session) return Promise.resolve(session);
-    return client.auth.signInAnonymously().then(function (res) {
-      if (res.error) throw res.error;
-      session = res.data.session;
-      return session;
+  function doClaim(v) {
+    if (!SHAPE.test(v) || !client || !session) return;
+    setBusy(true, 'Saving...');
+    setMsg('', null);
+
+    callFn('claim', v).then(function (res) {
+      if (res && res.ok) {
+        profile = { username: res.username };
+        cache(profile);
+        paintButton();
+        render();
+      } else {
+        setMsg((res && res.message) || 'Could not save that name.', 'bad');
+        setBusy(true);
+      }
+    }).catch(function () {
+      setMsg('Something went wrong. Try again.', 'bad');
+      setBusy(true);
     });
   }
 
@@ -364,7 +419,7 @@ window.DJAccount = (function () {
     client.auth.getSession().then(function (res) {
       session = (res && res.data && res.data.session) || null;
       if (!session) {
-        // No session: any cached name is stale (cleared storage, new device).
+        // No session: any cached name is stale (signed out, or a new device).
         profile = null;
         cache(null);
         paintButton();
@@ -375,6 +430,11 @@ window.DJAccount = (function () {
         cache(p);
         paintButton();
         if (built) render();
+
+        // Just came back from Google without a name yet. Finish the job rather
+        // than dropping them on the page with nothing to show for the round
+        // trip - this is the only time the modal opens on its own.
+        if (!p) open();
       });
     }).catch(function () { /* leave the cached paint in place */ });
   }
@@ -389,6 +449,8 @@ window.DJAccount = (function () {
     open: open,
     close: close,
     /** Current username, or null. Phase 2 uses this to gate score submission. */
-    username: function () { return profile ? profile.username : null; }
+    username: function () { return profile ? profile.username : null; },
+    /** True when there is a signed-in account with a claimed name. */
+    isReady: function () { return !!(session && profile); }
   };
 })();

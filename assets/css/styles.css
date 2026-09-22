@@ -2627,8 +2627,13 @@ input[type=range].slider::-moz-range-thumb {
 
 .dj-acct-badge{width:56px;height:56px;border-radius:999px;background:linear-gradient(135deg,#45b7d1,#2ecc71);color:#06231a;display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:900;margin:.25rem auto 0}
 .dj-acct-name-big{text-align:center;font-size:1.15rem;font-weight:800;margin:0}
-.dj-acct-warn{border:1px solid rgba(240,180,41,.35);background:rgba(240,180,41,.08);border-radius:10px;padding:.7rem .85rem}
-.dj-acct-warn p{margin:0;font-size:.78rem;color:#f0c96b;line-height:1.5}
+.dj-acct-email{margin:0;text-align:center;font-size:.8rem;color:#8f8fae;word-break:break-all}
+/* Google's own mark and wordmark treatment - white button, dark text, per their
+   branding rules. Deliberately not restyled to the DailyJamm palette. */
+.dj-acct-google{width:100%;display:flex;align-items:center;justify-content:center;gap:.6rem;padding:.7rem 1rem;border:1px solid #dadce0;border-radius:10px;background:#fff;color:#1f1f1f;font-family:inherit;font-size:.9rem;font-weight:700;cursor:pointer}
+.dj-acct-google:hover{background:#f4f4f6}
+.dj-acct-google:focus-visible{outline:2px solid #45b7d1;outline-offset:2px}
+.dj-acct-google svg{flex-shrink:0}
 .dj-acct-note p{margin:0;font-size:.85rem;color:#b8b8d1;line-height:1.5}
 
 /* ── Release bell (used by notify.js on all pages) ── */

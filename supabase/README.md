@@ -60,18 +60,45 @@ Run `migrations/0001_init.sql` three times:
 Then expose the non-public schemas to the API:
 **Settings → API → Exposed schemas** must list `app_tst` and `app_dev`.
 
-### 3. Auth
+### 3. Auth - Google sign-in
 
-**Authentication → Providers:**
+Identity is a Google account. DailyJamm sends **no email and stores no password**,
+so there is no SMTP provider, no sending domain, and no DNS to configure. The
+email address arrives already verified and unique.
 
-- Enable **Anonymous sign-ins**. This is what lets someone pick a username and
-  play without an email.
-- Leave email/password **off** for now. Phase 4 adds Google OAuth or magic
-  links for account durability.
+**Google Cloud Console** (console.cloud.google.com) - do this first:
 
-**Authentication → Rate limits:** lower the anonymous sign-in limit to
-something like 30/hour per IP. The default is generous and anonymous sign-ups
-are the cheapest thing to abuse here.
+1. Create a project (or reuse one) → **APIs & Services → Credentials**
+2. **Create Credentials → OAuth client ID → Web application**
+3. Under *Authorised redirect URIs* add **your Supabase callback**, which is:
+   `https://<project-ref>.supabase.co/auth/v1/callback`
+   Add it once per Supabase project, so twice: prod and nonprod.
+4. Copy the **Client ID** and **Client secret**
+
+**Supabase dashboard → Authentication → Providers → Google:**
+
+- Enable it, paste the Client ID and Client secret
+- Leave "Skip nonce check" off
+
+**Supabase dashboard → Authentication → URL Configuration:**
+
+`signInWithOAuth` sends the player back to the page they started on, so every
+origin they can start from must be on the allowlist or the round trip dead-ends.
+
+| Project | Site URL | Redirect allowlist |
+|---|---|---|
+| prod | `https://dailyjamm.com` | `https://dailyjamm.com/**` |
+| nonprod | `https://dailyjammtest.<sub>.workers.dev` | `https://dailyjammtest.<sub>.workers.dev/**`, `https://dailyjammdev.<sub>.workers.dev/**`, `http://localhost:8080/**` |
+
+The `/**` wildcard matters: players sign in from `/chainlink/`, `/yachtdle/` and
+every other page, not just the root.
+
+**Authentication → Rate limits:** the defaults are fine for OAuth - there are no
+emails to throttle. Leave them.
+
+> **Anonymous sign-ins are NOT used.** If you enabled them from an earlier draft
+> of this plan, turn them back off - an enabled anonymous provider is a free
+> unlimited account factory pointed at your database.
 
 ### 4. Edge Function
 
@@ -99,7 +126,9 @@ Run through this before Phase 1 ships, and again before prod.
       not in the list.
 - [ ] Secret key has never been pasted into a file, and `git log -p` does not
       contain a string starting `sb_secret_`.
-- [ ] Anonymous sign-in rate limit is lowered from the default.
+- [ ] Anonymous sign-ins are **disabled** (Authentication -> Providers).
+- [ ] Google is the only enabled provider, and its redirect allowlist contains
+      only DailyJamm origins.
 - [ ] **Database → Advisors** (Security) is clean - it flags definer functions
       with a mutable `search_path`, which is the classic Postgres escalation.
 - [ ] Auth **Site URL** and redirect allowlist name only DailyJamm hosts.
