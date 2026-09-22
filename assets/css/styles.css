@@ -2676,3 +2676,59 @@ input[type=range].slider::-moz-range-thumb {
   .site-header{gap:10px}
   .dj-bell-btn,.dj-acct-btn{width:30px;height:30px}
 }
+
+/* ── Leaderboards page + nav trophy (leaderboards.js, menu.js) ── */
+.dj-boards-btn{width:32px;height:32px;border-radius:999px;border:1px solid #4b5563;background:transparent;color:#9ca3af;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0;text-decoration:none;transition:border-color .2s,color .2s}
+.dj-boards-btn:hover{border-color:#9ca3af;color:#fff}
+.dj-boards-btn:focus-visible{outline:2px solid #45b7d1;outline-offset:2px}
+
+.lb-main{max-width:1100px;margin:0 auto;padding:84px 1rem 4rem;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;color:#fff}
+.lb-back{display:inline-block;color:#45b7d1;text-decoration:none;font-size:.85rem;margin-bottom:1rem}
+.lb-back:hover{text-decoration:underline}
+.lb-main h1{font-size:2rem;font-weight:900;letter-spacing:-.02em;margin:0 0 .35rem;background:linear-gradient(135deg,#45b7d1,#2ecc71);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.lb-lede{color:#b8b8d1;font-size:.95rem;margin:0 0 1.5rem;max-width:60ch}
+
+.lb-site{display:flex;flex-wrap:wrap;gap:.75rem;margin-bottom:1.5rem}
+.lb-site-stat{flex:1 1 140px;background:#16213e;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:.85rem 1rem}
+.lb-site-stat b{display:block;font-size:1.5rem;font-weight:900;font-variant-numeric:tabular-nums;color:#2ecc71;line-height:1.1}
+.lb-site-stat span{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:#7b7b96;font-weight:700}
+
+.lb-cta{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;border:1px solid rgba(69,183,209,.35);background:rgba(69,183,209,.08);border-radius:12px;padding:.85rem 1.1rem;margin-bottom:1.5rem}
+.lb-cta p{margin:0;font-size:.88rem;color:#b8b8d1}
+.lb-cta button{background:linear-gradient(135deg,#45b7d1,#2ecc71);color:#06231a;border:none;border-radius:9px;padding:.5rem 1rem;font-family:inherit;font-size:.82rem;font-weight:800;cursor:pointer;flex-shrink:0}
+.lb-cta button:hover{filter:brightness(1.12)}
+
+.lb-grid{display:grid;gap:1rem;grid-template-columns:repeat(auto-fill,minmax(310px,1fr))}
+.lb-card{background:#16213e;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:1rem 1.1rem 1.1rem;display:flex;flex-direction:column}
+.lb-card-head h2{margin:0 0 .6rem;font-size:1.05rem;font-weight:800}
+.lb-card-head a{color:#fff;text-decoration:none}
+.lb-card-head a:hover{color:#2ecc71}
+
+.lb-tabs{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:.75rem}
+.lb-tab{background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.1);color:#9898b8;border-radius:999px;padding:.24rem .6rem;font-family:inherit;font-size:.7rem;font-weight:700;cursor:pointer}
+.lb-tab:hover{color:#fff;border-color:rgba(255,255,255,.25)}
+.lb-tab.is-on{background:linear-gradient(135deg,#45b7d1,#2ecc71);color:#06231a;border-color:transparent}
+.lb-tab:focus-visible{outline:2px solid #45b7d1;outline-offset:2px}
+
+.lb-body{min-height:120px}
+.lb-msg{color:#7b7b96;font-size:.82rem;margin:.4rem 0}
+.lb-list{list-style:none;margin:0;padding:0}
+.lb-row{display:flex;align-items:center;gap:.6rem;padding:.33rem 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.85rem}
+.lb-row:last-child{border-bottom:0}
+.lb-rank{width:1.6rem;flex-shrink:0;color:#7b7b96;font-weight:800;font-variant-numeric:tabular-nums;font-size:.78rem}
+.lb-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-val{font-weight:800;font-variant-numeric:tabular-nums;color:#2ecc71;flex-shrink:0}
+.lb-row.is-me{background:rgba(46,204,113,.09);border-radius:6px;padding-left:.35rem;padding-right:.35rem;margin:0 -.35rem}
+.lb-row.is-me .lb-name{color:#2ecc71;font-weight:800}
+/* Podium: gold, silver, bronze on the first three only. */
+.lb-row:nth-child(1) .lb-rank{color:#f0b429}
+.lb-row:nth-child(2) .lb-rank{color:#c7ccd6}
+.lb-row:nth-child(3) .lb-rank{color:#cd8b5a}
+
+.lb-foot{color:#6b6b88;font-size:.75rem;margin-top:1.5rem;max-width:70ch;line-height:1.55}
+
+@media (max-width:420px){
+  .lb-main{padding-top:76px}
+  .lb-grid{grid-template-columns:1fr}
+  .dj-boards-btn{width:30px;height:30px}
+}

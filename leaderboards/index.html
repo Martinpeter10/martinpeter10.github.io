@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>About | DailyJamm</title>
-  <meta name="description" content="Learn about DailyJamm - a daily games hub featuring original games like Themedle, Chain Link, and BlackJackdle." />
+  <title>Leaderboards | DailyJamm</title>
+  <meta name="description" content="See who is on top across every DailyJamm game - daily scores, longest streaks, biggest chip stacks and more." />
   <meta name="robots" content="index,follow">
-  <link rel="canonical" href="https://dailyjamm.com/about/" />
+  <link rel="canonical" href="https://dailyjamm.com/leaderboards/" />
   <link rel="icon" type="image/png" href="/assets/img/favicon.png">
   <link rel="stylesheet" href="/assets/css/styles.css?v=20260922c">
 
   <!-- Open Graph -->
   <meta property="og:site_name" content="DailyJamm" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://dailyjamm.com/about/" />
-  <meta property="og:title" content="About | DailyJamm" />
-  <meta property="og:description" content="Learn about DailyJamm - a daily games hub featuring original games and a curated list of the best daily games on the web." />
+  <meta property="og:url" content="https://dailyjamm.com/leaderboards/" />
+  <meta property="og:title" content="Leaderboards | DailyJamm" />
+  <meta property="og:description" content="See who is on top across every DailyJamm game." />
   <meta property="og:image" content="https://dailyjamm.com/assets/img/favicon.png" />
 
   <meta name="theme-color" content="#1a1a2e" />
@@ -71,6 +71,7 @@
   <script src="/assets/js/dj-config.js?v=20260922c" defer></script>
   <script src="/assets/js/account.js?v=20260922c" defer></script>
   <script src="/assets/js/notify.js?v=20260922c" defer></script>
+  <script src="/assets/js/leaderboards.js?v=20260922c" defer></script>
 </head>
 <body>
 
@@ -133,43 +134,26 @@
     </div>
   </nav>
 
-  <div class="page-wrap">
-    <a class="back" href="/">← Back to DailyJamm</a>
-    <h1>About DailyJamm</h1>
-    <p>DailyJamm is a daily games hub built for people who love quick, fun daily challenges. We build our own original games and curate a collection of the best daily games on the web - all in one place.</p>
+  <main class="lb-main">
+    <a href="/" class="lb-back">&larr; Back to DailyJamm</a>
+    <h1>Leaderboards</h1>
+    <p class="lb-lede">Every game, every board. Sign in and your results start appearing the next time you play.</p>
 
-    <h2>Our Games</h2>
-    <p><strong style="color:#fff">Themedle</strong> - A daily TV show theme song guessing game. Listen to a short clip and guess the show in up to 6 attempts. Each wrong guess reveals a longer clip.</p>
-    <p><strong style="color:#fff">Chain Link</strong> - A daily compound word chain puzzle. Find the 5 missing words that link the chain. Use up to two hints per word (first letter, then a phrase clue) - or go hint-free for a perfect 20!</p>
-    <p><strong style="color:#fff">BlackJackdle</strong> - Daily blackjack with 3 hands per day. Start with 1,000 chips and a daily bonus, then beat the dealer to build your stack.</p>
-    <p><strong style="color:#fff">Spelldle</strong> - A daily D&amp;D 5E spell guessing game. Identify the spell in up to 8 tries using hints on level, school, range, components, class, and more.</p>
-    <p><strong style="color:#fff">Roulettedle</strong> - Daily American roulette with 3 spins per day. Place bets on numbers, colors, odd/even, dozens, columns, and more - then spin the wheel and see where the ball lands.</p>
-    <p><strong style="color:#fff">Holdle</strong> - Daily Texas Hold'em poker across 3 hands. Face off against 3 randomly selected AI opponents - each with a distinct personality - and see how many chips you can win.</p>
-    <p><strong style="color:#fff">Yachtdle</strong> - The classic five-dice game, one scorecard a day. Roll up to three times a turn, hold the dice you want, then decide which of the 13 boxes to spend the hand on. Every box must be filled, so a bad roll sometimes means taking a zero - and once the last box is done, that is your score for the day.</p>
-    <p><strong style="color:#fff">Shut the Box</strong> - The classic pub dice game, one box a day. Roll two dice and flip down any tiles that add up to your roll - take the 7, or 3 and 4, or 1, 2 and 4, whichever leaves you better placed. Shut 7, 8 and 9 and you can drop to a single die. When nothing matches your roll the box closes and the tiles still standing are your score, so lower is better.</p>
-    <p><strong style="color:#fff">Net Zero</strong> - A daily card game played with a stripped-down deck: black cards add, red cards subtract, and the hand closest to zero wins. Draw, or swap with the face-up card on the table, and stand at the right moment against 3 AI opponents - but watch the dice between rounds, because doubles throw every hand out.</p>
-    <p><strong style="color:#fff">Liar's Dice</strong> - The classic dice bluffing game, once a day against 3 AI opponents. Shake your cup, bid on the whole table's dice, and call Liar at the right moment - one wrong call and you're out for the day.</p>
+    <div class="lb-site" id="lb-site" hidden>
+      <div class="lb-site-stat"><b id="lb-players">-</b><span>players</span></div>
+      <div class="lb-site-stat"><b id="lb-games">-</b><span>games played</span></div>
+      <div class="lb-site-stat"><b id="lb-today">-</b><span>played today</span></div>
+    </div>
 
-    <h2>Our Mission</h2>
-    <p>We believe the best daily games are simple, satisfying, and over in a few minutes. DailyJamm exists to make finding and playing them effortless - no accounts, no downloads, no friction.</p>
+    <div class="lb-cta" id="lb-signedout" hidden>
+      <p>You are not signed in, so you will not appear on these boards.</p>
+      <button type="button" id="lb-signin">Sign in to join</button>
+    </div>
 
-    <h2>Contact</h2>
-    <p>Have a suggestion for a game to add to the curated list, feedback on one of our games, or just want to say hi? Reach us at <a href="mailto:dailyjammgames@gmail.com">dailyjammgames@gmail.com</a>.</p>
+    <div id="lb-grid" class="lb-grid"></div>
 
-    <footer>
-      <p>© <span id="year"></span> DailyJamm &nbsp;·&nbsp; <a href="/about/">About</a> &nbsp;·&nbsp; <a href="/terms/">Terms of Service</a> &nbsp;·&nbsp; <a href="/privacy/">Privacy Policy</a></p>
-    </footer>
-  </div>
+    <p class="lb-foot">Daily boards reset at midnight Chicago time. Stats imported from a browser before you had an account are shown on your profile but never ranked here.</p>
+  </main>
 
-  <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
-  </script>
-
-  <!-- Cookie consent -->
-  <div id="dj-cookie-bar" style="display:none">
-    <span>We use cookies for analytics. <a href="/privacy/">Privacy Policy</a></span>
-    <button onclick="document.getElementById('dj-cookie-bar').style.display='none';localStorage.setItem('dj_cookie_ok','1');djClarity()">Got it</button>
-  </div>
-  <script>if(!localStorage.getItem('dj_cookie_ok'))document.getElementById('dj-cookie-bar').style.display='flex';</script>
 </body>
 </html>

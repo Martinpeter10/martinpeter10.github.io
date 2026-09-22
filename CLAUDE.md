@@ -410,7 +410,7 @@ gameid: { title: 'Game Name', url: 'https://example.com/', ext: true },
 - **Share buttons**: game-over result panels have two side-by-side buttons — **Share Results** (green, `bg-green-700`) and **See Stats** (purple, `bg-purple-600`). Stats modals have a separate **Share Stats** button (green).
 - **Streaks**: Track current streak, best streak, total games played
 - **localStorage key convention**: stats keys use a `_v2` suffix (`td_stats_v2`, `cl_stats_v2`, `spd_stats_v2`, `bj_stats_v2`, `bj_alltime_v2`, `rl_stats_v2`, `rl_alltime_v2`). Daily state keys have no suffix (`themedleDailyState`, `cl_today`, `spd_today`, `bj_today`, `rl_today`, `hd_today`, `bf_today`). Bump the suffix when resetting stats site-wide.
-- **Site-wide localStorage keys** (not game-specific): `dj_cookie_ok` (cookie consent), `dj_favorites` (favorites list), `dj_seen_favs_intro` (favorites intro modal dismissed), `dj_account` (cached username for fast header paint - not the session; supabase-js owns the auth token under its own project-scoped key), `dj_seen_release` (last release version the player acknowledged via the bell)
+- **Site-wide localStorage keys** (not game-specific): `dj_cookie_ok` (cookie consent), `dj_favorites` (favorites list), `dj_seen_favs_intro` (favorites intro modal dismissed), `dj_account` (cached username for fast header paint - not the session; supabase-js owns the auth token under its own project-scoped key), `dj_seen_release` (last release version the player acknowledged via the bell), `dj_score_queue` (leaderboard submissions awaiting a working network)
 - **How to Play**: Show modal on first visit (check localStorage flag), include animated demo
 - **Mobile**: 16px minimum font on inputs (prevents iOS zoom), use `viewport-fit=cover` for notch support
 - **Accessibility**: ARIA labels on interactive elements, keyboard navigation (Enter activates role="button", ESC closes modals), screen-reader-only helper text via `.sr-only` class
@@ -427,6 +427,45 @@ Three sections, in this order (added in v3.0.0 "Your Games, Your Way"):
 **Section help popovers**: each section heading sits in a `.sec-head` with a `.sec-help` "?" button and a hidden `.sec-desc` popover (absolutely positioned, no layout shift). Behavior is device-aware via `matchMedia('(hover: hover) and (pointer: fine)')`: hover opens/closes on mouse devices; tap toggles on touch, and tapping elsewhere dismisses. Only one popover open at a time. Logic is inline in `index.html`.
 
 **First-visit intro**: on the home page, `favorites.js` auto-shows the favorites intro modal 600ms after load if `dj_seen_favs_intro` is unset. Any dismissal sets the flag.
+
+---
+
+## Leaderboards (`/leaderboards/`, `/assets/js/leaderboards.js`)
+
+A page, not a modal. **Per-game stats modals are unchanged** and stay the place for your own
+numbers; the leaderboards page is for comparing against other players.
+
+**The trophy button is injected by `menu.js`**, not hardcoded - same reasoning as the account
+button and the bell. `menu.js` runs before `account.js` and `notify.js`, so appending there
+produces the intended header order: **stats → help → trophy → bell → account**. The button
+hides itself on `/leaderboards/` rather than linking the page to itself.
+
+**One backend function serves every board**: `get_game_board(game, metric, limit)`. Metrics are
+`today`, `best`, `best_streak`, `cur_streak`, `played`, `total_score`, or `extras:<key>`. What
+differs per game is only which metrics are worth showing, and that lives in `BOARDS` in
+`leaderboards.js`. Adding a board is a line of config, not a query.
+
+**`game_stats.extras` is a jsonb bag** of per-game counters, merged by key suffix in
+`submit_score`:
+
+| Suffix | Behaviour | Example |
+|---|---|---|
+| `_total` | accumulates | `perfect_total`, `yachts_total` |
+| `_now` | overwrites | `chips_now` - a chip stack must be allowed to fall |
+| anything else | keeps the maximum | `biggest_win` - a personal best is never revised down |
+
+**Scoring direction is `sort_mult` in `game_defs`**, not caller logic. Themedle and Spelldle
+score on guesses, Shut the Box on tiles left and Net Zero on distance from zero - all four are
+**lower is better** and carry `sort_mult = -1`.
+
+**Submission is fire and forget.** Each game calls `djSubmit()` at its existing completion point.
+No game awaits it or branches on the result, so a leaderboard outage can never affect play.
+`DJAccount.submitScore` no-ops without an account and queues to `dj_score_queue` when the network
+fails, flushing on the next boot. `submit_score` enforces one row per player per game per day, so
+a retry cannot double-count.
+
+**Imported stats never rank.** `game_stats.imported` rows are excluded from every board - they
+came from a browser and cannot be verified.
 
 ---
 
