@@ -218,3 +218,29 @@ curl -s -X POST "https://<ref>.supabase.co/functions/v1/username" \
 Expect `{"available":false,...}`. Every rejection returns the same message on
 purpose: a filter that explains itself teaches people how to beat it, and
 telling someone their surname is profane is worse than telling them nothing.
+
+
+---
+
+## Testing a function that needs a signed-in user
+
+Read-path functions can be called with the publishable key alone. Anything using
+`auth.uid()` cannot, and skipping this is how a broken `submit_score` survived
+several rounds of "scores are not saving" - it was created cleanly and failed at
+call time with a plpgsql type error.
+
+Mint a real session for an existing user and call the function as they would:
+
+```python
+# service key from Management API /v1/projects/<ref>/api-keys?reveal=true
+link = POST {URL}/auth/v1/admin/generate_link  {"type":"magiclink","email": <user>}
+sess = POST {URL}/auth/v1/verify               {"type":"magiclink","token_hash": link.hashed_token}
+POST {URL}/rest/v1/rpc/submit_score
+  apikey: <publishable>            Authorization: Bearer <sess.access_token>
+  Content-Profile: app_dev         {"p_game":"chainlink","p_score":20,...}
+```
+
+Expect `{"accepted": true}` first, `{"reason":"already_submitted"}` on a repeat,
+and the extras bag unchanged by that repeat. **Delete any test rows afterwards** -
+one row per player per game per day means a leftover test score blocks the real
+one for the rest of the day.

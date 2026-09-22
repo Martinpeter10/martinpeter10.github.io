@@ -443,7 +443,14 @@ window.DJAccount = (function () {
       p_detail: item.detail || null,
       p_extras: item.extras || null
     }).then(function (res) {
-      if (res.error) throw res.error;
+      if (res.error) {
+        // Surface it. A silently queued failure is how a broken submit_score
+        // went unnoticed through several rounds of "scores are not saving".
+        if (window.console && console.warn) {
+          console.warn('[DJAccount] submit_score failed:', res.error);
+        }
+        throw res.error;
+      }
       return res.data;
     });
   }

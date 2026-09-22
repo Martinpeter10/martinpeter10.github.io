@@ -69,7 +69,7 @@ declare
   v_user  uuid := auth.uid();
   v_day   date := dj_today();
   v_def   game_defs%rowtype;
-  v_new   boolean;
+  v_new   integer;
   v_prev  date;
   v_st    game_stats%rowtype;
   v_ex    jsonb;
@@ -103,7 +103,7 @@ begin
   values (v_user, p_game, v_day, p_score, p_detail)
   on conflict (user_id, game, day) do nothing;
 
-  get diagnostics v_new = row_count;
+  get diagnostics v_new = row_count;   -- integer, not boolean
 
   if v_new = 0 then
     return jsonb_build_object('accepted', false, 'reason', 'already_submitted', 'day', v_day);

@@ -465,6 +465,13 @@ player per game per day and returns early on a duplicate *without touching extra
 the call is a genuine no-op - which is what makes the restore call safe. When adding a game, wire
 both paths or it will silently under-report.
 
+**Test the WRITE path, not just the read path.** `submit_score` had `v_new boolean` receiving
+`get diagnostics ... row_count` (an integer), so `if v_new = 0` raised
+`operator does not exist: boolean = integer` on **every call**. The function created cleanly and
+every read-path check passed, so it looked healthy for days. plpgsql type errors surface at call
+time, not creation time - exercise a definer function with a real user JWT before believing it
+works. There is a recipe in `supabase/README.md`.
+
 **Submission is fire and forget.** Each game calls `djSubmit()` at its existing completion point.
 No game awaits it or branches on the result, so a leaderboard outage can never affect play.
 `DJAccount.submitScore` no-ops without an account and queues to `dj_score_queue` when the network
