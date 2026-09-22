@@ -286,6 +286,11 @@
     const perfect = isPerfect();
     const display = perfect ? score + 5 : score;
     const stats   = isRestore ? loadStats() : saveStats(display);
+    // Also report on restore. A game finished before signing in would otherwise
+    // never reach the boards: saveStats only runs on first completion, and that
+    // is the only place the score is known. submit_score keeps one row per day,
+    // so calling it again is a no-op.
+    if (isRestore) djSubmit(display, display >= 20 ? { perfect_total: 1 } : {});
 
     finalScEl.textContent  = display;
     scoreMaxEl.textContent = perfect ? '/20' : '/15';

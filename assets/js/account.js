@@ -410,6 +410,19 @@ window.DJAccount = (function () {
 
   // ── Score submission ─────────────────────────────────────────────────────
 
+  /**
+   * Today's Chicago date, without depending on DJUtils. utils.js loads AFTER
+   * account.js on game pages and not at all on /leaderboards/, so a bare
+   * DJUtils reference throws ReferenceError rather than evaluating as falsy.
+   */
+  function chicagoToday() {
+    try {
+      return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
+    } catch (e) {
+      return null;
+    }
+  }
+
   function readQueue() {
     try { var q = JSON.parse(localStorage.getItem(QUEUE_KEY)); return Array.isArray(q) ? q : []; }
     catch (e) { return []; }
@@ -443,7 +456,7 @@ window.DJAccount = (function () {
 
     // Drop anything not earned today. submit_score stamps the server's date, so
     // flushing an older entry would file it under the wrong day.
-    var today = DJUtils && DJUtils.getChicagoDate ? DJUtils.getChicagoDate() : null;
+    var today = chicagoToday();
     if (today) q = q.filter(function (x) { return !x.day || x.day === today; });
     if (!q.length) { writeQueue([]); return Promise.resolve(); }
 
@@ -477,7 +490,7 @@ window.DJAccount = (function () {
       extras: extras || null,
       // The server pins the date, so a queued entry must carry the day it was
       // actually earned - otherwise yesterday's result flushes as today's.
-      day: DJUtils && DJUtils.getChicagoDate ? DJUtils.getChicagoDate() : null,
+      day: chicagoToday(),
       at: Date.now()
     };
 
@@ -565,7 +578,13 @@ window.DJAccount = (function () {
         // trip - this is the only time the modal opens on its own.
         if (!p) open();
       });
-    }).catch(function () { /* leave the cached paint in place */ });
+    }).catch(function (err) {
+      // Leave the cached paint in place, but say something - a swallowed
+      // exception here previously looked like "scores are not recording".
+      if (window.console && console.warn) {
+        console.warn('[DJAccount] boot failed:', err);
+      }
+    });
   }
 
   if (document.readyState === 'loading') {
@@ -582,6 +601,18 @@ window.DJAccount = (function () {
     /** True when there is a signed-in account with a claimed name. */
     isReady: function () { return !!(session && profile); },
     submitScore: submitScore,
+    /** Console helper: why is nothing recording? */
+    debug: function () {
+      return {
+        env: window.DJConfig && DJConfig.env,
+        schema: window.DJConfig && DJConfig.schema,
+        configured: !!(window.DJConfig && DJConfig.configured),
+        client: !!client,
+        signedIn: !!session,
+        username: profile ? profile.username : null,
+        queued: readQueue()
+      };
+    },
     board: board,
     siteStats: siteStats,
     myStats: myStats
