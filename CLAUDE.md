@@ -430,6 +430,39 @@ Three sections, in this order (added in v3.0.0 "Your Games, Your Way"):
 
 ---
 
+## Game State (`/assets/js/store.js`)
+
+Signed in, the **server owns game state**. Signed out, localStorage does and nothing changes.
+
+**The constraint**: every game reads its state synchronously at DOMContentLoaded and paints
+immediately; a server read cannot be synchronous. Rather than rewrite ten games around promises,
+localStorage stays the working store and becomes a *cache* of server state. `store.js` fetches,
+writes localStorage, and only then releases the gate.
+
+**Each game changes exactly one line**: `document.addEventListener('DOMContentLoaded', boot)`
+becomes `DJStore.ready(boot)`. Its `loadToday()` / `saveToday()` are untouched.
+
+**The gate must always open.** A gate that fails to open is a permanently blank game - the worst
+outcome in this design. Every path resolves: signed out, unconfigured, RPC error, timeout. There
+is a 6s fetch timeout, an 8s backstop, and `account.js` calls `markResolved()` on **every** exit
+from `boot()` including the `!window.DJConfig` early return. **If you add an early return to
+`account.boot`, resolve first.**
+
+**Two tables, different lifetimes** (migration 0004). `game_state` is per day and expires;
+`progress` is cumulative and holds the chip stack. Conflating them is how a stack gets wiped by a
+date rollover.
+
+**`complete` is a one-way latch.** `save_game_state` refuses to reopen a finished day, which is
+what stops a second device resurrecting it and makes a late offline write safe to drop.
+
+**Nothing merges.** On first sign-in the player starts at base values; local chips are discarded
+because an imported stack can be whatever devtools says. This is deliberate and one-way.
+
+**Writes are debounced** (~2.5s) because games save after every move. Completion, chip changes and
+`visibilitychange` force an immediate flush.
+
+---
+
 ## Leaderboards (`/leaderboards/`, `/assets/js/leaderboards.js`)
 
 A page, not a modal. **Per-game stats modals are unchanged** and stay the place for your own

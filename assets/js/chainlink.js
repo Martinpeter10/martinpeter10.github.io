@@ -93,6 +93,10 @@
       puzzleId: puzzle.id,
       results, currentStep, gameOver, clueState,
     });
+    // Mirror to the server when signed in. Debounced unless the game is over,
+    // which forces an immediate write - completion is the one thing that must
+    // not be lost to a closing tab.
+    if (window.DJStore) DJStore.saveDaily(gameOver);
   }
 
   // ── Game helpers ─────────────────────────────────────────────────────────
@@ -502,7 +506,10 @@
   window.CLGame = { showStats: showStats };
 
   // ── Boot: fetch puzzles, then init ────────────────────────────────────────
-  document.addEventListener('DOMContentLoaded', function () {
+  // DJStore.ready replaces DOMContentLoaded: signed in it fires once server
+  // state has been written into localStorage, signed out it fires immediately.
+  // loadTodayState() below is unchanged and still reads localStorage.
+  DJStore.ready(function () {
     fetch('/assets/data/chainlink-puzzles.json')
       .then(function (r) { return r.json(); })
       .then(function (puzzles) {

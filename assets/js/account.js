@@ -59,6 +59,8 @@ window.DJAccount = (function () {
   var session = null;
   var profile = null;      // { username }
   var built = false;
+  var resolvedFns = [];      // callbacks waiting on the session question
+  var resolved = false;
   var checkTimer = null;
   var lastChecked = '';
 
@@ -544,10 +546,33 @@ window.DJAccount = (function () {
     }).catch(function () { return null; });
   }
 
+  /**
+   * Fire fn once we know whether anyone is signed in - not whether they are.
+   * DJStore blocks the first paint of every game on this, so it must resolve
+   * on every path including failure, or games never boot.
+   */
+  function whenResolved(fn) {
+    if (resolved) { fn(); return; }
+    resolvedFns.push(fn);
+  }
+
+  function markResolved() {
+    if (resolved) return;
+    resolved = true;
+    var fns = resolvedFns; resolvedFns = [];
+    fns.forEach(function (fn) {
+      try { fn(); } catch (e) {
+        if (window.console && console.warn) console.warn('[DJAccount] resolve cb:', e);
+      }
+    });
+  }
+
   // ── Boot ─────────────────────────────────────────────────────────────────
 
   function boot() {
-    if (!window.DJConfig) return;
+    // Every exit from boot MUST resolve. DJStore blocks the first paint of
+    // every game on this, so an unresolved path is a permanently blank board.
+    if (!window.DJConfig) { markResolved(); return; }
 
     // Paint from cache first so the button does not flicker on a slow network.
     profile = cached();
@@ -555,6 +580,7 @@ window.DJAccount = (function () {
 
     client = window.DJConfig.getClient();
     if (!client) {
+      markResolved();
       // Unconfigured or the vendor bundle failed. Show nothing rather than a
       // broken control - but keep the cached name if we had one.
       if (!profile) {
@@ -571,6 +597,7 @@ window.DJAccount = (function () {
         profile = null;
         cache(null);
         paintButton();
+        markResolved();
         return;
       }
       return loadProfile().then(function (p) {
@@ -583,9 +610,11 @@ window.DJAccount = (function () {
         // Just came back from Google without a name yet. Finish the job rather
         // than dropping them on the page with nothing to show for the round
         // trip - this is the only time the modal opens on its own.
+        markResolved();
         if (!p) open();
       });
     }).catch(function (err) {
+      markResolved();
       // Leave the cached paint in place, but say something - a swallowed
       // exception here previously looked like "scores are not recording".
       if (window.console && console.warn) {
@@ -607,6 +636,12 @@ window.DJAccount = (function () {
     username: function () { return profile ? profile.username : null; },
     /** True when there is a signed-in account with a claimed name. */
     isReady: function () { return !!(session && profile); },
+    whenResolved: whenResolved,
+    signedIn: function () { return !!(session && profile); },
+    rpc: function (fn, args) {
+      if (!client) return Promise.reject(new Error('no client'));
+      return client.rpc(fn, args || {});
+    },
     submitScore: submitScore,
     /** Console helper: why is nothing recording? */
     debug: function () {
