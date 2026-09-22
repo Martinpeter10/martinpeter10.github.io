@@ -2732,3 +2732,13 @@ input[type=range].slider::-moz-range-thumb {
   .lb-grid{grid-template-columns:1fr}
   .dj-boards-btn{width:30px;height:30px}
 }
+
+/* ── Leaderboards: your-games panel + per-card today count ── */
+.lb-mine{background:linear-gradient(135deg,rgba(69,183,209,.1),rgba(46,204,113,.08));border:1px solid rgba(46,204,113,.28);border-radius:14px;padding:1rem 1.1rem;margin-bottom:1.5rem}
+.lb-mine h2{margin:0 0 .7rem;font-size:1rem;font-weight:800;color:#2ecc71}
+.lb-mine-grid{display:grid;gap:.55rem;grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
+.lb-mine-cell{display:flex;flex-direction:column;gap:.1rem;min-width:0}
+.lb-mine-game{font-size:.85rem;font-weight:800;color:#fff}
+.lb-mine-bits{font-size:.75rem;color:#9fb8c8;font-variant-numeric:tabular-nums}
+.lb-card-head{display:flex;align-items:baseline;justify-content:space-between;gap:.6rem}
+.lb-today-count{font-size:.68rem;color:#7b7b96;font-weight:700;white-space:nowrap;flex-shrink:0;font-variant-numeric:tabular-nums}

@@ -373,6 +373,8 @@ window.DJAccount = (function () {
         cache(profile);
         paintButton();
         render();
+        // Anything played before signing in is waiting in the queue.
+        flushQueue();
       } else {
         setMsg((res && res.message) || 'Could not save that name.', 'bad');
         setBusy(true);
@@ -433,11 +435,17 @@ window.DJAccount = (function () {
     });
   }
 
-  /** Send anything waiting from a previous failure. Silent either way. */
+  /** Send anything waiting - from a failed post, or from before sign-in. */
   function flushQueue() {
     if (!client || !session || !profile) return Promise.resolve();
     var q = readQueue();
     if (!q.length) return Promise.resolve();
+
+    // Drop anything not earned today. submit_score stamps the server's date, so
+    // flushing an older entry would file it under the wrong day.
+    var today = DJUtils && DJUtils.getChicagoDate ? DJUtils.getChicagoDate() : null;
+    if (today) q = q.filter(function (x) { return !x.day || x.day === today; });
+    if (!q.length) { writeQueue([]); return Promise.resolve(); }
 
     var remaining = [];
     return q.reduce(function (chain, item) {
@@ -460,7 +468,6 @@ window.DJAccount = (function () {
    *   other   keeps max    (personal bests)
    */
   function submitScore(game, score, detail, extras) {
-    if (!client || !session || !profile) return Promise.resolve(null);
     if (typeof score !== 'number' || !isFinite(score)) return Promise.resolve(null);
 
     var item = {
@@ -468,17 +475,28 @@ window.DJAccount = (function () {
       score: Math.round(score),
       detail: detail || null,
       extras: extras || null,
+      // The server pins the date, so a queued entry must carry the day it was
+      // actually earned - otherwise yesterday's result flushes as today's.
+      day: DJUtils && DJUtils.getChicagoDate ? DJUtils.getChicagoDate() : null,
       at: Date.now()
     };
 
-    return post(item).catch(function () {
+    function queue() {
       var q = readQueue();
       // One entry per game per day; a retry must not create a second row.
-      q = q.filter(function (x) { return x.game !== game; });
+      q = q.filter(function (x) { return !(x.game === game && x.day === item.day); });
       q.push(item);
       writeQueue(q);
       return null;
-    });
+    }
+
+    // No account yet. Hold the result rather than dropping it: a player who
+    // finishes a puzzle and THEN signs in should still get credit for the day.
+    // Every game records its result inside a "not yet recorded today" guard, so
+    // this is the only chance to capture it.
+    if (!client || !session || !profile) return Promise.resolve(queue());
+
+    return post(item).catch(queue);
   }
 
   // ── Leaderboard reads ────────────────────────────────────────────────────
@@ -489,6 +507,14 @@ window.DJAccount = (function () {
       p_game: game, p_metric: metric || 'today', p_limit: limit || 10
     }).then(function (res) { return res.error ? [] : (res.data || []); })
       .catch(function () { return []; });
+  }
+
+  /** The signed-in player's own row for every game they have played. */
+  function myStats() {
+    if (!client || !session || !profile) return Promise.resolve([]);
+    return client.rpc('get_my_stats').then(function (res) {
+      return res.error ? [] : (res.data || []);
+    }).catch(function () { return []; });
   }
 
   function siteStats() {
@@ -557,6 +583,7 @@ window.DJAccount = (function () {
     isReady: function () { return !!(session && profile); },
     submitScore: submitScore,
     board: board,
-    siteStats: siteStats
+    siteStats: siteStats,
+    myStats: myStats
   };
 })();

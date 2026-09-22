@@ -121,6 +121,9 @@ window.DJBoards = (function () {
     link.href = game.url;
     h.appendChild(link);
     head.appendChild(h);
+    var today = make('span', 'lb-today-count');
+    today.id = 'lb-today-' + game.id;
+    head.appendChild(today);
     card.appendChild(head);
 
     var tabs = make('div', 'lb-tabs');
@@ -193,7 +196,67 @@ window.DJBoards = (function () {
       $('lb-games').textContent   = Number(d.games_played || 0).toLocaleString();
       $('lb-today').textContent   = Number(d.played_today || 0).toLocaleString();
       $('lb-site').hidden = false;
+
+      var per = d.per_game || {};
+      GAMES.forEach(function (g) {
+        var el = $('lb-today-' + g.id);
+        if (!el) return;
+        var n = Number(per[g.id] || 0);
+        el.textContent = n ? n + (n === 1 ? ' played today' : ' played today') : '';
+      });
     }).catch(function () { /* the boards are the point; totals are decoration */ });
+  }
+
+  // What a player wants when they are not top of anything: their own numbers.
+  var MINE_EXTRA = {
+    chainlink:    ['perfect_total',   'perfect'],
+    yachtdle:     ['yachts_total',    'Yachts'],
+    shutthebox:   ['shut_total',      'boxes shut'],
+    netzero:      ['pure_total',      'perfect zeros'],
+    liarsdice:    ['table_wins_total','tables won'],
+    blackjackdle: ['chips_now',       'chips'],
+    roulettedle:  ['chips_now',       'chips'],
+    holdle:       ['chips_now',       'chips']
+  };
+
+  function myPanel() {
+    if (!window.DJAccount || !DJAccount.myStats) return;
+    DJAccount.myStats().then(function (rows) {
+      if (!rows || !rows.length) return;
+      var byGame = {};
+      rows.forEach(function (r) { byGame[r.game] = r; });
+
+      var host = $('lb-mine');
+      var grid = $('lb-mine-grid');
+      if (!host || !grid) return;
+      grid.textContent = '';
+
+      var totalPlayed = 0;
+      GAMES.forEach(function (g) {
+        var r = byGame[g.id];
+        if (!r || !r.played) return;
+        totalPlayed += r.played;
+
+        var cell = make('div', 'lb-mine-cell');
+        cell.appendChild(make('span', 'lb-mine-game', g.name));
+
+        var bits = [r.played + (r.played === 1 ? ' day' : ' days')];
+        if (r.cur_streak > 1) bits.push(r.cur_streak + ' day streak');
+        else if (r.best_streak > 1) bits.push('best ' + r.best_streak);
+
+        var ex = MINE_EXTRA[g.id];
+        if (ex && r.extras && r.extras[ex[0]] != null) {
+          bits.push(Number(r.extras[ex[0]]).toLocaleString() + ' ' + ex[1]);
+        }
+        cell.appendChild(make('span', 'lb-mine-bits', bits.join(' · ')));
+        grid.appendChild(cell);
+      });
+
+      if (!totalPlayed) return;
+      var who = DJAccount.username ? DJAccount.username() : null;
+      $('lb-mine-title').textContent = who ? who + "'s games" : 'Your games';
+      host.hidden = false;
+    }).catch(function () { /* the boards still stand on their own */ });
   }
 
   function signInPrompt() {
@@ -214,6 +277,7 @@ window.DJBoards = (function () {
     if (!grid) return;
     GAMES.forEach(function (g) { grid.appendChild(buildCard(g)); });
     siteStats();
+    myPanel();
     signInPrompt();
   }
 
