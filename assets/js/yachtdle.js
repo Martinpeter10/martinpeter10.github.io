@@ -103,6 +103,20 @@
     return d;
   }
 
+
+  var GAME_ID = 'yachtdle';
+
+  /**
+   * Report the finished game to the leaderboards. No-ops without an account,
+   * queues for retry when offline. Never awaited and never branched on - the
+   * game must behave identically whether or not this succeeds.
+   */
+  function djSubmit(score, extras) {
+    if (window.DJAccount && DJAccount.submitScore) {
+      DJAccount.submitScore(GAME_ID, score, null, extras || null);
+    }
+  }
+
   function loadStats() {
     return DJUtils.loadJSON(statsKey, {
       played: 0, best: 0, totalScore: 0,
@@ -463,6 +477,10 @@
     stats.lastDate = today;
 
     DJUtils.saveJSON(statsKey, stats);
+    djSubmit(total, {
+      yachts_total:  scores.yacht ? 1 : 0,
+      bonuses_total: bonusEarned() ? 1 : 0
+    });
   }
 
   function showStats() {

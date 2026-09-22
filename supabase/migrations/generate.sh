@@ -1,16 +1,21 @@
 #!/bin/sh
-# Generate the ready-to-paste migrations from 0001_init.sql.
-# Run after editing the template. Commit the generated files.
+# Generate ready-to-paste migrations from every NNNN_*.sql template that
+# contains a __SCHEMA__ token. Run after editing a template; commit the output.
 set -e
 cd "$(dirname "$0")"
-for SCHEMA in public app_tst app_dev; do
-  OUT="0001_init.${SCHEMA}.sql"
-  {
-    echo "-- GENERATED FROM 0001_init.sql - DO NOT EDIT BY HAND."
-    echo "-- Target schema: ${SCHEMA}"
-    echo "-- Regenerate with ./generate.sh after changing the template."
-    echo
-    sed "s/__SCHEMA__/${SCHEMA}/g" 0001_init.sql
-  } > "$OUT"
-  echo "wrote $OUT"
+for TPL in [0-9][0-9][0-9][0-9]_*.sql; do
+  case "$TPL" in *.public.sql|*.app_tst.sql|*.app_dev.sql) continue ;; esac
+  grep -q '__SCHEMA__' "$TPL" || continue
+  BASE="${TPL%.sql}"
+  for SCHEMA in public app_tst app_dev; do
+    OUT="${BASE}.${SCHEMA}.sql"
+    {
+      echo "-- GENERATED FROM ${TPL} - DO NOT EDIT BY HAND."
+      echo "-- Target schema: ${SCHEMA}"
+      echo "-- Regenerate with ./generate.sh after changing the template."
+      echo
+      sed "s/__SCHEMA__/${SCHEMA}/g" "$TPL"
+    } > "$OUT"
+    echo "wrote $OUT"
+  done
 done

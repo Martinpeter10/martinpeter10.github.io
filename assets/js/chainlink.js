@@ -43,6 +43,20 @@
   const TODAY_KEY = 'cl_today';
   const SEEN_KEY  = 'cl_seen_howto';
 
+
+  var GAME_ID = 'chainlink';
+
+  /**
+   * Report the finished game to the leaderboards. No-ops without an account,
+   * queues for retry when offline. Never awaited and never branched on - the
+   * game must behave identically whether or not this succeeds.
+   */
+  function djSubmit(score, extras) {
+    if (window.DJAccount && DJAccount.submitScore) {
+      DJAccount.submitScore(GAME_ID, score, null, extras || null);
+    }
+  }
+
   function loadStats() {
     return DJUtils.loadJSON(STATS_KEY, { streak: 0, best: 0, played: 0, totalScore: 0, perfectGames: 0 });
   }
@@ -59,6 +73,7 @@
       s.streak = 0;
     }
     localStorage.setItem(STATS_KEY, JSON.stringify(s));
+    djSubmit(score, score >= 20 ? { perfect_total: 1 } : {});
     return s;
   }
 

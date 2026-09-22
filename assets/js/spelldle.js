@@ -95,6 +95,20 @@
     return s;
   }
 
+
+  var GAME_ID = 'spelldle';
+
+  /**
+   * Report the finished game to the leaderboards. No-ops without an account,
+   * queues for retry when offline. Never awaited and never branched on - the
+   * game must behave identically whether or not this succeeds.
+   */
+  function djSubmit(score, extras) {
+    if (window.DJAccount && DJAccount.submitScore) {
+      DJAccount.submitScore(GAME_ID, score, null, extras || null);
+    }
+  }
+
   function saveStats(won) {
     const s = loadStats();
     s.played++;
@@ -109,6 +123,7 @@
       s.guessDistribution[MAX_GUESSES] = (s.guessDistribution[MAX_GUESSES] || 0) + 1;
     }
     localStorage.setItem(STATS_KEY, JSON.stringify(s));
+    djSubmit(won ? guesses.length : MAX_GUESSES + 1, won ? { wins_total: 1 } : {});
     return s;
   }
 

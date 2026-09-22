@@ -129,6 +129,20 @@
     });
   }
 
+
+  var GAME_ID = 'netzero';
+
+  /**
+   * Report the finished game to the leaderboards. No-ops without an account,
+   * queues for retry when offline. Never awaited and never branched on - the
+   * game must behave identically whether or not this succeeds.
+   */
+  function djSubmit(score, extras) {
+    if (window.DJAccount && DJAccount.submitScore) {
+      DJAccount.submitScore(GAME_ID, score, null, extras || null);
+    }
+  }
+
   function loadStats() {
     return DJUtils.loadJSON(statsKey, {
       played: 0, wins: 0, pure: 0, curStreak: 0, bestStreak: 0,
@@ -656,6 +670,10 @@
     if (stats.bestAbs === null || Math.abs(t) < stats.bestAbs) stats.bestAbs = Math.abs(t);
     stats.place[place - 1]++;
     DJUtils.saveJSON(statsKey, stats);
+    djSubmit(Math.min(Math.abs(t), 100), {
+      pure_total: t === 0 ? 1 : 0,
+      wins_total: win ? 1 : 0
+    });
     saveToday();
 
     clearBubbles();

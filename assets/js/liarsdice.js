@@ -127,6 +127,20 @@
     });
   }
 
+
+  var GAME_ID = 'liarsdice';
+
+  /**
+   * Report the finished game to the leaderboards. No-ops without an account,
+   * queues for retry when offline. Never awaited and never branched on - the
+   * game must behave identically whether or not this succeeds.
+   */
+  function djSubmit(score, extras) {
+    if (window.DJAccount && DJAccount.submitScore) {
+      DJAccount.submitScore(GAME_ID, score, null, extras || null);
+    }
+  }
+
   function loadStats() {
     return DJUtils.loadJSON(statsKey, {
       played: 0, wins: 0, curStreak: 0, bestStreak: 0,
@@ -571,6 +585,7 @@
     else stats.curStreak = 0;
     stats.place[outcome.aisBeaten]++;
     DJUtils.saveJSON(statsKey, stats);
+    djSubmit(outcome.aisBeaten, win ? { table_wins_total: 1 } : {});
     saveToday();
     renderSeats();
     renderControls();

@@ -47,6 +47,16 @@ const RLGame = (function () {
   function loadStats() {
     return DJUtils.loadJSON('rl_stats_v2', { streak: 0, best: 0, played: 0 });
   }
+  var GAME_ID = 'roulettedle';
+
+  function djSubmit(score, extras) {
+    // Report to the leaderboards. No-ops without an account, queues when offline.
+    // Never awaited and never branched on - the game behaves identically either way.
+    if (window.DJAccount && DJAccount.submitScore) {
+      DJAccount.submitScore(GAME_ID, score, null, extras || null);
+    }
+  }
+
   function saveStats(s) { DJUtils.saveJSON('rl_stats_v2', s); }
 
   function loadToday() {
@@ -471,6 +481,7 @@ const RLGame = (function () {
       stats.streak = 0;
     }
     saveStats(stats);
+    djSubmit(totalNet, { chips_now: chips, biggest_win: Math.max(0, totalNet) });
 
     $('rl-final-chips').textContent = chips.toLocaleString();
 
@@ -552,6 +563,10 @@ const RLGame = (function () {
     stats.played++;
     stats.streak = 0;
     saveStats(stats);
+    // Out of chips: the day is over and it counts. Net is whatever the
+    // session lost, and the stack really is zero.
+    djSubmit(sessionResults.reduce(function (t, r) { return t + r.net; }, 0),
+             { chips_now: chips });
 
     const row = $('rl-broke-spins');
     row.textContent = '';

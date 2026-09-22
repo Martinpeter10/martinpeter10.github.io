@@ -77,6 +77,20 @@
     });
   }
 
+
+  var GAME_ID = 'shutthebox';
+
+  /**
+   * Report the finished game to the leaderboards. No-ops without an account,
+   * queues for retry when offline. Never awaited and never branched on - the
+   * game must behave identically whether or not this succeeds.
+   */
+  function djSubmit(score, extras) {
+    if (window.DJAccount && DJAccount.submitScore) {
+      DJAccount.submitScore(GAME_ID, score, null, extras || null);
+    }
+  }
+
   function loadStats() {
     return DJUtils.loadJSON(statsKey, {
       played: 0, shut: 0, totalScore: 0, best: null,
@@ -320,6 +334,7 @@
       if (shut) stats.shut++;
       if (stats.best === null || score < stats.best) stats.best = score;
       DJUtils.saveJSON(statsKey, stats);
+      djSubmit(score, shut ? { shut_total: 1 } : {});
     }
     saveToday();
     renderTiles();

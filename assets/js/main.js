@@ -306,6 +306,16 @@ function loadStats() {
     }
   } catch (e) { /* start with defaults on parse error */ }
 }
+var GAME_ID = 'themedle';
+
+function djSubmit(score, extras) {
+  // Report to the leaderboards. No-ops without an account, queues when offline.
+  // Never awaited and never branched on - the game behaves identically either way.
+  if (window.DJAccount && DJAccount.submitScore) {
+    DJAccount.submitScore(GAME_ID, score, null, extras || null);
+  }
+}
+
 function saveStats() {
   DJUtils.saveJSON('td_stats_v2', gameStats);
 }
@@ -551,6 +561,7 @@ if (submitBtn) {
         if (gameStats.currentStreak > gameStats.bestStreak) gameStats.bestStreak = gameStats.currentStreak;
         gameStats.guessDistribution[currentGuess - 1]++;
         saveStats();
+        djSubmit(currentGuess, { wins_total: 1 });
       }
       disableGameControls();
 
@@ -584,6 +595,7 @@ if (submitBtn) {
           gameStats.lastPlayedDate = today;
           gameStats.guessDistribution[6]++;
           saveStats();
+          djSubmit(7, {});
         }
         disableGameControls();
         if (clipLengthSpan) clipLengthSpan.textContent = '15 seconds';
@@ -633,6 +645,7 @@ if (skipBtn) {
           gameStats.lastPlayedDate = today;
           gameStats.guessDistribution[6]++;
           saveStats();
+          djSubmit(7, {});
         }
         disableGameControls();
         if (clipLengthSpan) clipLengthSpan.textContent = '15 seconds';

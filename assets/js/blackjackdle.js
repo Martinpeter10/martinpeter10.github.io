@@ -45,6 +45,16 @@ const BJGame = (function () {
   function loadStats() {
     return DJUtils.loadJSON('bj_stats_v2', { streak: 0, best: 0, played: 0 });
   }
+  var GAME_ID = 'blackjackdle';
+
+  function djSubmit(score, extras) {
+    // Report to the leaderboards. No-ops without an account, queues when offline.
+    // Never awaited and never branched on - the game behaves identically either way.
+    if (window.DJAccount && DJAccount.submitScore) {
+      DJAccount.submitScore(GAME_ID, score, null, extras || null);
+    }
+  }
+
   function saveStats(s) { DJUtils.saveJSON('bj_stats_v2', s); }
 
   function loadToday() {
@@ -743,6 +753,7 @@ const BJGame = (function () {
     if (won) { stats.streak++; stats.best = Math.max(stats.best, stats.streak); }
     else { stats.streak = 0; }
     saveStats(stats);
+    djSubmit(totalNet, { chips_now: chips, biggest_win: Math.max(0, totalNet) });
 
     els.finalChips.textContent = chips.toLocaleString();
 
@@ -827,6 +838,10 @@ const BJGame = (function () {
     stats.played++;
     stats.streak = 0;
     saveStats(stats);
+    // Out of chips: the day is over and it counts. Net is whatever the
+    // session lost, and the stack really is zero.
+    djSubmit(sessionResults.reduce(function (t, r) { return t + r.net; }, 0),
+             { chips_now: chips });
 
     // Show hand results in broke panel
     const row = $('bj-broke-hands');

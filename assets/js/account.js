@@ -25,6 +25,7 @@ window.DJAccount = (function () {
   'use strict';
 
   var CACHE_KEY = 'dj_account';        // { username } - for instant paint only
+  var QUEUE_KEY = 'dj_score_queue';    // submissions awaiting a working network
   var MIN_LEN = 3;
   var MAX_LEN = 16;
   var SHAPE = /^[A-Za-z0-9_]{3,16}$/;
@@ -396,6 +397,98 @@ window.DJAccount = (function () {
       .catch(function () { return null; });
   }
 
+  // ── Score submission ─────────────────────────────────────────────────────
+
+  function readQueue() {
+    try { var q = JSON.parse(localStorage.getItem(QUEUE_KEY)); return Array.isArray(q) ? q : []; }
+    catch (e) { return []; }
+  }
+
+  function writeQueue(q) {
+    try {
+      // Cap it. An unreachable backend must not grow localStorage without limit.
+      if (q.length > 40) q = q.slice(-40);
+      localStorage.setItem(QUEUE_KEY, JSON.stringify(q));
+    } catch (e) { /* storage full or blocked - the score is simply lost */ }
+  }
+
+  function post(item) {
+    return client.rpc('submit_score', {
+      p_game: item.game,
+      p_score: item.score,
+      p_detail: item.detail || null,
+      p_extras: item.extras || null
+    }).then(function (res) {
+      if (res.error) throw res.error;
+      return res.data;
+    });
+  }
+
+  /** Send anything waiting from a previous failure. Silent either way. */
+  function flushQueue() {
+    if (!client || !session || !profile) return Promise.resolve();
+    var q = readQueue();
+    if (!q.length) return Promise.resolve();
+
+    var remaining = [];
+    return q.reduce(function (chain, item) {
+      return chain.then(function () {
+        return post(item).catch(function () { remaining.push(item); });
+      });
+    }, Promise.resolve()).then(function () {
+      writeQueue(remaining);
+    });
+  }
+
+  /**
+   * Record a finished game. Safe to call unconditionally from any game - it
+   * no-ops when the player has no account, and queues for retry when the
+   * network fails. A game must never wait on this or branch on its result.
+   *
+   * extras keys carry meaning by suffix:
+   *   _total  accumulates  (perfect games, Yachts rolled)
+   *   _now    overwrites   (current chip stack, which is allowed to fall)
+   *   other   keeps max    (personal bests)
+   */
+  function submitScore(game, score, detail, extras) {
+    if (!client || !session || !profile) return Promise.resolve(null);
+    if (typeof score !== 'number' || !isFinite(score)) return Promise.resolve(null);
+
+    var item = {
+      game: game,
+      score: Math.round(score),
+      detail: detail || null,
+      extras: extras || null,
+      at: Date.now()
+    };
+
+    return post(item).catch(function () {
+      var q = readQueue();
+      // One entry per game per day; a retry must not create a second row.
+      q = q.filter(function (x) { return x.game !== game; });
+      q.push(item);
+      writeQueue(q);
+      return null;
+    });
+  }
+
+  // ── Leaderboard reads ────────────────────────────────────────────────────
+
+  function board(game, metric, limit) {
+    if (!client) return Promise.resolve([]);
+    return client.rpc('get_game_board', {
+      p_game: game, p_metric: metric || 'today', p_limit: limit || 10
+    }).then(function (res) { return res.error ? [] : (res.data || []); })
+      .catch(function () { return []; });
+  }
+
+  function siteStats() {
+    if (!client) return Promise.resolve(null);
+    return client.rpc('get_site_stats').then(function (res) {
+      return res.error ? null : res.data;
+    }).catch(function () { return null; });
+  }
+
   // ── Boot ─────────────────────────────────────────────────────────────────
 
   function boot() {
@@ -430,6 +523,7 @@ window.DJAccount = (function () {
         cache(p);
         paintButton();
         if (built) render();
+        flushQueue();
 
         // Just came back from Google without a name yet. Finish the job rather
         // than dropping them on the page with nothing to show for the round
@@ -451,6 +545,9 @@ window.DJAccount = (function () {
     /** Current username, or null. Phase 2 uses this to gate score submission. */
     username: function () { return profile ? profile.username : null; },
     /** True when there is a signed-in account with a claimed name. */
-    isReady: function () { return !!(session && profile); }
+    isReady: function () { return !!(session && profile); },
+    submitScore: submitScore,
+    board: board,
+    siteStats: siteStats
   };
 })();
