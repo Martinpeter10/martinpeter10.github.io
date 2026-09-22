@@ -2637,14 +2637,23 @@ input[type=range].slider::-moz-range-thumb {
 .dj-acct-note p{margin:0;font-size:.85rem;color:#b8b8d1;line-height:1.5}
 
 /* ── Release bell (used by notify.js on all pages) ── */
-/* The bell only exists while a release is unread, so the header keeps its
-   usual three controls the rest of the time - this matters at 375px. */
+/* The bell is permanent; only its glow is conditional. It never disappears,
+   so the controls beside it never shift. Four round buttons plus the brand are
+   tight at 375px, hence the size/gap reduction at the bottom of this block. */
 .dj-bell-btn{position:relative;width:32px;height:32px;border-radius:999px;border:1px solid #4b5563;background:transparent;color:#9ca3af;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;padding:0;transition:border-color .2s,color .2s}
 .dj-bell-btn:hover{border-color:#9ca3af;color:#fff}
 .dj-bell-btn:focus-visible{outline:2px solid #45b7d1;outline-offset:2px}
-.dj-bell-btn.has-news{color:#f0b429;border-color:rgba(240,180,41,.5)}
+/* Unread: amber, glowing, with a dot. Read: an ordinary header button - the
+   bell stays put either way so the controls beside it never shift. */
+.dj-bell-btn.has-news{color:#f0b429;border-color:rgba(240,180,41,.55);box-shadow:0 0 0 0 rgba(240,180,41,.5);animation:dj-bell-glow 2.4s ease-in-out infinite}
 .dj-bell-btn.has-news:hover{color:#f7c94b;border-color:#f0b429}
-.dj-bell-dot{position:absolute;top:-2px;right:-2px;width:9px;height:9px;border-radius:999px;background:#2ecc71;border:2px solid #111827}
+@keyframes dj-bell-glow{
+  0%,100%{box-shadow:0 0 5px 0 rgba(240,180,41,.45),inset 0 0 0 0 rgba(240,180,41,0)}
+  50%    {box-shadow:0 0 12px 3px rgba(240,180,41,.75),inset 0 0 6px 0 rgba(240,180,41,.18)}
+}
+/* The dot belongs to the unread state only. */
+.dj-bell-dot{display:none;position:absolute;top:-2px;right:-2px;width:9px;height:9px;border-radius:999px;background:#2ecc71;border:2px solid #111827}
+.dj-bell-btn.has-news .dj-bell-dot{display:block}
 
 .dj-bell-panel{position:fixed;z-index:1102;display:none;background:linear-gradient(180deg,#111a33,#0f1b2d);border:1px solid rgba(255,255,255,.14);border-radius:14px;box-shadow:0 18px 40px rgba(0,0,0,.55);padding:1rem 1.1rem;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;color:#fff}
 .dj-bell-panel.open{display:block}
@@ -2656,6 +2665,10 @@ input[type=range].slider::-moz-range-thumb {
 .dj-bell-go:hover{filter:brightness(1.12)}
 .dj-bell-dismiss{padding:.5rem .75rem;border-radius:9px;border:1px solid rgba(255,255,255,.16);background:transparent;color:#b8b8d1;font-family:inherit;font-size:.78rem;font-weight:700;cursor:pointer}
 .dj-bell-dismiss:hover{color:#fff;border-color:rgba(255,255,255,.32)}
+
+@media (prefers-reduced-motion:reduce){
+  .dj-bell-btn.has-news{animation:none;box-shadow:0 0 9px 1px rgba(240,180,41,.6)}
+}
 
 /* Four round controls plus the brand overflow a 375px header, so tighten the
    header's gap while the bell is present. */

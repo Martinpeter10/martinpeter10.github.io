@@ -183,9 +183,10 @@ injected at runtime. Do not hardcode either one anywhere. Full order as rendered
 **stats → help → bell → account**.
 
 - The **account button** is injected by `account.js` and is always present (when the backend is reachable).
-- The **release bell** is injected by `notify.js` and exists *only* while the player has an unread
-  release, so most of the time the header keeps three controls. That is deliberate: four round
-  buttons plus the brand overflow a 375px header.
+- The **release bell** is injected by `notify.js` and is **always present**. Only its glow is
+  conditional. Do not make it conditional on unread state - a control that appears and disappears
+  shifts the buttons beside it and is harder to find a second time. Four round buttons plus the
+  brand are tight at 375px, which is why `styles.css` shrinks them under 420px.
 
 ```html
 <!-- Place these immediately after <div class="flex-1"></div> inside the header -->
@@ -497,9 +498,14 @@ left of the account button). No backend - it is a localStorage version compariso
 **Single source of truth** is the `RELEASE` object at the top of the file. Bump it in the same
 commit as the release notes; see step 11 of the new-game checklist.
 
-**The bell only exists when there is unread news.** `isUnread()` compares `dj_seen_release`
-against `RELEASE.version`. When they match, nothing is injected at all and the header keeps its
-usual three controls.
+**The bell is always in the header; only the glow is conditional.** `isUnread()` compares
+`dj_seen_release` against `RELEASE.version` and decides whether `.has-news` is applied - an amber
+pulsing glow plus a dot. Once acknowledged it reverts to an ordinary header button that still
+opens the panel, so "what's new" is always reachable.
+
+**Anything that shows the player the news acknowledges it**: opening the panel, dismissing it, or
+clicking through to the releases page. All three route through `acknowledge()`, which writes
+`dj_seen_release` and drops the glow without removing the button.
 
 **First-visit handling**: a browser with no `dj_seen_release` is ambiguous - it could be a
 returning player who predates the bell, or someone brand new. `hasPlayedBefore()` checks for any
@@ -854,7 +860,7 @@ All pages include `<meta name="referrer" content="strict-origin-when-cross-origi
   to be missing from the favorites catalog while the page that references it is already live. The
   test and dev Workers send `max-age=0, must-revalidate`, so **this class of bug is invisible on
   test and only ever appears in production**. Bump every asset's version together when releasing.
-- **`styles.css` cache busting**: All pages link to `styles.css` with a version query string (currently `?v=20260731`). Whenever `styles.css` gains new rules (e.g. adding a new game), bump this version on ALL pages — otherwise mobile and desktop browsers serve the old cached CSS and new game elements render unstyled. Update the version in all 12 pages: `index.html`, `404.html`, all game pages, and all info pages.
+- **`styles.css` cache busting**: All pages link to `styles.css` with a version query string (currently `?v=20260922b`). Whenever `styles.css` gains new rules (e.g. adding a new game), bump this version on ALL pages - otherwise mobile and desktop browsers serve the old cached CSS and new game elements render unstyled. Update the version in all **16** pages: `index.html`, `404.html`, the 10 game pages, and `about`/`privacy`/`releases`/`terms`. Bump every asset together, not just `styles.css`.
 - **New external resources**: If you add a new CDN, font, or API endpoint, update the CSP meta on every affected page. Forgetting this will silently block the resource in supporting browsers.
 - **Bare `JSON.parse` aborts boot**: Never call `JSON.parse(localStorage.getItem(...))` without a try/catch at the top level of a boot function. A malformed stored value will throw, silently aborting `boot()` mid-execution — game state never restores, result panels stay empty, and there is no visible error. Always wrap in try/catch or use `DJUtils.loadJSON()` which handles this safely.
 - **Stats key versioning**: When adding fields to a stats object that old saves won't have, bump the key suffix (e.g. `_v2` → `_v3`) rather than trying to migrate. Stale data under the old key is simply ignored and users start fresh. Do not remove the old key proactively — it ages out naturally as players accumulate new data.

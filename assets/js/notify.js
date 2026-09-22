@@ -94,15 +94,15 @@ window.DJNotify = (function () {
     go.className = 'dj-bell-go';
     go.href = '/releases/';
     go.textContent = "See what's new";
-    go.addEventListener('click', markSeen);
+    go.addEventListener('click', acknowledge);
 
     var dismiss = document.createElement('button');
     dismiss.type = 'button';
     dismiss.className = 'dj-bell-dismiss';
     dismiss.textContent = 'Dismiss';
     dismiss.addEventListener('click', function () {
-      markSeen();
-      removeBell();
+      acknowledge();
+      closePanel();
     });
 
     var row = document.createElement('div');
@@ -128,6 +128,10 @@ window.DJNotify = (function () {
     panel.classList.toggle('open', opening);
     btn.setAttribute('aria-expanded', String(opening));
 
+    // Seeing the panel counts as reading the news, so clicking away leaves a
+    // plain bell rather than one still demanding attention.
+    if (opening) acknowledge();
+
     if (opening) {
       // Anchor under the bell, clamped so it never runs off a narrow screen.
       var r = btn.getBoundingClientRect();
@@ -146,10 +150,24 @@ window.DJNotify = (function () {
     if (btn) btn.setAttribute('aria-expanded', 'false');
   }
 
-  function removeBell() {
-    closePanel();
+  /**
+   * The bell is permanent; only the glow comes and goes. Removing the control
+   * once read would shift every other header button sideways, so what changes
+   * is its state, not its existence.
+   */
+  function paintBell(unread) {
     var btn = document.getElementById('dj-bell-btn');
-    if (btn) btn.remove();
+    if (!btn) return;
+    btn.classList.toggle('has-news', !!unread);
+    btn.setAttribute('aria-label', unread
+      ? 'New release: ' + RELEASE.title
+      : "What's new");
+  }
+
+  /** Stop glowing. Called on any acknowledgement - open, dismiss, or navigate. */
+  function acknowledge() {
+    markSeen();
+    paintBell(false);
   }
 
   // ── Bell ─────────────────────────────────────────────────────────────────
@@ -161,8 +179,7 @@ window.DJNotify = (function () {
     var btn = document.createElement('button');
     btn.id = 'dj-bell-btn';
     btn.type = 'button';
-    btn.className = 'dj-bell-btn has-news';
-    btn.setAttribute('aria-label', 'New release: ' + RELEASE.title);
+    btn.className = 'dj-bell-btn';
     btn.setAttribute('aria-expanded', 'false');
     btn.innerHTML = BELL_SVG;   // static string, no interpolation
 
@@ -187,11 +204,12 @@ window.DJNotify = (function () {
   // ── Boot ─────────────────────────────────────────────────────────────────
 
   function boot() {
-    // The bell exists ONLY when there is unread news. Most of the time the
-    // header keeps its usual three controls, which matters on a 375px screen.
-    if (!isUnread()) return;
-
+    // The bell is always in the header. isUnread() decides whether it glows,
+    // not whether it exists - a control that appears and disappears shifts the
+    // buttons beside it and is harder to find the second time.
+    var unread = isUnread();
     injectBell();
+    paintBell(unread);
 
     document.addEventListener('click', function (e) {
       var panel = document.getElementById('dj-bell-panel');
