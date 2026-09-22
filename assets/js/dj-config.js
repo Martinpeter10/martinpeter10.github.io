@@ -30,12 +30,16 @@ window.DJConfig = (function () {
   var host = location.hostname;
   var env, project, schema;
 
+  // Each environment answers on two hostnames: a custom subdomain and the raw
+  // workers.dev one. Both must be listed - matching only the workers.dev form
+  // sent tst.dailyjamm.com to the dev schema, so the test site was writing
+  // playtest scores into dev data.
   if (host === 'dailyjamm.com' || host === 'www.dailyjamm.com') {
     env = 'prod';    project = PROD;    schema = 'public';
-  } else if (host.indexOf('dailyjammtest') === 0) {
+  } else if (host === 'tst.dailyjamm.com' || host.indexOf('dailyjammtest') === 0) {
     env = 'tst';     project = NONPROD; schema = 'app_tst';
   } else {
-    // dailyjammdev.*, localhost, 127.0.0.1, and anything unrecognised.
+    // dev.dailyjamm.com, dailyjammdev.*, localhost, and anything unrecognised.
     // Defaulting to dev is deliberate: an unknown host must never be able to
     // reach production data by accident.
     env = 'dev';     project = NONPROD; schema = 'app_dev';

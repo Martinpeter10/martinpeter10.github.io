@@ -6,7 +6,7 @@ DailyJamm (dailyjamm.com) is a daily games hub hosted on GitHub Pages. It featur
 ## Domain & Hosting
 - Domain: `dailyjamm.com` (CNAME file)
 - Hosting: GitHub Pages (static HTML, no build step), deployed from `main`
-- Test environment: Cloudflare Worker `dailyjammtest` deployed from the `tst` branch; dev environment: worker `dailyjammdev` from the `dev` branch (both `*.workers.dev` URLs)
+- Test environment: Cloudflare Worker `dailyjammtest` from the `tst` branch, at **tst.dailyjamm.com** and `dailyjammtest.*.workers.dev`; dev environment: worker `dailyjammdev` from the `dev` branch, at **dev.dailyjamm.com** and `dailyjammdev.*.workers.dev`. Both hostnames work for each - anything matching on hostname must handle both.
 - No framework - vanilla HTML/CSS/JS + Tailwind CDN on game pages
 
 ## Release Workflow (dev -> tst -> prod, with approval gates)
@@ -487,9 +487,22 @@ update or delete anything. All writes go through `security definer` SQL function
 it lives only in Supabase Edge Function secrets, injected automatically.
 
 **Environments**: `dj-config.js` resolves project + Postgres schema from `location.hostname`,
-mirroring the Google Analytics gate - `dailyjamm.com` → prod/`public`,
-`dailyjammtest*` → nonprod/`app_tst`, everything else (including localhost) → nonprod/`app_dev`.
-An unrecognised host falls through to dev on purpose, so it can never touch production data.
+mirroring the Google Analytics gate. **Each environment answers on two hostnames** - a custom
+subdomain and the raw workers.dev one - and both must be listed everywhere a hostname is matched:
+
+| Env | Hostnames | Schema |
+|---|---|---|
+| prod | `dailyjamm.com`, `www.dailyjamm.com` | `public` |
+| tst | `tst.dailyjamm.com`, `dailyjammtest.*.workers.dev` | `app_tst` |
+| dev | `dev.dailyjamm.com`, `dailyjammdev.*.workers.dev`, localhost | `app_dev` |
+
+An unrecognised host falls through to dev on purpose, so it can never touch production data - but
+that default is a safety net, not a mapping. Matching only the workers.dev form once sent
+`tst.dailyjamm.com` to the dev schema, so the test site was writing playtest scores into dev data.
+
+**Three places match hostnames and must stay in sync**: `dj-config.js`, the `ORIGIN_SCHEMA` /
+`ORIGIN_PREFIX` maps in `supabase/functions/username/index.ts`, and the Supabase redirect
+allowlist (Auth → URL Configuration) which needs `/**` on every entry.
 
 **`DJ_SCHEMAS` is a required Edge Function secret**, set per project:
 `public` on prod, `app_tst,app_dev` on nonprod. The function's origin map is shared by both

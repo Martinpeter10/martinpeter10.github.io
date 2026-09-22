@@ -28,9 +28,14 @@ import { moderate } from './moderation.ts';
 // The schema is deliberately NOT a request parameter. If the client could name
 // its own schema, anyone could point the dev site at the production tables.
 // Origin is set by the browser and cannot be forged by page script.
+// Each environment answers on two hostnames: a custom subdomain and the raw
+// workers.dev one. Exact matches first so tst.dailyjamm.com cannot be captured
+// by a dailyjamm.com prefix rule.
 const ORIGIN_SCHEMA: Record<string, string> = {
   'https://dailyjamm.com': 'public',
   'https://www.dailyjamm.com': 'public',
+  'https://tst.dailyjamm.com': 'app_tst',
+  'https://dev.dailyjamm.com': 'app_dev',
 };
 const ORIGIN_PREFIX: Array<[string, string]> = [
   ['https://dailyjammtest.', 'app_tst'],
