@@ -1,0 +1,22 @@
+# Supabase CLI project config.
+#
+# The ONLY reason this file exists is the verify_jwt setting below. Without it,
+# the next `supabase functions deploy username` silently re-enables Supabase's
+# automatic JWT gate and breaks username checking for signed-out players.
+
+project_id = "dailyjamm-nonprod"
+
+[functions.username]
+# MUST stay false. The function serves two actions with different auth needs:
+#
+#   check  - runs as the player types, BEFORE they have signed in. There is no
+#            JWT to present. With the platform gate on, every keystroke 401s.
+#   claim  - verifies the JWT itself, in code, and takes the user id from the
+#            verified token rather than the request body.
+#
+# It is also forced by the key format: the new sb_publishable_ keys are not
+# JWTs, so the platform gate would reject them outright.
+#
+# This is not a hole. The function still allowlists Origin, and the only write
+# path it exposes requires a token it verifies itself.
+verify_jwt = false
