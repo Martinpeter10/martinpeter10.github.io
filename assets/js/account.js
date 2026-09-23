@@ -171,6 +171,16 @@ window.DJAccount = (function () {
   function viewSignIn() {
     var w = document.createDocumentFragment();
 
+    if (!storageWorks()) {
+      var blocked = make('div', 'dj-acct-note');
+      blocked.appendChild(make('p', null,
+        'This browser is blocking site data, so we cannot keep you signed in. ' +
+        'Private browsing usually causes this. Try a normal window, or allow ' +
+        'site data for dailyjamm.com.'));
+      w.appendChild(blocked);
+      return w;
+    }
+
     w.appendChild(make('p', 'dj-acct-lede',
       'Every game is free to play without an account. Sign in to save your scores, keep your streaks on every device, and appear on the daily leaderboards.'));
 
@@ -425,6 +435,23 @@ window.DJAccount = (function () {
    * account.js on game pages and not at all on /leaderboards/, so a bare
    * DJUtils reference throws ReferenceError rather than evaluating as falsy.
    */
+  /**
+   * supabase-js persists the session in localStorage. Where that is blocked -
+   * a private window, or a browser set to refuse site data - sign-in completes
+   * at Google, returns, and then evaporates, which looks exactly like sign-in
+   * being broken. Detect it so we can say what actually happened.
+   */
+  function storageWorks() {
+    try {
+      var k = '__dj_probe__';
+      localStorage.setItem(k, '1');
+      localStorage.removeItem(k);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   function chicagoToday() {
     try {
       return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
@@ -598,6 +625,41 @@ window.DJAccount = (function () {
       return;
     }
 
+    // React to auth events, do not just sample once.
+    //
+    // detectSessionInUrl parses the OAuth fragment asynchronously during client
+    // construction. getSession() below can therefore run BEFORE the returning
+    // session has been parsed, report null, and paint a signed-out header - the
+    // player clicks Sign in, comes back, and appears signed out. Listening
+    // catches the session whenever it actually arrives.
+    client.auth.onAuthStateChange(function (event, s) {
+      if (event === 'SIGNED_OUT') {
+        session = null;
+        profile = null;
+        cache(null);
+        if (window.DJStore && DJStore.clearLocal) DJStore.clearLocal();
+        paintButton();
+        if (built) render();
+        return;
+      }
+      if (!s) return;
+
+      var hadNone = !session;
+      session = s;
+      if (!hadNone && profile) return;   // nothing new to do
+
+      loadProfile().then(function (p) {
+        profile = p;
+        cache(p);
+        paintButton();
+        if (built) render();
+        flushQueue();
+        // Back from Google with no name yet: finish the job rather than
+        // dropping them on the page with nothing to show for the round trip.
+        if (!p && event === 'SIGNED_IN') open();
+      });
+    });
+
     client.auth.getSession().then(function (res) {
       session = (res && res.data && res.data.session) || null;
       if (!session) {
@@ -660,6 +722,7 @@ window.DJAccount = (function () {
         client: !!client,
         signedIn: !!session,
         username: profile ? profile.username : null,
+        storageWorks: storageWorks(),
         queued: readQueue()
       };
     },
