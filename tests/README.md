@@ -44,7 +44,30 @@ export SB_TOKEN=sbp_...
 export DJ_PUBLISHABLE=sb_publishable_...
 ```
 
-## What it checks
+## play.mjs - actually plays a game
+
+```sh
+node play.mjs            # plays today's Chain Link to a perfect 20
+node play.mjs --headed   # watch it type
+node play.mjs --keep     # leave the rows for inspection
+```
+
+Chain Link is deterministic - the puzzle comes from the day of year - so the
+test computes today's answers, types them, and asserts a known 20/20. Then it
+reads the database and checks the score landed, matches the screen, rolled up
+into lifetime stats, counted the perfect game exactly once, reached the
+leaderboard, and marked the day complete.
+
+This is the half `smoke.mjs` cannot reach. It would have caught `submit_score`
+failing on every call, extras being double-counted on a first play, and
+Spelldle reporting a loss for every win.
+
+**Use `dj_today()`, never `current_date`.** The games stamp rows with the
+Chicago date; Postgres `current_date` is UTC. For five hours every evening they
+are different days, and a query using the wrong one silently finds nothing -
+which is how the first run of this test "failed".
+
+## What smoke.mjs checks
 
 Every page and all ten games:
 
