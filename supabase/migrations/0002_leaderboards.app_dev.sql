@@ -114,8 +114,11 @@ begin
 
   insert into game_stats (user_id, game, played, best, total_score,
                           cur_streak, best_streak, last_day, extras, updated_at)
+  -- Seed extras EMPTY. The merge block below is the single place extras are
+  -- applied; seeding them here too made the first-ever play of a game count
+  -- its _total counters twice.
   values (v_user, p_game, 1, p_score, p_score, 1, 1, v_day,
-          coalesce(p_extras, '{}'::jsonb), now())
+          '{}'::jsonb, now())
   on conflict (user_id, game) do update set
     played      = game_stats.played + 1,
     total_score = game_stats.total_score + p_score,
