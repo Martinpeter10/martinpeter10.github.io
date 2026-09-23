@@ -2742,3 +2742,11 @@ input[type=range].slider::-moz-range-thumb {
 .lb-mine-bits{font-size:.75rem;color:#9fb8c8;font-variant-numeric:tabular-nums}
 .lb-card-head{display:flex;align-items:baseline;justify-content:space-between;gap:.6rem}
 .lb-today-count{font-size:.68rem;color:#7b7b96;font-weight:700;white-space:nowrap;flex-shrink:0;font-variant-numeric:tabular-nums}
+
+/* ── Game state loading (store.js) ── */
+/* Only appears when a signed-in player's state fetch takes long enough to
+   notice. On a fast connection the gate opens before this is ever inserted. */
+.dj-store-loading{position:fixed;inset:0;z-index:1200;display:flex;align-items:center;justify-content:center;gap:.6rem;background:rgba(15,23,42,.72);backdrop-filter:blur(2px);color:#b8b8d1;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;font-size:.85rem;font-weight:600}
+.dj-store-spin{width:15px;height:15px;border-radius:999px;border:2px solid rgba(255,255,255,.2);border-top-color:#2ecc71;animation:dj-store-spin .7s linear infinite}
+@keyframes dj-store-spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.dj-store-spin{animation-duration:2s}}

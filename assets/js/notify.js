@@ -14,7 +14,7 @@ window.DJNotify = (function () {
   var RELEASE = {
     version: '3.5.0',
     title: 'Accounts and Leaderboards',
-    summary: 'Claim a username, save your scores, and see how you stack up on the daily boards.'
+    summary: 'Sign in to save your scores, climb the daily leaderboards, and pick up where you left off on any device.'
   };
 
   var SEEN_KEY = 'dj_seen_release';

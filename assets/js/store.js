@@ -57,9 +57,41 @@ window.DJStore = (function () {
 
   // ── The gate ─────────────────────────────────────────────────────────────
 
+  var loaderTimer = null;
+
+  /**
+   * Only shown if the gate is still closed after a moment. A signed-in player
+   * on a fast connection should never see it; one on a slow connection should
+   * not be left staring at a blank board wondering if the game is broken.
+   */
+  function showLoader() {
+    if (document.getElementById('dj-store-loading')) return;
+    var el = document.createElement('div');
+    el.id = 'dj-store-loading';
+    el.className = 'dj-store-loading';
+    el.setAttribute('role', 'status');
+    el.setAttribute('aria-live', 'polite');
+    var dot = document.createElement('span');
+    dot.className = 'dj-store-spin';
+    dot.setAttribute('aria-hidden', 'true');
+    var txt = document.createElement('span');
+    txt.textContent = 'Loading your game...';
+    el.appendChild(dot);
+    el.appendChild(txt);
+    (document.body || document.documentElement).appendChild(el);
+  }
+
+  function hideLoader() {
+    clearTimeout(loaderTimer);
+    loaderTimer = null;
+    var el = document.getElementById('dj-store-loading');
+    if (el) el.remove();
+  }
+
   function open() {
     if (opened) return;
     opened = true;
+    hideLoader();
     var fns = waiting; waiting = [];
     fns.forEach(function (fn) {
       try { fn(); } catch (e) { log('boot callback threw', e); }
@@ -93,6 +125,10 @@ window.DJStore = (function () {
 
     DJAccount.whenResolved(function () {
       if (!DJAccount.signedIn || !DJAccount.signedIn()) { open(); return; }
+
+      // Signed in means a round trip before the board can paint. Say so, but
+      // only if it actually takes long enough to notice.
+      loaderTimer = setTimeout(showLoader, 400);
 
       // Guard against a hung request holding the board blank forever. Opening
       // late with local state is far better than never opening.

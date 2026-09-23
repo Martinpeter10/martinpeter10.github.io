@@ -195,12 +195,17 @@ Full release notes are also available at [dailyjamm.com/releases](https://dailyj
 
 ### v3.5.0 - 2026-09-22
 
-**Player accounts and the release bell**
+**Accounts, leaderboards, and progress that follows you**
 
-- **Sign in with Google.** Every game is still completely free to play without an account. Signing in is optional and saves your scores, keeps your streaks on every device, and puts you on the daily leaderboards. We never see your password, and your email is never shown to other players.
-- **Pick a username.** Your username is the only thing other players see. Names are checked automatically, including attempts to disguise words with numbers or symbols.
-- **A bell in the header** appears when there is a new release and links you here. It only shows up when there is something you have not seen.
-- Privacy Policy and Terms of Service updated to cover accounts, usernames and leaderboards.
+- **Sign in with Google.** Every game is still completely free to play without an account - nothing is locked. Signing in saves your scores, keeps your streaks, and puts you on the leaderboards. We never see your password, and your email is never shown to other players.
+- **Pick a username.** It is the only thing other players see next to your scores. Names are checked automatically, including attempts to disguise words with numbers or symbols.
+- **Leaderboards for all ten games.** A new trophy button in the header opens a page with a board for every game - today's results, longest streaks, most days played, and the thing each game is actually worth bragging about: perfect Chain Links, Yachts rolled, boxes shut, perfect Net Zeros, tables won, and chip stacks.
+- **Your games at a glance.** Signed in, the leaderboards page also shows your own numbers for every game you play.
+- **Progress follows you between devices.** Signed in, your chip stacks and each day's progress live on your account instead of in one browser. Start a game on your phone, finish it on your laptop.
+- **A bell in the header** appears when there is a release you have not seen, and links here. When there is nothing new it stays out of the way.
+- Privacy Policy and Terms of Service updated to explain what an account stores, what is public, and how to have your account deleted.
+
+**Please note:** the first time you sign in on a chip game, your chip stack resets to the starting amount. Chips kept in a browser cannot be verified, so every account starts level.
 
 ### v3.4.0 - 2026-08-26
 
