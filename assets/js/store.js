@@ -104,20 +104,30 @@ window.DJStore = (function () {
         open();
       }, 6000);
 
-      DJAccount.rpc('get_game_state', { p_game: gameId }).then(function (res) {
-        if (released) return;
-        released = true;
-        clearTimeout(bail);
-        if (res && res.error) { log('get_game_state failed', res.error); open(); return; }
-        applyServerState(res && res.data);
-        open();
-      }).catch(function (err) {
-        if (released) return;
-        released = true;
-        clearTimeout(bail);
-        log('get_game_state threw', err);
-        open();
-      });
+      fetchState(function () { if (!released) { released = true; clearTimeout(bail); } open(); });
+    });
+  }
+
+  /**
+   * Fetch and apply, retrying once on failure. A first-attempt failure used to
+   * leave the page local-only until reload, with every subsequent write
+   * silently dropped - the gate opens either way, so a retry costs nothing the
+   * player can see.
+   */
+  function fetchState(done, attempt) {
+    attempt = attempt || 1;
+    DJAccount.rpc('get_game_state', { p_game: gameId }).then(function (res) {
+      if (res && res.error) throw res.error;
+      applyServerState(res && res.data);
+      done();
+    }).catch(function (err) {
+      log('get_game_state failed (attempt ' + attempt + ')', err);
+      if (attempt < 3) {
+        done();                                   // never hold the gate on a retry
+        setTimeout(function () { fetchState(function () {}, attempt + 1); }, 1500 * attempt);
+      } else {
+        done();
+      }
     });
   }
 
@@ -185,8 +195,18 @@ window.DJStore = (function () {
    * Pass { now: true } for changes that must not be lost: completion, and any
    * chip movement.
    */
+  var warnedUnsynced = false;
+
   function save(opts) {
-    if (!synced) return Promise.resolve(null);
+    if (!synced) {
+      // Signed in but unhydrated means every write is silently dropped and the
+      // player's progress quietly diverges from their account. Say so once.
+      if (window.DJAccount && DJAccount.signedIn && DJAccount.signedIn() && !warnedUnsynced) {
+        warnedUnsynced = true;
+        log('signed in but NOT synced - writes are being dropped. Hydration failed earlier this page load.');
+      }
+      return Promise.resolve(null);
+    }
     opts = opts || {};
 
     pending = pending || {};
@@ -259,7 +279,23 @@ window.DJStore = (function () {
     /** True when the server is authoritative for this page load. */
     isSynced: function () { return synced; },
     debug: function () {
-      return { game: gameId, keys: keys, opened: opened, synced: synced, pending: pending };
+      var signedIn = !!(window.DJAccount && DJAccount.signedIn && DJAccount.signedIn());
+      return {
+        game: gameId,
+        signedIn: signedIn,
+        synced: synced,
+        opened: opened,
+        pending: pending,
+        verdict: !gameId ? 'not a tracked game page'
+               : !signedIn ? 'signed out - localStorage is truth, nothing syncs'
+               : synced ? 'syncing to the server'
+               : 'SIGNED IN BUT NOT SYNCED - writes are being dropped',
+        local: keys ? {
+          daily: lsGet(keys.daily),
+          chips: keys.chips ? lsGet(keys.chips) : null,
+          bonus: keys.bonus ? lsGet(keys.bonus) : null
+        } : null
+      };
     }
   };
 })();
