@@ -44,7 +44,48 @@ export SB_TOKEN=sbp_...
 export DJ_PUBLISHABLE=sb_publishable_...
 ```
 
-## play.mjs - actually plays a game
+## games.mjs - plays each game, several ways
+
+```sh
+node games.mjs                    # every game, every case
+node games.mjs --only chainlink   # one game
+node games.mjs --case win         # one case
+node games.mjs --headed           # watch it play
+```
+
+Per game: a win, a partial/alternative outcome, and a loss - then two cases that
+are not game-specific but are where the real bugs lived:
+
+| Case | What it protects |
+|---|---|
+| outcomes | score stored, matches the screen, stats rolled up, extras counted **once**, day complete |
+| replay-after-finish | reloading a finished game does not double-count or reopen the day |
+| signed-out | the result is **queued**, not submitted, and never reaches the boards |
+
+### It plays as a dedicated account
+
+`session.mjs` creates and uses `autotest@dailyjamm.invalid`, never the site
+owner's account, and every read and wipe is scoped to that user id. `wipe()`
+throws if called without one.
+
+This matters: the tests delete rows. An earlier version played as the first user
+in the project and destroyed real play data, then left a fake score behind -
+and one row per player per game per day means a leftover blocks the real score
+for the rest of the day.
+
+### Replicated puzzle rules will drift
+
+`games/*.mjs` recomputes each game's answer using the same rule the game uses.
+That duplication is the weak point: the Spelldle module first used canonical
+mulberry32 while the game uses a variant (`>>> 0` not `| 0`, and `| 0` not
+`^ t`), so every computed answer was wrong. The suite reported it as "nothing
+was stored", which looked like an app bug.
+
+`games.mjs` now guards for this: if a winning plan does not end the game, it
+fails with *"this test's puzzle rule has drifted from the game"* rather than
+the downstream symptom.
+
+## play.mjs - the original single-game script
 
 ```sh
 node play.mjs            # plays today's Chain Link to a perfect 20

@@ -26,10 +26,39 @@ export async function mintSession() {
   const pub = keys.find((k) => (k.name || k.type) === 'anon')?.api_key
            || process.env.DJ_PUBLISHABLE;
 
+  // A DEDICATED test account, never the site owner's.
+  //
+  // The tests wipe scores, stats and state for whatever account they play as.
+  // Using the first user in the project meant every run destroyed real play
+  // data and left fake rows behind - and one row per player per game per day
+  // means a leftover test score blocks the real one for the rest of the day.
+  const TEST_EMAIL = process.env.DJ_TEST_EMAIL || 'autotest@dailyjamm.invalid';
+
   const users = await j(`${URL}/auth/v1/admin/users`,
     { headers: { apikey: svc, Authorization: `Bearer ${svc}` } });
-  const user = users.users[0];
-  if (!user) throw new Error('no users in this project to mint a session for');
+  let user = users.users.find((u) => u.email === TEST_EMAIL);
+
+  if (!user) {
+    user = await j(`${URL}/auth/v1/admin/users`, {
+      method: 'POST',
+      headers: { apikey: svc, Authorization: `Bearer ${svc}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: TEST_EMAIL, email_confirm: true,
+                             user_metadata: { autotest: true } }),
+    });
+    console.log(`  created test account ${TEST_EMAIL}`);
+  }
+
+  // submit_score refuses a player with no profile, so make sure it has one.
+  const schema = process.env.DJ_SCHEMA || 'app_dev';
+  const ref = REF;
+  await fetch(`https://api.supabase.com/v1/projects/${ref}/database/query`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${pat}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query:
+      `insert into ${schema}.profiles (id, username, username_key)
+       values ('${user.id}', 'AutoTest', 'autotest')
+       on conflict (id) do nothing;` }),
+  });
 
   const link = await j(`${URL}/auth/v1/admin/generate_link`, {
     method: 'POST',
@@ -44,6 +73,7 @@ export async function mintSession() {
   });
 
   return {
+    userId: user.id,
     email: user.email,
     key: `sb-${REF}-auth-token`,
     value: JSON.stringify({
