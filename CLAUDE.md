@@ -458,6 +458,11 @@ what stops a second device resurrecting it and makes a late offline write safe t
 **Nothing merges.** On first sign-in the player starts at base values; local chips are discarded
 because an imported stack can be whatever devtools says. This is deliberate and one-way.
 
+**Sign-out clears adopted state.** `DJStore.clearLocal()` drops every tracked daily/chips/bonus
+key. Without it a shared computer keeps reporting "already played today" to the next person and
+shows them someone else's board. Lifetime local stats (`cl_stats_v2` and friends) are deliberately
+NOT cleared - they record what this browser played and were never overwritten by sign-in.
+
 **Writes are debounced** (~2.5s) because games save after every move. Completion, chip changes and
 `visibilitychange` force an immediate flush.
 

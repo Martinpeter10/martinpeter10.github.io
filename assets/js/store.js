@@ -224,8 +224,34 @@ window.DJStore = (function () {
     hydrate();
   }
 
+  /**
+   * Drop every scrap of server-adopted state from this browser.
+   *
+   * Called on sign-out. Signing in overwrites local state with the account's;
+   * leaving that behind afterwards means a shared computer reports "already
+   * played today" to whoever uses it next, and shows them someone else's
+   * board. Signed out, the browser should own its own game again.
+   *
+   * Lifetime local stats (cl_stats_v2 and friends) are deliberately NOT
+   * touched - those record what was played in this browser and were never
+   * overwritten by sign-in.
+   */
+  function clearLocal() {
+    Object.keys(GAMES).forEach(function (id) {
+      var k = GAMES[id];
+      if (k.daily) lsDel(k.daily);
+      if (k.chips) lsDel(k.chips);
+      if (k.bonus) lsDel(k.bonus);
+    });
+    synced = false;
+    pending = null;
+    clearTimeout(timer);
+    timer = null;
+  }
+
   return {
     ready: ready,
+    clearLocal: clearLocal,
     save: save,
     saveDaily: saveDaily,
     flush: flush,

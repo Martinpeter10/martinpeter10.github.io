@@ -257,6 +257,9 @@ window.DJAccount = (function () {
     out.addEventListener('click', doSignOut);
     w.appendChild(out);
 
+    w.appendChild(make('p', 'dj-acct-fine',
+      'Signing out clears this device back to a fresh game. Your scores, streaks and chips stay on your account and come back when you sign in.'));
+
     return w;
   }
 
@@ -394,6 +397,11 @@ window.DJAccount = (function () {
         session = null;
         profile = null;
         cache(null);
+        // Drop state adopted from the account. Without this a shared computer
+        // keeps reporting "already played today" to the next person and shows
+        // them someone else's board. The account's own copy is safe on the
+        // server and comes back on the next sign-in.
+        if (window.DJStore && DJStore.clearLocal) DJStore.clearLocal();
         paintButton();
         render();
       });
