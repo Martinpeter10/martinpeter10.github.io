@@ -95,6 +95,7 @@
       date: chicagoDate(),
       dice, held, rollsLeft, rolledThisTurn, turn, scores, done
     });
+    if (window.DJStore) DJStore.saveDaily(done);
   }
 
   function loadToday() {
@@ -530,7 +531,9 @@
     done = !!saved.done;
   }
 
-  document.addEventListener('DOMContentLoaded', function () {
+  // DJStore.ready replaces DOMContentLoaded: signed in it fires once server
+  // state is in localStorage, signed out it fires immediately.
+  DJStore.ready(function () {
     buildCard();
     buildDice();
 

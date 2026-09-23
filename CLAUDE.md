@@ -458,6 +458,15 @@ what stops a second device resurrecting it and makes a late offline write safe t
 **Nothing merges.** On first sign-in the player starts at base values; local chips are discarded
 because an imported stack can be whatever devtools says. This is deliberate and one-way.
 
+**All ten games are gated.** No game listens for `DOMContentLoaded` any more - every boot goes
+through `DJStore.ready()`. If you add a game, use `DJStore.ready(boot)` and register it in the
+`GAMES` and `PATHS` maps in `store.js`, or it will neither hydrate nor sync.
+
+**The restore-path leaderboard submissions were deliberately KEPT.** The original plan said to
+retire them once the server owned "played today", but they still cover a case server state does
+not: a day played signed-out and then signed into. They are idempotent, so keeping them costs an
+RPC and removes a whole class of lost score.
+
 **Chip games** (BlackJackdle, Roulettedle, Holdle) keep their stack in `progress.chips` and the
 daily bonus in `progress.bonus_day`. Chips are written immediately rather than debounced - only a
 handful happen per session and losing one loses real winnings. `loadChips()` in each game already

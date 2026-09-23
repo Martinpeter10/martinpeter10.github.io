@@ -144,6 +144,7 @@
       guesses:   guesses,
       gameOver:  gameOver,
     });
+    if (window.DJStore) DJStore.saveDaily(gameOver);
   }
 
   // ── Comparison logic ─────────────────────────────────────────────────────
@@ -736,7 +737,9 @@
   window.SPDGame = { showStats: showStats };
 
   // ── Boot ─────────────────────────────────────────────────────────────────
-  document.addEventListener('DOMContentLoaded', function () {
+  // DJStore.ready replaces DOMContentLoaded: signed in it fires once server
+  // state is in localStorage, signed out it fires immediately.
+  DJStore.ready(function () {
     fetch('/assets/data/spelldle-spells.json')
       .then(function (r) { return r.json(); })
       .then(function (data) {

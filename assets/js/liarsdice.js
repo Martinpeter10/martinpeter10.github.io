@@ -125,6 +125,8 @@
       alive, dice, round, turnSeat, turnCount, curBid, phase,
       revealInfo, eliminatedOrder, outcome,
     });
+
+    if (window.DJStore) DJStore.saveDaily(phase === 'done');
   }
 
 
@@ -814,8 +816,9 @@
     });
   }
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
-  else boot();
+  // DJStore.ready replaces DOMContentLoaded: signed in it fires once server
+  // state is in localStorage, signed out it fires immediately.
+  DJStore.ready(boot);
 
   window.BFGame = { showStats, closeStats, shareStats, showModal, closeModal };
 })();

@@ -127,6 +127,8 @@
       deck, discard, upCard, reshuffles, hands, round, turnSeat, turnCount,
       phase, shiftCount, outcome,
     });
+
+    if (window.DJStore) DJStore.saveDaily(phase === 'done');
   }
 
 
@@ -914,8 +916,9 @@
     });
   }
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
-  else boot();
+  // DJStore.ready replaces DOMContentLoaded: signed in it fires once server
+  // state is in localStorage, signed out it fires immediately.
+  DJStore.ready(boot);
 
   window.SBGame = { showStats, closeStats, shareStats, showModal, closeModal };
 })();

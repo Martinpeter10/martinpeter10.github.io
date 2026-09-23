@@ -75,6 +75,8 @@
     DJUtils.saveJSON(todayKey, {
       date: chicagoDate(), open, rollIndex, curRoll, phase, outcome,
     });
+
+    if (window.DJStore) DJStore.saveDaily(phase === 'done');
   }
 
 
@@ -499,8 +501,9 @@
     });
   }
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
-  else boot();
+  // DJStore.ready replaces DOMContentLoaded: signed in it fires once server
+  // state is in localStorage, signed out it fires immediately.
+  DJStore.ready(boot);
 
   window.STBGame = { showStats, closeStats, shareStats, showModal, closeModal };
 })();

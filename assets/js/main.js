@@ -353,6 +353,7 @@ function loadDailyGameState() {
 }
 function saveDailyGameState() {
   DJUtils.saveJSON('themedleDailyState', dailyGameState);
+  if (window.DJStore) DJStore.saveDaily(dailyGameState.completed);
 }
 
 // -------------------- UI Helpers --------------------
@@ -967,7 +968,9 @@ function boot() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', boot);
+// DJStore.ready replaces DOMContentLoaded: signed in it fires once server
+// state is in localStorage, signed out it fires immediately.
+DJStore.ready(boot);
 
 // Expose functions called from HTML onclick handlers
 window.closeStatsModal = closeStatsModal;
