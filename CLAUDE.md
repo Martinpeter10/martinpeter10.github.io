@@ -458,6 +458,17 @@ what stops a second device resurrecting it and makes a late offline write safe t
 **Nothing merges.** On first sign-in the player starts at base values; local chips are discarded
 because an imported stack can be whatever devtools says. This is deliberate and one-way.
 
+**Chip games** (BlackJackdle, Roulettedle, Holdle) keep their stack in `progress.chips` and the
+daily bonus in `progress.bonus_day`. Chips are written immediately rather than debounced - only a
+handful happen per session and losing one loses real winnings. `loadChips()` in each game already
+falls back to `STARTING_CHIPS` when the key is absent, which is what makes reset-to-base on first
+sign-in work without touching game code.
+
+**The daily bonus was farmable** and is not any more for signed-in players: it was gated on
+`XX_bonus_date` in localStorage, so clearing site data re-granted it indefinitely. Server-side it
+is once per day. Signed-out players can still farm it - the only real fix there is requiring an
+account, which we deliberately do not.
+
 **Sign-out clears adopted state.** `DJStore.clearLocal()` drops every tracked daily/chips/bonus
 key. Without it a shared computer keeps reporting "already played today" to the next person and
 shows them someone else's board. Lifetime local stats (`cl_stats_v2` and friends) are deliberately

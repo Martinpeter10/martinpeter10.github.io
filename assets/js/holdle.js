@@ -93,6 +93,8 @@ const HDGame = (function () {
       aiIndexes:  todayAIs.map(a => a.def.id),
       aiChips:    todayAIs.map(a => a.chips),
     }));
+
+    if (window.DJStore) DJStore.saveDaily(dailyDone);
   }
 
   function loadChips() {
@@ -102,7 +104,13 @@ const HDGame = (function () {
     } catch {}
     return STARTING_CHIPS;
   }
-  function saveChips() { localStorage.setItem('hd_chips', JSON.stringify(chips)); }
+  function saveChips() {
+    localStorage.setItem('hd_chips', JSON.stringify(chips));
+    // Chips are the progression that has to survive a device change.
+    // Written immediately rather than debounced - only a handful of
+    // these happen per session and losing one loses real winnings.
+    if (window.DJStore) DJStore.save({ chips: chips });
+  }
 
   function loadAllTime() {
     try { return JSON.parse(localStorage.getItem('hd_alltime_v2')) || { biggestWin:0, biggestLoss:0, totalNet:0 }; }
@@ -1948,6 +1956,7 @@ const HDGame = (function () {
     chips += bonus;
     saveChips();
     localStorage.setItem('hd_bonus_date', chicagoDate());
+    if (window.DJStore) DJStore.save({ bonusDay: chicagoDate() });
 
     const bonusEl    = $('hd-bonus-amount');
     const newStackEl = $('hd-new-stack');
@@ -2064,6 +2073,7 @@ const HDGame = (function () {
       }
     } else {
       localStorage.setItem('hd_bonus_date', chicagoDate());
+    if (window.DJStore) DJStore.save({ bonusDay: chicagoDate() });
       if (isFirstVisit) {
         updateChipDisplay();
         showBetting();
@@ -2121,7 +2131,10 @@ const HDGame = (function () {
     });
   }
 
-  document.addEventListener('DOMContentLoaded', init);
+  // DJStore.ready replaces DOMContentLoaded. Signed in it fires once the
+  // account's chips and today's state have been written into localStorage,
+  // so loadChips()/loadToday() below read server truth without changing.
+  DJStore.ready(init);
 
   return { showModal, closeModal, showStats, closeStats, shareResults, shareBrokeResults, shareStats, showGuide, closeGuide };
 })();

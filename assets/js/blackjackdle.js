@@ -72,6 +72,8 @@ const BJGame = (function () {
       results: sessionResults,
       done: dailyDone
     }));
+
+    if (window.DJStore) DJStore.saveDaily(dailyDone);
   }
 
   function loadChips() {
@@ -81,7 +83,13 @@ const BJGame = (function () {
     } catch {}
     return STARTING_CHIPS;
   }
-  function saveChips() { localStorage.setItem('bj_chips', JSON.stringify(chips)); }
+  function saveChips() {
+    localStorage.setItem('bj_chips', JSON.stringify(chips));
+    // Chips are the progression that has to survive a device change.
+    // Written immediately rather than debounced - only a handful of
+    // these happen per session and losing one loses real winnings.
+    if (window.DJStore) DJStore.save({ chips: chips });
+  }
 
   function loadAllTime() {
     try { return JSON.parse(localStorage.getItem('bj_alltime_v2')) || { biggestWin: 0, biggestLoss: 0, totalNet: 0 }; }
@@ -892,6 +900,7 @@ const BJGame = (function () {
 
     // Record that we gave the bonus today
     localStorage.setItem('bj_bonus_date', chicagoDate());
+    if (window.DJStore) DJStore.save({ bonusDay: chicagoDate() });
 
     $('bj-bonus-amount').textContent = '+' + bonus;
     $('bj-new-stack').textContent = chips.toLocaleString();
@@ -967,6 +976,7 @@ const BJGame = (function () {
       if (isFirstEverVisit) {
         // First ever visit: give starting chips, show How to Play
         localStorage.setItem('bj_bonus_date', chicagoDate());
+    if (window.DJStore) DJStore.save({ bonusDay: chicagoDate() });
         updateChipDisplay();
         showBetting();
         showModal();
@@ -1051,7 +1061,10 @@ const BJGame = (function () {
     if (modal) modal.classList.add('hidden');
   }
 
-  document.addEventListener('DOMContentLoaded', init);
+  // DJStore.ready replaces DOMContentLoaded. Signed in it fires once the
+  // account's chips and today's state have been written into localStorage,
+  // so loadChips()/loadToday() below read server truth without changing.
+  DJStore.ready(init);
 
   return { closeModal, showModal, shareResults, shareBrokeResults, shareStats, showStats, closeStats };
 })();

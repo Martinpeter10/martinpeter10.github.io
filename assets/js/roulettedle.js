@@ -74,6 +74,8 @@ const RLGame = (function () {
       results: sessionResults,
       done: dailyDone
     }));
+
+    if (window.DJStore) DJStore.saveDaily(dailyDone);
   }
 
   function loadChips() {
@@ -83,7 +85,13 @@ const RLGame = (function () {
     } catch {}
     return STARTING_CHIPS;
   }
-  function saveChips() { localStorage.setItem('rl_chips', JSON.stringify(chips)); }
+  function saveChips() {
+    localStorage.setItem('rl_chips', JSON.stringify(chips));
+    // Chips are the progression that has to survive a device change.
+    // Written immediately rather than debounced - only a handful of
+    // these happen per session and losing one loses real winnings.
+    if (window.DJStore) DJStore.save({ chips: chips });
+  }
 
   /* ── Pocket helpers ── */
   function pocketColor(pocket) {
@@ -796,6 +804,7 @@ const RLGame = (function () {
     chips += bonus;
     saveChips();
     localStorage.setItem('rl_bonus_date', chicagoDate());
+    if (window.DJStore) DJStore.save({ bonusDay: chicagoDate() });
 
     $('rl-bonus-amount').textContent = '+' + bonus;
     $('rl-new-stack').textContent    = chips.toLocaleString();
@@ -850,6 +859,7 @@ const RLGame = (function () {
       // Fresh start for the day
       if (isFirstVisit) {
         localStorage.setItem('rl_bonus_date', chicagoDate());
+    if (window.DJStore) DJStore.save({ bonusDay: chicagoDate() });
         updateChipDisplay();
         updateSpinIndicator();
         showModal();
@@ -892,7 +902,10 @@ const RLGame = (function () {
     });
   }
 
-  document.addEventListener('DOMContentLoaded', init);
+  // DJStore.ready replaces DOMContentLoaded. Signed in it fires once the
+  // account's chips and today's state have been written into localStorage,
+  // so loadChips()/loadToday() below read server truth without changing.
+  DJStore.ready(init);
 
   return { closeModal, showModal, shareResults, shareBrokeResults, showHistory, closeHistory };
 })();
