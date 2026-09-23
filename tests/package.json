@@ -1,0 +1,11 @@
+{
+  "name": "dailyjamm-tests",
+  "private": true,
+  "description": "Browser tests. Not part of the site - excluded from both builds.",
+  "scripts": {
+    "test": "node smoke.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.63.0"
+  }
+}

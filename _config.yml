@@ -13,6 +13,7 @@ exclude:
   - server.py          # local dev server
   - wrangler.jsonc     # Cloudflare worker config
   - supabase           # migrations + Edge Functions (backend, never served)
+  - tests              # browser tests + node_modules, never served
   - .assetsignore
   - .claude
 

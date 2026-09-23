@@ -4,3 +4,6 @@
 
 # Claude Code local settings/worktrees
 .claude/
+
+# Browser test deps (reinstall with: cd tests && npm install)
+tests/node_modules/
