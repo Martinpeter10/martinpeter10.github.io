@@ -1,284 +1,320 @@
-// DailyJamm leaderboards page. Only loaded by /leaderboards/.
+// DailyJamm leaderboards page.
 //
-// Every board comes from one backend function, get_game_board(game, metric,
-// limit). What differs per game is which metrics are worth bragging about, and
-// that lives in BOARDS below.
+// THE PAGE'S JOB: show the player their own stats per game and where those put
+// them against everyone else. It is not a "who won today" board - that is one
+// of three periods, and not the default.
 //
-// Metric names:
-//   today            today's result, direction from the game's own scoring
-//   best             personal best, direction from the game's own scoring
-//   best_streak      longest run of consecutive days
-//   played           days played
-//   extras:<key>     a counter the game reports, always high to low
+// A global period filter (Daily / Weekly / Lifetime, defaulting to Lifetime)
+// applies to the whole page. One call paints it: get_period_summary(period)
+// returns a row per game with the player's own numbers AND their rank for each.
+// The top-N list for a single stat is fetched only when a card is expanded.
+//
+// Signed out there are no "my stats", so the cards show the leading players
+// instead and the page says plainly what signing in adds.
 window.DJBoards = (function () {
   'use strict';
 
-  // Order matches the home page. First board in each list is the default tab.
-  var GAMES = [
-    { id: 'themedle',     name: 'Themedle',     url: '/themedle/' },
-    { id: 'chainlink',    name: 'Chain Link',   url: '/chainlink/' },
-    { id: 'spelldle',     name: 'Spelldle',     url: '/spelldle/' },
-    { id: 'blackjackdle', name: 'BlackJackdle', url: '/blackjackdle/' },
-    { id: 'roulettedle',  name: 'Roulettedle',  url: '/roulettedle/' },
-    { id: 'holdle',       name: 'Holdle',       url: '/holdle/' },
-    { id: 'liarsdice',    name: "Liar's Dice",  url: '/liarsdice/' },
-    { id: 'netzero',      name: 'Net Zero',     url: '/netzero/' },
-    { id: 'shutthebox',   name: 'Shut the Box', url: '/shutthebox/' },
-    { id: 'yachtdle',     name: 'Yachtdle',     url: '/yachtdle/' }
+  var PERIODS = [
+    ['lifetime', 'Lifetime'],
+    ['weekly',   'This week'],
+    ['daily',    'Today']
   ];
+  var DEFAULT_PERIOD = 'lifetime';
+  var STORE_KEY = 'dj_board_period';
 
-  var CHIPS = [
-    ['today',                'Today'],
-    ['extras:chips_now',     'Chip stack'],
-    ['extras:biggest_win',   'Biggest day'],
-    ['best_streak',          'Streak'],
-    ['played',               'Days']
-  ];
-
-  var GUESSING = [
-    ['today',       'Today'],
-    ['best_streak', 'Streak'],
-    ['played',      'Days']
-  ];
-
-  var BOARDS = {
-    themedle:     GUESSING,
-    spelldle:     GUESSING,
-    chainlink: [
-      ['today',                  'Today'],
-      ['best',                   'Best score'],
-      ['extras:perfect_total',   'Perfect games'],
-      ['best_streak',            'Streak'],
-      ['played',                 'Days']
-    ],
-    blackjackdle: CHIPS,
-    roulettedle:  CHIPS,
-    holdle:       CHIPS,
-    liarsdice: [
-      ['today',                    'Today'],
-      ['extras:table_wins_total',  'Tables won'],
-      ['best_streak',              'Streak'],
-      ['played',                   'Days']
-    ],
-    netzero: [
-      ['today',                'Today'],
-      ['extras:pure_total',    'Perfect zeros'],
-      ['best_streak',          'Streak'],
-      ['played',               'Days']
-    ],
-    shutthebox: [
-      ['today',              'Today'],
-      ['best',               'Best round'],
-      ['extras:shut_total',  'Boxes shut'],
-      ['best_streak',        'Streak'],
-      ['played',             'Days']
-    ],
-    yachtdle: [
-      ['today',                 'Today'],
-      ['best',                  'High score'],
-      ['extras:yachts_total',   'Yachts'],
-      ['best_streak',           'Streak'],
-      ['played',                'Days']
-    ]
+  var GAME_URL = {
+    themedle: '/themedle/', chainlink: '/chainlink/', spelldle: '/spelldle/',
+    blackjackdle: '/blackjackdle/', roulettedle: '/roulettedle/', holdle: '/holdle/',
+    liarsdice: '/liarsdice/', netzero: '/netzero/', shutthebox: '/shutthebox/',
+    yachtdle: '/yachtdle/'
   };
 
-  // What an empty board should say. "No scores yet" reads like a fault on a
-  // board that simply resets every night.
-  var EMPTY = {
-    today: 'Nobody has played today yet.',
-    best:  'No results yet.'
+  // Point-in-time extras, shown on lifetime only - a chip stack has no
+  // "this week" value.
+  var LIFETIME_EXTRA = {
+    blackjackdle: ['chips_now', 'Chip stack'],
+    roulettedle:  ['chips_now', 'Chip stack'],
+    holdle:       ['chips_now', 'Chip stack'],
+    yachtdle:     ['yachts_total', 'Yachts rolled']
   };
+
+  var period = DEFAULT_PERIOD;
+  var signedIn = false;
 
   function $(id) { return document.getElementById(id); }
 
   function make(tag, cls, txt) {
     var n = document.createElement(tag);
     if (cls) n.className = cls;
-    if (txt != null) n.textContent = txt;   // always textContent for player data
+    if (txt != null) n.textContent = txt;   // player data is never innerHTML
     return n;
   }
 
-  function fmt(v, metric) {
+  function num(v) {
     var n = Number(v);
-    if (!isFinite(n)) return String(v);
-    // Session net reads better signed.
-    if (metric === 'today' && /^(blackjackdle|roulettedle|holdle)$/.test(fmt.game || '')) {
-      return (n > 0 ? '+' : '') + n.toLocaleString();
-    }
-    return n.toLocaleString();
+    return isFinite(n) ? n.toLocaleString() : '-';
   }
 
-  // ── One game card ────────────────────────────────────────────────────────
+  function signed(v) {
+    var n = Number(v);
+    if (!isFinite(n)) return '-';
+    return (n > 0 ? '+' : '') + n.toLocaleString();
+  }
 
-  function buildCard(game) {
-    var boards = BOARDS[game.id] || GUESSING;
+  function isChipGame(id) {
+    return id === 'blackjackdle' || id === 'roulettedle' || id === 'holdle';
+  }
 
-    var card = make('section', 'lb-card');
+  function periodWord() {
+    if (period === 'daily') return 'today';
+    if (period === 'weekly') return 'this week';
+    return 'all time';
+  }
 
-    var head = make('div', 'lb-card-head');
-    var h = make('h2');
-    var link = make('a', null, game.name);
-    link.href = game.url;
-    h.appendChild(link);
-    head.appendChild(h);
-    var today = make('span', 'lb-today-count');
-    today.id = 'lb-today-' + game.id;
-    head.appendChild(today);
-    card.appendChild(head);
+  // ── Period filter ────────────────────────────────────────────────────────
 
-    var tabs = make('div', 'lb-tabs');
-    tabs.setAttribute('role', 'tablist');
-    boards.forEach(function (b, i) {
-      var t = make('button', 'lb-tab' + (i === 0 ? ' is-on' : ''), b[1]);
-      t.type = 'button';
-      t.setAttribute('role', 'tab');
-      t.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
-      t.addEventListener('click', function () {
-        Array.prototype.forEach.call(tabs.children, function (o) {
-          o.classList.remove('is-on');
-          o.setAttribute('aria-selected', 'false');
-        });
-        t.classList.add('is-on');
-        t.setAttribute('aria-selected', 'true');
-        load(game, b[0], body);
+  function readPeriod() {
+    try {
+      var v = localStorage.getItem(STORE_KEY);
+      return PERIODS.some(function (p) { return p[0] === v; }) ? v : DEFAULT_PERIOD;
+    } catch (e) { return DEFAULT_PERIOD; }
+  }
+
+  function writePeriod(v) {
+    try { localStorage.setItem(STORE_KEY, v); } catch (e) {}
+  }
+
+  function buildFilter() {
+    var host = $('lb-filter');
+    if (!host) return;
+    host.textContent = '';
+    host.setAttribute('role', 'tablist');
+    PERIODS.forEach(function (p) {
+      var b = make('button', 'lb-period' + (p[0] === period ? ' is-on' : ''), p[1]);
+      b.type = 'button';
+      b.setAttribute('role', 'tab');
+      b.setAttribute('aria-selected', p[0] === period ? 'true' : 'false');
+      b.addEventListener('click', function () {
+        if (period === p[0]) return;
+        period = p[0];
+        writePeriod(period);
+        buildFilter();
+        load();
       });
-      tabs.appendChild(t);
+      host.appendChild(b);
     });
-    card.appendChild(tabs);
-
-    var body = make('div', 'lb-body');
-    body.appendChild(make('p', 'lb-msg', 'Loading...'));
-    card.appendChild(body);
-
-    load(game, boards[0][0], body);
-    return card;
   }
 
-  function load(game, metric, body) {
-    body.textContent = '';
-    body.appendChild(make('p', 'lb-msg', 'Loading...'));
+  // ── A stat row: my value, and where that puts me ─────────────────────────
+
+  function statRow(label, value, rank, players, metric, game) {
+    var row = make('div', 'lb-stat');
+    row.appendChild(make('span', 'lb-stat-label', label));
+    row.appendChild(make('span', 'lb-stat-val', value));
+
+    var r = make('span', 'lb-stat-rank');
+    if (rank != null && players) {
+      r.textContent = '#' + rank;
+      r.title = 'Rank ' + rank + ' of ' + players + ' players';
+      if (Number(rank) === 1) r.classList.add('is-first');
+    } else {
+      r.textContent = '';
+    }
+    row.appendChild(r);
+
+    if (metric) {
+      var b = make('button', 'lb-stat-see', 'board');
+      b.type = 'button';
+      b.setAttribute('aria-label', 'See the ' + label + ' board for ' + game.label);
+      b.addEventListener('click', function () { toggleBoard(game, metric, label, row); });
+      row.appendChild(b);
+    } else {
+      row.appendChild(make('span', 'lb-stat-see-spacer'));
+    }
+    return row;
+  }
+
+  function toggleBoard(game, metric, label, afterEl) {
+    var existing = afterEl.nextSibling;
+    if (existing && existing.classList && existing.classList.contains('lb-inline-board')) {
+      existing.remove();
+      return;
+    }
+    var box = make('div', 'lb-inline-board');
+    box.appendChild(make('p', 'lb-msg', 'Loading ' + label.toLowerCase() + '...'));
+    afterEl.parentNode.insertBefore(box, afterEl.nextSibling);
 
     if (!window.DJAccount || !DJAccount.board) {
-      body.textContent = '';
-      body.appendChild(make('p', 'lb-msg', 'Leaderboards are unavailable right now.'));
+      box.textContent = '';
+      box.appendChild(make('p', 'lb-msg', 'Boards are unavailable right now.'));
       return;
     }
 
-    DJAccount.board(game.id, metric, 10).then(function (rows) {
-      body.textContent = '';
+    DJAccount.board(game.game, metric, 10, period).then(function (rows) {
+      box.textContent = '';
       if (!rows || !rows.length) {
-        body.appendChild(make('p', 'lb-msg', EMPTY[metric] || 'Nobody has made this board yet.'));
+        box.appendChild(make('p', 'lb-msg', 'Nobody has made this board ' + periodWord() + ' yet.'));
         return;
       }
-      fmt.game = game.id;
       var ol = make('ol', 'lb-list');
       rows.forEach(function (r) {
         var li = make('li', 'lb-row' + (r.is_me ? ' is-me' : ''));
         li.appendChild(make('span', 'lb-rank', r.rank));
         li.appendChild(make('span', 'lb-name', r.username));
-        li.appendChild(make('span', 'lb-val', fmt(r.value, metric)));
+        var v = (metric === 'best' && isChipGame(game.game)) ? signed(r.value) : num(r.value);
+        li.appendChild(make('span', 'lb-val', v));
         ol.appendChild(li);
       });
-      body.appendChild(ol);
+      box.appendChild(ol);
     }).catch(function () {
-      body.textContent = '';
-      body.appendChild(make('p', 'lb-msg', 'Could not load this board.'));
+      box.textContent = '';
+      box.appendChild(make('p', 'lb-msg', 'Could not load this board.'));
     });
+  }
+
+  // ── A game card ──────────────────────────────────────────────────────────
+
+  function gameCard(g) {
+    var card = make('section', 'lb-card');
+
+    var head = make('div', 'lb-card-head');
+    var h = make('h2');
+    var link = make('a', null, g.label);
+    link.href = GAME_URL[g.game] || '/';
+    h.appendChild(link);
+    head.appendChild(h);
+    var pc = make('span', 'lb-players');
+    pc.textContent = g.players ? g.players + (g.players === 1 ? ' player' : ' players') : 'no players yet';
+    head.appendChild(pc);
+    card.appendChild(head);
+
+    var body = make('div', 'lb-stats');
+
+    if (!signedIn) {
+      // No "my stats" to show. Lead with who is ahead instead.
+      body.appendChild(make('p', 'lb-msg',
+        g.players ? 'Sign in to see how you compare.' : 'Nobody has played ' + periodWord() + ' yet.'));
+      if (g.players) {
+        var btn = make('button', 'lb-stat-see', 'see the board');
+        btn.type = 'button';
+        btn.addEventListener('click', function () { toggleBoard(g, 'played', 'Days played', body); });
+        body.appendChild(btn);
+      }
+      card.appendChild(body);
+      return card;
+    }
+
+    if (!g.my_played) {
+      body.appendChild(make('p', 'lb-msg',
+        period === 'lifetime' ? 'You have not played this one yet.'
+                              : 'You have not played this one ' + periodWord() + '.'));
+      card.appendChild(body);
+      return card;
+    }
+
+    var playedLabel = period === 'daily' ? 'Played today' : 'Days played';
+    body.appendChild(statRow(playedLabel, num(g.my_played), g.rank_played, g.players, 'played', g));
+
+    if (g.my_best != null) {
+      var bestLabel = period === 'lifetime' ? 'Best ' + (g.score_label || 'score').toLowerCase()
+                                            : (g.score_label || 'Score');
+      var bestVal = isChipGame(g.game) ? signed(g.my_best) : num(g.my_best);
+      body.appendChild(statRow(bestLabel, bestVal, g.rank_best, g.players, 'best', g));
+    }
+
+    if (g.notable_label) {
+      body.appendChild(statRow(g.notable_label, num(g.my_notable), g.rank_notable, g.players, 'notable', g));
+    }
+
+    // Streaks are a lifetime property - there is no "streak this week".
+    if (period === 'lifetime' && g.my_best_streak != null) {
+      body.appendChild(statRow('Current streak', num(g.my_cur_streak), null, null, 'cur_streak', g));
+      body.appendChild(statRow('Best streak', num(g.my_best_streak), null, null, 'best_streak', g));
+    }
+
+    // Point-in-time extras, lifetime only.
+    if (period === 'lifetime' && LIFETIME_EXTRA[g.game]) {
+      var ex = LIFETIME_EXTRA[g.game];
+      body.appendChild(statRow(ex[1], '-', null, null, 'extras:' + ex[0], g));
+    }
+
+    card.appendChild(body);
+    return card;
   }
 
   // ── Page ─────────────────────────────────────────────────────────────────
 
-  function siteStats() {
-    if (!window.DJAccount || !DJAccount.siteStats) return;
-    DJAccount.siteStats().then(function (d) {
-      if (!d) return;
-      $('lb-players').textContent = Number(d.players || 0).toLocaleString();
-      $('lb-games').textContent   = Number(d.games_played || 0).toLocaleString();
-      $('lb-today').textContent   = Number(d.played_today || 0).toLocaleString();
-      $('lb-site').hidden = false;
+  function paintTotals(rows) {
+    var played = 0, games = 0;
+    rows.forEach(function (r) {
+      played += Number(r.my_played || 0);
+      if (r.my_played) games++;
+    });
+    var el = $('lb-mine');
+    if (!el) return;
+    if (!signedIn || !played) { el.hidden = true; return; }
 
-      var per = d.per_game || {};
-      GAMES.forEach(function (g) {
-        var el = $('lb-today-' + g.id);
-        if (!el) return;
-        var n = Number(per[g.id] || 0);
-        el.textContent = n ? n + (n === 1 ? ' played today' : ' played today') : '';
-      });
-    }).catch(function () { /* the boards are the point; totals are decoration */ });
+    var who = (window.DJAccount && DJAccount.username && DJAccount.username()) || 'You';
+    $('lb-mine-title').textContent = who;
+    $('lb-mine-sub').textContent =
+      played.toLocaleString() + (played === 1 ? ' result ' : ' results ') +
+      periodWord() + ' across ' + games + (games === 1 ? ' game' : ' games');
+    el.hidden = false;
   }
 
-  // What a player wants when they are not top of anything: their own numbers.
-  var MINE_EXTRA = {
-    chainlink:    ['perfect_total',   'perfect'],
-    yachtdle:     ['yachts_total',    'Yachts'],
-    shutthebox:   ['shut_total',      'boxes shut'],
-    netzero:      ['pure_total',      'perfect zeros'],
-    liarsdice:    ['table_wins_total','tables won'],
-    blackjackdle: ['chips_now',       'chips'],
-    roulettedle:  ['chips_now',       'chips'],
-    holdle:       ['chips_now',       'chips']
-  };
+  function load() {
+    var grid = $('lb-grid');
+    if (!grid) return;
+    grid.textContent = '';
+    grid.appendChild(make('p', 'lb-msg', 'Loading...'));
 
-  function myPanel() {
-    if (!window.DJAccount || !DJAccount.myStats) return;
-    DJAccount.myStats().then(function (rows) {
-      if (!rows || !rows.length) return;
-      var byGame = {};
-      rows.forEach(function (r) { byGame[r.game] = r; });
-
-      var host = $('lb-mine');
-      var grid = $('lb-mine-grid');
-      if (!host || !grid) return;
+    if (!window.DJAccount || !DJAccount.rpc) {
       grid.textContent = '';
+      grid.appendChild(make('p', 'lb-msg', 'Leaderboards are unavailable right now.'));
+      return;
+    }
 
-      var totalPlayed = 0;
-      GAMES.forEach(function (g) {
-        var r = byGame[g.id];
-        if (!r || !r.played) return;
-        totalPlayed += r.played;
-
-        var cell = make('div', 'lb-mine-cell');
-        cell.appendChild(make('span', 'lb-mine-game', g.name));
-
-        var bits = [r.played + (r.played === 1 ? ' day' : ' days')];
-        if (r.cur_streak > 1) bits.push(r.cur_streak + ' day streak');
-        else if (r.best_streak > 1) bits.push('best ' + r.best_streak);
-
-        var ex = MINE_EXTRA[g.id];
-        if (ex && r.extras && r.extras[ex[0]] != null) {
-          bits.push(Number(r.extras[ex[0]]).toLocaleString() + ' ' + ex[1]);
-        }
-        cell.appendChild(make('span', 'lb-mine-bits', bits.join(' · ')));
-        grid.appendChild(cell);
-      });
-
-      if (!totalPlayed) return;
-      var who = DJAccount.username ? DJAccount.username() : null;
-      $('lb-mine-title').textContent = who ? who + "'s games" : 'Your games';
-      host.hidden = false;
-    }).catch(function () { /* the boards still stand on their own */ });
+    DJAccount.rpc('get_period_summary', { p_period: period }).then(function (res) {
+      if (res && res.error) throw res.error;
+      var rows = res.data || [];
+      grid.textContent = '';
+      if (!rows.length) {
+        grid.appendChild(make('p', 'lb-msg', 'No games are set up yet.'));
+        return;
+      }
+      rows.forEach(function (g) { grid.appendChild(gameCard(g)); });
+      paintTotals(rows);
+    }).catch(function (err) {
+      if (window.console && console.warn) console.warn('[DJBoards] summary failed:', err);
+      grid.textContent = '';
+      grid.appendChild(make('p', 'lb-msg', 'Could not load your stats. Try again shortly.'));
+    });
   }
 
   function signInPrompt() {
-    // account.js resolves its session asynchronously, so ask a moment later
-    // rather than racing it and telling a signed-in player to sign in.
-    setTimeout(function () {
-      if (window.DJAccount && DJAccount.isReady && DJAccount.isReady()) return;
-      var el = $('lb-signedout');
-      if (!el) return;
-      el.hidden = false;
-      var btn = $('lb-signin');
-      if (btn) btn.addEventListener('click', function () { DJAccount.open(); });
-    }, 1200);
+    var el = $('lb-signedout');
+    if (!el) return;
+    el.hidden = signedIn;
+    var btn = $('lb-signin');
+    if (btn && !btn.dataset.wired) {
+      btn.dataset.wired = '1';
+      btn.addEventListener('click', function () { if (window.DJAccount) DJAccount.open(); });
+    }
   }
 
   function boot() {
-    var grid = $('lb-grid');
-    if (!grid) return;
-    GAMES.forEach(function (g) { grid.appendChild(buildCard(g)); });
-    siteStats();
-    myPanel();
-    signInPrompt();
+    period = readPeriod();
+    buildFilter();
+
+    // account.js settles the session asynchronously; wait for it rather than
+    // painting a signed-out page to someone who is signed in.
+    function go() {
+      signedIn = !!(window.DJAccount && DJAccount.isReady && DJAccount.isReady());
+      signInPrompt();
+      load();
+    }
+    if (window.DJAccount && DJAccount.whenResolved) DJAccount.whenResolved(go);
+    else setTimeout(go, 1200);
   }
 
   if (document.readyState === 'loading') {
@@ -287,5 +323,8 @@ window.DJBoards = (function () {
     boot();
   }
 
-  return { games: GAMES, boards: BOARDS };
+  return {
+    period: function () { return period; },
+    reload: load
+  };
 })();

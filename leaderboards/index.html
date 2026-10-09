@@ -8,7 +8,7 @@
   <meta name="robots" content="index,follow">
   <link rel="canonical" href="https://dailyjamm.com/leaderboards/" />
   <link rel="icon" type="image/png" href="/assets/img/favicon.png">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=20260922p">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=20261009">
 
   <!-- Open Graph -->
   <meta property="og:site_name" content="DailyJamm" />
@@ -65,14 +65,14 @@
     footer a { color: #6b7280; }
     footer a:hover { color: #fff; }
   </style>
-  <script src="/assets/js/menu.js?v=20260922p" defer></script>
-  <script src="/assets/js/favorites.js?v=20260922p" defer></script>
-  <script src="/assets/js/vendor/supabase.js?v=20260922p" defer></script>
-  <script src="/assets/js/dj-config.js?v=20260922p" defer></script>
-  <script src="/assets/js/account.js?v=20260922p" defer></script>
-  <script src="/assets/js/store.js?v=20260922p" defer></script>
-  <script src="/assets/js/notify.js?v=20260922p" defer></script>
-  <script src="/assets/js/leaderboards.js?v=20260922p" defer></script>
+  <script src="/assets/js/menu.js?v=20261009" defer></script>
+  <script src="/assets/js/favorites.js?v=20261009" defer></script>
+  <script src="/assets/js/vendor/supabase.js?v=20261009" defer></script>
+  <script src="/assets/js/dj-config.js?v=20261009" defer></script>
+  <script src="/assets/js/account.js?v=20261009" defer></script>
+  <script src="/assets/js/store.js?v=20261009" defer></script>
+  <script src="/assets/js/notify.js?v=20261009" defer></script>
+  <script src="/assets/js/leaderboards.js?v=20261009" defer></script>
 </head>
 <body>
 
@@ -138,27 +138,23 @@
   <main class="lb-main">
     <a href="/" class="lb-back">&larr; Back to DailyJamm</a>
     <h1>Leaderboards</h1>
-    <p class="lb-lede">Every game, every board. Sign in and your results start appearing the next time you play.</p>
+    <p class="lb-lede">Your stats for every game, and how they stack up against everyone else playing.</p>
 
-    <div class="lb-site" id="lb-site" hidden>
-      <div class="lb-site-stat"><b id="lb-players">-</b><span>players</span></div>
-      <div class="lb-site-stat"><b id="lb-games">-</b><span>games played</span></div>
-      <div class="lb-site-stat"><b id="lb-today">-</b><span>played today</span></div>
-    </div>
-
-    <div class="lb-cta" id="lb-signedout" hidden>
-      <p>You are not signed in, so you will not appear on these boards.</p>
-      <button type="button" id="lb-signin">Sign in to join</button>
-    </div>
+    <div class="lb-filter" id="lb-filter"></div>
 
     <section class="lb-mine" id="lb-mine" hidden>
-      <h2 id="lb-mine-title">Your games</h2>
-      <div class="lb-mine-grid" id="lb-mine-grid"></div>
+      <h2 id="lb-mine-title">You</h2>
+      <p id="lb-mine-sub"></p>
     </section>
+
+    <div class="lb-cta" id="lb-signedout" hidden>
+      <p>Sign in to track your stats and see where you rank.</p>
+      <button type="button" id="lb-signin">Sign in</button>
+    </div>
 
     <div id="lb-grid" class="lb-grid"></div>
 
-    <p class="lb-foot">Daily boards reset at midnight Chicago time. Stats imported from a browser before you had an account are shown on your profile but never ranked here.</p>
+    <p class="lb-foot">Today resets at midnight Chicago time; this week covers the last seven days. Streaks and chip stacks are lifetime figures, so they do not change with the filter. Stats imported from a browser before you had an account are never ranked.</p>
   </main>
 
 </body>

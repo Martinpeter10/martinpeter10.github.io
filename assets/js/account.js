@@ -558,12 +558,25 @@ window.DJAccount = (function () {
 
   // ── Leaderboard reads ────────────────────────────────────────────────────
 
-  function board(game, metric, limit) {
+  /**
+   * One board. Metrics are played | best | notable | total | cur_streak |
+   * best_streak | extras:<key>. Period is daily | weekly | lifetime, and is
+   * ignored for streaks and extras, which have no windowed form.
+   */
+  function board(game, metric, limit, period) {
     if (!client) return Promise.resolve([]);
     return client.rpc('get_game_board', {
-      p_game: game, p_metric: metric || 'today', p_limit: limit || 10
-    }).then(function (res) { return res.error ? [] : (res.data || []); })
-      .catch(function () { return []; });
+      p_game: game,
+      p_metric: metric || 'played',
+      p_limit: limit || 10,
+      p_period: period || 'lifetime'
+    }).then(function (res) {
+      if (res.error) {
+        if (window.console && console.warn) console.warn('[DJAccount] board failed:', res.error);
+        return [];
+      }
+      return res.data || [];
+    }).catch(function () { return []; });
   }
 
   /** The signed-in player's own row for every game they have played. */

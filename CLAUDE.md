@@ -498,10 +498,35 @@ button and the bell. `menu.js` runs before `account.js` and `notify.js`, so appe
 produces the intended header order: **stats → help → trophy → bell → account**. The button
 hides itself on `/leaderboards/` rather than linking the page to itself.
 
-**One backend function serves every board**: `get_game_board(game, metric, limit)`. Metrics are
-`today`, `best`, `best_streak`, `cur_streak`, `played`, `total_score`, or `extras:<key>`. What
-differs per game is only which metrics are worth showing, and that lives in `BOARDS` in
-`leaderboards.js`. Adding a board is a line of config, not a query.
+**The page's job is "my stats, and how I compare" - not "who won today".** A global period filter
+(Daily / This week / **Lifetime, the default**) applies to the whole page. One call paints it:
+`get_period_summary(period)` returns a row per game with the player's own numbers AND their rank
+for each stat. A top-N list is fetched only when a stat's `board` button is pressed.
+
+**Everything is computed from `scores`, not `game_stats`** - same shape for all three periods, and
+imported stats never created score rows so they are excluded automatically rather than by a flag.
+
+**Not every stat has all three periods, and the page must not pretend otherwise:**
+
+| Stat | Daily | Weekly | Lifetime |
+|---|---|---|---|
+| Days played, best, notable count | yes | yes | yes |
+| Current / best streak | - | - | yes |
+| Chip stack, Yachts rolled (`extras`) | - | - | yes |
+
+Streaks are not a window, and a chip stack is a point-in-time value. Both are lifetime-only and
+are simply absent from the other periods.
+
+**"Notable" is per-game and derived from the score**, via `notable_op` / `notable_value` /
+`notable_label` on `game_defs` - an operator plus a value, so nothing executable lives in a data
+column. That is what lets "perfect games" or "tables won" be counted for *this week* rather than
+lifetime-only. **Yachtdle is the exception**: a Yacht is 50 points inside a 375 total, so it cannot
+be derived from the score. Its countable brag is `score >= 250`; Yachts rolled stays a lifetime
+figure from `extras`.
+
+**`get_game_board(game, metric, limit, period)`** serves one board. Metrics: `played`, `best`,
+`notable`, `total`, `cur_streak`, `best_streak`, `extras:<key>`. Period is ignored for streaks and
+extras - they have no windowed form.
 
 **`game_stats.extras` is a jsonb bag** of per-game counters, merged by key suffix in
 `submit_score`:
