@@ -301,15 +301,8 @@ window.DJBoards = (function () {
       // otherwise outrank a long honest record forever.
       if (g.my_avg != null) {
         var avgVal = isChipGame(g.game) ? signed(Math.round(g.my_avg)) : avg(g.my_avg);
-        var row = statRow(AVG_LABEL[g.game] || 'Average',
-          avgVal, g.rank_avg, g.avg_players, 'avg', g);
-        if (g.rank_avg == null && g.my_played < g.min_games) {
-          row.querySelector('.lb-stat-rank').textContent = g.my_played + '/' + g.min_games;
-          row.querySelector('.lb-stat-rank').title =
-            'Ranked once you have ' + g.min_games + ' results';
-          row.querySelector('.lb-stat-rank').classList.add('is-pending');
-        }
-        body.appendChild(row);
+        body.appendChild(statRow(AVG_LABEL[g.game] || 'Average',
+          avgVal, g.rank_avg, g.avg_players, 'avg', g));
       }
 
       // The best stays as a personal milestone. It is only RANKED for games
@@ -351,20 +344,12 @@ window.DJBoards = (function () {
   // ── Page ─────────────────────────────────────────────────────────────────
 
   function paintTotals(rows) {
-    var played = 0, games = 0;
-    rows.forEach(function (r) {
-      played += Number(r.my_played || 0);
-      if (r.my_played) games++;
-    });
     var el = $('lb-mine');
     if (!el) return;
-    if (!signedIn || !played) { el.hidden = true; return; }
-
-    var who = (window.DJAccount && DJAccount.username && DJAccount.username()) || 'You';
-    $('lb-mine-title').textContent = who;
-    $('lb-mine-sub').textContent =
-      played.toLocaleString() + (played === 1 ? ' result ' : ' results ') +
-      periodWord() + ' across ' + games + (games === 1 ? ' game' : ' games');
+    if (!signedIn) { el.hidden = true; return; }
+    // Just the name. Every number it used to summarise is on the cards below.
+    $('lb-mine-title').textContent =
+      (window.DJAccount && DJAccount.username && DJAccount.username()) || 'You';
     el.hidden = false;
   }
 

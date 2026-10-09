@@ -2696,9 +2696,8 @@ input[type=range].slider::-moz-range-thumb {
 .lb-period.is-on{background:linear-gradient(135deg,#45b7d1,#2ecc71);color:#06231a;border-color:transparent}
 .lb-period:focus-visible{outline:2px solid #45b7d1;outline-offset:2px}
 
-.lb-mine{background:linear-gradient(135deg,rgba(69,183,209,.1),rgba(46,204,113,.08));border:1px solid rgba(46,204,113,.28);border-radius:14px;padding:.9rem 1.1rem;margin-bottom:1.25rem}
+.lb-mine{background:linear-gradient(135deg,rgba(69,183,209,.1),rgba(46,204,113,.08));border:1px solid rgba(46,204,113,.28);border-radius:14px;padding:.6rem 1.1rem;margin-bottom:1.25rem}
 .lb-mine h2{margin:0;font-size:1.05rem;font-weight:800;color:#2ecc71}
-.lb-mine p{margin:.15rem 0 0;font-size:.82rem;color:#9fb8c8;font-variant-numeric:tabular-nums}
 
 .lb-cta{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;border:1px solid rgba(69,183,209,.35);background:rgba(69,183,209,.08);border-radius:12px;padding:.85rem 1.1rem;margin-bottom:1.25rem}
 .lb-cta p{margin:0;font-size:.88rem;color:#b8b8d1}
@@ -2772,6 +2771,3 @@ input[type=range].slider::-moz-range-thumb {
 .dj-store-spin{width:15px;height:15px;border-radius:999px;border:2px solid rgba(255,255,255,.2);border-top-color:#2ecc71;animation:dj-store-spin .7s linear infinite}
 @keyframes dj-store-spin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.dj-store-spin{animation-duration:2s}}
-/* An average not yet ranked shows progress toward the minimum instead of a
-   position, so "no rank" does not read as "broken". */
-.lb-stat-rank.is-pending{color:#7b7b96;background:none;border-style:dashed;font-size:.62rem}
