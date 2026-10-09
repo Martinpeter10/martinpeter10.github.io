@@ -7,3 +7,4 @@
 
 # Browser test deps (reinstall with: cd tests && npm install)
 tests/node_modules/
+tests/.node/

@@ -1,0 +1,69 @@
+# Keep the Supabase projects from being paused for inactivity.
+#
+# WHY THIS IS NOT OPTIONAL
+# Free-tier projects pause after 7 days with no DATABASE activity. A paused
+# project is completely unreachable - it answers nothing and does NOT wake on
+# request. It has to be restored by hand from the dashboard, which took about
+# two and a half minutes when it happened.
+#
+# The trap is specific to how DailyJamm works: every game is free to play
+# without an account, so a signed-out player generates ZERO database activity.
+# The site can be busy for a week while the database sees nothing, and then
+# accounts and leaderboards are dead for the first person who tries to sign in.
+# account.js degrades quietly - the button simply disappears - so nobody would
+# report it.
+#
+# Both projects were found paused 17 days after setup, which is exactly this.
+#
+# No secrets needed: these are the publishable keys, which already ship in
+# every page of the site by design.
+name: Supabase keepalive
+
+on:
+  schedule:
+    - cron: '17 9 * * *'     # daily, 09:17 UTC
+  workflow_dispatch:          # and on demand
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping every project and schema
+        run: |
+          # Right after a restore, PostgREST returns 503 PGRST002 while it
+          # rebuilds its schema cache. That is a warming project, not a dead
+          # one, so retry rather than failing the run.
+          ping() {
+            local label="$1" url="$2" key="$3" profile="$4"
+            for attempt in 1 2 3 4 5 6; do
+              if [ -n "$profile" ]; then
+                code=$(curl -s -o /tmp/out.json -w '%{http_code}' --max-time 30 \
+                  -X POST "$url/rest/v1/rpc/get_site_stats" \
+                  -H "apikey: $key" -H "Content-Profile: $profile" \
+                  -H 'content-type: application/json' -d '{}')
+              else
+                code=$(curl -s -o /tmp/out.json -w '%{http_code}' --max-time 30 \
+                  -X POST "$url/rest/v1/rpc/get_site_stats" \
+                  -H "apikey: $key" -H 'content-type: application/json' -d '{}')
+              fi
+              if [ "$code" = "200" ]; then
+                echo "$label ok: $(cat /tmp/out.json)"
+                return 0
+              fi
+              echo "$label attempt $attempt got $code: $(cat /tmp/out.json)"
+              sleep 20
+            done
+            echo "::error::$label never answered - the project is probably paused and needs a manual restore"
+            return 1
+          }
+
+          PROD=https://desvghzavijzffjhqshe.supabase.co
+          PROD_KEY=sb_publishable_L_z-FQxvwOUcy4JVeuPT7A_OLUicuiY
+          NP=https://uyvozabvhhaqhypnquzd.supabase.co
+          NP_KEY=sb_publishable_F9mTPasPg_nUDirR-9OZLw_3Rh988g2
+
+          fail=0
+          ping "prod/public"   "$PROD" "$PROD_KEY" ""        || fail=1
+          ping "nonprod/tst"   "$NP"   "$NP_KEY"   app_tst   || fail=1
+          ping "nonprod/dev"   "$NP"   "$NP_KEY"   app_dev   || fail=1
+          exit $fail
