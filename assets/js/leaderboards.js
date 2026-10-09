@@ -29,6 +29,28 @@ window.DJBoards = (function () {
     yachtdle: '/yachtdle/'
   };
 
+  // How to name a player's BEST result, per game. Built mechanically from
+  // game_defs.score_label this produced "Best guesses", "Best tiles left" and
+  // "Best distance from zero" - nonsense for every lower-is-better game, which
+  // is half of them. These are display phrasing, so they live here rather than
+  // in the database: adding a column to get_period_summary's result would
+  // change its return type, and Postgres only allows that after a DROP.
+  //
+  // score_label stays the name of the measurement and is what the Daily row
+  // uses, because a single day's result is not a "best" of anything.
+  var BEST_LABEL = {
+    themedle:     'Fewest guesses',
+    chainlink:    'Best score',
+    spelldle:     'Fewest guesses',
+    blackjackdle: 'Best day',
+    roulettedle:  'Best day',
+    holdle:       'Best day',
+    liarsdice:    'Most outlasted',
+    netzero:      'Closest to zero',
+    shutthebox:   'Fewest tiles left',
+    yachtdle:     'High score'
+  };
+
   // Point-in-time extras, shown on lifetime only - a chip stack has no
   // "this week" value.
   var LIFETIME_EXTRA = {
@@ -244,8 +266,11 @@ window.DJBoards = (function () {
     body.appendChild(statRow(playedLabel, num(g.my_played), g.rank_played, g.players, 'played', g));
 
     if (g.my_best != null) {
-      var bestLabel = period === 'lifetime' ? 'Best ' + (g.score_label || 'score').toLowerCase()
-                                            : (g.score_label || 'Score');
+      // Today's row is a single result, not a best - name the measurement.
+      // Weekly and lifetime are genuinely a best within the window.
+      var bestLabel = period === 'daily'
+        ? (g.score_label || 'Score')
+        : (BEST_LABEL[g.game] || 'Best ' + (g.score_label || 'score').toLowerCase());
       var bestVal = isChipGame(g.game) ? signed(g.my_best) : num(g.my_best);
       body.appendChild(statRow(bestLabel, bestVal, g.rank_best, g.players, 'best', g));
     }
