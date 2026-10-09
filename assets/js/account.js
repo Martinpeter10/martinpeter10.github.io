@@ -210,21 +210,6 @@ window.DJAccount = (function () {
     fb.appendChild(btn);
     w.appendChild(fb);
 
-    // An always-visible way through, because GIS has a failure mode that
-    // cannot be detected from here: if the page's origin is missing from the
-    // client's Authorized JavaScript origins, renderButton SUCCEEDS and the
-    // button simply does nothing when clicked - the complaint is logged by
-    // Google's own script, asynchronously, and the click happens inside a
-    // cross-origin iframe we cannot observe. Without this link that state is
-    // an account modal with no way to sign in and no error. Deliberately a
-    // quiet link rather than a second button, so it does not compete with the
-    // Google one on the happy path.
-    var alt = make('button', 'dj-acct-alt');
-    alt.id = 'dj-acct-alt';
-    alt.type = 'button';
-    alt.textContent = 'Having trouble? Use the standard sign-in';
-    alt.addEventListener('click', doSignIn);
-    w.appendChild(alt);
 
     var err = make('p', 'dj-acct-msg');
     err.id = 'dj-acct-msg';
@@ -542,13 +527,52 @@ window.DJAccount = (function () {
     });
   }
 
+  /**
+   * Reveal the redirect button. Only ever called when GIS has actually failed,
+   * so on the happy path there is exactly ONE way to sign in - an earlier
+   * version showed a permanent "having trouble?" link beside Google's button,
+   * which meant two sign-in affordances where the quiet one led to the badly
+   * branded consent screen.
+   */
   function showFallback() {
     var fb = document.getElementById('dj-acct-fallback');
     if (fb) fb.hidden = false;
-    // The full button says the same thing as the quiet link, so drop the link
-    // rather than offer the same route twice.
-    var alt = document.getElementById('dj-acct-alt');
-    if (alt) alt.hidden = true;
+  }
+
+  /**
+   * Turn GIS's one undetectable failure into a detectable one.
+   *
+   * If the page's origin is missing from the client's Authorized JavaScript
+   * origins, `renderButton` SUCCEEDS and the button does nothing when clicked:
+   * the click lands in a cross-origin iframe and Google reports the problem
+   * only by logging it, asynchronously, from its own script. Watching for that
+   * log is what lets the fallback stay hidden until it is needed.
+   *
+   * Best effort by nature - it matches on Google's wording, so a reword would
+   * silence it. `tests/gis.mjs` is the real guard: it fails the build for an
+   * unregistered origin rather than relying on this. Always chains to the
+   * original console.error, so nothing is swallowed.
+   */
+  function watchGsiErrors() {
+    try {
+      if (!window.console || typeof console.error !== 'function') return;
+      if (console.error.djWrapped) return;
+      var orig = console.error;
+      var wrapped = function () {
+        try {
+          var first = arguments[0];
+          if (typeof first === 'string' &&
+              first.indexOf('GSI_LOGGER') !== -1 &&
+              /origin is not allowed/i.test(first)) {
+            setMsg('This site is not set up with Google yet. Use the button below.', 'bad');
+            showFallback();
+          }
+        } catch (e) { /* never let logging break sign-in */ }
+        return orig.apply(console, arguments);
+      };
+      wrapped.djWrapped = true;
+      console.error = wrapped;
+    } catch (e) {}
   }
 
   /**
@@ -563,6 +587,7 @@ window.DJAccount = (function () {
     var cid = window.DJConfig && DJConfig.googleClientId;
     if (!cid) { showFallback(); return; }
     gsiMounted = true;
+    watchGsiErrors();
 
     loadGsi(function (ok) {
       gsiMounted = false;

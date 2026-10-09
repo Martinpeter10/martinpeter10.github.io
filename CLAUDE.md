@@ -709,12 +709,20 @@ returns the session in the URL fragment; false breaks it silently), and every or
 the Supabase redirect allowlist with a `/**` wildcard - players sign in from game pages, not just
 the root.
 
-**The failure mode that forced an always-visible escape hatch**: if the page's origin is missing
-from the client's **Authorized JavaScript origins**, `renderButton` *succeeds* and the button does
-nothing when clicked. Google logs it from its own script, asynchronously, and the click lands in a
-cross-origin iframe - nothing in `account.js` can observe either. So there is a quiet, always-shown
-"Having trouble?" link running the redirect path. **Do not make it conditional**; the condition is
-exactly what cannot be detected.
+**The one failure mode GIS does not report**: if the page's origin is missing from the client's
+**Authorized JavaScript origins**, `renderButton` *succeeds* and the button does nothing when
+clicked. The click lands in a cross-origin iframe, and Google reports it only by logging it,
+asynchronously, from its own script.
+
+This first shipped as a permanent "Having trouble?" link beside Google's button - which meant
+**two sign-in affordances, where the quiet one led to the badly branded consent screen**, the exact
+thing the whole change was meant to remove. `watchGsiErrors()` now wraps `console.error` and
+watches for Google's own log line, so the redirect button stays hidden until GIS has really
+failed. It always chains to the original `console.error`, so nothing is swallowed.
+
+That sniff matches on Google's wording and would go quiet if they reworded it, so it is a
+convenience, not the guarantee. **`tests/gis.mjs` is the guarantee** - it fails on an unregistered
+origin, and asserts there is exactly one sign-in affordance on the happy path.
 
 **Authorized JavaScript origins must list every environment**: `https://dailyjamm.com`,
 `https://www.dailyjamm.com`, `https://tst.dailyjamm.com`, `https://dev.dailyjamm.com`, both

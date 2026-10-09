@@ -13,9 +13,12 @@
 //   - no CSP violation anywhere (GSI injects a stylesheet into the PARENT
 //     document, which the first version of the CSP blocked; the button still
 //     appeared, so it looked fine)
-//   - the quiet fallback link is present, because GIS has a failure mode this
-//     page cannot detect: a missing Authorized JavaScript origin makes
-//     renderButton succeed and the button do nothing
+//   - there is exactly ONE sign-in affordance. A missing Authorized JavaScript
+//     origin makes renderButton succeed and the button do nothing, which once
+//     justified a permanent "having trouble?" link beside Google's button -
+//     two buttons, where the quiet one led to the badly branded consent
+//     screen. account.js now watches for Google's own log line instead, and
+//     this test is the real guard.
 //
 // "origin is not allowed for the given client ID" is reported as PENDING, not
 // as a failure: it means the code is right and the Google console still needs
@@ -80,7 +83,13 @@ const r = await p.evaluate(() => {
     iframe: !!(slot && slot.querySelector('iframe')),
     height: slot ? Math.round(slot.getBoundingClientRect().height) : -1,
     fallbackShown: !!(fb && !fb.hidden),
-    altShown: !!(alt && !alt.hidden && alt.offsetParent !== null),
+    altExists: !!alt,
+    // Anything the player could read as "sign in with Google". Google's own
+    // button is an iframe and has no text, so it is counted separately.
+    googleWordedControls: [].slice.call(document.querySelectorAll('#dj-acct-body button'))
+      .filter(function (el) {
+        return el.offsetParent !== null && /sign in with google/i.test(el.textContent || '');
+      }).length,
     gsi: !!(window.google && window.google.accounts && window.google.accounts.id),
   };
 });
@@ -89,8 +98,11 @@ check("Google's library loaded", r.gsi === true);
 check('the button slot exists', r.slot === true);
 check('renderButton put an iframe in it', r.iframe === true, JSON.stringify(r));
 check('the slot has real height', r.height >= 30, `height=${r.height}`);
-check('the quiet fallback link is reachable', r.altShown === true, JSON.stringify(r));
 check('the full fallback button stays hidden while GIS works', r.fallbackShown === false);
+check('the old permanent "having trouble" link is gone', r.altExists === false);
+check('exactly one sign-in affordance (Google\'s iframe, nothing else)',
+  r.iframe === true && r.googleWordedControls === 0,
+  `iframe=${r.iframe} extraButtons=${r.googleWordedControls}`);
 check('no unexpected CSP violations', csp.length === 0, csp.slice(0, 2).join(' | '));
 check('no page errors', errs.length === 0, errs.slice(0, 2).join(' | '));
 

@@ -205,6 +205,7 @@ Full release notes are also available at [dailyjamm.com/releases](https://dailyj
 - **Your stats follow you too.** Every game's stats screen - games played, win rate, streaks, best scores, head-to-head records - now lives on your account. Sign in on a new phone and your history is already there. The first time you sign in, whatever that browser had already recorded becomes your account's history, so nothing is lost.
 - **A bell in the header** appears when there is a release you have not seen, and links here. When there is nothing new it stays out of the way.
 - Privacy Policy and Terms of Service updated to explain what an account stores, what is public, and how to have your account deleted.
+- New contact address for questions and feedback: **dailyjammcontactus@gmail.com**, on the About, Privacy and Terms pages.
 
 **Spelldle fixes**
 
