@@ -107,6 +107,12 @@ window.DJBoards = (function () {
 
   // ── A stat row: my value, and where that puts me ─────────────────────────
 
+  // Static markup, never interpolated.
+  var CHEVRON =
+    '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" ' +
+    'stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+    '<path d="M6 9l6 6 6-6"/></svg>';
+
   function statRow(label, value, rank, players, metric, game) {
     var row = make('div', 'lb-stat');
     row.appendChild(make('span', 'lb-stat-label', label));
@@ -123,10 +129,12 @@ window.DJBoards = (function () {
     row.appendChild(r);
 
     if (metric) {
-      var b = make('button', 'lb-stat-see', 'board');
+      var b = make('button', 'lb-stat-see');
       b.type = 'button';
-      b.setAttribute('aria-label', 'See the ' + label + ' board for ' + game.label);
-      b.addEventListener('click', function () { toggleBoard(game, metric, label, row); });
+      b.innerHTML = CHEVRON;                       // static string
+      b.setAttribute('aria-expanded', 'false');
+      b.setAttribute('aria-label', 'Show the top players for ' + label + ' in ' + game.label);
+      b.addEventListener('click', function () { toggleBoard(game, metric, label, row, b); });
       row.appendChild(b);
     } else {
       row.appendChild(make('span', 'lb-stat-see-spacer'));
@@ -134,12 +142,20 @@ window.DJBoards = (function () {
     return row;
   }
 
-  function toggleBoard(game, metric, label, afterEl) {
+  function toggleBoard(game, metric, label, afterEl, btn) {
+    function setOpen(open) {
+      if (!btn) return;
+      btn.classList.toggle('is-open', open);
+      btn.setAttribute('aria-expanded', String(open));
+    }
+
     var existing = afterEl.nextSibling;
     if (existing && existing.classList && existing.classList.contains('lb-inline-board')) {
       existing.remove();
+      setOpen(false);
       return;
     }
+    setOpen(true);
     var box = make('div', 'lb-inline-board');
     box.appendChild(make('p', 'lb-msg', 'Loading ' + label.toLowerCase() + '...'));
     afterEl.parentNode.insertBefore(box, afterEl.nextSibling);
@@ -195,9 +211,9 @@ window.DJBoards = (function () {
       body.appendChild(make('p', 'lb-msg',
         g.players ? 'Sign in to see how you compare.' : 'Nobody has played ' + periodWord() + ' yet.'));
       if (g.players) {
-        var btn = make('button', 'lb-stat-see', 'see the board');
+        var btn = make('button', 'lb-see-top', 'See the top players');
         btn.type = 'button';
-        btn.addEventListener('click', function () { toggleBoard(g, 'played', 'Days played', body); });
+        btn.addEventListener('click', function () { toggleBoard(g, 'played', 'Days played', body, btn); });
         body.appendChild(btn);
       }
       card.appendChild(body);
