@@ -757,9 +757,22 @@ Loaded on **every page** (after `menu.js`, both `defer`). Exposes `window.DJFav 
 ```json
 { "id": 1, "name": "Acid Splash", "level": 0, "school": "Evocation", "castingTime": "action", "range": "medium", "components": "VS", "concentration": false, "ritual": false, "duration": "instant", "classes": ["sorcerer", "wizard"] }
 ```
-- **339 spells** (SRD 5.2), ids 1–339. Append new spells with the next sequential id.
+- **339 spells** (SRD 5.2, the 2024 rules), ids 1–339. Append new spells with the next sequential id.
+- **The list is confirmed 2024, not 2014**: it matches the 2024 SRD name-for-name, contains all 22
+  spells that exist only in 2024 (Elementalism, Sorcerous Burst, Chromatic Orb, Hex, ...) and
+  neither of the two dropped in 2024 (Branding Smite, Feeblemind). So `Produce Flame`, `Jump`,
+  `Barkskin` and `Lesser Restoration` being bonus actions is CORRECT - do not "fix" them against
+  a 2014 source.
+- **Audit against a 2024 source, and not open5e for casting times**: open5e's v2 `casting_time`
+  clamps anything over an hour to `1hour`, which would silently corrupt Awaken (8 hours) and
+  Hallow (24 hours). `dnd5eapi.co/api/2024/spells/<slug>` is correct.
 - `school`: Title Case (e.g. `"Evocation"`)
-- `castingTime`: `"action"` | `"bonus"` | `"reaction"`
+- `castingTime`: a **tier**, shortest to longest - `"reaction"` | `"bonus"` | `"action"` | `"1min"` |
+  `"10min"` | `"1hour"` | `"8hours"` | `"12hours"` | `"24hours"`. It was originally just the first
+  three, which forced all 55 spells that really take minutes or hours to be stored as an action -
+  a reader reported Create Undead and was right. Compared like Range and Duration: exact tier is
+  green, adjacent is yellow with an arrow. **Plant Growth** is the only dual-mode spell
+  ("Action or 8 hours") and is stored as `action`, its combat mode.
 - `range`: tier string — `"self"` | `"touch"` | `"short"` | `"medium"` | `"long"` | `"special"`
 - `components`: uppercase concatenated string — `"V"` | `"S"` | `"VS"` | `"VSM"` etc.
 - `duration`: tier string — `"instant"` | `"round"` | `"minute"` | `"10min"` | `"hour"` | `"8hours"` | `"day"` | `"permanent"`
@@ -772,7 +785,7 @@ Loaded on **every page** (after `menu.js`, both `defer`). Exposes `window.DJFav 
 |---|---|---|---|
 | Level | Exact | Within ±2 (arrow) | >2 off (arrow) |
 | School | Exact | — | Wrong |
-| Casting Time | Exact | — | Wrong |
+| Casting Time | Exact tier | Adjacent tier (arrow) | >1 tier off (arrow) |
 | Range | Exact tier | Adjacent tier (arrow) | >1 tier off (arrow) |
 | Components | Exact | ≥1 letter in common | No overlap |
 | Concentration | Exact | — | Wrong |

@@ -13,7 +13,15 @@
   const LEVEL_LABELS = ['Cantrip','1st','2nd','3rd','4th','5th','6th','7th','8th','9th'];
   const RANGE_LABELS    = { self:'Self', touch:'Touch', short:'30 ft', medium:'60-120 ft', long:'150+ ft', special:'Special' };
   const DURATION_LABELS = { instant:'Instant', round:'1 Round', minute:'1 Min', '10min':'10 Min', hour:'1 Hour', '8hours':'8 Hours', day:'24 Hours', permanent:'Permanent' };
-  const CASTING_LABELS  = { action:'Action', bonus:'Bonus', reaction:'Reaction', minute:'1+ Min' };
+  // Casting time is a tiered scale, shortest to longest, compared the same way
+  // as Range and Duration: exact = green, one tier off = yellow with an arrow.
+  // Before this it was three values with exact-match only, which forced every
+  // spell that really takes minutes or hours to be stored as an Action - 55 of
+  // them. A reader spotted Create Undead and was right.
+  const CASTING_TIERS  = ['reaction', 'bonus', 'action', '1min', '10min', '1hour', '8hours', '12hours', '24hours'];
+  const CASTING_LABELS = { reaction:'Reaction', bonus:'Bonus', action:'Action', '1min':'1 Min',
+                           '10min':'10 Min', '1hour':'1 Hour', '8hours':'8 Hours',
+                           '12hours':'12 Hours', '24hours':'24 Hours' };
   const CLASS_ABBREVS   = { bard:'Brd', cleric:'Clr', druid:'Drd', paladin:'Pal', ranger:'Rgr', sorcerer:'Sor', warlock:'Wlk', wizard:'Wiz' };
   const SCHOOL_ABBREVS  = { Abjuration:'Abj', Conjuration:'Conj', Divination:'Div', Enchantment:'Ench', Evocation:'Evoc', Illusion:'Illus', Necromancy:'Necro', Transmutation:'Trans' };
 
@@ -173,12 +181,25 @@
       display: SCHOOL_ABBREVS[guess.school] || guess.school,
     });
 
-    // Casting time: green=exact, red=wrong
-    results.push({
-      attr: 'castingTime', arrow: null,
-      status:  guess.castingTime === ans.castingTime ? 'green' : 'red',
-      display: CASTING_LABELS[guess.castingTime] || guess.castingTime,
-    });
+    // Casting time: green=exact, yellow=adjacent tier with arrow, red=>1 off
+    (function () {
+      const gi = CASTING_TIERS.indexOf(guess.castingTime);
+      const ai = CASTING_TIERS.indexOf(ans.castingTime);
+      let status, arrow = null;
+      if (gi === ai) {
+        status = 'green';
+      } else if (Math.abs(gi - ai) === 1) {
+        status = 'yellow';
+        arrow  = ai > gi ? '↑' : '↓';
+      } else {
+        status = 'red';
+        arrow  = ai > gi ? '↑' : '↓';
+      }
+      results.push({
+        attr: 'castingTime', status: status, arrow: arrow,
+        display: CASTING_LABELS[guess.castingTime] || guess.castingTime,
+      });
+    })();
 
     // Range: green=exact, yellow=adjacent tier with arrow, red=>1 tier off
     (function () {
