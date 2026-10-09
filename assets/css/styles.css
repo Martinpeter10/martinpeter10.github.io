@@ -2696,8 +2696,9 @@ input[type=range].slider::-moz-range-thumb {
 .lb-period.is-on{background:linear-gradient(135deg,#45b7d1,#2ecc71);color:#06231a;border-color:transparent}
 .lb-period:focus-visible{outline:2px solid #45b7d1;outline-offset:2px}
 
-.lb-mine{background:linear-gradient(135deg,rgba(69,183,209,.1),rgba(46,204,113,.08));border:1px solid rgba(46,204,113,.28);border-radius:14px;padding:.6rem 1.1rem;margin-bottom:1.25rem}
-.lb-mine h2{margin:0;font-size:1.05rem;font-weight:800;color:#2ecc71}
+/* Just the name. A panel around a single word was more chrome than content. */
+.lb-mine{margin:-.5rem 0 1.1rem}
+.lb-mine h2{margin:0;font-size:.9rem;font-weight:800;color:#2ecc71;letter-spacing:-.01em}
 
 .lb-cta{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;border:1px solid rgba(69,183,209,.35);background:rgba(69,183,209,.08);border-radius:12px;padding:.85rem 1.1rem;margin-bottom:1.25rem}
 .lb-cta p{margin:0;font-size:.88rem;color:#b8b8d1}
