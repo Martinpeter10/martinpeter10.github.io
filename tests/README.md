@@ -126,6 +126,28 @@ capped every control at 95px from the right edge and reported 14 failures
 against a correctly aligned header - with four buttons the leftmost is ~116px
 in by construction.
 
+## gis.mjs - the Google sign-in button renders
+
+```sh
+node gis.mjs
+node gis.mjs --base https://tst.dailyjamm.com
+```
+
+Sign-in itself cannot be driven (Google blocks automation - that is why
+`session.mjs` mints a JWT). Everything up to the click can be, and that is
+where the bugs were: the library loading past the CSP, `renderButton` putting
+its iframe in the slot, no CSP violation anywhere, and the fallback link being
+present.
+
+The CSP one is worth knowing about: GSI injects `/gsi/style` into the **parent**
+document, so a `style-src` without `accounts.google.com` blocks it - and the
+button still appears, because that part is an iframe with its own CSP. The
+thing you look at works.
+
+A missing **Authorized JavaScript origin** is reported as **PENDING**, not a
+failure. It means the code is right and the Google console needs that
+environment's hostname.
+
 ## play.mjs - the original single-game script
 
 ```sh

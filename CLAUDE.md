@@ -658,9 +658,10 @@ An unrecognised host falls through to dev on purpose, so it can never touch prod
 that default is a safety net, not a mapping. Matching only the workers.dev form once sent
 `tst.dailyjamm.com` to the dev schema, so the test site was writing playtest scores into dev data.
 
-**Three places match hostnames and must stay in sync**: `dj-config.js`, the `ORIGIN_SCHEMA` /
-`ORIGIN_PREFIX` maps in `supabase/functions/username/index.ts`, and the Supabase redirect
-allowlist (Auth → URL Configuration) which needs `/**` on every entry.
+**Four places match hostnames and must stay in sync**: `dj-config.js`, the `ORIGIN_SCHEMA` /
+`ORIGIN_PREFIX` maps in `supabase/functions/username/index.ts`, the Supabase redirect
+allowlist (Auth → URL Configuration) which needs `/**` on every entry, and the **Authorized
+JavaScript origins** on the Google OAuth client.
 
 **`DJ_SCHEMAS` is a required Edge Function secret**, set per project:
 `public` on prod, `app_tst,app_dev` on nonprod. The function's origin map is shared by both
@@ -679,10 +680,55 @@ to a match key first. See `/supabase/README.md` for the test cases.
 
 **Identity is a Google account.** DailyJamm sends no email and stores no password, so there is
 no SMTP provider and no sending domain - the address arrives verified and unique from Google.
-`detectSessionInUrl` must stay **true** in `dj-config.js`: the OAuth round trip returns the
-session in the URL fragment, and setting it false breaks sign-in silently, with no error.
-`signInWithOAuth` uses `redirectTo: location.href`, so every origin must be on the Supabase
-redirect allowlist with a `/**` wildcard - players sign in from game pages, not just the root.
+
+**There are two sign-in paths, and that is deliberate.**
+
+**Primary: Google Identity Services.** `google.accounts.id.renderButton` delivers an ID token to a
+callback, which goes to `supabase.auth.signInWithIdToken`. Nothing redirects through
+`<project>.supabase.co`.
+
+**Why it is not `signInWithOAuth`**: the consent screen said *"continue to
+uyvozabvh....supabase.co"*. That is not a branding field left blank. Google shows an app's
+configured name only after **brand verification**, and verification requires proving ownership in
+Search Console of the top private domain of **every** redirect URI and JavaScript origin on
+**every** web client in the project. `signInWithOAuth` sends the browser to
+`<project>.supabase.co/auth/v1/callback`, so `supabase.co` is one of those domains and cannot be
+verified. **Setting the App name on its own does nothing** - that is why the earlier verification
+attempt failed. The paid alternative is a Supabase custom domain (a paid plan plus a ~$10/mo
+add-on, per project), which the no-cost constraint rules out.
+
+**`renderButton`, not One Tap.** One Tap suppresses itself after a few dismissals, which would
+leave a button that silently does nothing. A popup has no such rules. It must be Google's own
+button - `renderButton` is what produces the token, and restyling it breaks their branding terms.
+
+**`signInWithOAuth` is KEPT as a fallback and is not dead code.** GIS needs a third-party script, a
+popup and the credential APIs; a script blocker, a locked-down iOS profile or an embedded webview
+can each remove one. A player who cannot sign in at all is far worse than a consent screen with the
+wrong name. `detectSessionInUrl` must therefore stay **true** in `dj-config.js` (the round trip
+returns the session in the URL fragment; false breaks it silently), and every origin must stay on
+the Supabase redirect allowlist with a `/**` wildcard - players sign in from game pages, not just
+the root.
+
+**The failure mode that forced an always-visible escape hatch**: if the page's origin is missing
+from the client's **Authorized JavaScript origins**, `renderButton` *succeeds* and the button does
+nothing when clicked. Google logs it from its own script, asynchronously, and the click lands in a
+cross-origin iframe - nothing in `account.js` can observe either. So there is a quiet, always-shown
+"Having trouble?" link running the redirect path. **Do not make it conditional**; the condition is
+exactly what cannot be detected.
+
+**Authorized JavaScript origins must list every environment**: `https://dailyjamm.com`,
+`https://www.dailyjamm.com`, `https://tst.dailyjamm.com`, `https://dev.dailyjamm.com`, both
+`workers.dev` hosts, and `http://localhost:8080`. This is a **fourth** place that enumerates
+hostnames, alongside the three below.
+
+**CSP: GSI needs four allowances, and one of them is not obvious.** `script-src` and `connect-src`
+for `accounts.google.com`, a **`frame-src`** (new - `default-src 'self'` would otherwise block the
+button's iframe), and **`style-src`**, because GSI injects `/gsi/style` into the **parent**
+document, not just into its iframe. Missing `style-src` still renders the button, since that part
+is an iframe with its own CSP - the thing you look at works, which is what makes it ship.
+
+**`tests/gis.mjs`** checks everything up to the click and reports a missing origin as PENDING
+rather than a failure.
 
 **Playing is never gated.** Every game is free without an account; signing in buys saved scores,
 cross-device streaks, and a place on the leaderboards. The modal opens on its own in exactly one
@@ -704,6 +750,11 @@ to load, or the network is down, `account.js` removes its own button and every g
 working exactly as before. Never let an account failure break a game.
 
 **Public API** (`window.DJAccount`): `open`, `close`, `username()`, `isReady()`.
+
+**The Google client ID lives in `dj-config.js`** and is public by design - it identifies the app to
+Google and is meant to ship in the page. The client **secret** stays in the Supabase dashboard and
+must never appear here. One OAuth client serves both Supabase projects; what differs per
+environment is only the authorized origin, which lives on Google's side.
 
 ---
 
