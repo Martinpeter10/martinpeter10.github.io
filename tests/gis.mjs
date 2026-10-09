@@ -100,6 +100,9 @@ async function run(label, path) {
       gsi: !!(window.google && window.google.accounts && window.google.accounts.id),
       iframes: slot ? slot.querySelectorAll('iframe').length : -1,
       slotH: Math.round(box(slot).height),
+      // Must be 'normal': inheriting `color-scheme: dark` makes Google paint
+      // a white card behind the pill on our dark modal.
+      slotColorScheme: slot ? getComputedStyle(slot).colorScheme : 'no-el',
       fbDisplay: fb ? getComputedStyle(fb).display : 'no-el',
       fbRenderedH: Math.round(box(fb).height),
       visibleButtonText: visibleButtons.map((el) => (el.textContent || '').trim()),
@@ -115,6 +118,8 @@ async function run(label, path) {
     `display=${r.fbDisplay} height=${r.fbRenderedH}`);
   check(`${label}: no other visible button in the modal`,
     r.visibleButtonText.length === 0, JSON.stringify(r.visibleButtonText));
+  check(`${label}: button slot forces color-scheme normal`,
+    r.slotColorScheme === 'normal', `colorScheme=${r.slotColorScheme}`);
   check(`${label}: no unexpected CSP violations`, csp.length === 0, csp.slice(0, 2).join(' | '));
   check(`${label}: no page errors`, errs.length === 0, errs.slice(0, 2).join(' | '));
   console.log(`       (tailwind on this page: ${r.tailwind})`);

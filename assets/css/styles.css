@@ -2657,7 +2657,14 @@ input[type=range].slider::-moz-range-thumb {
    give it a width or a border - the button is Google's, and restyling it
    breaks their branding terms. Reserve the height so the modal does not jump
    when the script finishes loading. */
-.dj-gis-slot{display:flex;justify-content:center;align-items:center;min-height:44px}
+/* color-scheme MUST be normal here. index.html declares `color-scheme: dark`,
+   which an iframe inherits - and Google's button then paints a white card
+   behind the pill, so it reads as a white rectangle on our dark modal. Game
+   pages never showed it because they do not declare a colour scheme at all.
+   Forcing `normal` makes every page render the way the game pages did.
+   Google's own button is an iframe we cannot style inside, so this is the
+   only lever. */
+.dj-gis-slot{display:flex;justify-content:center;align-items:center;min-height:44px;color-scheme:normal}
 .dj-acct-alt{display:block;width:100%;margin:0;padding:.2rem 0;border:0;background:none;color:#8f8fa8;font-family:inherit;font-size:.74rem;text-decoration:underline;cursor:pointer}
 .dj-acct-alt:hover{color:#b8b8d1}
 .dj-acct-alt:focus-visible{outline:2px solid #45b7d1;outline-offset:2px}
