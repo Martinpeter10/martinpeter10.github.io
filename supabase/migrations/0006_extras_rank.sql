@@ -56,5 +56,8 @@ as $fn$
   order by d.sort_order;
 $fn$;
 
+-- Revoke from PUBLIC, not from anon. Functions are executable by PUBLIC by
+-- default and anon inherits that, so revoking from anon alone leaves the
+-- function wide open - which is exactly what happened on the first pass.
+revoke all on function get_my_lifetime() from public;
 grant execute on function get_my_lifetime() to authenticated;
-revoke all on function get_my_lifetime() from anon;
