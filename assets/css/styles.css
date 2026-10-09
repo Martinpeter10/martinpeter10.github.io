@@ -2772,3 +2772,6 @@ input[type=range].slider::-moz-range-thumb {
 .dj-store-spin{width:15px;height:15px;border-radius:999px;border:2px solid rgba(255,255,255,.2);border-top-color:#2ecc71;animation:dj-store-spin .7s linear infinite}
 @keyframes dj-store-spin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.dj-store-spin{animation-duration:2s}}
+/* An average not yet ranked shows progress toward the minimum instead of a
+   position, so "no rank" does not read as "broken". */
+.lb-stat-rank.is-pending{color:#7b7b96;background:none;border-style:dashed;font-size:.62rem}

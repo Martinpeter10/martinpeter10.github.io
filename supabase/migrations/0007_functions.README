@@ -1,0 +1,3 @@
+-- Companion to 0007_averages.sql: the two function bodies.
+-- Applied separately because a single statement of this size was refused.
+-- See get_summary_v2 and get_game_board as applied to app_dev.

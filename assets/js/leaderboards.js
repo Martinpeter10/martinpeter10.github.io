@@ -38,6 +38,23 @@ window.DJBoards = (function () {
   //
   // score_label stays the name of the measurement and is what the Daily row
   // uses, because a single day's result is not a "best" of anything.
+  // What the player's AVERAGE is called. This is the ranked comparison for any
+  // game whose best saturates - six of ten have a hard floor or ceiling that a
+  // good player reaches and never loses, which freezes a "best" board with
+  // everyone tied at first.
+  var AVG_LABEL = {
+    themedle:     'Average guesses',
+    chainlink:    'Average score',
+    spelldle:     'Average guesses',
+    blackjackdle: 'Average day',
+    roulettedle:  'Average day',
+    holdle:       'Average day',
+    liarsdice:    'Average outlasted',
+    netzero:      'Average distance',
+    shutthebox:   'Average tiles left',
+    yachtdle:     'Average score'
+  };
+
   var BEST_LABEL = {
     themedle:     'Fewest guesses',
     chainlink:    'Best score',
@@ -62,7 +79,6 @@ window.DJBoards = (function () {
 
   var period = DEFAULT_PERIOD;
   var signedIn = false;
-  var lifeByGame = {};      // from get_my_lifetime(), lifetime period only
 
   function $(id) { return document.getElementById(id); }
 
@@ -76,6 +92,14 @@ window.DJBoards = (function () {
   function num(v) {
     var n = Number(v);
     return isFinite(n) ? n.toLocaleString() : '-';
+  }
+
+  function avg(v) {
+    var n = Number(v);
+    if (!isFinite(n)) return '-';
+    // One decimal is enough to separate players without implying false
+    // precision from a handful of games.
+    return (Math.round(n * 10) / 10).toFixed(1);
   }
 
   function signed(v) {
@@ -265,14 +289,39 @@ window.DJBoards = (function () {
     var playedLabel = period === 'daily' ? 'Played today' : 'Days played';
     body.appendChild(statRow(playedLabel, num(g.my_played), g.rank_played, g.players, 'played', g));
 
-    if (g.my_best != null) {
-      // Today's row is a single result, not a best - name the measurement.
-      // Weekly and lifetime are genuinely a best within the window.
-      var bestLabel = period === 'daily'
-        ? (g.score_label || 'Score')
-        : (BEST_LABEL[g.game] || 'Best ' + (g.score_label || 'score').toLowerCase());
-      var bestVal = isChipGame(g.game) ? signed(g.my_best) : num(g.my_best);
-      body.appendChild(statRow(bestLabel, bestVal, g.rank_best, g.players, 'best', g));
+    if (period === 'daily') {
+      // A single day is one result. No average, no "best" of anything.
+      if (g.my_best != null) {
+        var dv = isChipGame(g.game) ? signed(g.my_best) : num(g.my_best);
+        body.appendChild(statRow(g.score_label || 'Score', dv, g.rank_best, g.players, 'best', g));
+      }
+    } else {
+      // The AVERAGE is the comparison that keeps working. It is ranked only
+      // once a player has min_games results - one lucky first day would
+      // otherwise outrank a long honest record forever.
+      if (g.my_avg != null) {
+        var avgVal = isChipGame(g.game) ? signed(Math.round(g.my_avg)) : avg(g.my_avg);
+        var row = statRow(AVG_LABEL[g.game] || 'Average',
+          avgVal, g.rank_avg, g.avg_players, 'avg', g);
+        if (g.rank_avg == null && g.my_played < g.min_games) {
+          row.querySelector('.lb-stat-rank').textContent = g.my_played + '/' + g.min_games;
+          row.querySelector('.lb-stat-rank').title =
+            'Ranked once you have ' + g.min_games + ' results';
+          row.querySelector('.lb-stat-rank').classList.add('is-pending');
+        }
+        body.appendChild(row);
+      }
+
+      // The best stays as a personal milestone. It is only RANKED for games
+      // where it does not saturate - an unbounded chip day, or a Yachtdle
+      // score. Elsewhere the rank column is deliberately blank.
+      if (g.my_best != null) {
+        var bestVal = isChipGame(g.game) ? signed(g.my_best) : num(g.my_best);
+        body.appendChild(statRow(BEST_LABEL[g.game] || 'Best',
+          bestVal, g.best_ranked ? g.rank_best : null,
+          g.best_ranked ? g.players : null,
+          g.best_ranked ? 'best' : null, g));
+      }
     }
 
     if (g.notable_label) {
@@ -283,19 +332,15 @@ window.DJBoards = (function () {
     // "streak this week" or "chip stack this week". Their values and ranks come
     // from get_my_lifetime(), which is why they are absent on the other periods.
     if (period === 'lifetime') {
-      var life = lifeByGame[g.game] || {};
-
       if (g.my_best_streak != null) {
         body.appendChild(statRow('Current streak', num(g.my_cur_streak), null, null, 'cur_streak', g));
         body.appendChild(statRow('Best streak', num(g.my_best_streak),
-          life.rank_streak, life.ranked_players, 'best_streak', g));
+          g.rank_streak, g.players, 'best_streak', g));
       }
-
-      if (life.extra_label && life.my_extra != null) {
+      if (g.extra_label && g.my_extra != null) {
         var ex = LIFETIME_EXTRA[g.game];
-        body.appendChild(statRow(life.extra_label, num(life.my_extra),
-          life.rank_extra, life.ranked_players,
-          ex ? 'extras:' + ex[0] : null, g));
+        body.appendChild(statRow(g.extra_label, num(g.my_extra),
+          g.rank_extra, g.players, ex ? 'extras:' + ex[0] : null, g));
       }
     }
 
@@ -335,21 +380,8 @@ window.DJBoards = (function () {
       return;
     }
 
-    // Lifetime needs a second small call for streak ranks and the point-in-time
-    // extras. It is skipped entirely on daily and weekly, where neither applies.
-    var wantLife = (period === 'lifetime' && signedIn && DJAccount.rpc);
-    var lifePromise = wantLife
-      ? DJAccount.rpc('get_my_lifetime').then(function (r) { return r.error ? [] : (r.data || []); })
-                 .catch(function () { return []; })
-      : Promise.resolve([]);
-
-    Promise.all([
-      DJAccount.rpc('get_period_summary', { p_period: period }),
-      lifePromise
-    ]).then(function (both) {
-      var res = both[0];
-      lifeByGame = {};
-      (both[1] || []).forEach(function (r) { lifeByGame[r.game] = r; });
+    // One call now carries everything, including the lifetime-only figures.
+    DJAccount.rpc('get_summary_v2', { p_period: period }).then(function (res) {
       if (res && res.error) throw res.error;
       var rows = res.data || [];
       grid.textContent = '';
