@@ -336,6 +336,7 @@
       if (shut) stats.shut++;
       if (stats.best === null || score < stats.best) stats.best = score;
       DJUtils.saveJSON(statsKey, stats);
+      if (window.DJStore) DJStore.saveStats();
       djSubmit(score, shut ? { shut_total: 1 } : {});
     }
     saveToday();

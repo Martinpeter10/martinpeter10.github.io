@@ -131,6 +131,7 @@
       s.guessDistribution[MAX_GUESSES] = (s.guessDistribution[MAX_GUESSES] || 0) + 1;
     }
     localStorage.setItem(STATS_KEY, JSON.stringify(s));
+    if (window.DJStore) DJStore.saveStats();
     djSubmit(won ? guesses.length : MAX_GUESSES + 1, won ? { wins_total: 1 } : {});
     return s;
   }

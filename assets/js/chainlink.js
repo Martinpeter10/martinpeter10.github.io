@@ -73,6 +73,7 @@
       s.streak = 0;
     }
     localStorage.setItem(STATS_KEY, JSON.stringify(s));
+    if (window.DJStore) DJStore.saveStats();
     djSubmit(score, score >= 20 ? { perfect_total: 1 } : {});
     return s;
   }

@@ -478,6 +478,7 @@
     stats.lastDate = today;
 
     DJUtils.saveJSON(statsKey, stats);
+    if (window.DJStore) DJStore.saveStats();
     djSubmit(total, {
       yachts_total:  scores.yacht ? 1 : 0,
       bonuses_total: bonusEarned() ? 1 : 0

@@ -55,7 +55,10 @@ const BJGame = (function () {
     }
   }
 
-  function saveStats(s) { DJUtils.saveJSON('bj_stats_v2', s); }
+  function saveStats(s) {
+    DJUtils.saveJSON('bj_stats_v2', s);
+    if (window.DJStore) DJStore.saveStats();
+  }
 
   function loadToday() {
     try {
@@ -101,6 +104,7 @@ const BJGame = (function () {
     if (net < 0 && net < a.biggestLoss) a.biggestLoss = net;
     a.totalNet += net;
     localStorage.setItem('bj_alltime_v2', JSON.stringify(a));
+    if (window.DJStore) DJStore.saveStats();
   }
 
   /* ── Deck ── */

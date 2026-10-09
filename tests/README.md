@@ -85,6 +85,47 @@ was stored", which looked like an app bug.
 fails with *"this test's puzzle rule has drifted from the game"* rather than
 the downstream symptom.
 
+## store-stats.mjs - cross-device stats, no credentials needed
+
+```sh
+node store-stats.mjs
+```
+
+The only suite here that needs neither a token nor a deploy. It loads
+`assets/js/store.js` into a `vm` context with stubbed `localStorage`,
+`document` and `DJAccount`, and asserts the stats contract: a second device
+hydrates the account's blob, a first sign-in seeds its history UP exactly once
+(`p_merge`), a stale or freshly installed device cannot overwrite the account,
+sign-out leaves nothing behind, consecutive writes coalesce into one round
+trip, and **every failure path still opens the gate**.
+
+Run it after touching `store.js`. Two `[DJStore]` warnings in the output are
+deliberate - the last cases make the RPC reject on purpose.
+
+## stats.mjs - the same contract, end to end
+
+```sh
+node stats.mjs
+node stats.mjs --only chainlink --headed
+```
+
+Needs `SB_TOKEN` and a dev deploy. Primes `localStorage` directly rather than
+playing a game (gameplay is `games.mjs`'s job) and checks the real round trip
+through `save_game_stats` / `get_game_state`, including the reported bug as a
+case: played on one device, signed in on another, stats must follow.
+
+## header.mjs - header controls stay right-aligned
+
+```sh
+node header.mjs
+```
+
+Asserts the invariant, not a distance: the rightmost control hugs the edge and
+the rest run right-to-left in order (account, bell, trophy). An earlier version
+capped every control at 95px from the right edge and reported 14 failures
+against a correctly aligned header - with four buttons the leftmost is ~116px
+in by construction.
+
 ## play.mjs - the original single-game script
 
 ```sh

@@ -449,14 +449,50 @@ from `boot()` including the `!window.DJConfig` early return. **If you add an ear
 `account.boot`, resolve first.**
 
 **Two tables, different lifetimes** (migration 0004). `game_state` is per day and expires;
-`progress` is cumulative and holds the chip stack. Conflating them is how a stack gets wiped by a
-date rollover.
+`progress` is cumulative and holds the chip stack and the lifetime stats blob. Conflating them is
+how a stack gets wiped by a date rollover.
 
 **`complete` is a one-way latch.** `save_game_state` refuses to reopen a finished day, which is
 what stops a second device resurrecting it and makes a late offline write safe to drop.
 
 **Nothing merges.** On first sign-in the player starts at base values; local chips are discarded
-because an imported stack can be whatever devtools says. This is deliberate and one-way.
+because an imported stack can be whatever devtools says. This is deliberate and one-way. Lifetime
+stats are the one exception - see below.
+
+**Each game's stats modal is account state too** (migration 0009, `progress.stats`). This was the
+hole: signing in adopted today's board, the chip stack and the daily bonus, but not the numbers in
+the bar-chart modal, so a player who played on a desktop and signed in on a phone was correctly
+told they had already played today and then shown an empty stats modal.
+
+The blob is **the stats key stored verbatim**, keyed by the real localStorage key:
+`{"hd_stats_v2": {...}, "hd_alltime_v2": {...}, "hd_ai_stats_v3": {...}}`. It is deliberately NOT
+mapped onto the `game_stats` columns - those hold one shape and the ten games keep ten (guess
+distributions, place arrays, per-opponent records, biggest loss, all-time net), so a mapping would
+mean ten translations and would still drop the fields with no column. Keying by the real key also
+means a stats-key version bump (`_v2` -> `_v3`) lands as a new entry and the stale one is simply
+never read, exactly as the localStorage convention already works.
+
+**It is a cache, never a ranking input.** Leaderboards read `scores` rows and the structured
+`game_stats` columns that `submit_score` computes server-side. A forged blob changes only what its
+own owner sees in their own modal - already true when it lived in localStorage.
+
+**Stats seed UP on first sign-in; everything else resets down.** `save_game_stats(..., p_merge =>
+true)` writes only when the account has no blob for that game, so a desktop's existing history
+becomes the account's rather than being thrown away, and a freshly installed phone cannot blank it
+with zeros because the server already has a row by then. Chips are discarded instead because an
+imported stack is unverifiable *winnings*; a games-played count is not a reward. After the seed the
+server wins with no merging, like everything else.
+
+**Why `save_game_stats` is its own function** and not another argument on `save_game_state`: an
+optional sixth parameter would leave two overloads whose named-argument calls overlap, and
+PostgREST answers that with `PGRST203` rather than picking one. Dropping the old signature was not
+an option either - `DROP` is refused through the MCP tooling.
+
+**Each game calls `DJStore.saveStats()` right after writing its stats key** - 15 call sites across
+the ten games, because some write two or three keys (Holdle writes session stats, all-time net and
+the head-to-head record). `saveStats()` is debounced only 400ms, enough to coalesce those
+consecutive writes into one round trip but short enough to survive a game that ends and is closed;
+`flush()` and `visibilitychange` force it out.
 
 **All ten games are gated.** No game listens for `DOMContentLoaded` any more - every boot goes
 through `DJStore.ready()`. If you add a game, use `DJStore.ready(boot)` and register it in the
@@ -478,10 +514,11 @@ sign-in work without touching game code.
 is once per day. Signed-out players can still farm it - the only real fix there is requiring an
 account, which we deliberately do not.
 
-**Sign-out clears adopted state.** `DJStore.clearLocal()` drops every tracked daily/chips/bonus
-key. Without it a shared computer keeps reporting "already played today" to the next person and
-shows them someone else's board. Lifetime local stats (`cl_stats_v2` and friends) are deliberately
-NOT cleared - they record what this browser played and were never overwritten by sign-in.
+**Sign-out clears adopted state.** `DJStore.clearLocal()` drops every tracked daily, chips, bonus
+**and stats** key. Without it a shared computer keeps reporting "already played today" to the next
+person and shows them someone else's board - and, since migration 0009, someone else's lifetime
+stats. (Stats used to be left alone here, on the grounds that they recorded what this browser
+played; once sign-in adopts them from the account that reasoning no longer holds.)
 
 **Writes are debounced** (~2.5s) because games save after every move. Completion, chip changes and
 `visibilitychange` force an immediate flush.
@@ -805,7 +842,7 @@ Loaded on **every page** (after `menu.js`, both `defer`). Exposes `window.DJFav 
 
 Texas Hold'em poker game. Player faces 3 randomly selected AI opponents each day (seeded from date). 3 hands are played per session; chip total carries over. Starting chips: 1,000.
 
-**localStorage keys**: `hd_stats_v2`, `hd_alltime_v2`, `hd_ai_stats_v2`, `hd_today`, `hd_chips`, `hd_seen_howto`, `hd_bonus_date`
+**localStorage keys**: `hd_stats_v2`, `hd_alltime_v2`, `hd_ai_stats_v3`, `hd_today`, `hd_chips`, `hd_seen_howto`, `hd_bonus_date`
 
 **Daily AI selection**: `getDailyAIIndexes(dateStr)` shuffles indices 0-5 using a seeded RNG and returns 3 for the day. Same 3 opponents for all players on a given date.
 
@@ -832,7 +869,7 @@ Texas Hold'em poker game. Player faces 3 randomly selected AI opponents each day
 
 **Madelyn peek feature**: On each new hand, there is a 1% chance Madelyn's hole cards briefly appear face-up with a chat bubble ("Is this good??") for ~2.4 seconds before flipping back over and play begins. Implemented in `maybeShowMadelynPeek()`.
 
-**Per-AI head-to-head stats**: `hd_ai_stats_v2` stores `{ [aiId]: { w, l, f } }` - wins, losses, and folds per AI across all sessions. Updated in `recordAIStats(type)` called from `finishHand`. Displayed in the stats modal under "Head-to-Head" with W/L/F columns and win percentage per AI.
+**Per-AI head-to-head stats**: `hd_ai_stats_v3` stores `{ [aiId]: { w, l, f } }` - wins, losses, and folds per AI across all sessions. Updated in `recordAIStats(type)` called from `finishHand`. Displayed in the stats modal under "Head-to-Head" with W/L/F columns and win percentage per AI.
 
 **Betting flow:**
 - Pre-flop: AIs act first (SB/BB posted), then player acts (button). If player raises, AIs respond again. If an AI re-raises, player gets one more action.

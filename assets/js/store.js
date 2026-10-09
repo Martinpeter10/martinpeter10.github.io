@@ -16,18 +16,29 @@ window.DJStore = (function () {
   'use strict';
 
   // Which localStorage keys belong to which game. `daily` expires at midnight;
-  // chips and bonus survive the rollover and live in the progress table.
+  // chips, bonus and stats survive the rollover and live in the progress table.
+  //
+  // `stats` is the game's own lifetime stats modal - the numbers a player sees
+  // when they tap the bar-chart button. It is a LIST because some games spread
+  // theirs over several keys (Holdle keeps all-time net and per-opponent
+  // records separately), and they must travel together or a device shows half
+  // a history. Stored verbatim: the server does not interpret these, and they
+  // never rank - leaderboards read `scores` and the structured game_stats
+  // columns that submit_score computes server-side.
   var GAMES = {
-    themedle:     { daily: 'themedleDailyState' },
-    chainlink:    { daily: 'cl_today' },
-    spelldle:     { daily: 'spd_today' },
-    blackjackdle: { daily: 'bj_today', chips: 'bj_chips', bonus: 'bj_bonus_date' },
-    roulettedle:  { daily: 'rl_today', chips: 'rl_chips', bonus: 'rl_bonus_date' },
-    holdle:       { daily: 'hd_today', chips: 'hd_chips', bonus: 'hd_bonus_date' },
-    liarsdice:    { daily: 'bf_today' },
-    netzero:      { daily: 'sb_today' },
-    shutthebox:   { daily: 'stb_today' },
-    yachtdle:     { daily: 'yc_today' }
+    themedle:     { daily: 'themedleDailyState', stats: ['td_stats_v2'] },
+    chainlink:    { daily: 'cl_today',  stats: ['cl_stats_v2'] },
+    spelldle:     { daily: 'spd_today', stats: ['spd_stats_v2'] },
+    blackjackdle: { daily: 'bj_today', chips: 'bj_chips', bonus: 'bj_bonus_date',
+                    stats: ['bj_stats_v2', 'bj_alltime_v2'] },
+    roulettedle:  { daily: 'rl_today', chips: 'rl_chips', bonus: 'rl_bonus_date',
+                    stats: ['rl_stats_v2', 'rl_alltime_v2'] },
+    holdle:       { daily: 'hd_today', chips: 'hd_chips', bonus: 'hd_bonus_date',
+                    stats: ['hd_stats_v2', 'hd_alltime_v2', 'hd_ai_stats_v3'] },
+    liarsdice:    { daily: 'bf_today',  stats: ['bf_stats_v2'] },
+    netzero:      { daily: 'sb_today',  stats: ['sb_stats_v2'] },
+    shutthebox:   { daily: 'stb_today', stats: ['stb_stats_v2'] },
+    yachtdle:     { daily: 'yc_today',  stats: ['yc_stats_v2'] }
   };
 
   var PATHS = {
@@ -197,6 +208,115 @@ window.DJStore = (function () {
       if (d.bonus_day) lsSet(keys.bonus, d.bonus_day);
       else lsDel(keys.bonus);
     }
+
+    applyServerStats(d.stats);
+  }
+
+  // ── Lifetime stats ───────────────────────────────────────────────────────
+  //
+  // The gap this closes: signing in adopted today's board, the chip stack and
+  // the daily bonus, but not the game's own stats modal. A player who played
+  // on a desktop and signed in on a phone was correctly told they had already
+  // played today, and then shown an empty stats modal.
+  //
+  // Stats are the ONE piece of state that is seeded from the browser rather
+  // than reset. Chips are discarded on first sign-in because an imported
+  // stack is unverifiable winnings; a games-played count is not a reward, and
+  // throwing away a player's whole history the moment they create an account
+  // is a worse answer than carrying it forward. So: if the account has no
+  // stats for this game and this browser has real ones, they become the
+  // account's. After that the server wins, with no merging - the same rule as
+  // everything else here.
+
+  /** The blob of every tracked stats key currently in this browser. */
+  function collectStats() {
+    if (!keys || !keys.stats) return null;
+    var blob = {};
+    var any = false;
+    keys.stats.forEach(function (k) {
+      var raw = lsGet(k);
+      if (!raw) return;
+      try { blob[k] = JSON.parse(raw); any = true; } catch (e) {}
+    });
+    return any ? blob : null;
+  }
+
+  /**
+   * Has this browser actually played, or is it just holding default objects?
+   * Games differ on the field name, and nothing else in the blob reliably
+   * distinguishes "never played" from "played zero times".
+   */
+  function hasHistory(blob) {
+    if (!blob) return false;
+    return Object.keys(blob).some(function (k) {
+      var s = blob[k];
+      if (!s || typeof s !== 'object') return false;
+      return (typeof s.played === 'number' && s.played > 0) ||
+             (typeof s.gamesPlayed === 'number' && s.gamesPlayed > 0);
+    });
+  }
+
+  function applyServerStats(remote) {
+    if (!keys || !keys.stats) return;
+
+    if (!remote || typeof remote !== 'object') {
+      // The account has nothing for this game. Hand this browser's history to
+      // it, once. p_merge makes the server refuse if another device got there
+      // first, so a freshly installed phone cannot blank a desktop's numbers.
+      var mine = collectStats();
+      if (hasHistory(mine)) {
+        DJAccount.rpc('save_game_stats', { p_game: gameId, p_stats: mine, p_merge: true })
+          .catch(function (err) { log('seeding stats failed', err); });
+      }
+      return;
+    }
+
+    // Server wins. A tracked key absent from the blob is absent from the
+    // account, so it goes - otherwise a second device keeps showing numbers
+    // the account does not have.
+    keys.stats.forEach(function (k) {
+      if (Object.prototype.hasOwnProperty.call(remote, k)) {
+        lsSet(k, JSON.stringify(remote[k]));
+      } else {
+        lsDel(k);
+      }
+    });
+  }
+
+  /**
+   * Mirror the stats modal to the account. Called by each game right after it
+   * writes its stats key.
+   *
+   * Barely debounced: a game writes its stats once, at the end, but several
+   * write two or three keys in consecutive statements (Holdle writes the
+   * session stats, the all-time net and the head-to-head record). The short
+   * window turns those into one round trip; anything longer would risk losing
+   * the write on a game that ends and is immediately closed.
+   */
+  var statsDirty = false;
+  var statsTimer = null;
+
+  function saveStats() {
+    if (!synced || !keys || !keys.stats) return Promise.resolve(null);
+    statsDirty = true;
+    clearTimeout(statsTimer);
+    statsTimer = setTimeout(flushStats, 400);
+    return Promise.resolve(null);
+  }
+
+  function flushStats() {
+    clearTimeout(statsTimer);
+    statsTimer = null;
+    if (!statsDirty || !synced) return Promise.resolve(null);
+    statsDirty = false;
+    var blob = collectStats();
+    if (!blob) return Promise.resolve(null);
+    return DJAccount.rpc('save_game_stats', { p_game: gameId, p_stats: blob })
+      .then(function (res) {
+        if (res && res.error) log('save_game_stats failed', res.error);
+        return res;
+      })
+      .catch(function (err) { log('save_game_stats threw', err); return null; });
   }
 
   // ── Writes ───────────────────────────────────────────────────────────────
@@ -218,6 +338,7 @@ window.DJStore = (function () {
   function flush() {
     clearTimeout(timer);
     timer = null;
+    flushStats();                       // a pending stats write must not outlive the tab
     if (!pending) return Promise.resolve(null);
     var p = pending; pending = null;
     return push(p);
@@ -288,9 +409,10 @@ window.DJStore = (function () {
    * played today" to whoever uses it next, and shows them someone else's
    * board. Signed out, the browser should own its own game again.
    *
-   * Lifetime local stats (cl_stats_v2 and friends) are deliberately NOT
-   * touched - those record what was played in this browser and were never
-   * overwritten by sign-in.
+   * Lifetime stats are cleared too, which they were NOT before stats became
+   * account state. They are now adopted from the server on sign-in, so
+   * leaving them behind would show the next person on a shared computer
+   * someone else's history - the same leak the daily keys had.
    */
   function clearLocal() {
     Object.keys(GAMES).forEach(function (id) {
@@ -298,11 +420,15 @@ window.DJStore = (function () {
       if (k.daily) lsDel(k.daily);
       if (k.chips) lsDel(k.chips);
       if (k.bonus) lsDel(k.bonus);
+      if (k.stats) k.stats.forEach(lsDel);
     });
     synced = false;
     pending = null;
     clearTimeout(timer);
     timer = null;
+    statsDirty = false;
+    clearTimeout(statsTimer);
+    statsTimer = null;
   }
 
   return {
@@ -310,6 +436,7 @@ window.DJStore = (function () {
     clearLocal: clearLocal,
     save: save,
     saveDaily: saveDaily,
+    saveStats: saveStats,
     flush: flush,
     game: function () { return gameId; },
     /** True when the server is authoritative for this page load. */
@@ -329,7 +456,8 @@ window.DJStore = (function () {
         local: keys ? {
           daily: lsGet(keys.daily),
           chips: keys.chips ? lsGet(keys.chips) : null,
-          bonus: keys.bonus ? lsGet(keys.bonus) : null
+          bonus: keys.bonus ? lsGet(keys.bonus) : null,
+          stats: collectStats()
         } : null
       };
     }

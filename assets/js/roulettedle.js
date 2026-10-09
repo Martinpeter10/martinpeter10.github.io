@@ -57,7 +57,10 @@ const RLGame = (function () {
     }
   }
 
-  function saveStats(s) { DJUtils.saveJSON('rl_stats_v2', s); }
+  function saveStats(s) {
+    DJUtils.saveJSON('rl_stats_v2', s);
+    if (window.DJStore) DJStore.saveStats();
+  }
 
   function loadToday() {
     try {
@@ -609,6 +612,7 @@ const RLGame = (function () {
     if (net < 0 && net < a.biggestLoss)  a.biggestLoss = net;
     a.totalNet += net;
     localStorage.setItem('rl_alltime_v2', JSON.stringify(a));
+    if (window.DJStore) DJStore.saveStats();
   }
 
   /* ── Spin history ── */

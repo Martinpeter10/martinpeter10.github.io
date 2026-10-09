@@ -193,7 +193,7 @@ Press `Ctrl+C` in the terminal to stop the server.
 
 Full release notes are also available at [dailyjamm.com/releases](https://dailyjamm.com/releases/).
 
-### v3.5.0 - 2026-09-22
+### v3.5.0 - 2026-10-09
 
 **Accounts, leaderboards, and progress that follows you**
 
@@ -202,10 +202,16 @@ Full release notes are also available at [dailyjamm.com/releases](https://dailyj
 - **Leaderboards for all ten games.** A new trophy button in the header opens a page with a board for every game - today's results, longest streaks, most days played, and the thing each game is actually worth bragging about: perfect Chain Links, Yachts rolled, boxes shut, perfect Net Zeros, tables won, and chip stacks.
 - **Your games at a glance.** Signed in, the leaderboards page also shows your own numbers for every game you play.
 - **Progress follows you between devices.** Signed in, your chip stacks and each day's progress live on your account instead of in one browser. Start a game on your phone, finish it on your laptop.
+- **Your stats follow you too.** Every game's stats screen - games played, win rate, streaks, best scores, head-to-head records - now lives on your account. Sign in on a new phone and your history is already there. The first time you sign in, whatever that browser had already recorded becomes your account's history, so nothing is lost.
 - **A bell in the header** appears when there is a release you have not seen, and links here. When there is nothing new it stays out of the way.
 - Privacy Policy and Terms of Service updated to explain what an account stores, what is public, and how to have your account deleted.
 
-**Please note:** the first time you sign in on a chip game, your chip stack resets to the starting amount. Chips kept in a browser cannot be verified, so every account starts level.
+**Spelldle fixes**
+
+- **Casting time is now a proper scale** rather than right-or-wrong. Reaction, Bonus, Action, 1 Minute, 10 Minutes, 1 Hour, 8 Hours, 12 Hours and 24 Hours sit in order, and a guess one step away turns yellow with an arrow pointing the way - the same way Range and Duration already worked.
+- **Corrected the casting time on 55 spells** and fixed four other details: Otiluke's Resilient Sphere is Abjuration, Forcecage needs concentration, and Protection from Evil and Good and Glyph of Warding do not. Thanks to the reader who wrote in about Create Undead.
+
+**Please note:** the first time you sign in on a chip game, your chip stack resets to the starting amount. Chips kept in a browser cannot be verified, so every account starts level. Your games-played history is not reset - only chips, which are winnings a browser cannot vouch for.
 
 ### v3.4.0 - 2026-08-26
 

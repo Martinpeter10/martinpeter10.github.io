@@ -318,6 +318,9 @@ function djSubmit(score, extras) {
 
 function saveStats() {
   DJUtils.saveJSON('td_stats_v2', gameStats);
+  // Lifetime stats are account state too - mirror them so the modal reads the
+  // same on every device.
+  if (window.DJStore) DJStore.saveStats();
 }
 
 /** Returns a 1-based puzzle number (days since 2024-01-01 Chicago) */

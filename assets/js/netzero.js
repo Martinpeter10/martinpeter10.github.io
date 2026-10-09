@@ -672,6 +672,7 @@
     if (stats.bestAbs === null || Math.abs(t) < stats.bestAbs) stats.bestAbs = Math.abs(t);
     stats.place[place - 1]++;
     DJUtils.saveJSON(statsKey, stats);
+    if (window.DJStore) DJStore.saveStats();
     djSubmit(Math.min(Math.abs(t), 100), {
       pure_total: t === 0 ? 1 : 0,
       wins_total: win ? 1 : 0

@@ -575,6 +575,7 @@
       stats.hh[id].beat++;
     }
     DJUtils.saveJSON(statsKey, stats);
+    if (window.DJStore) DJStore.saveStats();
   }
 
   function endDay(win) {
@@ -587,6 +588,7 @@
     else stats.curStreak = 0;
     stats.place[outcome.aisBeaten]++;
     DJUtils.saveJSON(statsKey, stats);
+    if (window.DJStore) DJStore.saveStats();
     djSubmit(outcome.aisBeaten, win ? { table_wins_total: 1 } : {});
     saveToday();
     renderSeats();

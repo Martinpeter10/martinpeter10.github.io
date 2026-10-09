@@ -74,7 +74,10 @@ const HDGame = (function () {
     }
   }
 
-  function saveStats(s) { DJUtils.saveJSON('hd_stats_v2', s); }
+  function saveStats(s) {
+    DJUtils.saveJSON('hd_stats_v2', s);
+    if (window.DJStore) DJStore.saveStats();
+  }
 
   function loadToday() {
     try {
@@ -122,6 +125,7 @@ const HDGame = (function () {
     if (net < 0 && net < a.biggestLoss) a.biggestLoss = net;
     a.totalNet += net;
     localStorage.setItem('hd_alltime_v2', JSON.stringify(a));
+    if (window.DJStore) DJStore.saveStats();
   }
 
   /* Per-AI head-to-head stats: { [aiId]: { w, l, f, af } }
@@ -130,7 +134,10 @@ const HDGame = (function () {
     try { return JSON.parse(localStorage.getItem('hd_ai_stats_v3')) || {}; }
     catch { return {}; }
   }
-  function saveAIStats(s) { localStorage.setItem('hd_ai_stats_v3', JSON.stringify(s)); }
+  function saveAIStats(s) {
+    localStorage.setItem('hd_ai_stats_v3', JSON.stringify(s));
+    if (window.DJStore) DJStore.saveStats();
+  }
   function recordAIStats(type) {
     // type: 'win' | 'lose' | 'fold' (player folded)
     const s = loadAIStats();
