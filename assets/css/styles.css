@@ -2718,9 +2718,18 @@ input[type=range].slider::-moz-range-thumb {
 .lb-stat{display:grid;grid-template-columns:1fr auto 2.6rem 22px;gap:.5rem;align-items:center;padding:.4rem 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.85rem}
 .lb-stat:last-child{border-bottom:0}
 .lb-stat-label{color:#b8b8d1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.lb-stat-val{font-weight:800;color:#fff;font-variant-numeric:tabular-nums;text-align:right}
-.lb-stat-rank{font-size:.75rem;font-weight:800;color:#7b7b96;text-align:right;font-variant-numeric:tabular-nums}
-.lb-stat-rank.is-first{color:#f0b429}
+/* Your number: white and prominent. */
+.lb-stat-val{font-weight:800;color:#fff;font-variant-numeric:tabular-nums;text-align:right;font-size:.95rem}
+/* Your rank: a bordered pill, so it reads as a position rather than a second
+   measurement of the same thing. The # alone was too subtle to tell apart. */
+.lb-stat-rank{font-size:.7rem;font-weight:800;color:#9fb8c8;text-align:center;font-variant-numeric:tabular-nums;border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:.1rem 0;background:rgba(0,0,0,.25)}
+.lb-stat-rank:empty{border:0;background:none}
+.lb-stat-rank.is-first{color:#06231a;background:#f0b429;border-color:transparent}
+
+/* Column header, so nobody has to infer which number is which. */
+.lb-stat-head{border-bottom:1px solid rgba(255,255,255,.12);padding-bottom:.25rem;margin-bottom:.1rem}
+.lb-stat-head .lb-stat-val,
+.lb-stat-head .lb-stat-rank{font-size:.6rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#6b6b88;border:0;background:none;padding:0}
 /* A chevron, not a word. It rotates to show the board is open. */
 .lb-stat-see{width:22px;height:22px;display:flex;align-items:center;justify-content:center;background:transparent;border:1px solid rgba(255,255,255,.12);color:#8f8fae;border-radius:6px;padding:0;cursor:pointer;transition:color .15s,border-color .15s,transform .18s ease}
 .lb-stat-see:hover{color:#fff;border-color:rgba(255,255,255,.32)}

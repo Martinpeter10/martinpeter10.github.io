@@ -40,6 +40,7 @@ window.DJBoards = (function () {
 
   var period = DEFAULT_PERIOD;
   var signedIn = false;
+  var lifeByGame = {};      // from get_my_lifetime(), lifetime period only
 
   function $(id) { return document.getElementById(id); }
 
@@ -206,6 +207,15 @@ window.DJBoards = (function () {
 
     var body = make('div', 'lb-stats');
 
+    function addHeader() {
+      var h = make('div', 'lb-stat lb-stat-head');
+      h.appendChild(make('span', 'lb-stat-label', ''));
+      h.appendChild(make('span', 'lb-stat-val', 'You'));
+      h.appendChild(make('span', 'lb-stat-rank', 'Rank'));
+      h.appendChild(make('span', 'lb-stat-see-spacer'));
+      body.appendChild(h);
+    }
+
     if (!signedIn) {
       // No "my stats" to show. Lead with who is ahead instead.
       body.appendChild(make('p', 'lb-msg',
@@ -228,6 +238,8 @@ window.DJBoards = (function () {
       return card;
     }
 
+    addHeader();
+
     var playedLabel = period === 'daily' ? 'Played today' : 'Days played';
     body.appendChild(statRow(playedLabel, num(g.my_played), g.rank_played, g.players, 'played', g));
 
@@ -242,16 +254,24 @@ window.DJBoards = (function () {
       body.appendChild(statRow(g.notable_label, num(g.my_notable), g.rank_notable, g.players, 'notable', g));
     }
 
-    // Streaks are a lifetime property - there is no "streak this week".
-    if (period === 'lifetime' && g.my_best_streak != null) {
-      body.appendChild(statRow('Current streak', num(g.my_cur_streak), null, null, 'cur_streak', g));
-      body.appendChild(statRow('Best streak', num(g.my_best_streak), null, null, 'best_streak', g));
-    }
+    // Streaks and point-in-time extras are lifetime properties - there is no
+    // "streak this week" or "chip stack this week". Their values and ranks come
+    // from get_my_lifetime(), which is why they are absent on the other periods.
+    if (period === 'lifetime') {
+      var life = lifeByGame[g.game] || {};
 
-    // Point-in-time extras, lifetime only.
-    if (period === 'lifetime' && LIFETIME_EXTRA[g.game]) {
-      var ex = LIFETIME_EXTRA[g.game];
-      body.appendChild(statRow(ex[1], '-', null, null, 'extras:' + ex[0], g));
+      if (g.my_best_streak != null) {
+        body.appendChild(statRow('Current streak', num(g.my_cur_streak), null, null, 'cur_streak', g));
+        body.appendChild(statRow('Best streak', num(g.my_best_streak),
+          life.rank_streak, life.ranked_players, 'best_streak', g));
+      }
+
+      if (life.extra_label && life.my_extra != null) {
+        var ex = LIFETIME_EXTRA[g.game];
+        body.appendChild(statRow(life.extra_label, num(life.my_extra),
+          life.rank_extra, life.ranked_players,
+          ex ? 'extras:' + ex[0] : null, g));
+      }
     }
 
     card.appendChild(body);
@@ -290,7 +310,21 @@ window.DJBoards = (function () {
       return;
     }
 
-    DJAccount.rpc('get_period_summary', { p_period: period }).then(function (res) {
+    // Lifetime needs a second small call for streak ranks and the point-in-time
+    // extras. It is skipped entirely on daily and weekly, where neither applies.
+    var wantLife = (period === 'lifetime' && signedIn && DJAccount.rpc);
+    var lifePromise = wantLife
+      ? DJAccount.rpc('get_my_lifetime').then(function (r) { return r.error ? [] : (r.data || []); })
+                 .catch(function () { return []; })
+      : Promise.resolve([]);
+
+    Promise.all([
+      DJAccount.rpc('get_period_summary', { p_period: period }),
+      lifePromise
+    ]).then(function (both) {
+      var res = both[0];
+      lifeByGame = {};
+      (both[1] || []).forEach(function (r) { lifeByGame[r.game] = r; });
       if (res && res.error) throw res.error;
       var rows = res.data || [];
       grid.textContent = '';
