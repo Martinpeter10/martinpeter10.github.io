@@ -13,12 +13,11 @@
 //   - no CSP violation anywhere (GSI injects a stylesheet into the PARENT
 //     document, which the first version of the CSP blocked; the button still
 //     appeared, so it looked fine)
-//   - there is exactly ONE sign-in affordance. A missing Authorized JavaScript
-//     origin makes renderButton succeed and the button do nothing, which once
-//     justified a permanent "having trouble?" link beside Google's button -
-//     two buttons, where the quiet one led to the badly branded consent
-//     screen. account.js now watches for Google's own log line instead, and
-//     this test is the real guard.
+//   - there is exactly ONE sign-in affordance, measured by what RENDERS rather
+//     than by the `hidden` property. Checking `el.hidden` is what let the
+//     two-button bug ship: the property was perfectly true while the element
+//     was on screen, because an author `display` rule beats the browser's own
+//     [hidden]{display:none}.
 //
 // "origin is not allowed for the given client ID" is reported as PENDING, not
 // as a failure: it means the code is right and the Google console still needs
@@ -28,6 +27,16 @@ import { chromium } from 'playwright';
 
 const argOf = (n, d) => { const i = process.argv.indexOf('--' + n); return i === -1 ? d : process.argv[i + 1]; };
 const BASE = argOf('base', 'https://dev.dailyjamm.com');
+
+// BOTH kinds of page, and that is the whole point.
+//
+// This suite used to check /chainlink/ only, and missed a two-buttons bug that
+// appeared on every page WITHOUT Tailwind. Game pages load the Tailwind CDN,
+// whose preflight re-declares [hidden]{display:none} as author CSS; that
+// masked an author rule of ours which was overriding `hidden`. The home and
+// info pages have no Tailwind, so there the hidden fallback button rendered.
+// A game page therefore proves nothing about the home page.
+const PAGES = [['home', ''], ['game', 'chainlink']];
 
 // Cloudflare auto-injects this on the Worker sites and the CSP blocks it.
 // Pre-existing, dev/tst only - production is GitHub Pages and never sees it -
@@ -41,79 +50,87 @@ const check = (label, ok, detail) => {
 };
 
 const b = await chromium.launch({ channel: 'chrome', headless: !process.argv.includes('--headed') });
-const ctx = await b.newContext({ viewport: { width: 390, height: 844 } });
-await ctx.addInitScript(() => {
-  try {
-    localStorage.setItem('dj_cookie_ok', '1');
-    localStorage.setItem('dj_seen_release', '99.0.0');
-  } catch (e) {}
-});
-const p = await ctx.newPage();
-
-const csp = [], errs = [];
 let originBlocked = false;
-p.on('console', (m) => {
-  const t = m.text();
-  if (/GSI_LOGGER.*origin is not allowed/i.test(t)) { originBlocked = true; return; }
-  if (/violates the following Content Security Policy|Refused to/i.test(t)) {
-    if (!KNOWN_CSP.some((re) => re.test(t))) csp.push(t);
-    return;
-  }
-  if (m.type() === 'error' && !/favicon|clarity|gtag|google-analytics|gsi\/log|\b40[13]\b/i.test(t)) errs.push(t);
-});
-p.on('pageerror', (e) => errs.push('UNCAUGHT: ' + e.message));
 
-console.log(`\nGIS sign-in  ${BASE}\n`);
-await p.goto(`${BASE}/chainlink/`, { waitUntil: 'domcontentloaded', timeout: 30000 });
-await p.waitForFunction(() => window.DJAccount, null, { timeout: 15000 });
-await p.waitForTimeout(1500);
+async function run(label, path) {
+  console.log(`\n  ${label} page  (${BASE}/${path})`);
+  const ctx = await b.newContext({ viewport: { width: 390, height: 844 } });
+  await ctx.addInitScript(() => {
+    try {
+      localStorage.setItem('dj_cookie_ok', '1');
+      localStorage.setItem('dj_seen_release', '99.0.0');
+      localStorage.setItem('dj_seen_favs_intro', '1');   // keep it off the modal
+    } catch (e) {}
+  });
+  const p = await ctx.newPage();
 
-const cid = await p.evaluate(() => window.DJConfig && DJConfig.googleClientId);
-check('a Google client ID is configured', !!cid && /\.apps\.googleusercontent\.com$/.test(cid), String(cid));
+  const csp = [], errs = [];
+  p.on('console', (m) => {
+    const t = m.text();
+    if (/GSI_LOGGER.*origin is not allowed/i.test(t)) { originBlocked = true; return; }
+    if (/violates the following Content Security Policy|Refused to/i.test(t)) {
+      if (!KNOWN_CSP.some((re) => re.test(t))) csp.push(t);
+      return;
+    }
+    if (m.type() === 'error' && !/favicon|clarity|gtag|google-analytics|gsi\/log|\b40[13]\b/i.test(t)) errs.push(t);
+  });
+  p.on('pageerror', (e) => errs.push('UNCAUGHT: ' + e.message));
 
-await p.evaluate(() => DJAccount.open());
-await p.waitForTimeout(4000);
+  await p.goto(`${BASE}/${path}${path ? '/' : ''}`, { waitUntil: 'domcontentloaded', timeout: 30000 });
+  await p.waitForFunction(() => window.DJAccount, null, { timeout: 15000 });
+  await p.waitForTimeout(1200);
 
-const r = await p.evaluate(() => {
-  const slot = document.getElementById('dj-gis-btn');
-  const fb = document.getElementById('dj-acct-fallback');
-  const alt = document.getElementById('dj-acct-alt');
-  return {
-    slot: !!slot,
-    iframe: !!(slot && slot.querySelector('iframe')),
-    height: slot ? Math.round(slot.getBoundingClientRect().height) : -1,
-    fallbackShown: !!(fb && !fb.hidden),
-    altExists: !!alt,
-    // Anything the player could read as "sign in with Google". Google's own
-    // button is an iframe and has no text, so it is counted separately.
-    googleWordedControls: [].slice.call(document.querySelectorAll('#dj-acct-body button'))
-      .filter(function (el) {
-        return el.offsetParent !== null && /sign in with google/i.test(el.textContent || '');
-      }).length,
-    gsi: !!(window.google && window.google.accounts && window.google.accounts.id),
-  };
-});
+  const cid = await p.evaluate(() => window.DJConfig && DJConfig.googleClientId);
+  check(`${label}: a Google client ID is configured`,
+    !!cid && /\.apps\.googleusercontent\.com$/.test(cid), String(cid));
 
-check("Google's library loaded", r.gsi === true);
-check('the button slot exists', r.slot === true);
-check('renderButton put an iframe in it', r.iframe === true, JSON.stringify(r));
-check('the slot has real height', r.height >= 30, `height=${r.height}`);
-check('the full fallback button stays hidden while GIS works', r.fallbackShown === false);
-check('the old permanent "having trouble" link is gone', r.altExists === false);
-check('exactly one sign-in affordance (Google\'s iframe, nothing else)',
-  r.iframe === true && r.googleWordedControls === 0,
-  `iframe=${r.iframe} extraButtons=${r.googleWordedControls}`);
-check('no unexpected CSP violations', csp.length === 0, csp.slice(0, 2).join(' | '));
-check('no page errors', errs.length === 0, errs.slice(0, 2).join(' | '));
+  await p.evaluate(() => DJAccount.open());
+  await p.waitForTimeout(5000);
 
+  const r = await p.evaluate(() => {
+    const slot = document.getElementById('dj-gis-btn');
+    const fb = document.getElementById('dj-acct-fallback');
+    const box = (el) => (el ? el.getBoundingClientRect() : { width: 0, height: 0 });
+    // What a PLAYER can see, not what an attribute claims. Google's button is
+    // an iframe with no text of its own, so it is counted separately.
+    const visibleButtons = [].slice.call(document.querySelectorAll('#dj-acct-body button'))
+      .filter((el) => box(el).height > 0 && getComputedStyle(el).display !== 'none');
+    return {
+      tailwind: !!document.querySelector('script[src*="tailwindcss"]'),
+      gsi: !!(window.google && window.google.accounts && window.google.accounts.id),
+      iframes: slot ? slot.querySelectorAll('iframe').length : -1,
+      slotH: Math.round(box(slot).height),
+      fbDisplay: fb ? getComputedStyle(fb).display : 'no-el',
+      fbRenderedH: Math.round(box(fb).height),
+      visibleButtonText: visibleButtons.map((el) => (el.textContent || '').trim()),
+    };
+  });
+
+  check(`${label}: Google's library loaded`, r.gsi === true);
+  check(`${label}: exactly one Google button iframe`, r.iframes === 1, `iframes=${r.iframes}`);
+  check(`${label}: the slot has real height`, r.slotH >= 30, `h=${r.slotH}`);
+  // The assertion that would have caught it: rendered height, not `hidden`.
+  check(`${label}: fallback button is not RENDERED`,
+    r.fbRenderedH === 0 && r.fbDisplay === 'none',
+    `display=${r.fbDisplay} height=${r.fbRenderedH}`);
+  check(`${label}: no other visible button in the modal`,
+    r.visibleButtonText.length === 0, JSON.stringify(r.visibleButtonText));
+  check(`${label}: no unexpected CSP violations`, csp.length === 0, csp.slice(0, 2).join(' | '));
+  check(`${label}: no page errors`, errs.length === 0, errs.slice(0, 2).join(' | '));
+  console.log(`       (tailwind on this page: ${r.tailwind})`);
+
+  await ctx.close();
+}
+
+console.log(`\nGIS sign-in  ${BASE}`);
+for (const [label, path] of PAGES) await run(label, path);
 await b.close();
 
 if (originBlocked) {
-  console.log('\n  PENDING  this origin is not on the OAuth client yet.');
+  console.log('\n  PENDING  an origin is not on the OAuth client yet.');
   console.log('           Google Cloud Console -> Clients -> the web client ->');
   console.log(`           Authorized JavaScript origins -> add ${new URL(BASE).origin}`);
-  console.log('           Until then the button renders but does nothing, which is');
-  console.log('           what the fallback link covers.');
+  console.log('           Until then the button renders but does nothing.');
 }
 console.log(`\n  ${pass} passed, ${fail} failed\n`);
 process.exit(fail ? 1 : 0);

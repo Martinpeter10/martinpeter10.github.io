@@ -738,6 +738,13 @@ is an iframe with its own CSP - the thing you look at works, which is what makes
 **`tests/gis.mjs`** checks everything up to the click and reports a missing origin as PENDING
 rather than a failure.
 
+**Sign-out must offer the chooser next time.** `doSignOut()` calls
+`google.accounts.id.disableAutoSelect()`, and the `signInWithOAuth` fallback passes
+`queryParams: { prompt: 'select_account' }`. Without both, Google silently reuses whichever
+account the browser used last - wrong for anyone signing out *in order to* switch, and on a shared
+computer it is how one person lands in another's DailyJamm profile. Same reasoning as
+`DJStore.clearLocal()`.
+
 **Playing is never gated.** Every game is free without an account; signing in buys saved scores,
 cross-device streaks, and a place on the leaderboards. The modal opens on its own in exactly one
 case - returning from Google without a username yet - so the round trip is not wasted.
@@ -1155,6 +1162,17 @@ All pages include `<meta name="referrer" content="strict-origin-when-cross-origi
 ---
 
 ## Common Pitfalls
+- **An author `display` rule beats `hidden`** - and game pages hide the evidence. `[hidden]` is
+  styled by the browser's own stylesheet, and **author CSS outranks user-agent CSS**, so
+  `.thing{display:block}` on an element carrying `hidden` renders it anyway. This shipped: the
+  account modal's fallback sign-in button appeared beside Google's, giving two "Sign in with
+  Google" buttons - **but only on pages without Tailwind**. Tailwind's preflight re-declares
+  `[hidden]{display:none}` as author CSS, so all ten game pages masked it and only the home and
+  info pages showed it. `styles.css` now opens with `[hidden]{display:none!important}` so the
+  class of bug cannot return. **Test the home page, not just a game page** - they have different
+  CSS baselines - and assert on rendered height or computed display, never on `el.hidden`, which
+  stayed perfectly `true` the whole time the button was on screen.
+
 - **Curly quotes**: Always use straight quotes in JS (`'` and `"`, never `'` `'` `"` `"`). Curly quotes in onclick handlers cause silent JS failures.
 - **Nav sync**: The hamburger nav is duplicated in every page's HTML. When adding a game, you must update ALL pages' nav or they'll be out of sync. (The "Your Favorite Games" drawer section is the exception — it is injected by `favorites.js` and must NOT be hardcoded anywhere.)
 - **Inline header CSS**: Never define `.site-header`, `.site-brand`, `.hamburger`, `.backdrop`, `.drawer`, or `.menu-*` CSS inside a page's `<style>` block. All of that lives in `/assets/css/styles.css`. Duplicating it inline causes visual inconsistency across pages (different font sizes, colors, blur values) and was the root cause of the "DailyJamm moves and changes style" bug. Every page must link styles.css and use `class="site-header"` / `class="site-brand"` with no extra Tailwind classes on those elements.

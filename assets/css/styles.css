@@ -1,3 +1,15 @@
+/* `hidden` must always win.
+   An author rule like `.thing{display:block}` on an element carrying the
+   hidden attribute BEATS the browser's own [hidden]{display:none}, because
+   author styles outrank user-agent styles - so the element renders anyway.
+   This shipped: the account modal's fallback sign-in button appeared beside
+   Google's, but ONLY on the pages without Tailwind. Tailwind's preflight
+   re-declares [hidden]{display:none} as author CSS, so every game page masked
+   the bug and only the home and info pages showed it.
+   Declared here, in the stylesheet every page loads, so the class of bug
+   cannot come back. */
+[hidden]{display:none!important}
+
 /* Accessibility */
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 
@@ -2645,8 +2657,7 @@ input[type=range].slider::-moz-range-thumb {
    give it a width or a border - the button is Google's, and restyling it
    breaks their branding terms. Reserve the height so the modal does not jump
    when the script finishes loading. */
-.dj-gis-slot{display:flex;justify-content:center;min-height:44px}
-.dj-acct-fallback-wrap{display:block}
+.dj-gis-slot{display:flex;justify-content:center;align-items:center;min-height:44px}
 .dj-acct-alt{display:block;width:100%;margin:0;padding:.2rem 0;border:0;background:none;color:#8f8fa8;font-family:inherit;font-size:.74rem;text-decoration:underline;cursor:pointer}
 .dj-acct-alt:hover{color:#b8b8d1}
 .dj-acct-alt:focus-visible{outline:2px solid #45b7d1;outline-offset:2px}

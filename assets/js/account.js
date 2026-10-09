@@ -609,10 +609,12 @@ window.DJAccount = (function () {
 
         try {
           google.accounts.id.initialize(init);
+          // No explicit width: GSI then sizes the iframe to the button it
+          // actually draws. Asking for one left the iframe wider than the
+          // button, which showed as a white band around the pill.
           google.accounts.id.renderButton(slot, {
             type: 'standard', theme: 'filled_blue', size: 'large',
-            text: 'signin_with', shape: 'pill', logo_alignment: 'left',
-            width: 260
+            text: 'signin_with', shape: 'pill', logo_alignment: 'left'
           });
         } catch (e) {
           if (window.console && console.warn) {
@@ -638,7 +640,12 @@ window.DJAccount = (function () {
     setMsg('', null);
     client.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: location.href }
+      // prompt=select_account forces the chooser instead of silently reusing
+      // whichever Google account this browser used last. Someone signing out
+      // is often signing out in order to switch - and on a shared computer,
+      // silently reusing the previous account is how one person ends up in
+      // another's DailyJamm profile.
+      options: { redirectTo: location.href, queryParams: { prompt: 'select_account' } }
     }).then(function (res) {
       if (res.error) setMsg('Could not reach Google. Try again.', 'bad');
     }).catch(function () {
@@ -674,6 +681,19 @@ window.DJAccount = (function () {
 
   function doSignOut() {
     if (!client) return;
+
+    // Tell Google this was a deliberate sign-out, so the next visit offers the
+    // account chooser rather than re-selecting the last account used. Without
+    // it GIS treats the returning visitor as the same person - wrong for
+    // anyone switching accounts, and wrong for a shared computer. Google's own
+    // documented sign-out step; guarded because GIS may never have loaded.
+    try {
+      if (window.google && google.accounts && google.accounts.id &&
+          google.accounts.id.disableAutoSelect) {
+        google.accounts.id.disableAutoSelect();
+      }
+    } catch (e) {}
+
     client.auth.signOut().catch(function () { /* clear locally regardless */ })
       .then(function () {
         session = null;
