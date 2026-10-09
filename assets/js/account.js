@@ -161,6 +161,10 @@ window.DJAccount = (function () {
     else if (!profile) body.appendChild(viewUsername('claim'));
     else if (renaming) body.appendChild(viewUsername('rename'));
     else body.appendChild(viewProfile());
+
+    // Google's renderButton needs its container attached to the document, so
+    // this cannot happen inside viewSignIn().
+    if (client && !session) mountGsi();
   }
 
   function viewUnavailable() {
@@ -186,12 +190,25 @@ window.DJAccount = (function () {
     w.appendChild(make('p', 'dj-acct-lede',
       'Every game is free to play without an account. Sign in to save your scores, keep your streaks on every device, and appear on the daily leaderboards.'));
 
+    // Google renders its own button in here. Empty until mountGsi() runs,
+    // which render() kicks off once this fragment is actually in the DOM.
+    var slot = make('div', 'dj-gis-slot');
+    slot.id = 'dj-gis-btn';
+    w.appendChild(slot);
+
+    // Our button, kept for when GIS cannot run at all. Hidden by default so
+    // there is never a moment with two sign-in buttons offering the same
+    // thing; showFallback() reveals it.
+    var fb = make('div', 'dj-acct-fallback-wrap');
+    fb.id = 'dj-acct-fallback';
+    fb.hidden = true;
     var btn = make('button', 'dj-acct-google');
     btn.type = 'button';
     btn.innerHTML = ICON_GOOGLE;                  // static string
     btn.appendChild(make('span', null, 'Sign in with Google'));
     btn.addEventListener('click', doSignIn);
-    w.appendChild(btn);
+    fb.appendChild(btn);
+    w.appendChild(fb);
 
     var err = make('p', 'dj-acct-msg');
     err.id = 'dj-acct-msg';
@@ -381,11 +398,195 @@ window.DJAccount = (function () {
   }
 
   // ── Auth ─────────────────────────────────────────────────────────────────
+  //
+  // WHY THERE ARE TWO SIGN-IN PATHS
+  //
+  // The visible problem: Google's consent screen said "continue to
+  // uyvozabvh....supabase.co" instead of DailyJamm. That string is not a
+  // branding setting we failed to fill in. Google shows an app's configured
+  // name only after **brand verification**, and brand verification requires
+  // proving ownership in Search Console of the top private domain of every
+  // redirect URI and JavaScript origin on every web client in the project.
+  // `signInWithOAuth` sends the browser to
+  // <project>.supabase.co/auth/v1/callback, so `supabase.co` is one of those
+  // domains - and it cannot be verified, because we do not own it. That is
+  // why the earlier verification attempt failed, and why setting the App name
+  // on its own changes nothing.
+  //
+  // Google Identity Services avoids the problem instead of fighting it. The
+  // browser asks Google for an ID token directly, using a client whose only
+  // registered URL is an Authorized JavaScript origin on dailyjamm.com, and
+  // hands that token to Supabase. Nothing redirects through supabase.co, so
+  // Google has no supabase.co to name: the prompt shows our own domain (or
+  // "DailyJamm" once brand verification passes, which is now possible).
+  //
+  // `signInWithOAuth` is KEPT as a fallback and is not dead code. GIS needs a
+  // third-party script, a popup, and browser support for the credential APIs;
+  // any of those can be blocked - script blockers, a locked-down iOS
+  // configuration, an embedded webview. A player who cannot sign in at all is
+  // a far worse outcome than a consent screen with the wrong name on it, so
+  // the redirect path stays until GIS has been seen to work everywhere.
+
+  var GSI_SRC = 'https://accounts.google.com/gsi/client';
+  var gsiState = 'idle';      // idle | loading | ready | failed
+  var gsiWaiting = [];
+  var gsiNonce = null;        // raw nonce; Supabase needs the un-hashed one
+  var gsiMounted = false;
 
   /**
-   * Hand off to Google. This navigates away; the browser comes back to the
-   * same page with the session in the URL fragment, which supabase-js reads
-   * because dj-config.js sets detectSessionInUrl.
+   * Load Google's library once, on demand. Not on every page view: this is a
+   * third-party script that only matters to the handful of visitors who open
+   * the account modal.
+   *
+   * Always calls back. A blocked or slow script resolves as 'failed' so the
+   * fallback button appears, rather than leaving a modal with no way out.
+   */
+  function loadGsi(done) {
+    if (gsiState === 'ready' || gsiState === 'failed') { done(gsiState === 'ready'); return; }
+    gsiWaiting.push(done);
+    if (gsiState === 'loading') return;
+    gsiState = 'loading';
+
+    function settle(ok) {
+      if (gsiState !== 'loading') return;
+      gsiState = ok ? 'ready' : 'failed';
+      var fns = gsiWaiting; gsiWaiting = [];
+      fns.forEach(function (fn) { try { fn(ok); } catch (e) {} });
+    }
+
+    var s = document.createElement('script');
+    s.src = GSI_SRC;
+    s.async = true;
+    s.onload = function () {
+      // onload fires for a script the CSP let through but that failed to
+      // define its global; check for what we actually need.
+      settle(!!(window.google && window.google.accounts && window.google.accounts.id));
+    };
+    s.onerror = function () { settle(false); };
+    document.head.appendChild(s);
+
+    // A blocker can leave a script element that never fires either handler.
+    setTimeout(function () { settle(false); }, 8000);
+  }
+
+  /**
+   * A nonce binds the token Google issues to this page load, so a token
+   * captured elsewhere cannot be replayed into our sign-in. Google is given
+   * the SHA-256 hash; Supabase is given the raw value and checks they match.
+   *
+   * Resolves with null where SubtleCrypto is unavailable (an http:// origin,
+   * an old browser). A missing nonce is a weaker check, not a broken one -
+   * Supabase still validates the token's signature, issuer and audience - so
+   * it is better than refusing to sign anybody in.
+   */
+  function makeNonce() {
+    try {
+      if (!window.crypto || !crypto.getRandomValues || !crypto.subtle) {
+        return Promise.resolve(null);
+      }
+      var bytes = new Uint8Array(24);
+      crypto.getRandomValues(bytes);
+      var raw = Array.prototype.map.call(bytes, function (b) {
+        return ('0' + b.toString(16)).slice(-2);
+      }).join('');
+
+      var enc = new TextEncoder().encode(raw);
+      return crypto.subtle.digest('SHA-256', enc).then(function (buf) {
+        var hashed = Array.prototype.map.call(new Uint8Array(buf), function (b) {
+          return ('0' + b.toString(16)).slice(-2);
+        }).join('');
+        return { raw: raw, hashed: hashed };
+      }).catch(function () { return null; });
+    } catch (e) {
+      return Promise.resolve(null);
+    }
+  }
+
+  /** Google handed us an ID token. Trade it for a Supabase session. */
+  function onGoogleCredential(resp) {
+    if (!client || !resp || !resp.credential) return;
+    setMsg('Signing you in...', null);
+    var args = { provider: 'google', token: resp.credential };
+    if (gsiNonce) args.nonce = gsiNonce;
+
+    client.auth.signInWithIdToken(args).then(function (res) {
+      if (res && res.error) throw res.error;
+      // Nothing else to do here: onAuthStateChange owns what happens next,
+      // exactly as it does for the redirect path.
+      setMsg('', null);
+    }).catch(function (err) {
+      if (window.console && console.warn) {
+        console.warn('[DJAccount] signInWithIdToken failed:', err);
+      }
+      // The token was fine and Supabase refused it - usually the client ID is
+      // not on the provider's allowed list. The redirect path does not depend
+      // on that, so offer it.
+      setMsg('Google signed you in but we could not finish. Try the button below.', 'bad');
+      showFallback();
+    });
+  }
+
+  function showFallback() {
+    var fb = document.getElementById('dj-acct-fallback');
+    if (fb) fb.hidden = false;
+  }
+
+  /**
+   * Render Google's own button into the modal. Their button rather than ours
+   * because `renderButton` is what delivers an ID token to the callback, and
+   * because a popup has none of One Tap's suppression rules - One Tap goes
+   * quiet after a few dismissals and would leave a button that does nothing.
+   */
+  function mountGsi() {
+    var slot = document.getElementById('dj-gis-btn');
+    if (!slot || gsiMounted) return;
+    var cid = window.DJConfig && DJConfig.googleClientId;
+    if (!cid) { showFallback(); return; }
+    gsiMounted = true;
+
+    loadGsi(function (ok) {
+      gsiMounted = false;
+      if (!ok) { showFallback(); return; }
+      // The modal may have been closed and re-rendered while loading.
+      slot = document.getElementById('dj-gis-btn');
+      if (!slot) return;
+
+      makeNonce().then(function (n) {
+        gsiNonce = n ? n.raw : null;
+        var init = {
+          client_id: cid,
+          callback: onGoogleCredential,
+          ux_mode: 'popup',
+          auto_select: false,
+          itp_support: true
+        };
+        if (n) init.nonce = n.hashed;
+
+        try {
+          google.accounts.id.initialize(init);
+          google.accounts.id.renderButton(slot, {
+            type: 'standard', theme: 'filled_blue', size: 'large',
+            text: 'signin_with', shape: 'pill', logo_alignment: 'left',
+            width: 260
+          });
+        } catch (e) {
+          if (window.console && console.warn) {
+            console.warn('[DJAccount] GIS init failed:', e);
+          }
+          showFallback();
+        }
+      });
+    });
+  }
+
+  /**
+   * The fallback: hand off to Google the old way. This navigates away; the
+   * browser comes back to the same page with the session in the URL fragment,
+   * which supabase-js reads because dj-config.js sets detectSessionInUrl.
+   *
+   * Reaching this means the consent screen will name the Supabase host. That
+   * is the trade being made deliberately - see the note at the top of this
+   * section.
    */
   function doSignIn() {
     if (!client) return;

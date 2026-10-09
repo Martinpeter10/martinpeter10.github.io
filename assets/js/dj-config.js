@@ -25,6 +25,21 @@ window.DJConfig = (function () {
     url: 'https://uyvozabvhhaqhypnquzd.supabase.co',
     key: 'sb_publishable_F9mTPasPg_nUDirR-9OZLw_3Rh988g2'
   };
+
+  // Google OAuth client ID. PUBLIC by design - it identifies the app to
+  // Google and is meant to ship in the page; the client *secret* stays in the
+  // Supabase dashboard and never appears here.
+  //
+  // ONE client serves both Supabase projects (its redirect URI list holds both
+  // callbacks), so there is one value rather than one per environment. What
+  // differs per environment is only the Authorized JavaScript origin, and that
+  // is configured on Google's side, not here.
+  //
+  // This is what lets sign-in use Google Identity Services instead of a
+  // redirect through <project>.supabase.co - see account.js for why that
+  // matters for the consent screen.
+  var GOOGLE_CLIENT_ID =
+    '1061811011268-povvsrlk86fs91uh0742m9ue8v61audd.apps.googleusercontent.com';
   // ────────────────────────────────────────────────────────────────────────
 
   var host = location.hostname;
@@ -84,6 +99,7 @@ window.DJConfig = (function () {
     schema: schema,
     url: project.url,
     anonKey: project.key,
+    googleClientId: GOOGLE_CLIENT_ID,
     configured: configured,
     getClient: getClient,
     functionUrl: functionUrl

@@ -2640,6 +2640,13 @@ input[type=range].slider::-moz-range-thumb {
 .dj-acct-google:hover{background:#f4f4f6}
 .dj-acct-google:focus-visible{outline:2px solid #45b7d1;outline-offset:2px}
 .dj-acct-google svg{flex-shrink:0}
+/* Google Identity Services renders its own button into this slot. It comes
+   back as a fixed-width iframe, so the slot only has to centre it; do not
+   give it a width or a border - the button is Google's, and restyling it
+   breaks their branding terms. Reserve the height so the modal does not jump
+   when the script finishes loading. */
+.dj-gis-slot{display:flex;justify-content:center;min-height:44px}
+.dj-acct-fallback-wrap{display:block}
 .dj-acct-note p{margin:0;font-size:.85rem;color:#b8b8d1;line-height:1.5}
 
 /* ── Release bell (used by notify.js on all pages) ── */
