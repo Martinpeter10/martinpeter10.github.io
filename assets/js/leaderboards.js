@@ -160,6 +160,13 @@ window.DJBoards = (function () {
     'stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
     '<path d="M6 9l6 6 6-6"/></svg>';
 
+  /**
+   * One stat row: label, the player's own number, their rank, and a chevron.
+   *
+   * Pass metric = null for anything not ranked globally. A chevron that opens
+   * an empty or meaningless board is worse than no chevron - the current
+   * streak and a saturating best both fall into that category.
+   */
   function statRow(label, value, rank, players, metric, game) {
     var row = make('div', 'lb-stat');
     row.appendChild(make('span', 'lb-stat-label', label));
@@ -326,7 +333,9 @@ window.DJBoards = (function () {
     // from get_my_lifetime(), which is why they are absent on the other periods.
     if (period === 'lifetime') {
       if (g.my_best_streak != null) {
-        body.appendChild(statRow('Current streak', num(g.my_cur_streak), null, null, 'cur_streak', g));
+        // Personal status, not a global stat. No rank, so no chevron either -
+        // offering a board for something the row does not rank is a dead end.
+        body.appendChild(statRow('Current streak', num(g.my_cur_streak), null, null, null, g));
         body.appendChild(statRow('Best streak', num(g.my_best_streak),
           g.rank_streak, g.players, 'best_streak', g));
       }
