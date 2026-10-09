@@ -620,6 +620,30 @@ update or delete anything. All writes go through `security definer` SQL function
 **secret** key (`sb_secret_...`) must never appear in this repo, in `/assets`, or in a commit;
 it lives only in Supabase Edge Function secrets, injected automatically.
 
+**`revoke ... from PUBLIC` does NOT close a function in the `public` schema** (migration 0010).
+Supabase ships `alter default privileges in schema public grant execute on functions to anon,
+authenticated`, so every function got an *explicit* `anon` grant when it was created, and revoking
+from the `PUBLIC` pseudo-role leaves that grant in place. Production was therefore letting `anon`
+execute `save_game_state`, `save_game_stats`, `submit_score`, `get_game_state`, `get_my_stats` and
+`get_my_rank` - not exploitable, because each one refuses when `auth.uid()` is null and the read
+ones scope to it, but one missing guard away from being so.
+
+**`app_dev` and `app_tst` were correct the whole time**, because a schema we create inherits no
+default privileges - which is exactly why this survived every nonprod check. It cannot be
+reproduced outside `public`. When adding a function, verify the grant rather than trusting the
+revoke:
+
+```sql
+select p.proname, has_function_privilege('anon', p.oid, 'execute')
+  from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+ where n.nspname = 'public';
+```
+
+Six functions keep `anon` on purpose - `dj_today`, `get_game_board` (both arities),
+`get_leaderboard`, `get_site_stats`, `get_summary_v2` - because the leaderboards page works signed
+out. Everything else is `authenticated` only. 0010 also sets the schema default so the next
+function added does not repeat it.
+
 **Environments**: `dj-config.js` resolves project + Postgres schema from `location.hostname`,
 mirroring the Google Analytics gate. **Each environment answers on two hostnames** - a custom
 subdomain and the raw workers.dev one - and both must be listed everywhere a hostname is matched:
