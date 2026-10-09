@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// DailyJamm - username check + claim
+// DailyJamm - username check, claim and rename
 //
 // This function is the ONLY way a row reaches `profiles`. The table has RLS on
 // with no client-writable policy, so the moderation filter cannot be skipped by
@@ -9,13 +9,17 @@
 // The filter itself lives in ./moderation.ts so it can be unit tested without a
 // server: `deno test --allow-net moderation_test.ts`.
 //
-// Two actions:
+// Three actions:
 //   { action: 'check', username } -> validate + availability. No write. No auth
 //                                    required, so the field can respond as the
 //                                    player types.
 //   { action: 'claim', username } -> validate + create the profile. Requires a
 //                                    valid JWT; the id comes from the token,
 //                                    never from the request body.
+//   { action: 'rename', username } -> same checks as claim, plus a cooldown.
+//                                    A rename is the move someone makes to
+//                                    dodge a report, so it is rate limited and
+//                                    recorded in name_history.
 //
 // Deploy:  supabase functions deploy username
 // ═══════════════════════════════════════════════════════════════════════════
@@ -93,8 +97,15 @@ function corsHeaders(origin: string | null) {
 
 // ── Handler ───────────────────────────────────────────────────────────────
 
+// A rename is how someone escapes a report, so it is rate limited. Long
+// enough to matter, short enough that a genuine regret is not permanent.
+const RENAME_COOLDOWN_DAYS = 30;
+
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+
+const TAKEN = 'That name is already taken - try another.';
+const NOT_AVAILABLE = "That name isn't available - try another.";
 
 function json(body: unknown, status: number, origin: string | null) {
   return new Response(JSON.stringify(body), {
@@ -126,7 +137,7 @@ Deno.serve(async (req) => {
   const username = typeof body.username === 'string' ? body.username.trim() : '';
   const action = body.action;
 
-  if (action !== 'check' && action !== 'claim') {
+  if (action !== 'check' && action !== 'claim' && action !== 'rename') {
     return json({ error: 'bad_request' }, 400, origin);
   }
 
@@ -135,7 +146,7 @@ Deno.serve(async (req) => {
     // One message for every rejection reason. A filter that explains itself
     // teaches people how to beat it, and telling someone their surname is
     // profane is worse than telling them nothing.
-    return json({ available: false, message: "That name isn't available - try another." }, 200, origin);
+    return json({ available: false, message: NOT_AVAILABLE }, 200, origin);
   }
 
   // Service key stays server-side. It bypasses RLS, which is exactly why it
@@ -147,20 +158,22 @@ Deno.serve(async (req) => {
 
   const key = username.toLowerCase();
 
-  const { data: taken, error: lookupErr } = await db
-    .from('profiles').select('id').eq('username_key', key).maybeSingle();
-  if (lookupErr) return json({ error: 'server_error' }, 500, origin);
+  // No generated types for this schema, so the row shape is declared here
+  // rather than inferred as `never`.
+  type ProfileRow = { id: string; username: string };
+  const lookup = await db
+    .from('profiles').select('id, username').eq('username_key', key).maybeSingle();
+  if (lookup.error) return json({ error: 'server_error' }, 500, origin);
+  const taken = lookup.data as unknown as ProfileRow | null;
 
   if (action === 'check') {
     return taken
-      ? json({ available: false, reason: 'taken',
-               message: 'That name is already taken - try another.' }, 200, origin)
+      ? json({ available: false, reason: 'taken', message: TAKEN }, 200, origin)
       : json({ available: true }, 200, origin);
   }
 
-  // ── claim ───────────────────────────────────────────────────────────────
   // The user id comes from the verified JWT. It is never read from the body -
-  // that would let anyone create a profile for anyone else's account.
+  // that would let anyone create or rename a profile for someone else.
   const authHeader = req.headers.get('Authorization') ?? '';
   const jwt = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
   if (!jwt) return json({ error: 'not_authenticated' }, 401, origin);
@@ -169,11 +182,71 @@ Deno.serve(async (req) => {
   if (userErr || !userData?.user) return json({ error: 'not_authenticated' }, 401, origin);
   const userId = userData.user.id;
 
-  if (taken) {
-    return json({ available: false, reason: 'taken',
-                  message: 'That name is already taken - try another.' }, 200, origin);
+  // Deliberately NOT a shared check. For a claim, any existing holder blocks
+  // it. For a rename, the holder might be YOU - which is how a player fixes
+  // their own capitalisation - so the rename branch tests the owner instead.
+  if (action === 'claim' && taken) {
+    return json({ available: false, reason: 'taken', message: TAKEN }, 200, origin);
   }
 
+  // ── rename ──────────────────────────────────────────────────────────────
+  if (action === 'rename') {
+    // Taken by someone ELSE. Your own current name is not a conflict - it lets
+    // a player fix their own capitalisation.
+    if (taken && taken.id !== userId) {
+      return json({ available: false, reason: 'taken', message: TAKEN }, 200, origin);
+    }
+
+    const cur = await db
+      .from('profiles').select('username, renamed_at').eq('id', userId).maybeSingle();
+    if (cur.error) return json({ error: 'server_error' }, 500, origin);
+    const current = cur.data as unknown as { username: string; renamed_at: string | null } | null;
+    if (!current) return json({ error: 'no_profile' }, 400, origin);
+
+    if (current.username === username) {
+      return json({ ok: true, username, unchanged: true }, 200, origin);
+    }
+
+    // Cooldown enforced in the WHERE clause, not by reading then writing, so
+    // two requests cannot both pass the check.
+    const cutoff = new Date(Date.now() - RENAME_COOLDOWN_DAYS * 86400000).toISOString();
+    const upd = await db
+      .from('profiles')
+      .update({ username, username_key: key, renamed_at: new Date().toISOString() })
+      .eq('id', userId)
+      .or(`renamed_at.is.null,renamed_at.lt.${cutoff}`)
+      .select('username, renamed_at');
+    const updated = upd.data as unknown as Array<unknown> | null;
+    const upErr = upd.error;
+
+    if (upErr) {
+      if (upErr.code === '23505') {
+        return json({ available: false, reason: 'taken', message: TAKEN }, 200, origin);
+      }
+      return json({ error: 'server_error' }, 500, origin);
+    }
+
+    if (!updated || !updated.length) {
+      // The cooldown clause matched nothing, so a rename is not due yet.
+      // Only reachable when renamed_at is set - a null would have matched the
+      // cooldown clause - but guard it rather than produce an Invalid Date.
+      const since = current.renamed_at ? new Date(current.renamed_at).getTime() : Date.now();
+      const nextAt = new Date(since + RENAME_COOLDOWN_DAYS * 86400000);
+      return json({ available: false, reason: 'cooldown', next_at: nextAt.toISOString(),
+                    message: 'You can change your name again on '
+                             + nextAt.toISOString().slice(0, 10) + '.' }, 200, origin);
+    }
+
+    // Audit trail. Fire and forget - a missing history row must not fail a
+    // rename the player has already been told succeeded.
+    db.from('name_history').insert({
+      user_id: userId, old_username: current.username, new_username: username,
+    }).then(function () {}, function () {});
+
+    return json({ ok: true, username, renamed: true }, 200, origin);
+  }
+
+  // ── claim ───────────────────────────────────────────────────────────────
   const { error: insertErr } = await db
     .from('profiles')
     .insert({ id: userId, username, username_key: key });
@@ -183,8 +256,7 @@ Deno.serve(async (req) => {
     // this account already has a profile. Both are "pick another / you're
     // already set up", not a server fault.
     if (insertErr.code === '23505') {
-      return json({ available: false, reason: 'taken',
-                    message: 'That name is already taken - try another.' }, 200, origin);
+      return json({ available: false, reason: 'taken', message: TAKEN }, 200, origin);
     }
     return json({ error: 'server_error' }, 500, origin);
   }

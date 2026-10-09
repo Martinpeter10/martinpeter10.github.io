@@ -63,6 +63,7 @@ window.DJAccount = (function () {
   var resolved = false;
   var checkTimer = null;
   var lastChecked = '';
+  var renaming = false;
 
   // ── Small helpers ────────────────────────────────────────────────────────
 
@@ -157,7 +158,8 @@ window.DJAccount = (function () {
     body.textContent = '';
     if (!client) body.appendChild(viewUnavailable());
     else if (!session) body.appendChild(viewSignIn());
-    else if (!profile) body.appendChild(viewUsername());
+    else if (!profile) body.appendChild(viewUsername('claim'));
+    else if (renaming) body.appendChild(viewUsername('rename'));
     else body.appendChild(viewProfile());
   }
 
@@ -201,11 +203,13 @@ window.DJAccount = (function () {
     return w;
   }
 
-  function viewUsername() {
+  function viewUsername(mode) {
     var w = document.createDocumentFragment();
+    var isRename = mode === 'rename';
 
-    w.appendChild(make('p', 'dj-acct-lede',
-      'You are signed in. Pick the name other players will see on the leaderboards.'));
+    w.appendChild(make('p', 'dj-acct-lede', isRename
+      ? 'Pick a new name. The same rules apply, and your scores and streaks stay with you.'
+      : 'You are signed in. Pick the name other players will see on the leaderboards.'));
 
     var field = make('div', 'dj-acct-field');
     var label = make('label', null, 'Username');
@@ -217,6 +221,7 @@ window.DJAccount = (function () {
     input.autocomplete = 'off';
     input.spellcheck = false;
     input.placeholder = '3-16 letters, numbers or _';
+    if (isRename && profile) input.value = profile.username;
     field.appendChild(label);
     field.appendChild(input);
     w.appendChild(field);
@@ -231,13 +236,21 @@ window.DJAccount = (function () {
     btn.disabled = true;
     w.appendChild(btn);
 
-    w.appendChild(make('p', 'dj-acct-fine',
-      'This is public on leaderboards. Keep it clean - names are checked. Choose carefully; renaming is not available yet.'));
+    if (isRename) {
+      var cancel = make('button', 'dj-acct-secondary', 'Cancel');
+      cancel.type = 'button';
+      cancel.addEventListener('click', function () { renaming = false; render(); });
+      w.appendChild(cancel);
+    }
+
+    w.appendChild(make('p', 'dj-acct-fine', isRename
+      ? 'Changing your name updates it everywhere, including past leaderboard entries. You can change it again after 30 days.'
+      : 'This is public on leaderboards. Keep it clean - names are checked. You can change it later.'));
 
     input.addEventListener('input', function () { onNameInput(input.value); });
-    btn.addEventListener('click', function () { doClaim(input.value.trim()); });
+    btn.addEventListener('click', function () { submitName(input.value.trim(), mode); });
     input.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter' && !btn.disabled) doClaim(input.value.trim());
+      if (e.key === 'Enter' && !btn.disabled) submitName(input.value.trim(), mode);
     });
 
     setTimeout(function () { input.focus(); }, 50);
@@ -261,6 +274,11 @@ window.DJAccount = (function () {
 
     w.appendChild(make('p', 'dj-acct-lede',
       'Your scores are saved to your account. Sign in with the same Google account on any device to pick up your streaks.'));
+
+    var edit = make('button', 'dj-acct-secondary', 'Change username');
+    edit.type = 'button';
+    edit.addEventListener('click', function () { renaming = true; render(); });
+    w.appendChild(edit);
 
     var out = make('button', 'dj-acct-secondary', 'Sign out');
     out.type = 'button';
@@ -302,6 +320,11 @@ window.DJAccount = (function () {
       // Shape feedback is the one check that is safe and useful to explain,
       // because it describes a rule rather than revealing the filter.
       setMsg('Letters, numbers and underscores only.', 'bad');
+      setBusy(true);
+      return;
+    }
+    if (renaming && profile && v === profile.username) {
+      setMsg('That is already your name.', null);
       setBusy(true);
       return;
     }
@@ -377,20 +400,23 @@ window.DJAccount = (function () {
     });
   }
 
-  function doClaim(v) {
+  function submitName(v, mode) {
     if (!SHAPE.test(v) || !client || !session) return;
+    var action = mode === 'rename' ? 'rename' : 'claim';
     setBusy(true, 'Saving...');
     setMsg('', null);
 
-    callFn('claim', v).then(function (res) {
+    callFn(action, v).then(function (res) {
       if (res && res.ok) {
         profile = { username: res.username };
         cache(profile);
+        renaming = false;
         paintButton();
         render();
         // Anything played before signing in is waiting in the queue.
         flushQueue();
       } else {
+        // The server distinguishes taken, not-allowed, and a rename cooldown.
         setMsg((res && res.message) || 'Could not save that name.', 'bad');
         setBusy(true);
       }
@@ -406,6 +432,7 @@ window.DJAccount = (function () {
       .then(function () {
         session = null;
         profile = null;
+        renaming = false;
         cache(null);
         // Drop state adopted from the account. Without this a shared computer
         // keeps reporting "already played today" to the next person and shows
