@@ -756,6 +756,24 @@ Google and is meant to ship in the page. The client **secret** stays in the Supa
 must never appear here. One OAuth client serves both Supabase projects; what differs per
 environment is only the authorized origin, which lives on Google's side.
 
+**Supabase side: one field serves both flows.** The Google provider's **Client ID** field is what
+`signInWithIdToken` validates the token's audience against, and it is the same field the OAuth
+flow already uses - so if the redirect path works, the ID-token path is already configured. It
+takes a comma-separated list with the **web client ID first**. The **Client Secret** is not needed
+for the ID-token flow but must stay, because the fallback uses it.
+
+**Leave "Skip nonce check" OFF.** `account.js` sends a real nonce: the hex SHA-256 to Google, the
+raw value to Supabase, which is the encoding Supabase expects (it also accepts unpadded base64url,
+added for Apple). The toggle exists for client libraries that cannot produce a nonce - ours can,
+and enabling it would accept a token bearing any nonce. The only case it would help is a browser
+with no SubtleCrypto, where `makeNonce()` resolves null and the token carries no nonce claim; that
+browser gets the fallback link instead.
+
+**Verify the id_token grant is live without the dashboard** - a garbage token answers
+`Bad ID token` (provider enabled, parse failed) rather than `Unsupported provider`:
+`curl -s -X POST "$URL/auth/v1/token?grant_type=id_token" -H "apikey: $PUBLISHABLE"
+-H 'Content-Type: application/json' -d '{"provider":"google","id_token":"not.a.real.token"}'`
+
 ---
 
 ## Release Bell (`/assets/js/notify.js`)
