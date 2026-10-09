@@ -19,7 +19,13 @@
 
 /* ── Site-wide fixed header ── */
 .site-header{position:fixed;top:0;left:0;width:100%;background:rgba(17,24,39,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.06);z-index:1001;display:flex;align-items:center;padding:12px 20px;gap:14px}
-.site-brand{font-size:1.25rem;font-weight:900;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;color:#2ecc71;text-decoration:none;letter-spacing:-.02em;white-space:nowrap;flex-shrink:0}
+/* margin-right:auto pushes every control after the brand to the right edge on
+   EVERY page. Game pages have a hardcoded <div class="flex-1"> spacer doing
+   that job, but the six non-game pages never did - so the injected trophy,
+   bell and account buttons sat next to the brand on the left. An auto margin
+   absorbs free space before flex-grow does, so this is idempotent where the
+   spacer already exists rather than fighting it. */
+.site-brand{font-size:1.25rem;font-weight:900;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;color:#2ecc71;text-decoration:none;letter-spacing:-.02em;white-space:nowrap;flex-shrink:0;margin-right:auto}
 .site-brand:hover{color:#45b7d1}
 
 /* ── Hamburger nav ── */
