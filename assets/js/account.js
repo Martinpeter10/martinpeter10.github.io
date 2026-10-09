@@ -210,6 +210,22 @@ window.DJAccount = (function () {
     fb.appendChild(btn);
     w.appendChild(fb);
 
+    // An always-visible way through, because GIS has a failure mode that
+    // cannot be detected from here: if the page's origin is missing from the
+    // client's Authorized JavaScript origins, renderButton SUCCEEDS and the
+    // button simply does nothing when clicked - the complaint is logged by
+    // Google's own script, asynchronously, and the click happens inside a
+    // cross-origin iframe we cannot observe. Without this link that state is
+    // an account modal with no way to sign in and no error. Deliberately a
+    // quiet link rather than a second button, so it does not compete with the
+    // Google one on the happy path.
+    var alt = make('button', 'dj-acct-alt');
+    alt.id = 'dj-acct-alt';
+    alt.type = 'button';
+    alt.textContent = 'Having trouble? Use the standard sign-in';
+    alt.addEventListener('click', doSignIn);
+    w.appendChild(alt);
+
     var err = make('p', 'dj-acct-msg');
     err.id = 'dj-acct-msg';
     w.appendChild(err);
@@ -529,6 +545,10 @@ window.DJAccount = (function () {
   function showFallback() {
     var fb = document.getElementById('dj-acct-fallback');
     if (fb) fb.hidden = false;
+    // The full button says the same thing as the quiet link, so drop the link
+    // rather than offer the same route twice.
+    var alt = document.getElementById('dj-acct-alt');
+    if (alt) alt.hidden = true;
   }
 
   /**

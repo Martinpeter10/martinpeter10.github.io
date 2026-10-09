@@ -2647,6 +2647,9 @@ input[type=range].slider::-moz-range-thumb {
    when the script finishes loading. */
 .dj-gis-slot{display:flex;justify-content:center;min-height:44px}
 .dj-acct-fallback-wrap{display:block}
+.dj-acct-alt{display:block;width:100%;margin:0;padding:.2rem 0;border:0;background:none;color:#8f8fa8;font-family:inherit;font-size:.74rem;text-decoration:underline;cursor:pointer}
+.dj-acct-alt:hover{color:#b8b8d1}
+.dj-acct-alt:focus-visible{outline:2px solid #45b7d1;outline-offset:2px}
 .dj-acct-note p{margin:0;font-size:.85rem;color:#b8b8d1;line-height:1.5}
 
 /* ── Release bell (used by notify.js on all pages) ── */
