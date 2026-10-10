@@ -410,7 +410,7 @@ gameid: { title: 'Game Name', url: 'https://example.com/', ext: true },
 - **Share buttons**: game-over result panels have two side-by-side buttons — **Share Results** (green, `bg-green-700`) and **See Stats** (purple, `bg-purple-600`). Stats modals have a separate **Share Stats** button (green).
 - **Streaks**: Track current streak, best streak, total games played
 - **localStorage key convention**: stats keys use a `_v2` suffix (`td_stats_v2`, `cl_stats_v2`, `spd_stats_v2`, `bj_stats_v2`, `bj_alltime_v2`, `rl_stats_v2`, `rl_alltime_v2`). Daily state keys have no suffix (`themedleDailyState`, `cl_today`, `spd_today`, `bj_today`, `rl_today`, `hd_today`, `bf_today`). Bump the suffix when resetting stats site-wide.
-- **Site-wide localStorage keys** (not game-specific): `dj_cookie_ok` (cookie consent), `dj_favorites` (favorites list), `dj_seen_favs_intro` (favorites intro modal dismissed), `dj_account` (cached username for fast header paint - not the session; supabase-js owns the auth token under its own project-scoped key), `dj_seen_release` (last release version the player acknowledged via the bell), `dj_score_queue` (leaderboard submissions awaiting a working network)
+- **Site-wide localStorage keys** (not game-specific): `dj_pre_signin` (the browser's own state, copied aside before an account overwrites it, and restored on sign-out), `dj_cookie_ok` (cookie consent), `dj_favorites` (favorites list), `dj_seen_favs_intro` (favorites intro modal dismissed), `dj_account` (cached username for fast header paint - not the session; supabase-js owns the auth token under its own project-scoped key), `dj_seen_release` (last release version the player acknowledged via the bell), `dj_score_queue` (leaderboard submissions awaiting a working network)
 - **How to Play**: Show modal on first visit (check localStorage flag), include animated demo
 - **Mobile**: 16px minimum font on inputs (prevents iOS zoom), use `viewport-fit=cover` for notch support
 - **Accessibility**: ARIA labels on interactive elements, keyboard navigation (Enter activates role="button", ESC closes modals), screen-reader-only helper text via `.sr-only` class
@@ -514,11 +514,33 @@ sign-in work without touching game code.
 is once per day. Signed-out players can still farm it - the only real fix there is requiring an
 account, which we deliberately do not.
 
-**Sign-out clears adopted state.** `DJStore.clearLocal()` drops every tracked daily, chips, bonus
-**and stats** key. Without it a shared computer keeps reporting "already played today" to the next
-person and shows them someone else's board - and, since migration 0009, someone else's lifetime
-stats. (Stats used to be left alone here, on the grounds that they recorded what this browser
-played; once sign-in adopts them from the account that reasoning no longer holds.)
+**Sign-out restores, it does not wipe.** `DJStore.clearLocal()` must remove the account's state -
+on a shared computer, leaving it reports "already played today" to the next person and shows them
+someone else's board and lifetime stats. But clearing to **nothing** was its own bug: play signed
+out, sign in, sign out, and the browser could play the same puzzle a third time, because its own
+record had been destroyed along with the account's. The browser ended up knowing less than before
+anyone signed in.
+
+`applyServerState()` therefore calls **`snapshotBeforeAdopt()`** first, copying that game's keys to
+`dj_pre_signin` - it is the only place account state lands in localStorage, and the last moment the
+originals are readable. Captured per game, because only the open game is ever overwritten.
+
+`clearLocal()` then takes one of three paths per game:
+
+| Snapshot | Action | Why |
+|---|---|---|
+| entry for this game | restore it exactly, absences included | it was adopted; this is what the browser had first |
+| snapshot exists, no entry | leave it alone | adoption always snapshots, so no entry proves it was never adopted |
+| no snapshot at all | clear it | signed in on another device, storage wiped, or a pre-0009 browser - cannot prove the data is the browser's own, so fall back to the old behaviour |
+
+What comes back is always this browser's **own signed-out** progress, never the account's, so the
+shared-computer leak stays fixed. The snapshot is deleted once spent; the next sign-in takes a
+fresh one. A quota failure while storing it is logged and ignored - the fallback is simply the old
+clearing behaviour, and sign-in must never break over a snapshot.
+
+**Playing again right after signing in is NOT this bug.** The account genuinely has no record of
+today, so the first signed-in play is allowed by design; the signed-out score reaches the account
+through `dj_score_queue` anyway, and `submit_score` keeps one row per player per game per day.
 
 **Writes are debounced** (~2.5s) because games save after every move. Completion, chip changes and
 `visibilitychange` force an immediate flush.

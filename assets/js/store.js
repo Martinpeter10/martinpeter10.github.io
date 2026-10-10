@@ -186,6 +186,11 @@ window.DJStore = (function () {
     if (!d || !d.signed_in) return;
     synced = true;
 
+    // Everything below overwrites this browser's own state with the account's.
+    // Take a copy first, so signing out can hand the browser back what it had
+    // rather than leaving it blank. See snapshotBeforeAdopt().
+    snapshotBeforeAdopt();
+
     if (d.state) {
       lsSet(keys.daily, JSON.stringify(d.state));
     } else {
@@ -319,6 +324,68 @@ window.DJStore = (function () {
       .catch(function (err) { log('save_game_stats threw', err); return null; });
   }
 
+  // ── The pre-sign-in snapshot ─────────────────────────────────────────────
+  //
+  // THE BUG THIS FIXES
+  // Play signed out, sign in, then sign out again, and the game let you play a
+  // third time. Signing in replaces local state with the account's, and
+  // clearLocal() then wiped that on sign-out - so the browser's own record of
+  // having played today was destroyed along with the account's. The browser
+  // ended up knowing less than it did before anyone signed in.
+  //
+  // clearLocal() exists for a good reason: on a shared computer, leaving the
+  // ACCOUNT's state behind shows the next person someone else's board. The
+  // mistake was clearing to nothing instead of clearing back.
+  //
+  // So: copy the browser's own state the moment before the account overwrites
+  // it, and restore that copy on sign-out. What comes back is this browser's
+  // own signed-out progress - never the account's - so the leak stays fixed.
+  var SNAPSHOT_KEY = 'dj_pre_signin';
+
+  function readSnapshot() {
+    try {
+      var raw = lsGet(SNAPSHOT_KEY);
+      var o = raw ? JSON.parse(raw) : null;
+      return (o && typeof o === 'object' && o.games) ? o : null;
+    } catch (e) { return null; }
+  }
+
+  /**
+   * Copy this game's keys aside, once. Called from applyServerState, which is
+   * the only place the account's state lands in localStorage - so a game that
+   * has no snapshot entry provably never adopted anything.
+   *
+   * Captured per game rather than all ten at once because only the game whose
+   * page is open is ever overwritten, and because this is the one moment the
+   * original values are still there to read.
+   */
+  function snapshotBeforeAdopt() {
+    if (!gameId || !keys) return;
+    var snap = readSnapshot() || { games: {} };
+    if (snap.games[gameId]) return;         // already captured; do not re-take
+    var g = { daily: lsGet(keys.daily) };
+    if (keys.chips) g.chips = lsGet(keys.chips);
+    if (keys.bonus) g.bonus = lsGet(keys.bonus);
+    if (keys.stats) {
+      g.stats = {};
+      keys.stats.forEach(function (k) { g.stats[k] = lsGet(k); });
+    }
+    snap.games[gameId] = g;
+    snap.at = new Date().toISOString();     // debugging only; nothing reads it
+    try { lsSet(SNAPSHOT_KEY, JSON.stringify(snap)); } catch (e) {
+      // A full quota must not break sign-in. Worst case the snapshot is
+      // missing and clearLocal falls back to clearing, which is what it did
+      // before this existed.
+      log('could not store the pre-sign-in snapshot', e);
+    }
+  }
+
+  /** Put a key back exactly as it was, including "it was absent". */
+  function restoreKey(k, v) {
+    if (typeof v === 'string') lsSet(k, v);
+    else lsDel(k);
+  }
+
   // ── Writes ───────────────────────────────────────────────────────────────
 
   function push(payload) {
@@ -402,26 +469,57 @@ window.DJStore = (function () {
   }
 
   /**
-   * Drop every scrap of server-adopted state from this browser.
+   * Hand the browser back its own game on sign-out.
    *
-   * Called on sign-out. Signing in overwrites local state with the account's;
-   * leaving that behind afterwards means a shared computer reports "already
-   * played today" to whoever uses it next, and shows them someone else's
-   * board. Signed out, the browser should own its own game again.
+   * The account's state must not survive a sign-out: on a shared computer it
+   * reports "already played today" to whoever uses the machine next, and shows
+   * them someone else's board. But clearing to NOTHING was its own bug - a
+   * player who played signed out, signed in, then signed out again could play
+   * the same puzzle a third time, because their own record had been destroyed
+   * along with the account's.
    *
-   * Lifetime stats are cleared too, which they were NOT before stats became
-   * account state. They are now adopted from the server on sign-in, so
-   * leaving them behind would show the next person on a shared computer
-   * someone else's history - the same leak the daily keys had.
+   * So each game takes one of three paths:
+   *
+   *   snapshot entry exists  -> restore it. This game WAS adopted, and the
+   *                             snapshot is what this browser had before that.
+   *   snapshot exists, no
+   *   entry for this game    -> leave it alone. applyServerState is the only
+   *                             thing that writes account state, and it always
+   *                             snapshots first, so no entry proves this game
+   *                             was never adopted and still holds its own data.
+   *   no snapshot at all     -> clear it. Signed in on another device, storage
+   *                             wiped, or a version that predates this: we
+   *                             cannot prove the data is the browser's own, so
+   *                             the safe answer is the old behaviour.
    */
   function clearLocal() {
+    var snap = readSnapshot();
     Object.keys(GAMES).forEach(function (id) {
       var k = GAMES[id];
+      var saved = snap && snap.games[id];
+
+      if (saved) {
+        restoreKey(k.daily, saved.daily);
+        if (k.chips) restoreKey(k.chips, saved.chips);
+        if (k.bonus) restoreKey(k.bonus, saved.bonus);
+        if (k.stats) {
+          k.stats.forEach(function (sk) {
+            restoreKey(sk, saved.stats ? saved.stats[sk] : null);
+          });
+        }
+        return;
+      }
+
+      if (snap) return;                 // never adopted - its own data is intact
+
       if (k.daily) lsDel(k.daily);
       if (k.chips) lsDel(k.chips);
       if (k.bonus) lsDel(k.bonus);
       if (k.stats) k.stats.forEach(lsDel);
     });
+
+    // Spent. A later sign-in takes a fresh one.
+    lsDel(SNAPSHOT_KEY);
     synced = false;
     pending = null;
     clearTimeout(timer);
@@ -453,6 +551,7 @@ window.DJStore = (function () {
                : !signedIn ? 'signed out - localStorage is truth, nothing syncs'
                : synced ? 'syncing to the server'
                : 'SIGNED IN BUT NOT SYNCED - writes are being dropped',
+        snapshot: readSnapshot(),
         local: keys ? {
           daily: lsGet(keys.daily),
           chips: keys.chips ? lsGet(keys.chips) : null,

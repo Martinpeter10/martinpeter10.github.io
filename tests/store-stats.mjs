@@ -196,21 +196,28 @@ console.log('\nstore.js stats contract\n');
   check('flush: sent the current value', e.statsWrites()[0]?.args.p_stats.cl_stats_v2.played === 2);
 }
 
-// 9. Sign-out must not leave the account's stats on a shared computer.
+// 9. Sign-out must not leave the ACCOUNT's stats on a shared computer.
+//
+// Narrower than it once was, on purpose. This used to assert that clearLocal
+// wiped every key for every game, which is what let a player replay a puzzle
+// they had already finished signed out. The thing that actually matters is
+// that nothing the ACCOUNT put here survives; a game's own data is case 14.
 {
-  const ALL = ['td_stats_v2','cl_stats_v2','spd_stats_v2','bj_stats_v2','bj_alltime_v2',
-    'rl_stats_v2','rl_alltime_v2','hd_stats_v2','hd_alltime_v2','hd_ai_stats_v3','bf_stats_v2',
-    'sb_stats_v2','stb_stats_v2','yc_stats_v2'];
-  const prime = {};
-  ALL.forEach((k) => { prime[k] = { played: 1 }; });
-  prime.cl_today = { date: 'x' };
-  prime.bj_chips = 1500;
-  const e = env({ path: '/holdle/', signedIn: true, prime,
-    server: { signed_in: true, state: null, chips: 1000, bonus_day: null, stats: null } });
+  const e = env({ path: '/holdle/', signedIn: true,
+    // Nothing of its own for holdle, so the snapshot is empty and there is
+    // nothing to restore - whatever the account wrote must simply go.
+    server: { signed_in: true, state: { date: 'today', hand: 3 }, chips: 1000,
+              bonus_day: '2026-10-10',
+              stats: { hd_stats_v2: { played: 12 }, hd_alltime_v2: { totalNet: 900 },
+                       hd_ai_stats_v3: { 0: { w: 5 } } } } });
   await tick();
+  check('adopt: account state landed',
+    e.get('hd_stats_v2')?.played === 12 && e.get('hd_chips') === 1000);
+
   e.ctx.DJStore.clearLocal();
-  const left = ALL.concat(['cl_today', 'bj_chips']).filter((k) => e.ls.getItem(k) !== null);
-  check('clearLocal: every stats key gone', left.length === 0, left.join(','));
+  const left = ['hd_today', 'hd_chips', 'hd_bonus_date', 'hd_stats_v2', 'hd_alltime_v2',
+                'hd_ai_stats_v3'].filter((k) => e.ls.getItem(k) !== null);
+  check('clearLocal: nothing the account wrote survives', left.length === 0, left.join(','));
   check('clearLocal: stops syncing', e.ctx.DJStore.isSynced() === false);
 }
 
@@ -246,6 +253,83 @@ console.log('\nstore.js stats contract\n');
   check('non-game page: no RPCs', e.rpcs.length === 0);
   check('non-game page: saveStats is a safe no-op',
     e.ctx.DJStore.saveStats() instanceof Promise);
+}
+
+// ── 12. Sign-out hands the browser back its OWN game ─────────────────────
+// The reported sequence: play signed out, sign in, sign out - and the game let
+// you play a third time, because clearLocal() wiped the browser's own record
+// along with the account's.
+{
+  const PLAYED = { date: '2026-10-10', done: true, guesses: 4 };
+  const e = env({ path: '/themedle/', signedIn: true,
+    prime: { themedleDailyState: PLAYED, td_stats_v2: { gamesPlayed: 9, wins: 7 } },
+    // The account has never played today, which is why sign-in lets you play.
+    server: { signed_in: true, state: null, chips: null, bonus_day: null, stats: null } });
+  await tick();
+
+  check('adopt: the account\'s empty day replaced the local one',
+    e.get('themedleDailyState') === null, JSON.stringify(e.get('themedleDailyState')));
+  check('adopt: a snapshot was taken', !!e.ctx.DJStore.debug().snapshot);
+
+  e.ctx.DJStore.clearLocal();
+  check('sign-out: the browser\'s own played-today record is BACK',
+    JSON.stringify(e.get('themedleDailyState')) === JSON.stringify(PLAYED),
+    JSON.stringify(e.get('themedleDailyState')));
+  check('sign-out: the browser\'s own lifetime stats are back',
+    e.get('td_stats_v2')?.gamesPlayed === 9, JSON.stringify(e.get('td_stats_v2')));
+  check('sign-out: the snapshot is spent', !e.ctx.DJStore.debug().snapshot);
+}
+
+// 13. A day played only while SIGNED IN must not survive sign-out.
+{
+  const e = env({ path: '/themedle/', signedIn: true,
+    server: { signed_in: true, state: { date: '2026-10-10', done: true },
+              chips: null, bonus_day: null, stats: null } });
+  await tick();
+  check('account-only day: adopted while signed in',
+    e.get('themedleDailyState')?.done === true);
+  e.ctx.DJStore.clearLocal();
+  check('account-only day: gone on sign-out, nothing to restore',
+    e.get('themedleDailyState') === null, JSON.stringify(e.get('themedleDailyState')));
+}
+
+// 14. A game never opened while signed in keeps its own data.
+{
+  const e = env({ path: '/themedle/', signedIn: true,
+    prime: { cl_today: { date: '2026-10-10', done: true }, cl_stats_v2: { played: 4 } },
+    server: { signed_in: true, state: null, chips: null, bonus_day: null, stats: null } });
+  await tick();
+  e.ctx.DJStore.clearLocal();
+  check('untouched game: its own day survives sign-out',
+    e.get('cl_today')?.done === true, JSON.stringify(e.get('cl_today')));
+  check('untouched game: its own stats survive sign-out',
+    e.get('cl_stats_v2')?.played === 4, JSON.stringify(e.get('cl_stats_v2')));
+}
+
+// 15. No snapshot at all -> fall back to clearing, so the leak cannot return.
+{
+  const e = env({ path: '/themedle/', signedIn: false, server: null,
+    prime: { themedleDailyState: { date: '2026-10-10', done: true }, bj_chips: 4000 } });
+  await tick();
+  e.ctx.DJStore.clearLocal();
+  check('no snapshot: clears, as it did before any of this existed',
+    e.get('themedleDailyState') === null && e.get('bj_chips') === null,
+    JSON.stringify([e.get('themedleDailyState'), e.get('bj_chips')]));
+}
+
+// 16. Chips and the daily bonus come back too.
+{
+  const e = env({ path: '/blackjackdle/', signedIn: true,
+    prime: { bj_chips: 2750, bj_bonus_date: '2026-10-10', bj_today: { date: '2026-10-10' } },
+    server: { signed_in: true, state: null, chips: 1000, bonus_day: null, stats: null } });
+  await tick();
+  check('adopt: account stack replaced the browser stack', e.get('bj_chips') === 1000,
+    String(e.get('bj_chips')));
+  e.ctx.DJStore.clearLocal();
+  check('sign-out: the browser gets its own stack back', e.get('bj_chips') === 2750,
+    String(e.get('bj_chips')));
+  check('sign-out: and its own bonus day', e.get('bj_bonus_date') === '2026-10-10',
+    String(e.get('bj_bonus_date')));
 }
 
 console.log(`\n  ${pass} passed, ${fail} failed\n`);
