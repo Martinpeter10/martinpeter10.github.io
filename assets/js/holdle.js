@@ -51,7 +51,30 @@ const HDGame = (function () {
   let playerTotalBet   = 0;  // player's total contribution this hand (ante + all streets)
   let streetRaiseCount = 0;  // total raises on current street (capped at 2)
   let dailyRng     = null;   // seeded rng function
+  let rngCalls     = 0;      // how far dailyRng has been advanced this hand
   let actionLocked = false;  // prevent double-clicks during AI animation
+  // A hand in progress, persisted so a reload resumes it. See saveLiveHand().
+  let liveHand     = null;
+
+  /**
+   * The hand RNG, with a counter.
+   *
+   * AI decisions draw from this, so its POSITION is part of the hand's state.
+   * Restoring the cards without it would give a resumed hand different
+   * opponents' decisions - the same board, played by different players. The
+   * counter lets a resume fast-forward a fresh generator to exactly where the
+   * hand left off.
+   */
+  function makeHandRng(seed, skip) {
+    const base = mulberry32(seed);
+    for (let i = 0; i < (skip || 0); i++) base();
+    rngCalls = skip || 0;
+    return function () { rngCalls++; return base(); };
+  }
+
+  function handSeed() {
+    return dateToSeed(chicagoDate()) + handNum * 1000;
+  }
 
   /* ── DOM helper ── */
   const $ = (id) => document.getElementById(id);
@@ -95,6 +118,7 @@ const HDGame = (function () {
       done:       dailyDone,
       aiIndexes:  todayAIs.map(a => a.def.id),
       aiChips:    todayAIs.map(a => a.chips),
+      live:       liveHand,
     }));
 
     if (window.DJStore) DJStore.saveDaily(dailyDone);
@@ -1074,6 +1098,8 @@ const HDGame = (function () {
   }
 
   function showActions(toCall) {
+    // Every moment the player can act is a moment they can reload.
+    saveLiveHand(toCall);
     actionLocked = false;
     const actDiv   = $('hd-actions');
     const raiseDiv = $('hd-raise-picker');
@@ -1169,6 +1195,98 @@ const HDGame = (function () {
 
   /* ── Game Flow ── */
 
+  /**
+   * Write the whole hand down.
+   *
+   * `toCall` is null while the hand is being dealt and a number once the
+   * player has the action, which is also how a resume knows where to pick up.
+   *
+   * The deck and the RNG position both go in. Without the deck the board
+   * would come out differently; without the RNG position the same opponents
+   * would make different decisions. Either one alone makes a resumed hand a
+   * different hand.
+   */
+  function saveLiveHand(toCall) {
+    liveHand = {
+      toCall,
+      street,
+      deck,
+      playerHole,
+      community,
+      pot,
+      playerFolded,
+      playerAllIn,
+      potContributions,
+      currentStreetBet,
+      playerStreetBet,
+      playerTotalBet,
+      streetRaiseCount,
+      pendingBet,
+      rngCalls,
+      ais: todayAIs.map(ai => ({
+        chips: ai.chips, hole: ai.hole, folded: ai.folded,
+        allIn: ai.allIn, streetBet: ai.streetBet, totalBet: ai.totalBet
+      }))
+    };
+    saveToday();
+  }
+
+  function clearLiveHand() { liveHand = null; }
+
+  /**
+   * Put an interrupted hand back and carry on.
+   *
+   * The AI seats keep their identities from buildAIStates (which is
+   * date-seeded, so they are the same three opponents) and only their chips
+   * and cards are restored onto them.
+   */
+  function resumeHand(live) {
+    street            = live.street || 'preflop';
+    deck              = live.deck || [];
+    playerHole        = live.playerHole || [];
+    community         = live.community || [];
+    pot               = live.pot || 0;
+    playerFolded      = !!live.playerFolded;
+    playerAllIn       = !!live.playerAllIn;
+    potContributions  = live.potContributions || 0;
+    currentStreetBet  = live.currentStreetBet || 0;
+    playerStreetBet   = live.playerStreetBet || 0;
+    playerTotalBet    = live.playerTotalBet || 0;
+    streetRaiseCount  = live.streetRaiseCount || 0;
+    pendingBet        = live.pendingBet || 0;
+
+    (live.ais || []).forEach((s, i) => {
+      const ai = todayAIs[i];
+      if (!ai) return;
+      ai.chips = s.chips; ai.hole = s.hole || []; ai.folded = !!s.folded;
+      ai.allIn = !!s.allIn; ai.streetBet = s.streetBet || 0; ai.totalBet = s.totalBet || 0;
+    });
+
+    // Fast-forward the generator to where the hand left off.
+    dailyRng = makeHandRng(handSeed(), live.rngCalls || 0);
+
+    const betArea = $('hd-bet-area');
+    if (betArea) betArea.classList.add('hidden');
+
+    clearCommunityCards();
+    community.forEach((c, i) => renderCommunityCard(i, c));
+    renderPlayerCards();
+    updatePlayerHandDisplay();
+    todayAIs.forEach((ai, i) => renderAISeat(ai, i));
+    updatePot();
+    updateChipDisplay();
+    setStreetLabel(street === 'preflop' ? 'PRE-FLOP' : street.toUpperCase());
+
+    if (live.toCall === null || typeof live.toCall === 'undefined') {
+      // Interrupted during the deal, before anyone acted. Replaying the street
+      // from here is deterministic: same deck, same RNG position, so the same
+      // opponents make the same decisions they were about to make.
+      beginStreet(street);
+    } else {
+      showActions(live.toCall);
+    }
+  }
+
   function startHand() {
     if (pendingBet <= 0 || pendingBet > chips) return;
     const betArea = $('hd-bet-area');
@@ -1189,12 +1307,14 @@ const HDGame = (function () {
     });
 
     // Re-init seeded rng for this hand
-    dailyRng = mulberry32(dateToSeed(chicagoDate()) + handNum * 1000);
+    dailyRng = makeHandRng(handSeed(), 0);
 
     // Create and shuffle deck
     deck = shuffleDeck(createDeck());
 
-    // Player antes their chosen amount
+    // Player antes their chosen amount. Persisted immediately: in memory alone
+    // meant a reload restored the pre-ante stack and the hand could be played
+    // again, which is a free redo on a game feeding the chip leaderboards.
     chips            -= pendingBet;
     pot               = pendingBet;
     playerStreetBet   = pendingBet;
@@ -1229,7 +1349,12 @@ const HDGame = (function () {
     });
     updatePot();
     updateChipDisplay();
+    saveChips();
     setStreetLabel('PRE-FLOP');
+
+    // The deal is decided here; the animation only reveals it. Write it down
+    // before the reveal so a reload during the deal resumes this hand.
+    saveLiveHand(null);
 
     // Deal cards one at a time in poker order, then begin the street
     dealHoleCardsSequentially(() => {
@@ -1445,6 +1570,7 @@ const HDGame = (function () {
     }
     if (chips === 0) playerAllIn = true;
     updateChipDisplay();
+    saveChips();              // the call is paid, reload or not
     updatePot();
     proceedAfterPlayerAction();
   }
@@ -1475,6 +1601,7 @@ const HDGame = (function () {
     potContributions = Math.min(potContributions + 1, 16);
 
     updateChipDisplay();
+    saveChips();              // the raise is paid, reload or not
     updatePot();
     proceedAfterPlayerAction();
   }
@@ -1680,6 +1807,8 @@ const HDGame = (function () {
   }
 
   function finishHand(net, type) {
+    // Settled. A reload must not replay it.
+    clearLiveHand();
     updateAllTime(net);
     recordAIStats(playerFolded ? 'fold' : type);
     sessionResults.push({ net });
@@ -2075,6 +2204,14 @@ const HDGame = (function () {
       } else {
         showFinalResults();
       }
+    } else if (today && today.live && today.live.playerHole) {
+      // A hand was dealt but never settled - the player reloaded part way
+      // through it. Resume it. The ante and every call have already left the
+      // stack, so dealing a fresh hand here would hand all of that back.
+      handNum        = today.handNum || 0;
+      sessionResults = today.results || [];
+      updateChipDisplay();
+      resumeHand(today.live);
     } else if (today && today.handNum > 0) {
       handNum        = today.handNum;
       sessionResults = today.results || [];

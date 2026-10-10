@@ -503,6 +503,38 @@ retire them once the server owned "played today", but they still cover a case se
 not: a day played signed-out and then signed into. They are idempotent, so keeping them costs an
 RPC and removes a whole class of lost score.
 
+**A round in progress is persisted, and a reload RESUMES it.** All three chip games used to deduct
+the stake in memory only and write nothing until the round resolved, so reloading on a bad hand
+handed the stake back and re-dealt - a free redo, on the games that feed the chip leaderboards.
+
+Two halves, and both are needed:
+
+1. **Persist the stack the moment it changes** - ante, call, raise, double, split. `saveChips()`
+   at each. Roulettedle already did this, which is why it had the *other* symptom instead: the
+   stack was saved but `rl_today.chips` was stale, so the screen and the save disagreed.
+2. **Persist the round itself**, in `XX_today.live`, cleared when it settles. Written at every
+   point a reload can interrupt: the deal (decided before it is animated), and every moment the
+   player has the action.
+
+**What goes in `live` is the whole of what makes the round that round.** The deck, or the board
+comes out differently. For Holdle also the **RNG call count**, because AI decisions draw from a
+stateful generator seeded per hand - restore the cards without it and the same opponents make
+different decisions. `makeHandRng(seed, skip)` fast-forwards a fresh generator to where the hand
+left off.
+
+**Resuming does not re-animate.** The cards are known; re-dealing them suggests the outcome is
+still open. Roulettedle settles the saved pocket immediately rather than re-spinning the wheel -
+the ball had already landed as far as the game was concerned.
+
+**Where a resume re-enters**: Roulettedle `resumeSpin` → `settleSpin`; BlackJackdle `resumeHand`
+→ `afterDeal` / `showActions` / `dealerThenResolve` / `resolveSplit` by saved phase; Holdle
+`resumeHand` → `beginStreet` when interrupted during the deal, else `showActions(toCall)`.
+Replaying a street from a deal-time snapshot is safe precisely because the deck and RNG position
+are both restored.
+
+`tests/redo.mjs` drives each game to mid-round, reloads, and asserts the stake did not come back
+and the same cards did.
+
 **Chip games** (BlackJackdle, Roulettedle, Holdle) keep their stack in `progress.chips` and the
 daily bonus in `progress.bonus_day`. Chips are written immediately rather than debounced - only a
 handful happen per session and losing one loses real winnings. `loadChips()` in each game already

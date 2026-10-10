@@ -32,6 +32,9 @@ const BJGame = (function () {
   let splitBets = null;       // [mainBet, splitBet] when splitting, null otherwise
   let sessionResults = [];    // [{result, net}]
   let dailyDone = false;
+  // A hand in progress. Persisted so a reload resumes it rather than handing
+  // the stake back and re-dealing - see saveLive().
+  let liveHand = null;
 
   /* ── DOM refs ── */
   const $ = (id) => document.getElementById(id);
@@ -73,7 +76,8 @@ const BJGame = (function () {
       chips,
       handNum,
       results: sessionResults,
-      done: dailyDone
+      done: dailyDone,
+      live: liveHand
     }));
 
     if (window.DJStore) DJStore.saveDaily(dailyDone);
@@ -418,6 +422,41 @@ const BJGame = (function () {
   }
 
   /* ── Game flow ── */
+  /**
+   * Write the hand down, at every point a reload could interrupt it.
+   *
+   * The stake leaves the stack the moment the cards come out, and used to be
+   * persisted only when the hand resolved - so reloading on a bad hand handed
+   * it back and dealt a fresh one. A free redo, on a game that feeds the chip
+   * leaderboards.
+   *
+   * The deck goes in too. That is what makes a resumed hand identical rather
+   * than merely similar: the dealer draws the same cards it would have drawn,
+   * because it draws from the same deck in the same order.
+   *
+   * phase is where the hand had got to:
+   *   deal   - cards are out, the blackjack check has not run
+   *   player - waiting on the player
+   *   dealer - the player is done and the dealer is playing it out
+   *   split  - same, for a split hand
+   */
+  function saveLive(phase) {
+    liveHand = {
+      phase,
+      deck,
+      dealerHand,
+      playerHand,
+      splitHand,
+      activeSplitHand,
+      splitBets,
+      currentBet
+    };
+    saveToday();
+  }
+
+  /** The hand is over; nothing left to resume. */
+  function clearLive() { liveHand = null; }
+
   function startHand() {
     els.betArea.classList.add('hidden');
     els.betDisplay.classList.remove('hidden');
@@ -428,35 +467,44 @@ const BJGame = (function () {
     els.splitArea.classList.add('hidden');
     els.playerRow.classList.remove('bj-split-active');
 
-    // Deduct bet from chips upfront
+    // Deduct bet from chips upfront - and PERSIST it. In memory alone was the
+    // whole exploit: reloading restored the pre-bet stack from bj_chips, so
+    // the stake came back and the hand could be dealt again.
     chips -= currentBet;
     $('bj-current-bet').textContent = currentBet.toLocaleString();
     updateChipDisplay();
+    saveChips();
 
     // Fresh deck each hand
     deck = shuffle(createDeck());
     playerHand = [drawCard(), drawCard()];
     dealerHand = [drawCard(), drawCard()];
 
-    animateDeal(() => {
-      // Check for blackjack
-      if (isBlackjack(playerHand)) {
-        if (isBlackjack(dealerHand)) {
-          endHand('push');
-        } else {
-          endHand('blackjack');
-        }
-        return;
-      }
-      if (isBlackjack(dealerHand)) {
-        endHand('dealer_blackjack');
-        return;
-      }
-      showActions();
-    });
+    // The cards are already decided here; animateDeal only reveals them. Write
+    // them down before the reveal, so a reload during the deal resumes this
+    // hand instead of dealing another.
+    saveLive('deal');
+
+    animateDeal(afterDeal);
+  }
+
+  /** The decision that follows a deal. Split out so a resume can replay it. */
+  function afterDeal() {
+    if (isBlackjack(playerHand)) {
+      if (isBlackjack(dealerHand)) endHand('push');
+      else endHand('blackjack');
+      return;
+    }
+    if (isBlackjack(dealerHand)) {
+      endHand('dealer_blackjack');
+      return;
+    }
+    showActions();
   }
 
   function showActions() {
+    // Every moment the player can act is a moment they could reload.
+    saveLive('player');
     els.actions.classList.remove('hidden');
     $('bj-btn-hit').disabled = false;
     $('bj-btn-stay').disabled = false;
@@ -478,6 +526,9 @@ const BJGame = (function () {
     const hand = activeSplitHand === 0 ? playerHand : splitHand;
     const newCard = drawCard();
     hand.push(newCard);
+    // Drawn now, revealed a moment later. Written down now, so a reload
+    // during the reveal keeps the card the player actually drew.
+    saveLive('player');
     const container = activeSplitHand === 0 ? els.playerCards : els.splitCards;
 
     els.actions.querySelectorAll('button').forEach(b => { b.disabled = true; });
@@ -514,6 +565,12 @@ const BJGame = (function () {
       return;
     }
     els.actions.classList.add('hidden');
+    saveLive('dealer');
+    dealerThenResolve();
+  }
+
+  /** Dealer plays out a single (non-split) hand. Replayable on resume. */
+  function dealerThenResolve() {
     dealerPlay(() => {
       const pv = handValue(playerHand);
       const dv = handValue(dealerHand);
@@ -535,10 +592,14 @@ const BJGame = (function () {
       $('bj-current-bet').textContent = currentBet.toLocaleString();
     }
     updateChipDisplay();
+    saveChips();            // the doubled stake is spent, reload or not
 
     const hand = activeSplitHand === 0 ? playerHand : splitHand;
     const newCard = drawCard();
     hand.push(newCard);
+    // The card is drawn before it is shown; persist so a reload mid-animation
+    // resumes with it rather than drawing a different one.
+    saveLive('player');
     const container = activeSplitHand === 0 ? els.playerCards : els.splitCards;
 
     els.actions.querySelectorAll('button').forEach(b => { b.disabled = true; });
@@ -565,6 +626,7 @@ const BJGame = (function () {
     if (chips < currentBet) return;
     chips -= currentBet;
     updateChipDisplay();
+    saveChips();            // the second stake is spent, reload or not
 
     // Each hand starts with just 1 card — new cards are dealt via animation
     splitHand = [playerHand.pop()];
@@ -624,6 +686,7 @@ const BJGame = (function () {
 
   function resolveSplit() {
     els.actions.classList.add('hidden');
+    saveLive('split');
     dealerPlay(() => {
       const dv = handValue(dealerHand);
       const db = isBust(dealerHand);
@@ -704,6 +767,8 @@ const BJGame = (function () {
   }
 
   function finishHand(result, net, bannerHTML) {
+    // Paid out. A reload must not settle it a second time.
+    clearLive();
     els.betDisplay.classList.add('hidden');
     updateChipDisplay();
     saveChips();
@@ -918,6 +983,49 @@ const BJGame = (function () {
   }
 
   /* ── Init ── */
+  /**
+   * Put an interrupted hand back on the table and carry on.
+   *
+   * No deal animation: the cards are known, and re-dealing them would suggest
+   * the hand is starting over. The hole card stays face down for the phases
+   * where the player has not seen it yet, and is revealed by the dealer
+   * sequence otherwise, exactly as in normal play.
+   */
+  function resumeHand(live) {
+    deck            = live.deck || [];
+    dealerHand      = live.dealerHand || [];
+    playerHand      = live.playerHand || [];
+    splitHand       = live.splitHand || null;
+    activeSplitHand = live.activeSplitHand || 0;
+    splitBets       = live.splitBets || null;
+    currentBet      = live.currentBet || 0;
+
+    els.betArea.classList.add('hidden');
+    els.betDisplay.classList.remove('hidden');
+    els.handResult.classList.add('hidden');
+    els.handNum.textContent = 'Hand ' + (handNum + 1);
+    $('bj-current-bet').textContent =
+      (splitBets ? splitBets[0] + splitBets[1] : currentBet).toLocaleString();
+
+    const dealerDone = live.phase === 'dealer' || live.phase === 'split';
+    renderHand(els.dealerCards, dealerHand, !dealerDone, false);
+    els.dealerScore.classList.remove('hidden');
+    els.dealerScore.textContent = dealerDone
+      ? handValue(dealerHand)
+      : handValue([dealerHand[0]]);
+    renderPlayer();
+    if (splitHand) {
+      els.playerRow.classList.add('bj-split-active');
+      renderSplit();
+    }
+    updateChipDisplay();
+
+    if (live.phase === 'deal')        afterDeal();
+    else if (live.phase === 'dealer') dealerThenResolve();
+    else if (live.phase === 'split')  resolveSplit();
+    else                              showActions();
+  }
+
   function init() {
     els = {
       dealerCards: $('bj-dealer-cards'),
@@ -967,6 +1075,14 @@ const BJGame = (function () {
       } else {
         showFinalResults();
       }
+    } else if (today && today.live && today.live.playerHand) {
+      // A hand was dealt but never paid out - the player reloaded part way
+      // through it. Resume it. The stake has already left the stack, so
+      // dealing a fresh hand here would be the free redo this prevents.
+      handNum = today.handNum || 0;
+      sessionResults = today.results || [];
+      updateChipDisplay();
+      resumeHand(today.live);
     } else if (today && today.handNum > 0) {
       // Partial session restore
       handNum = today.handNum;

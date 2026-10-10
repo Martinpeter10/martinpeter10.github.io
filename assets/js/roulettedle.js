@@ -35,6 +35,9 @@ const RLGame = (function () {
   let sessionResults = [];        // [{pocket, net}]
   let dailyDone     = false;
   let isSpinning    = false;
+  // A spin whose outcome is decided but not yet settled. Persisted, so a
+  // reload resumes it instead of handing the stake back - see doSpin().
+  let liveSpin      = null;       // { bets, pocket, betTotal } | null
 
   /* ── DOM helper ── */
   const $ = (id) => document.getElementById(id);
@@ -75,7 +78,8 @@ const RLGame = (function () {
       chips,
       spinNum,
       results: sessionResults,
-      done: dailyDone
+      done: dailyDone,
+      live: liveSpin
     }));
 
     if (window.DJStore) DJStore.saveDaily(dailyDone);
@@ -392,6 +396,14 @@ const RLGame = (function () {
     const pocket    = ALL_POCKETS[Math.floor(Math.random() * ALL_POCKETS.length)];
     const pocketIdx = WHEEL_ORDER.indexOf(pocket);
 
+    // The outcome is decided NOW, before any of it is shown. Write it down
+    // before the animation starts: a reload during the spin used to hand the
+    // stake back and let the player bet again, which is a free redo every
+    // time a wheel looks like it is going the wrong way. Persisting the
+    // decided pocket means a reload can only ever resume this spin.
+    liveSpin = { bets: Object.assign({}, activeBets), pocket, betTotal };
+    saveToday();
+
     // Reset result badge
     $('rl-result-num').textContent = '?';
     $('rl-result-badge').className = 'rl-result-badge';
@@ -400,59 +412,88 @@ const RLGame = (function () {
     const finalDeg = startWheelAnimation();
 
     animateBall(finalDeg, pocketIdx, () => {
-      isSpinning = false;
-      $('rl-clear-bets').disabled = false;
-
-      // Evaluate bets, return stake + net
-      const net = evaluateBets(pocket);
-      chips += betTotal + net;
-      if (chips < 0) chips = 0;
-
-      // Update result badge
-      const color = pocketColor(pocket);
-      $('rl-result-badge').className = 'rl-result-badge rl-result-' + color;
-      $('rl-result-num').textContent = pocket;
-
-      updateChipDisplay();
-      saveChips();
-
-      sessionResults.push({ pocket, net });
-      pushHistory(pocket);
-      updateAllTime(net);
-      spinNum++;
-      saveToday();
-
-      showSpinResult(net, pocket);
-
-      // Decide what comes next
-      if (chips <= 0 && spinNum < SPINS_PER_DAY) {
-        setTimeout(() => {
-          activeBets = {};
-          updateBoardBets();
-          updateBetDisplay();
-          showBrokeScreen();
-        }, 2200);
-      } else if (spinNum >= SPINS_PER_DAY) {
-        setTimeout(() => {
-          activeBets = {};
-          updateBoardBets();
-          updateBetDisplay();
-          showFinalResults();
-        }, 2200);
-      } else {
-        // Ready for next spin — hide ball
-        setTimeout(() => {
-          const ballEl = document.getElementById('rl-ball');
-          if (ballEl) ballEl.setAttribute('visibility', 'hidden');
-          activeBets = {};
-          updateBoardBets();
-          updateBetDisplay();
-          $('rl-spin-result').classList.add('hidden');
-          updateSpinIndicator();
-          updateSpinBtn();
-        }, 2200);
-      }
+      settleSpin(pocket, betTotal);
+      afterSpin(2200);
     });
+  }
+
+  /**
+   * Pay out a spin whose pocket is already decided.
+   *
+   * Split out of the animation callback so the restore path can call it too:
+   * a spin interrupted by a reload is settled on the pocket that was chosen
+   * when the player pressed Spin, never a fresh one.
+   */
+  function settleSpin(pocket, betTotal) {
+    isSpinning = false;
+    const clearBtn = $('rl-clear-bets');
+    if (clearBtn) clearBtn.disabled = false;
+
+    const net = evaluateBets(pocket);
+    chips += betTotal + net;
+    if (chips < 0) chips = 0;
+
+    const color = pocketColor(pocket);
+    $('rl-result-badge').className = 'rl-result-badge rl-result-' + color;
+    $('rl-result-num').textContent = pocket;
+
+    updateChipDisplay();
+    saveChips();
+
+    sessionResults.push({ pocket, net });
+    pushHistory(pocket);
+    updateAllTime(net);
+    spinNum++;
+    // The spin is paid; it must not be settled a second time on the next load.
+    liveSpin = null;
+    saveToday();
+
+    showSpinResult(net, pocket);
+  }
+
+  /** Clear the table and move to whatever comes next. */
+  function afterSpin(delay) {
+    if (chips <= 0 && spinNum < SPINS_PER_DAY) {
+      setTimeout(() => {
+        activeBets = {};
+        updateBoardBets();
+        updateBetDisplay();
+        showBrokeScreen();
+      }, delay);
+    } else if (spinNum >= SPINS_PER_DAY) {
+      setTimeout(() => {
+        activeBets = {};
+        updateBoardBets();
+        updateBetDisplay();
+        showFinalResults();
+      }, delay);
+    } else {
+      setTimeout(() => {
+        const ballEl = document.getElementById('rl-ball');
+        if (ballEl) ballEl.setAttribute('visibility', 'hidden');
+        activeBets = {};
+        updateBoardBets();
+        updateBetDisplay();
+        $('rl-spin-result').classList.add('hidden');
+        updateSpinIndicator();
+        updateSpinBtn();
+      }, delay);
+    }
+  }
+
+  /**
+   * Finish a spin that a reload interrupted.
+   *
+   * No wheel animation - the ball has already landed as far as the game is
+   * concerned, and replaying five seconds of spinning would suggest the
+   * outcome is still open. The result banner is shown immediately instead.
+   */
+  function resumeSpin(live) {
+    activeBets = live.bets || {};
+    updateBoardBets();
+    updateBetDisplay();
+    settleSpin(live.pocket, live.betTotal || 0);
+    afterSpin(1200);
   }
 
   /* ── Spin result banner ── */
@@ -853,6 +894,15 @@ const RLGame = (function () {
       } else {
         showFinalResults();
       }
+    } else if (today && today.live && typeof today.live.pocket !== 'undefined') {
+      // A spin was decided but never paid out - the player reloaded while the
+      // wheel was turning. Resume it. The stake has already left the stack
+      // (saveChips runs before the animation), so handing the table back as
+      // if nothing happened would be the free redo this exists to prevent.
+      spinNum        = today.spinNum || 0;
+      sessionResults = today.results || [];
+      updateSpinIndicator();
+      resumeSpin(today.live);
     } else if (today && today.spinNum > 0) {
       // Mid-session restore
       spinNum        = today.spinNum;
