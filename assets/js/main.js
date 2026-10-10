@@ -363,6 +363,16 @@ function saveDailyGameState() {
 function restoreGameState() {
   currentGuess = dailyGameState.currentGuess;
   currentClipLength = timeIncrements[currentGuess - 1];
+  // The LABEL has to be set here too. The clip itself was always restored
+  // correctly - playback reads currentClipLength, set on the line above - but
+  // the span is hardcoded "1 second" in the HTML and only ever updated when a
+  // guess is submitted. So after a mid-game reload a player on their sixth
+  // guess was told they had 1 second while actually getting 15, which reads
+  // as the game having thrown away their progress.
+  if (clipLengthSpan) {
+    clipLengthSpan.textContent =
+      currentClipLength + (currentClipLength === 1 ? ' second' : ' seconds');
+  }
   dailyGameState.guesses.forEach((guess, index) => {
     const guessSlot = document.getElementById(`guessSlot-${index + 1}`);
     if (!guessSlot) return;

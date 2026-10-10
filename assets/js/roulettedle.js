@@ -836,7 +836,14 @@ const RLGame = (function () {
     if (today && today.done) {
       // Already finished today
       spinNum        = today.spinNum;
-      chips          = today.chips;
+      // chips deliberately NOT taken from `today`. There are two copies of the
+      // stack and only one is kept current: XX_chips is written on every chip
+      // movement and is what DJStore mirrors to progress.chips, while
+      // today.chips is only refreshed when a round resolves. Roulettedle
+      // showed the cost - it saves chips the moment a bet is placed, so after
+      // a mid-spin reload the screen read today.chips (1,100) while the stack
+      // really held 1,000, and the next save wrote the inflated figure back.
+      // One source of truth: loadChips(), already read above.
       sessionResults = today.results || [];
       dailyDone      = true;
       updateChipDisplay();
@@ -849,7 +856,6 @@ const RLGame = (function () {
     } else if (today && today.spinNum > 0) {
       // Mid-session restore
       spinNum        = today.spinNum;
-      chips          = today.chips;
       sessionResults = today.results || [];
       updateChipDisplay();
       updateSpinIndicator();

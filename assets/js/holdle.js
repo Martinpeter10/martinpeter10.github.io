@@ -2059,7 +2059,14 @@ const HDGame = (function () {
 
     if (today && today.done) {
       handNum        = today.handNum;
-      chips          = today.chips;
+      // chips deliberately NOT taken from `today`. There are two copies of the
+      // stack and only one is kept current: XX_chips is written on every chip
+      // movement and is what DJStore mirrors to progress.chips, while
+      // today.chips is only refreshed when a round resolves. Roulettedle
+      // showed the cost - it saves chips the moment a bet is placed, so after
+      // a mid-spin reload the screen read today.chips (1,100) while the stack
+      // really held 1,000, and the next save wrote the inflated figure back.
+      // One source of truth: loadChips(), already read above.
       sessionResults = today.results || [];
       dailyDone      = true;
       updateChipDisplay();
@@ -2070,7 +2077,6 @@ const HDGame = (function () {
       }
     } else if (today && today.handNum > 0) {
       handNum        = today.handNum;
-      chips          = today.chips;
       sessionResults = today.results || [];
       updateChipDisplay();
       if (handNum >= HANDS_PER_DAY || chips <= 0) {
