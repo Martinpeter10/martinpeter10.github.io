@@ -1976,6 +1976,8 @@ const HDGame = (function () {
     const atSign  = at.totalNet >= 0 ? '+' : '';
     const atColor = at.totalNet >= 0 ? '#4ade80' : '#f87171';
 
+    // The other half of a stats modal: what everyone else scored.
+    if (window.DJGlobal) DJGlobal.attach({ game: 'holdle', contentId: 'hd-stats-content' });
     DJUtils.setStatRows('hd-stats-content', [
       { label: 'Current Stack',    value: chips.toLocaleString() + ' chips', color: '#4ade80' },
       { label: 'Games Played',     value: s.played || 0 },

@@ -394,6 +394,8 @@
     const stats = loadStats();
     const shutRate = stats.played ? Math.round((stats.shut / stats.played) * 100) + '%' : '-';
     const avg = stats.played ? (stats.totalScore / stats.played).toFixed(1) : '-';
+    // The other half of a stats modal: what everyone else scored.
+    if (window.DJGlobal) DJGlobal.attach({ game: 'shutthebox', contentId: 'stb-stats-content' });
     DJUtils.setStatRows('stb-stats-content', [
       { label: 'Games Played', value: stats.played },
       { label: 'Boxes Shut', value: stats.shut, color: '#4ade80' },

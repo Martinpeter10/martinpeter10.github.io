@@ -657,6 +657,68 @@ came from a browser and cannot be verified.
 
 ---
 
+## Global Stats (`/assets/js/globalstats.js`, migration 0011)
+
+An **Everyone** tab inside each game's own stats modal. The modal only ever showed the player
+their own trend, which says nothing about whether four guesses is good.
+
+**One module and one SQL function serve all ten games**, because everything that differs per game
+is already in `game_defs` and comes back in the payload:
+
+| From `game_defs` | Used for |
+|---|---|
+| `score_label` | "Average guesses" vs "Average session net" |
+| `sort_mult` | which end of the range `best` comes from |
+| `notable_op` / `notable_value` / `notable_label` | the global success rate, correctly labelled per game |
+
+`notable_*` was added for the leaderboards page and turns out to be exactly the "what fraction
+succeeded" rule each game needs - Themedle `lte 6` "Wins", Chain Link `eq 20` "Perfect games", the
+chip games `gt 0` "Winning days". **A new game needs no changes to `globalstats.js`.**
+
+**`DJGlobal.attach()` inserts SIBLINGS, never children.** Every game rewrites its stats container
+on each open, so anything of ours inside it would be wiped. The tab bar goes before the container
+and the panel after it; `attach` is safe to call on every open and only refreshes `mine`.
+
+**Roulettedle is the exception**: its modal is several sibling sections rather than one container,
+so `roulettedle/index.html` wraps them in `#rl-hist-own` for the tab to hide as a unit. Its heading
+is "Spin History", not "My Stats" - the heading is swapped to "Everyone" and restored to whatever
+it was, so never assume the string.
+
+**Distribution shape is chosen from the data, not the declared bounds.** A bar per distinct score
+where the real spread is <= 24 (every guess-count game), otherwise ten buckets - and the buckets
+come from the actual min/max, because the chip games are bounded at +/-100000 as a sanity check
+while real session nets live in the hundreds, so declared bounds would put everything in one bar.
+
+**TODAY ONLY.** Lifetime and weekly comparisons live on the leaderboards page; repeating them in
+the modal would be two places to maintain and two places to disagree. What belongs in a game's own
+modal is the thing that is only true right now - how everyone did on today's puzzle. There is no
+period toggle, and `plays` is not shown beside `players` because for a single day they are the
+same number.
+
+**SIGNED IN ONLY, and that is the point.** The player's own stats work signed out exactly as they
+always have; seeing how everyone else did is what an account buys. So:
+
+- the tab is shown to **everyone** - a feature nobody can see is not an incentive - and the
+  sign-in pitch is what sits behind it when signed out;
+- the client does not call the RPC at all when signed out, so there is no doomed request;
+- the grant is **`authenticated` alone**. Granting `anon` would make the gate cosmetic, one curl
+  away.
+
+`signedIn()` is checked when the tab is opened, not when it is attached, and the panel reloads on
+every switch - so a player who signs in from the pitch comes back to figures rather than to the
+pitch they just answered. **Share Stats is hidden on the Everyone tab**, found by `id*="share"`
+rather than listed per game, because it shares the player's own stats and means nothing under
+everyone else's.
+
+**Do not compose "Best" with `score_label`.** It produces "Best guesses", which is the exact
+phrase the leaderboards page was pulled up on. The row says **"Best result"**; the unit is already
+established by the Average row above it.
+
+`tests/globalstats.mjs` opens all ten modals signed out, switches tabs both ways, and checks the
+heading changes and comes back.
+
+---
+
 ## Account System (`/assets/js/account.js`)
 
 Loaded on every page except `404.html` (which has no `site-header` to attach to), after

@@ -488,6 +488,8 @@
   function showStats() {
     const s = loadStats();
     const avg = s.played ? Math.round(s.totalScore / s.played) : 0;
+    // The other half of a stats modal: what everyone else scored.
+    if (window.DJGlobal) DJGlobal.attach({ game: 'yachtdle', contentId: 'yc-stats-content' });
     DJUtils.setStatRows('yc-stats-content', [
       { label: 'Scorecards Played', value: s.played },
       { label: 'Best Score',        value: s.best, color: '#34d399' },

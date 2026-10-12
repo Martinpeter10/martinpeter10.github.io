@@ -669,6 +669,10 @@ const RLGame = (function () {
   }
 
   function showHistory() {
+    // The other half of a stats modal: what everyone else scored.
+    if (window.DJGlobal) {
+      DJGlobal.attach({ game: 'roulettedle', contentId: 'rl-hist-own' });
+    }
     const history = loadHistory();
 
     // Last 10 spins as colored chips

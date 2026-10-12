@@ -463,6 +463,8 @@
     const played = s.played || 0;
     const avg    = played > 0 ? (((s.totalScore || 0) / played)).toFixed(1) : '—';
 
+    // The other half of a stats modal: what everyone else scored.
+    if (window.DJGlobal) DJGlobal.attach({ game: 'chainlink', contentId: 'cl-stats-content' });
     DJUtils.setStatRows('cl-stats-content', [
       { label: 'Games Played', value: played },
       { label: 'Average Score', value: avg + ' / 20', color: '#facc15' },

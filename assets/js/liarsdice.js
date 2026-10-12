@@ -649,6 +649,8 @@
   function showStats() {
     const stats = loadStats();
     const winRate = stats.played ? Math.round((stats.wins / stats.played) * 100) + '%' : '-';
+    // The other half of a stats modal: what everyone else scored.
+    if (window.DJGlobal) DJGlobal.attach({ game: 'liarsdice', contentId: 'bf-stats-content' });
     DJUtils.setStatRows('bf-stats-content', [
       { label: 'Games Played', value: stats.played },
       { label: 'Tables Won', value: stats.wins, color: '#4ade80' },

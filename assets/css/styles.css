@@ -2806,3 +2806,36 @@ input[type=range].slider::-moz-range-thumb {
 .dj-store-spin{width:15px;height:15px;border-radius:999px;border:2px solid rgba(255,255,255,.2);border-top-color:#2ecc71;animation:dj-store-spin .7s linear infinite}
 @keyframes dj-store-spin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.dj-store-spin{animation-duration:2s}}
+
+
+/* ── Global stats ("Everyone" tab in each game's stats modal) ──────────────
+   Literal brand colours, not vars: game pages redefine --brand per game and
+   this panel has to look the same in all ten. */
+.dj-g-tabs{display:flex;gap:.4rem;margin:0 0 .9rem;background:rgba(255,255,255,.05);padding:.25rem;border-radius:10px}
+.dj-g-tab{flex:1;padding:.45rem .5rem;border:0;border-radius:8px;background:transparent;color:#b8b8d1;font-family:inherit;font-size:.82rem;font-weight:700;cursor:pointer}
+.dj-g-tab.is-on{background:#2ecc71;color:#07301a}
+.dj-g-tab:focus-visible{outline:2px solid #45b7d1;outline-offset:2px}
+
+/* The signed-out pitch. This panel is what an account buys, so what sits
+   behind the tab when signed out is an invitation, not an error. */
+.dj-g-pitch{text-align:center;padding:.75rem .25rem}
+.dj-g-pitch-lede{margin:0 0 .9rem;color:#b8b8d1;font-size:.86rem;line-height:1.5}
+.dj-g-pitch-btn{display:inline-block;padding:.55rem 1.4rem;border:0;border-radius:10px;background:#2ecc71;color:#07301a;font-family:inherit;font-size:.88rem;font-weight:800;cursor:pointer}
+.dj-g-pitch-btn:hover{background:#29b765}
+.dj-g-pitch-btn:focus-visible{outline:2px solid #45b7d1;outline-offset:2px}
+.dj-g-pitch-fine{margin:.8rem 0 0;color:#8f8fa8;font-size:.74rem}
+
+.dj-g-empty{margin:.9rem 0;color:#8f8fa8;font-size:.84rem;text-align:center}
+.dj-g-rows{display:flex;flex-direction:column;gap:.1rem}
+.dj-g-row{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;padding:.4rem .1rem;border-bottom:1px solid rgba(255,255,255,.07)}
+.dj-g-label{color:#b8b8d1;font-size:.82rem}
+.dj-g-value{color:#fff;font-weight:800;font-size:.9rem;font-variant-numeric:tabular-nums}
+.dj-g-h{margin:1rem 0 .5rem;color:#b8b8d1;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em}
+
+.dj-g-chart{display:flex;flex-direction:column;gap:.25rem}
+.dj-g-bar-row{display:flex;align-items:center;gap:.5rem}
+.dj-g-key{min-width:3.2em;text-align:right;color:#b8b8d1;font-size:.78rem;font-variant-numeric:tabular-nums}
+.dj-g-track{flex:1;min-width:0}
+.dj-g-fill{display:flex;justify-content:flex-end;align-items:center;padding:.12rem .4rem;border-radius:4px;background:#3a3a55;color:#fff;font-size:.74rem;font-weight:700;font-variant-numeric:tabular-nums}
+.dj-g-fill.is-mine{background:#2ecc71;color:#07301a}
+.dj-g-bar-row.is-mine .dj-g-key{color:#2ecc71;font-weight:800}

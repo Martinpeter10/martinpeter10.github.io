@@ -731,6 +731,16 @@
     const wins   = s.wins   || 0;
     const winPct = played > 0 ? Math.round(wins / played * 100) : 0;
 
+    // The other half of a stats modal: what everyone else scored.
+    if (window.DJGlobal) {
+      // Exactly the expression djSubmit uses, so the highlight lands on the
+      // bar the player is really in. spd_today has no won/done fields - the
+      // win is derived from the last guess, same as on the submit path.
+      var won  = guesses.length > 0 && isWin(guesses[guesses.length - 1].results);
+      var mine = gameOver ? (won ? guesses.length : MAX_GUESSES + 1) : null;
+      DJGlobal.attach({ game: 'spelldle', contentId: 'spd-stats-content',
+                        extraIds: ['spd-stats-dist'], mine: mine });
+    }
     DJUtils.setStatRows('spd-stats-content', [
       { label: 'Games Played', value: played },
       { label: 'Wins', value: wins, color: '#4ade80' },

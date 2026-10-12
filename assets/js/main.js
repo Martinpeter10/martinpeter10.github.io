@@ -753,6 +753,16 @@ function showStatsModal() {
   const wins   = s.wins || 0;
   const winPct = played > 0 ? Math.round(wins / played * 100) : 0;
 
+  // The other half of a stats modal: what everyone else scored.
+  if (window.DJGlobal) {
+    // Highlight today's own result in the distribution - the same number
+    // djSubmit sends, so it lands on the bar the player is actually in.
+    var mine = dailyGameState && dailyGameState.completed
+      ? (dailyGameState.won ? currentGuess : 7)
+      : null;
+    DJGlobal.attach({ game: 'themedle', contentId: 'td-stats-content',
+                      extraIds: ['td-stats-dist'], mine: mine });
+  }
   DJUtils.setStatRows('td-stats-content', [
     { label: 'Games Played', value: played },
     { label: 'Wins', value: wins, color: '#4ade80' },

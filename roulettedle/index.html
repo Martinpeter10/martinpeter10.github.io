@@ -8,7 +8,7 @@
   <meta name="robots" content="index,follow">
   <link rel="canonical" href="https://dailyjamm.com/roulettedle/">
   <link rel="icon" type="image/png" href="/assets/img/favicon.png">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=20261010c">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=20261012c">
 
   <!-- Open Graph -->
   <meta property="og:site_name" content="DailyJamm" />
@@ -65,13 +65,14 @@
     "author": { "@type": "Organization", "name": "DailyJamm", "url": "https://dailyjamm.com" }
   }
   </script>
-  <script src="/assets/js/menu.js?v=20261010c" defer></script>
-  <script src="/assets/js/favorites.js?v=20261010c" defer></script>
-  <script src="/assets/js/vendor/supabase.js?v=20261010c" defer></script>
-  <script src="/assets/js/dj-config.js?v=20261010c" defer></script>
-  <script src="/assets/js/account.js?v=20261010c" defer></script>
-  <script src="/assets/js/store.js?v=20261010c" defer></script>
-  <script src="/assets/js/notify.js?v=20261010c" defer></script>
+  <script src="/assets/js/menu.js?v=20261012c" defer></script>
+  <script src="/assets/js/favorites.js?v=20261012c" defer></script>
+  <script src="/assets/js/vendor/supabase.js?v=20261012c" defer></script>
+  <script src="/assets/js/dj-config.js?v=20261012c" defer></script>
+  <script src="/assets/js/account.js?v=20261012c" defer></script>
+  <script src="/assets/js/globalstats.js?v=20261012c" defer></script>
+  <script src="/assets/js/store.js?v=20261012c" defer></script>
+  <script src="/assets/js/notify.js?v=20261012c" defer></script>
 </head>
 <body class="bg-gray-900 text-white">
 
@@ -307,6 +308,10 @@
          style="-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:calc(1.25rem + env(safe-area-inset-bottom,0px))">
       <h2 class="text-xl font-black text-center mb-4">Spin History</h2>
 
+      <!-- Wrapped so the Everyone tab can hide this player's own sections as
+           one unit; this modal has several siblings rather than one content
+           container like the other games. -->
+      <div id="rl-hist-own">
       <!-- Last 10 spins -->
       <div class="mb-5">
         <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-3">Last 10 Spins</h3>
@@ -337,6 +342,7 @@
         <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-3">All-Time</h3>
         <div id="rl-hist-alltime"></div>
       </div>
+      </div><!-- /rl-hist-own -->
 
       <button id="rl-hist-share-btn"
         class="w-full py-2.5 bg-green-700 hover:bg-green-600 text-white text-sm font-bold rounded-lg transition-colors mb-2">
@@ -424,8 +430,8 @@
     </div>
   </div>
 
-  <script src="/assets/js/utils.js?v=20261010c" defer></script>
-  <script src="/assets/js/roulettedle.js?v=20261010c" defer></script>
+  <script src="/assets/js/utils.js?v=20261012c" defer></script>
+  <script src="/assets/js/roulettedle.js?v=20261012c" defer></script>
 
 
 </body>
