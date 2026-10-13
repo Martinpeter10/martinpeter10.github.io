@@ -208,6 +208,11 @@ Full release notes are also available at [dailyjamm.com/releases](https://dailyj
 - Privacy Policy and Terms of Service updated to explain what an account stores, what is public, and how to have your account deleted.
 - New contact address for questions and feedback: **dailyjammcontactus@gmail.com**, on the About, Privacy and Terms pages.
 
+**Our Favorite Games**
+
+- Added **Magnitudle**, **Krillion** and **Color-Toon** to the curated list.
+- Removed Contexto, Linxicon and Spelling Bee. If you had any of those starred, they will drop off your Your Favorite Games list.
+
 **Spelldle fixes**
 
 - **Casting time is now a proper scale** rather than right-or-wrong. Reaction, Bonus, Action, 1 Minute, 10 Minutes, 1 Hour, 8 Hours, 12 Hours and 24 Hours sit in order, and a guess one step away turns yellow with an arrow pointing the way - the same way Range and Duration already worked.
