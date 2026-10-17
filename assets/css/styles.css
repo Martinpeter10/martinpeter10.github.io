@@ -2710,6 +2710,15 @@ input[type=range].slider::-moz-range-thumb {
   .site-header{gap:10px}
   .dj-bell-btn,.dj-acct-btn{width:30px;height:30px}
 }
+/* Holdle carries a sixth control - its opponent guide - on top of the five
+   every game now has (stats, help, trophy, bell, account). At 375px, the
+   narrowest phone still worth supporting, that pushed the account button 9px
+   off the right edge where it could not be tapped. Reclaimed from padding and
+   gaps rather than from the buttons: they are already 30px, and shrinking a
+   tap target further to fit one more control is the wrong trade. */
+@media (max-width:400px){
+  .site-header{padding-left:12px;padding-right:12px;gap:8px}
+}
 
 /* ── Leaderboards page + nav trophy (leaderboards.js, menu.js) ── */
 .dj-boards-btn{width:32px;height:32px;border-radius:999px;border:1px solid #4b5563;background:transparent;color:#9ca3af;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0;text-decoration:none;transition:border-color .2s,color .2s}

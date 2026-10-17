@@ -185,8 +185,14 @@ injected at runtime. Do not hardcode either one anywhere. Full order as rendered
 - The **account button** is injected by `account.js` and is always present (when the backend is reachable).
 - The **release bell** is injected by `notify.js` and is **always present**. Only its glow is
   conditional. Do not make it conditional on unread state - a control that appears and disappears
-  shifts the buttons beside it and is harder to find a second time. Four round buttons plus the
-  brand are tight at 375px, which is why `styles.css` shrinks them under 420px.
+  shifts the buttons beside it and is harder to find a second time.
+
+**Header width at 375px is the real constraint.** Five controls plus the brand are tight, which is
+why `styles.css` shrinks the buttons under 420px and tightens padding and gaps under 400px.
+**Holdle has a sixth** - its opponent guide - and at 375px that pushed the account button 9px off
+the right edge where it could not be tapped. Space was reclaimed from padding and gaps, not from
+the buttons: they are already 30px and shrinking a tap target to fit one more control is the wrong
+trade. **Adding a seventh header control would overflow again** - check `tests/layout.mjs`.
 
 ```html
 <!-- Place these immediately after <div class="flex-1"></div> inside the header -->

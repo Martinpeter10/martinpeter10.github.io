@@ -148,6 +148,23 @@ A missing **Authorized JavaScript origin** is reported as **PENDING**, not a
 failure. It means the code is right and the Google console needs that
 environment's hostname.
 
+## layout.mjs - nothing pushed off the edge of a phone
+
+```sh
+node layout.mjs
+```
+
+Every page at 375px and at desktop. What it catches is a control pushed
+outside the viewport where it cannot be tapped - Holdle hit exactly this: it
+carries a sixth header control (its opponent guide) on top of the five every
+game now has, and the account button ended up 9px past the right edge.
+
+Elements inside a deliberately side-scrolling container are **not** flagged.
+Spelldle's nine-attribute grid and BlackJackdle's table both overflow on
+purpose, identically on production - flagging them would be noise that trains
+you to ignore the output. Checking that against prod is what separated the one
+real regression from the two false alarms.
+
 ## play.mjs - the original single-game script
 
 ```sh
