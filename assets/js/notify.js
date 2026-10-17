@@ -22,12 +22,6 @@ window.DJNotify = (function () {
   // Any one of these means the browser has played DailyJamm before. Used to
   // tell a returning player (who should hear about the release) from a brand
   // new one (who should not be greeted by news of a version they never missed).
-  var PRIOR_USE_KEYS = [
-    'dj_cookie_ok', 'dj_favorites', 'dj_account',
-    'td_stats_v2', 'cl_stats_v2', 'spd_stats_v2', 'bj_stats_v2', 'rl_stats_v2',
-    'hd_stats_v2', 'bf_stats_v2', 'sb_stats_v2', 'stb_stats_v2', 'yc_stats_v2'
-  ];
-
   var BELL_SVG =
     '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" ' +
     'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
@@ -46,25 +40,25 @@ window.DJNotify = (function () {
     catch (e) { /* nothing to do - the bell simply returns next load */ }
   }
 
-  function hasPlayedBefore() {
-    for (var i = 0; i < PRIOR_USE_KEYS.length; i++) {
-      if (read(PRIOR_USE_KEYS[i])) return true;
-    }
-    return false;
-  }
-
   /** True when this browser should be told about RELEASE.version. */
+  /**
+   * One rule: the bell glows until the player has actually seen this release.
+   *
+   * It used to try to spare brand-new visitors an announcement that predated
+   * them, by looking for signs of prior use (cookie consent, favorites, any
+   * stats key) and quietly marking the release seen when it found none. That
+   * had two problems. It guessed, and it guessed WRONG for anyone on a fresh
+   * browser, a cleared profile or a new device - they were silently opted out
+   * of the only notification we send. And because it wrote the flag on that
+   * first load, the glow never came back for them even once they started
+   * playing.
+   *
+   * So nothing is inferred and nothing is auto-marked. The flag is written in
+   * exactly one place - acknowledge() - which runs when the player opens the
+   * panel, dismisses it, or clicks through to the releases page.
+   */
   function isUnread() {
-    var seen = read(SEEN_KEY);
-    if (seen === RELEASE.version) return false;
-    if (seen) return true;              // saw an older release, has missed this one
-
-    // Never recorded a release. A returning player missed this one; a first-time
-    // visitor did not, so quietly bring them up to date instead of announcing
-    // news that predates them.
-    if (hasPlayedBefore()) return true;
-    markSeen();
-    return false;
+    return read(SEEN_KEY) !== RELEASE.version;
   }
 
   // ── Panel ────────────────────────────────────────────────────────────────

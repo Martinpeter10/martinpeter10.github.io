@@ -1044,11 +1044,23 @@ opens the panel, so "what's new" is always reachable.
 clicking through to the releases page. All three route through `acknowledge()`, which writes
 `dj_seen_release` and drops the glow without removing the button.
 
-**First-visit handling**: a browser with no `dj_seen_release` is ambiguous - it could be a
-returning player who predates the bell, or someone brand new. `hasPlayedBefore()` checks for any
-existing DailyJamm key (`dj_cookie_ok`, `dj_favorites`, any `*_stats_v2`). A returning player gets
-the notification; a genuinely new visitor is silently brought up to date, because announcing a
-release that predates them is noise.
+**One rule: it glows until the player acknowledges it.** `isUnread()` is
+`read(SEEN_KEY) !== RELEASE.version` and nothing else, and `markSeen()` is reachable only from
+`acknowledge()`.
+
+It used to try to be clever: a browser with no `dj_seen_release` is ambiguous - a returning player
+who predates the bell, or someone brand new - so `hasPlayedBefore()` looked for any existing
+DailyJamm key and, finding none, quietly marked the release seen rather than announce news that
+predated them.
+
+**That guessed, and it guessed wrong for anyone on a fresh browser, a cleared profile or a new
+device** - they were silently opted out of the only notification the site sends. Worse, because
+the flag was written on that first load, the glow never returned even once they started playing.
+Found on a real visit to the test site, where a clean browser profile meant the release went
+unannounced. **Do not reintroduce the inference**; an extra "what's new" for a first-time visitor
+is a far cheaper mistake than a returning player never hearing about a release.
+
+`tests/bell.mjs` covers every visitor type plus the acknowledge-and-reload path.
 
 **Public API** (`window.DJNotify`): `version`, `show()` (force the panel open), `reset()` (clear
 the seen flag so the bell returns - useful for testing from the console).

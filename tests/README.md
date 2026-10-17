@@ -182,6 +182,20 @@ nobody ever saw.
 It also asserts the caret lands within 2px of the trophy's centre at both
 390px and 375px, because a fixed offset previously pointed at the bell.
 
+## bell.mjs - the release bell glows until acknowledged
+
+```sh
+node bell.mjs
+```
+
+One rule, and the test exists because the old rule guessed. It used to infer
+whether a browser looked "new" and silently mark the release seen for those -
+which opted out anyone on a fresh browser or a cleared profile, permanently,
+since the flag was written on that first load.
+
+Covers every visitor type plus the part that matters: clicking the bell stops
+the glow, and it stays stopped across a reload.
+
 ## layout.mjs - nothing pushed off the edge of a phone
 
 ```sh
