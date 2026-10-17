@@ -1,7 +1,13 @@
 # DailyJamm - Project Instructions
 
 ## What This Is
-DailyJamm (dailyjamm.com) is a daily games hub hosted on GitHub Pages. It features original custom-built games, curates links to external daily games, and lets players build their own "Your Favorite Games" list (star built-in games or add custom links; see Favorites System below). Dark-mode-only, mobile-first, no backend - all game state lives in localStorage.
+DailyJamm (dailyjamm.com) is a daily games hub hosted on GitHub Pages. It features original custom-built games, curates links to external daily games, and lets players build their own "Your Favorite Games" list (star built-in games or add custom links; see Favorites System below). Dark-mode-only and mobile-first.
+
+**Playing needs no account and no network.** localStorage is still the working store and every game
+runs exactly as it always did signed out. Since v3.5.0 there is also a **Supabase backend** behind
+it: sign in and the server owns your game state, chip stacks, lifetime stats and leaderboard
+scores, with localStorage acting as the cache that lets a game paint synchronously. See Game State,
+Leaderboards and Account System below.
 
 ## Domain & Hosting
 - Domain: `dailyjamm.com` (CNAME file)
@@ -329,6 +335,50 @@ The two should stay in sync with identical content. Release notes should be play
 - Include streak tracking, share-to-clipboard, and countdown-to-next-puzzle
 - Disable game replay if already completed today
 
+### 14. Wire the game into the backend (REQUIRED since v3.5.0)
+
+**None of this fails loudly.** A game that skips these steps looks perfect signed out and is
+quietly missing from the leaderboards, does not sync, and shows an empty Everyone tab. Work
+through all of it.
+
+**In the game's JS:**
+
+| Do this | Why |
+|---|---|
+| `DJStore.ready(boot)` instead of `DOMContentLoaded` | Otherwise it paints before server state arrives |
+| `djSubmit(score, extras)` at completion **and on the restore path** | A day played signed-out then signed into never reaches the boards otherwise. `submit_score` is idempotent per player/game/day, so the second call is free |
+| `DJStore.saveStats()` after writing any `*_stats_v2` key | Otherwise the stats modal never syncs |
+| `DJGlobal.attach({ game, contentId })` in `showStats()` | The Everyone tab |
+
+**In `store.js`:** add the game to **both** `GAMES` (its `daily`, and `chips`/`bonus`/`stats` keys)
+and `PATHS`. Miss either and it neither hydrates nor syncs.
+
+**In the page:** load `globalstats.js` alongside the other shared scripts.
+
+**In `game_defs`, in all three schemas** (`public`, `app_tst`, `app_dev`) - a migration template
+plus `./generate.sh`:
+
+| Column | What it drives |
+|---|---|
+| `label`, `score_label` | How the score is named everywhere |
+| `min_score` / `max_score` | `submit_score` rejects anything outside - sanity bounds, not scoring rules |
+| `sort_mult` | `-1` when **lower is better** |
+| `sort_order` | Position on the leaderboards page |
+| `notable_op` / `notable_value` / `notable_label` | What counts as a good result, used by both the boards and the Everyone panel |
+| `global_dist` | `true` only for guess-count games |
+| `global_kind` | `'chips'` for a session-net game, else null |
+
+**If it is a chip game**, also: persist the stake the moment it leaves the stack (`saveChips()` at
+ante/call/raise/double/split), and persist the in-progress round to `XX_today.live` so a reload
+resumes rather than refunds. See the chip-game section below - this was a real exploit.
+
+**Header budget:** a game page now carries stats, help, trophy, bell and account. **Holdle's sixth
+control already overflows 375px**, so a new game adding its own button needs `tests/layout.mjs`
+run before you believe it fits.
+
+**Then run** `node tests/smoke.mjs`, `node tests/layout.mjs` and `node tests/globalstats.mjs` -
+all three cover every game automatically and will notice a missing one.
+
 ---
 
 ## Checklist: Adding an External Game Link
@@ -353,7 +403,9 @@ Add to the "Our Favorite Games" section of the drawer nav in **alphabetical orde
 
 Pages to update:
 - `index.html`
-- All 6 game pages (`/themedle/`, `/chainlink/`, `/blackjackdle/`, `/spelldle/`, `/roulettedle/`, `/holdle/`)
+- All **10** game pages (`/themedle/`, `/chainlink/`, `/blackjackdle/`, `/spelldle/`,
+  `/roulettedle/`, `/holdle/`, `/liarsdice/`, `/netzero/`, `/shutthebox/`, `/yachtdle/`)
+- `/leaderboards/`
 - All info pages (`/about/`, `/releases/`, `/terms/`, `/privacy/`)
 
 ### 3. Add to the Favorites Catalog
@@ -398,6 +450,7 @@ gameid: { title: 'Game Name', url: 'https://example.com/', ext: true },
 ├── themedle/index.html           # Game pages (also chainlink, blackjackdle,
 ├── ...                           #   spelldle, roulettedle, holdle, liarsdice, netzero,
 ├── ...                           #   shutthebox, yachtdle)
+├── leaderboards/index.html       # Leaderboards page (see Leaderboards below)
 ├── about/index.html              # About page
 ├── releases/index.html           # Release notes page
 ├── terms/index.html              # Terms of Service page
@@ -409,7 +462,9 @@ gameid: { title: 'Game Name', url: 'https://example.com/', ext: true },
 
 ## Game Design Conventions
 - **Daily reset**: Games use Chicago timezone (`America/Chicago` via `Intl.DateTimeFormat`) for consistent daily rotation
-- **No backend**: All state in localStorage; no server, no database
+- **Backend is optional, never required**: signed out, all state is in localStorage and nothing is
+  sent anywhere. Signed in, the server owns it and localStorage caches it. A game must behave
+  identically either way - if an account failure can break a game, that is the bug.
 - **Puzzle cycling**: Chain Link uses day-of-year (puzzle #1 = Jan 1, auto-resets each Jan 1). Other games cycle modularly off a fixed epoch. Prefer day-of-year for clean annual resets.
 - **Scoring**: Use emoji dots in share text (🟢 = best, 🟡 = partial, 🔴 = missed)
 - **Share format**: Copy-to-clipboard with game name, puzzle number, score, and emoji grid
@@ -1270,6 +1325,63 @@ DailyJamm does **not** use Google AdSense or any other ad network. The only thir
 - `innerHTML` is acceptable only for clearing a container (`el.innerHTML = ''` → prefer `el.textContent = ''`) or static strings with no variable interpolation.
 - The existing `escHtml()` utility in `main.js` is available for Themedle-specific escaping needs.
 
+### Default privileges in `public` are the recurring trap
+
+Supabase's `public` schema ships `alter default privileges ... grant` for **both tables and
+functions** to `anon` and `authenticated`. A migration that grants what it needs without revoking
+the rest leaves the extra grant in place, and `revoke ... from PUBLIC` does **not** remove it -
+`PUBLIC` is a different grantee from `anon`.
+
+It has now bitten twice:
+
+- **0010, functions.** Every definer function was `anon`-executable on production. Not exploitable
+  - each refuses when `auth.uid()` is null - but not the stated posture.
+- **0013, tables.** `game_defs` had INSERT/UPDATE/DELETE granted to `anon` and `authenticated`.
+  RLS blocked the writes because every policy is SELECT-only and no policy for a command means
+  deny, which was **verified by actually attempting an UPDATE and an INSERT as a signed-in user**,
+  not by reading the policies.
+
+**`app_dev` and `app_tst` are correct by construction** - a schema you create inherits no default
+privileges - so neither bug can be reproduced in nonprod. Check `public` explicitly after any
+migration:
+
+```sql
+select c.relname, has_table_privilege('authenticated','public.'||c.relname,'INSERT')
+  from pg_class c join pg_namespace n on n.oid=c.relnamespace
+ where n.nspname='public' and c.relkind='r';
+select p.proname, has_function_privilege('anon', p.oid, 'execute')
+  from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='public';
+```
+
+Supabase's own linter catches some of this: `get_advisors(type: 'security')`. Run it after DDL.
+
+**`name_history` and `name_reports` have RLS on and NO policy, deliberately.** The linter reports
+that as INFO; it is the lock, not a gap. Only the Edge Function touches them, as `service_role`,
+which bypasses RLS. **Do not "fix" it by adding a policy.**
+
+**Five functions are `anon`-executable on purpose** - `dj_today`, `get_game_board` (both arities),
+`get_leaderboard`, `get_site_stats`, `get_summary_v2` - because the leaderboards page works signed
+out. Everything else is `authenticated` only, and `get_game_global` is deliberately among them so
+the Everyone tab is a real sign-in incentive rather than a cosmetic one.
+
+**Four functions are dead and should be dropped** when a hand-run SQL session is available:
+`get_leaderboard`, the 3-arg `get_game_board`, and in `app_dev` only `get_period_summary` and
+`get_my_lifetime`. Nothing in `/assets/js` calls them. `DROP` is refused through the MCP tooling,
+which is why they are still there.
+
+### What the write functions already refuse
+
+Verified by calling them with a real role rather than by reading them: a score outside
+`game_defs` min/max (`out_of_range`), an unknown game (`unknown_game`), a stats blob over 16KB
+(`stats_too_large`), a day state over 32KB (`state_too_large`), and any write at all with no
+session (`not_authenticated`). The user id always comes from the verified JWT, never the body.
+
+**What is NOT defended, and is accepted:** a determined player can forge a score for a game whose
+outcome is not date-seeded, because the result is computed in the browser. `submit_score` keeps
+one row per player per game per day, so it is one forged score per day, and `imported` stats never
+rank. Making this airtight means running the games server-side, which would break playing signed
+out - a trade deliberately not made.
+
 ### Security Headers
 
 The CSP ships as a `<meta http-equiv>` tag on every page. That covers script/style/connect/img
@@ -1331,7 +1443,7 @@ All pages include `<meta name="referrer" content="strict-origin-when-cross-origi
   to be missing from the favorites catalog while the page that references it is already live. The
   test and dev Workers send `max-age=0, must-revalidate`, so **this class of bug is invisible on
   test and only ever appears in production**. Bump every asset's version together when releasing.
-- **`styles.css` cache busting**: All pages link to `styles.css` with a version query string (currently `?v=20260922b`). Whenever `styles.css` gains new rules (e.g. adding a new game), bump this version on ALL pages - otherwise mobile and desktop browsers serve the old cached CSS and new game elements render unstyled. Update the version in all **16** pages: `index.html`, `404.html`, the 10 game pages, and `about`/`privacy`/`releases`/`terms`. Bump every asset together, not just `styles.css`.
+- **`styles.css` cache busting**: All pages link to `styles.css` with a version query string (bumped every release; `grep` for the current one rather than trusting a number written here). Whenever `styles.css` gains new rules (e.g. adding a new game), bump this version on ALL pages - otherwise mobile and desktop browsers serve the old cached CSS and new game elements render unstyled. Update the version in all **17** pages: `index.html`, `404.html`, the 10 game pages, `/leaderboards/`, and `about`/`privacy`/`releases`/`terms`. Bump every asset together, not just `styles.css` - `tests/curated.mjs` and a quick `grep -ro '?v=[0-9a-z]*' --include='*.html' .` will tell you if one drifted.
 - **New external resources**: If you add a new CDN, font, or API endpoint, update the CSP meta on every affected page. Forgetting this will silently block the resource in supporting browsers.
 - **Bare `JSON.parse` aborts boot**: Never call `JSON.parse(localStorage.getItem(...))` without a try/catch at the top level of a boot function. A malformed stored value will throw, silently aborting `boot()` mid-execution — game state never restores, result panels stay empty, and there is no visible error. Always wrap in try/catch or use `DJUtils.loadJSON()` which handles this safely.
 - **Stats key versioning**: When adding fields to a stats object that old saves won't have, bump the key suffix (e.g. `_v2` → `_v3`) rather than trying to migrate. Stale data under the old key is simply ignored and users start fresh. Do not remove the old key proactively — it ages out naturally as players accumulate new data.
