@@ -2768,6 +2768,11 @@ input[type=range].slider::-moz-range-thumb {
 .lb-stat-rank{font-size:.7rem;font-weight:800;color:#9fb8c8;text-align:center;font-variant-numeric:tabular-nums;border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:.1rem 0;background:rgba(0,0,0,.25)}
 .lb-stat-rank:empty{border:0;background:none}
 .lb-stat-rank.is-first{color:#06231a;background:#f0b429;border-color:transparent}
+/* Silver and bronze for 2nd and 3rd; everything below keeps the neutral pill.
+   Both carry dark text for the same reason gold does - these are light fills
+   on a dark page, so the text has to flip. */
+.lb-stat-rank.is-second{color:#15181d;background:#c7ccd6;border-color:transparent}
+.lb-stat-rank.is-third{color:#1d1206;background:#cd8b5a;border-color:transparent}
 
 /* Column header, so nobody has to infer which number is which. */
 .lb-stat-head{border-bottom:1px solid rgba(255,255,255,.12);padding-bottom:.25rem;margin-bottom:.1rem}
@@ -2845,6 +2850,11 @@ input[type=range].slider::-moz-range-thumb {
 .dj-g-bar-row{display:flex;align-items:center;gap:.5rem}
 .dj-g-key{min-width:3.2em;text-align:right;color:#b8b8d1;font-size:.78rem;font-variant-numeric:tabular-nums}
 .dj-g-track{flex:1;min-width:0}
-.dj-g-fill{display:flex;justify-content:flex-end;align-items:center;padding:.12rem .4rem;border-radius:4px;background:#3a3a55;color:#fff;font-size:.74rem;font-weight:700;font-variant-numeric:tabular-nums}
+.dj-g-fill{display:flex;justify-content:flex-end;align-items:center;padding:.12rem .4rem;border-radius:4px;background:#3a3a55;color:#fff;font-size:.74rem;font-weight:700;font-variant-numeric:tabular-nums;min-height:1.15rem}
+/* A bucket nobody hit keeps its row and its count. Zero width would hide the
+   "0", so the label sits outside the (empty) bar instead. */
+.dj-g-fill.is-empty{background:none;color:#6b6b88;padding-left:0;overflow:visible}
+.dj-g-fill.is-empty .dj-g-n{transform:translateX(1.1rem)}
+.dj-g-bar-row.is-loss .dj-g-key{color:#f0656f}
 .dj-g-fill.is-mine{background:#2ecc71;color:#07301a}
 .dj-g-bar-row.is-mine .dj-g-key{color:#2ecc71;font-weight:800}

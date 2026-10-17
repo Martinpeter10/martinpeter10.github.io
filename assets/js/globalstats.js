@@ -44,6 +44,14 @@ window.DJGlobal = (function () {
     return Math.round((n / of) * 100) + '%';
   }
 
+  /** Chip figures carry their sign: +160 reads differently from 160. */
+  function signed(n) {
+    if (n === null || typeof n === 'undefined') return '-';
+    var num = Number(n);
+    if (!isFinite(num)) return String(n);
+    return (num > 0 ? '+' : '') + fmt(num);
+  }
+
   function fmt(n) {
     if (n === null || typeof n === 'undefined') return '-';
     var num = Number(n);
@@ -61,7 +69,7 @@ window.DJGlobal = (function () {
     }
     if (!d || !d.plays) {
       panel.appendChild(el('p', 'dj-g-empty',
-        'Nobody has finished today\u2019s puzzle yet. Be the first.'));
+        'Nobody has finished today yet. Be the first.'));
       return;
     }
 
@@ -74,19 +82,30 @@ window.DJGlobal = (function () {
     }
 
     row('Players today', fmt(d.players));
-    if (d.notable_label) {
-      row(d.notable_label, fmt(d.notable) + '  (' + pct(d.notable, d.plays) + ')');
-    }
     // `plays` and `players` are the same number for a single day - one result
     // per player per game per day - so showing both would just look like a
     // mistake.
 
-    row('Average ' + (d.score_label || 'score').toLowerCase(), fmt(d.avg));
-    // "Best result", not "Best guesses". Composing "Best" with the score
-    // label produced exactly the nonsense phrase the leaderboards page was
-    // pulled up on - "best guesses" tells you nothing about whether more is
-    // better. The unit is already stated by the Average row above.
-    row('Best result', fmt(d.best));
+    if (d.kind === 'chips') {
+      // A session net, so the comparable facts are how many came out ahead
+      // and how big the day's swings were. The shared `notable_label` here is
+      // "Winning days", which is a lifetime phrase: over one day it is a
+      // share of players, and it has to say so.
+      row('Finished up', fmt(d.notable) + '  (' + pct(d.notable, d.plays) + ')');
+      row(d.best > 0 ? 'Biggest win' : 'Best result', signed(d.best));
+      row(d.worst < 0 ? 'Biggest loss' : 'Worst result', signed(d.worst));
+      row('Average net', signed(d.avg));
+    } else {
+      if (d.notable_label) {
+        row(d.notable_label, fmt(d.notable) + '  (' + pct(d.notable, d.plays) + ')');
+      }
+      row('Average ' + (d.score_label || 'score').toLowerCase(), fmt(d.avg));
+      // "Best result", not "Best guesses". Composing "Best" with the score
+      // label produced exactly the nonsense phrase the leaderboards page was
+      // pulled up on - "best guesses" tells you nothing about whether more is
+      // better. The unit is already stated by the Average row above.
+      row('Best result', fmt(d.best));
+    }
     panel.appendChild(rows);
 
     var dist = d.dist || [];
@@ -97,19 +116,23 @@ window.DJGlobal = (function () {
     var chart = el('div', 'dj-g-chart');
 
     dist.forEach(function (b) {
-      var isDiscrete = typeof b.v !== 'undefined';
-      var key = isDiscrete ? String(b.v)
-                           : (b.lo === b.hi ? String(b.lo) : b.lo + '-' + b.hi);
+      // Past the success threshold is a loss, and a loss is not an Nth guess.
+      var key = b.loss ? 'X' : String(b.v);
 
       var line = el('div', 'dj-g-bar-row');
+      if (b.loss) line.classList.add('is-loss');
       line.appendChild(el('span', 'dj-g-key', key));
 
       var track = el('div', 'dj-g-track');
       var fill  = el('div', 'dj-g-fill');
-      // Always wide enough to read the count sitting in it.
-      fill.style.width = Math.max(8, Math.round((b.n / max) * 100)) + '%';
+      // An empty bucket keeps its row - the range is fixed, so a missing bar
+      // would read as "impossible" rather than "nobody did it today", and the
+      // bars would stop lining up from one day to the next.
+      fill.style.width = b.n === 0 ? '0%'
+        : Math.max(10, Math.round((b.n / max) * 100)) + '%';
+      if (b.n === 0) fill.classList.add('is-empty');
       // The player's own result, so the chart says something about THEM.
-      if (isDiscrete && opts.mine !== null && typeof opts.mine !== 'undefined'
+      if (opts.mine !== null && typeof opts.mine !== 'undefined'
           && Number(opts.mine) === Number(b.v)) {
         fill.classList.add('is-mine');
         line.classList.add('is-mine');

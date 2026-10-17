@@ -690,10 +690,29 @@ so `roulettedle/index.html` wraps them in `#rl-hist-own` for the tab to hide as 
 is "Spin History", not "My Stats" - the heading is swapped to "Everyone" and restored to whatever
 it was, so never assume the string.
 
-**Distribution shape is chosen from the data, not the declared bounds.** A bar per distinct score
-where the real spread is <= 24 (every guess-count game), otherwise ten buckets - and the buckets
-come from the actual min/max, because the chip games are bounded at +/-100000 as a sanity check
-while real session nets live in the hundreds, so declared bounds would put everything in one bar.
+**Three panel shapes, chosen by `game_defs`, not by a list of ids in the JavaScript** (migration
+0012). One uniform panel was wrong in two places, and both were reported:
+
+| `global_kind` / `global_dist` | Games | What it shows |
+|---|---|---|
+| `global_dist = true` | Themedle, Spelldle | Full distribution, **empty buckets included**, losses as **X** |
+| `global_kind = 'chips'` | BlackJackdle, Roulettedle, Holdle | Finished up (% of players), biggest win, biggest loss, average net |
+| neither | the other five | Players, notable count, average, best - **no distribution** |
+
+**Chain Link's distribution was noise**: a 0-20 score spread across a handful of players is a chart
+nobody reads, and the average plus the perfect-game count already say it.
+
+**The chip games read "Winning days: 1 (100%)".** `notable_op gt 0` is the right *sum* - players
+who finished up - but "winning days" is a lifetime phrase and this panel is one day. Over a single
+day it is a share of players, so it says "Finished up", and both ends of the swing are shown
+because "the biggest hit anyone took today" is half the comparison.
+
+**Empty buckets are kept deliberately.** A guess distribution missing its zeros reads as though
+those scores are impossible rather than unachieved, and the bars stop lining up from one day to
+the next. `generate_series` over `min_score..max_score` does it server-side, so the client never
+has to know a game's range.
+
+**A new game sets two columns** and `globalstats.js` does not change.
 
 **TODAY ONLY.** Lifetime and weekly comparisons live on the leaderboards page; repeating them in
 the modal would be two places to maintain and two places to disagree. What belongs in a game's own
@@ -715,6 +734,11 @@ every switch - so a player who signs in from the pitch comes back to figures rat
 pitch they just answered. **Share Stats is hidden on the Everyone tab**, found by `id*="share"`
 rather than listed per game, because it shares the player's own stats and means nothing under
 everyone else's.
+
+**Rank pills on the leaderboards page are a podium**: `is-first` gold, `is-second` silver,
+`is-third` bronze, everything below keeps the neutral pill. All three podium fills carry dark text
+because they are light fills on a dark page. What the colour says is "top three", not "ranked" - a
+player in 40th still wants to read their number.
 
 **Do not compose "Best" with `score_label`.** It produces "Best guesses", which is the exact
 phrase the leaderboards page was pulled up on. The row says **"Best result"**; the unit is already

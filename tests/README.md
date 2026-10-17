@@ -148,6 +148,26 @@ A missing **Authorized JavaScript origin** is reported as **PENDING**, not a
 failure. It means the code is right and the Google console needs that
 environment's hostname.
 
+## globalpanels.mjs - the Everyone panel fits the game
+
+```sh
+node globalpanels.mjs
+```
+
+`globalstats.mjs` covers the signed-OUT case (the pitch). This covers what a
+signed-in player sees, by stubbing `DJAccount` and feeding fixtures shaped
+exactly like `get_game_global` returns. It tests the rendering, not the SQL -
+the SQL is checked directly against the database.
+
+Three shapes, because one uniform panel was wrong in two places: Chain Link's
+0-20 distribution was noise, and the chip games read "Winning days: 1 (100%)"
+when the panel only ever covers one day.
+
+The empty buckets are the subtle one. A guess distribution with its zeros
+missing reads as though those scores are impossible rather than unachieved,
+and the bars stop lining up from one day to the next - so the test asserts the
+exact count of empty rows, not just that bars exist.
+
 ## layout.mjs - nothing pushed off the edge of a phone
 
 ```sh

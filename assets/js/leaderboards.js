@@ -176,7 +176,12 @@ window.DJBoards = (function () {
     if (rank != null && players) {
       r.textContent = '#' + rank;
       r.title = 'Rank ' + rank + ' of ' + players + ' players';
-      if (Number(rank) === 1) r.classList.add('is-first');
+      // Podium colours, then a neutral pill. A player ranked 40th still wants
+      // to see the number - what the colour says is "top three", not "ranked".
+      var n = Number(rank);
+      if (n === 1)      r.classList.add('is-first');
+      else if (n === 2) r.classList.add('is-second');
+      else if (n === 3) r.classList.add('is-third');
     } else {
       r.textContent = '';
     }
