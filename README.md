@@ -193,7 +193,7 @@ Press `Ctrl+C` in the terminal to stop the server.
 
 Full release notes are also available at [dailyjamm.com/releases](https://dailyjamm.com/releases/).
 
-### v3.5.0 - 2026-10-09
+### v3.5.0 - 2026-10-17
 
 **Accounts, leaderboards, and progress that follows you**
 
