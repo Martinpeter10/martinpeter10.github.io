@@ -814,6 +814,13 @@ Loaded on every page except `404.html` (which has no `site-header` to attach to)
 which is excluded from the GitHub Pages build by `_config.yml` and from the Cloudflare
 upload by `.assetsignore`. Nothing under `/supabase/` is ever served.
 
+**Deploy the function to NONPROD first, then prod, from the repo source.** The two deployments
+had drifted - nonprod ran a condensed variant of `index.ts` and the repo copy had never been
+deployed anywhere, so "the repo is what is running" was false. Both now run the repo source, which
+the **`ezbr_sha256` in the deploy result proves**: identical hashes mean identical bytes, and that
+is the cheapest check that a two-environment deploy actually matched. Compare them after any
+deploy.
+
 **Keys - the one thing to get right**: `dj-config.js` holds the **publishable** key
 (`sb_publishable_...`), which is meant to be public and ships in every page. It is safe only
 because every table has RLS on with **no client-writable policy** - the browser cannot insert,
