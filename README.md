@@ -205,6 +205,7 @@ Full release notes are also available at [dailyjamm.com/releases](https://dailyj
 - **See how everyone else did today.** Every game's stats screen gains an **Everyone** tab showing how today's players did. Themedle and Spelldle show the full guess distribution with your own result highlighted; the chip games show how many players finished up and the biggest win and loss of the day; the rest show the average and what counts as a standout score. Signing in is what unlocks it; your own stats are always there either way.
 - **Your stats follow you too.** Every game's stats screen - games played, win rate, streaks, best scores, head-to-head records - now lives on your account. Sign in on a new phone and your history is already there. The first time you sign in, whatever that browser had already recorded becomes your account's history, so nothing is lost.
 - **A bell in the header** appears when there is a release you have not seen, and links here. When there is nothing new it stays out of the way.
+- **A one-time pointer to the new trophy button**, so the leaderboards are not something you have to stumble across. Dismiss it and it never comes back.
 - Privacy Policy and Terms of Service updated to explain what an account stores, what is public, and how to have your account deleted.
 - New contact address for questions and feedback: **dailyjammcontactus@gmail.com**, on the About, Privacy and Terms pages.
 

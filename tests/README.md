@@ -168,6 +168,20 @@ missing reads as though those scores are impossible rather than unachieved,
 and the bars stop lining up from one day to the next - so the test asserts the
 exact count of empty rows, not just that bars exist.
 
+## boardsintro.mjs - the one-time leaderboards spotlight
+
+```sh
+node boardsintro.mjs
+```
+
+Most of this test is the cases where it must **not** appear: already
+dismissed, a brand-new visitor who should get the favorites intro first, a
+game page, and after a reload. A modal that comes back is worse than one
+nobody ever saw.
+
+It also asserts the caret lands within 2px of the trophy's centre at both
+390px and 375px, because a fixed offset previously pointed at the bell.
+
 ## layout.mjs - nothing pushed off the edge of a phone
 
 ```sh

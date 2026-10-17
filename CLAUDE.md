@@ -471,7 +471,7 @@ gameid: { title: 'Game Name', url: 'https://example.com/', ext: true },
 - **Share buttons**: game-over result panels have two side-by-side buttons — **Share Results** (green, `bg-green-700`) and **See Stats** (purple, `bg-purple-600`). Stats modals have a separate **Share Stats** button (green).
 - **Streaks**: Track current streak, best streak, total games played
 - **localStorage key convention**: stats keys use a `_v2` suffix (`td_stats_v2`, `cl_stats_v2`, `spd_stats_v2`, `bj_stats_v2`, `bj_alltime_v2`, `rl_stats_v2`, `rl_alltime_v2`). Daily state keys have no suffix (`themedleDailyState`, `cl_today`, `spd_today`, `bj_today`, `rl_today`, `hd_today`, `bf_today`). Bump the suffix when resetting stats site-wide.
-- **Site-wide localStorage keys** (not game-specific): `dj_pre_signin` (the browser's own state, copied aside before an account overwrites it, and restored on sign-out), `dj_cookie_ok` (cookie consent), `dj_favorites` (favorites list), `dj_seen_favs_intro` (favorites intro modal dismissed), `dj_account` (cached username for fast header paint - not the session; supabase-js owns the auth token under its own project-scoped key), `dj_seen_release` (last release version the player acknowledged via the bell), `dj_score_queue` (leaderboard submissions awaiting a working network)
+- **Site-wide localStorage keys** (not game-specific): `dj_seen_boards_intro` (the one-time leaderboards spotlight has been dismissed), `dj_pre_signin` (the browser's own state, copied aside before an account overwrites it, and restored on sign-out), `dj_cookie_ok` (cookie consent), `dj_favorites` (favorites list), `dj_seen_favs_intro` (favorites intro modal dismissed), `dj_account` (cached username for fast header paint - not the session; supabase-js owns the auth token under its own project-scoped key), `dj_seen_release` (last release version the player acknowledged via the bell), `dj_score_queue` (leaderboard submissions awaiting a working network)
 - **How to Play**: Show modal on first visit (check localStorage flag), include animated demo
 - **Mobile**: 16px minimum font on inputs (prevents iOS zoom), use `viewport-fit=cover` for notch support
 - **Accessibility**: ARIA labels on interactive elements, keyboard navigation (Enter activates role="button", ESC closes modals), screen-reader-only helper text via `.sr-only` class
@@ -989,6 +989,34 @@ browser gets the fallback link instead.
 `Bad ID token` (provider enabled, parse failed) rather than `Unsupported provider`:
 `curl -s -X POST "$URL/auth/v1/token?grant_type=id_token" -H "apikey: $PUBLISHABLE"
 -H 'Content-Type: application/json' -d '{"provider":"google","id_token":"not.a.real.token"}'`
+
+---
+
+## One-time intros (`menu.js`, `favorites.js`)
+
+Two modals that appear once and never again. Both live on the **home page only**: a modal over a
+game someone opened deliberately is worse than one they never see.
+
+| Intro | Key | Owner |
+|---|---|---|
+| Your Favorite Games | `dj_seen_favs_intro` | `favorites.js` |
+| Leaderboards | `dj_seen_boards_intro` | `menu.js` (it injects the trophy) |
+
+**Never two at once.** The boards intro checks `dj_seen_favs_intro` and stands down if the
+favorites intro is about to run, so a first-ever visitor gets one now and the other next visit.
+
+**It spotlights the REAL trophy, not a picture of one** - "it is up there" is the whole message.
+The backdrop sits at **z-index 1000, just under the header's 1001**, so the header stays lit while
+the page behind dims. Raising the trophy above a backdrop that covers the header is not possible:
+the header's own z-index makes it a stacking context its children cannot escape.
+
+**The caret is positioned from a measurement**, not a fixed offset. A hardcoded `right` looked
+correct at one width and pointed at the *bell* at another, because the header carries a different
+number of controls per page and tightens under 420px. `showBoardsIntro()` measures the trophy and
+sets `--dj-bi-caret`.
+
+`window.DJBoardsIntro.reset()` clears the flag so you can see it again, like `DJNotify.reset()`.
+`tests/boardsintro.mjs` covers it, and most of that test is the cases where it must NOT appear.
 
 ---
 

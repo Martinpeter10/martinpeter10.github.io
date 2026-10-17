@@ -2858,3 +2858,43 @@ input[type=range].slider::-moz-range-thumb {
 .dj-g-bar-row.is-loss .dj-g-key{color:#f0656f}
 .dj-g-fill.is-mine{background:#2ecc71;color:#07301a}
 .dj-g-bar-row.is-mine .dj-g-key{color:#2ecc71;font-weight:800}
+
+
+/* ── One-time leaderboards intro (menu.js) ────────────────────────────────
+   The backdrop sits at 1000, just UNDER the header's 1001, so the header
+   stays lit while the page behind it dims. Raising the trophy above a
+   backdrop that covers the header is not possible - the header's own z-index
+   makes it a stacking context its children cannot escape. */
+.dj-bi-backdrop{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.72);
+  display:flex;justify-content:flex-end;align-items:flex-start;
+  padding:calc(64px + env(safe-area-inset-top,0px)) 12px 0}
+.dj-bi-card{position:relative;max-width:320px;width:min(320px,calc(100vw - 24px));
+  background:linear-gradient(180deg,#111a33,#0f1b2d);border:1px solid rgba(255,255,255,.14);
+  border-radius:14px;box-shadow:0 18px 44px rgba(0,0,0,.55);padding:1rem 1.1rem 1.1rem;
+  color:#fff;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;z-index:1002}
+/* Caret pointing up at the trophy. Offset from the right so it lands under
+   the button rather than the corner. */
+.dj-bi-card{--dj-bi-caret:46px}
+.dj-bi-card:focus{outline:none}
+.dj-bi-card::before{content:'';position:absolute;top:-9px;right:var(--dj-bi-caret);width:16px;height:16px;
+  background:#111a33;border-left:1px solid rgba(255,255,255,.14);
+  border-top:1px solid rgba(255,255,255,.14);transform:rotate(45deg);border-radius:3px 0 0 0}
+.dj-bi-card h3{margin:0 0 .45rem;font-size:1.02rem;font-weight:900;color:#2ecc71}
+.dj-bi-card p{margin:0 0 .6rem;font-size:.86rem;line-height:1.5;color:#b8b8d1}
+.dj-bi-fine{font-size:.76rem!important;color:#8f8fa8!important}
+.dj-bi-ok{width:100%;padding:.55rem 1rem;border:0;border-radius:10px;background:#2ecc71;
+  color:#07301a;font-family:inherit;font-size:.88rem;font-weight:800;cursor:pointer}
+.dj-bi-ok:hover{background:#29b765}
+.dj-bi-ok:focus-visible{outline:2px solid #45b7d1;outline-offset:2px}
+
+/* The real button, pulsing. Not a drawing of one - "it is up there" is the
+   whole message, so it has to be the actual control. */
+.dj-boards-btn.is-spotlit{border-color:#2ecc71;color:#2ecc71;
+  animation:dj-bi-pulse 1.6s ease-in-out infinite}
+@keyframes dj-bi-pulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(46,204,113,.55)}
+  50%{box-shadow:0 0 0 8px rgba(46,204,113,0)}
+}
+@media (prefers-reduced-motion:reduce){
+  .dj-boards-btn.is-spotlit{animation:none;box-shadow:0 0 0 3px rgba(46,204,113,.5)}
+}
