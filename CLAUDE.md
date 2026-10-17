@@ -100,17 +100,27 @@ Every game page MUST include all of these in the `<head>`:
 
 <!-- Security headers -->
 <meta name="referrer" content="strict-origin-when-cross-origin" />
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; img-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com; font-src 'self' https://cdn.tailwindcss.com;" />
+<!-- Copy this from an existing page rather than from here, and diff it against one.
+     It is long because it carries Supabase, Clarity and Google Identity Services as
+     well as analytics, and every entry is load-bearing. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://cdn.tailwindcss.com https://*.clarity.ms https://accounts.google.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://accounts.google.com; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co https://*.google-analytics.com https://analytics.google.com https://*.analytics.google.com https://stats.g.doubleclick.net https://www.googletagmanager.com https://*.clarity.ms https://accounts.google.com; font-src 'self' https://cdn.tailwindcss.com; frame-src https://accounts.google.com;" />
 
 <!-- Google Analytics (gtag.js) - REQUIRED on every page -->
-<!-- gtag('config') is gated on cookie consent (dj_cookie_ok in localStorage) -->
+<!-- TWO gates, and both matter: cookie consent (dj_cookie_ok) AND hostname.
+     Dropping the hostname check sends dev and tst play into real analytics. -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-XLRXG28EZV"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-  if (localStorage.getItem('dj_cookie_ok')) { gtag('config', 'G-XLRXG28EZV'); }
+  if (localStorage.getItem('dj_cookie_ok') && location.hostname === 'dailyjamm.com') { gtag('config', 'G-XLRXG28EZV'); }
 </script>
+
+<!-- Microsoft Clarity - same two gates, but it is INJECTED rather than in the markup,
+     so before consent it genuinely does not load. gtag.js above is a static script tag
+     and does load; consent gates config, which is what sets cookies and sends data.
+     The privacy policy has to describe that difference accurately. Copy djClarity()
+     from an existing page. -->
 
 <!-- Tailwind CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
@@ -1429,6 +1439,29 @@ one row per player per game per day, so it is one forged score per day, and `imp
 rank. Making this airtight means running the games server-side, which would break playing signed
 out - a trade deliberately not made.
 
+### Privacy policy and terms are part of the release
+
+`/privacy/` and `/terms/` describe what is collected, what is stored, what is **public**, and how
+to delete it. Any change to those facts changes those pages, in the same release - not afterwards.
+What counts: a new thing stored server-side, a new third-party script, a new field shown next to a
+username, a change to retention or deletion.
+
+**Bump `Last updated` whenever the text changes.** The accounts release rewrote both pages -
+Google sign-in, email, Supabase, deletion, leaderboard visibility - and shipped them still dated
+three weeks earlier, which the privacy policy's own "Changes to This Policy" section promises not
+to happen. A stale date on a materially changed policy is worse than an ugly one.
+
+**Describe the mechanism, not the intention.** The policy said both analytics tools "load only
+after you accept the cookie notice". Clarity is injected by `djClarity()` and genuinely does not
+load; **gtag.js is a static `<script async src>` in the markup and loads regardless** - consent
+gates `gtag('config')`, which is what sets cookies and sends data. Both are fine; only one was
+described correctly. When in doubt, read the head block rather than the previous wording.
+
+**Store less than the policy allows, and keep the policy honest about what is public.** Only
+`scores` and `username` are public. The `progress.stats` blob (migration 0009) is per-player and
+owner-visible only - the policy says so explicitly, so a future change that exposes it is a policy
+change too.
+
 ### Security Headers
 
 The CSP ships as a `<meta http-equiv>` tag on every page. That covers script/style/connect/img
@@ -1451,15 +1484,43 @@ CDN-side version bump cannot silently change what every page executes. Re-pin de
 upgrading.
 
 ### Content Security Policy
-All pages include a `<meta http-equiv="Content-Security-Policy">` tag. The CSP allows:
-- Scripts only from `'self'`, `googletagmanager.com`, and `cdn.tailwindcss.com`
-- Inline scripts (required for GA init) via `'unsafe-inline'`
-- Images from `'self'`, `data:`, and any `https:` source
-- Fetch/XHR only to `'self'`, `google-analytics.com`, and `googletagmanager.com`
 
-**Themedle** additionally needs `media-src 'self'` for audio files.
+All pages carry a `<meta http-equiv="Content-Security-Policy">` tag. `connect-src` is the
+directive that has caused real outages, so what each entry is for:
 
-If you add a new external script or font source, update the CSP on the relevant page(s).
+| Entry | Needed by |
+|---|---|
+| `'self'` | puzzle and spell JSON |
+| `https://*.supabase.co` | accounts, game state, leaderboards (**not on `404.html`**, which loads no `account.js`) |
+| `https://*.google-analytics.com` | GA4 `/g/collect`, including the regional `region1.` hosts |
+| `https://analytics.google.com`, `https://*.analytics.google.com` | GA4 `/g/collect` |
+| `https://stats.g.doubleclick.net` | GA4 `/g/collect` |
+| `https://www.googletagmanager.com` | gtag container |
+| `https://*.clarity.ms` | Microsoft Clarity |
+| `https://accounts.google.com` | Google Identity Services |
+
+**GA was blocked by our own CSP and nothing said so.** `connect-src` listed only
+`www.google-analytics.com`, correct for Universal Analytics; GA4 posts to
+`analytics.google.com`, `stats.g.doubleclick.net` and the regional `*.google-analytics.com` hosts
+instead. **Two things hid it**: `script-src` allows googletagmanager.com, so gtag.js loads
+perfectly and the tag looks installed while being unable to transmit; and `gtag('config')` is
+hostname-gated to `dailyjamm.com`, so no beacon is ever attempted on dev or tst and the console
+violation could only appear in **production**. Google Search was unaffected (Search Console reads
+Google's crawler, not the page) and Clarity was never blocked.
+
+`https://www.google.com` is deliberately **not** allowed. gtag posts there for ads and the
+conversion linker; allowing the whole domain is far broader than analytics needs.
+
+**Themedle** additionally needs `media-src 'self'` for audio files. GSI needs four allowances, one
+non-obvious - see the Account System section.
+
+**`tests/csp.mjs` is the guard.** It probes the policy directly rather than waiting for a beacon,
+since no beacon happens outside production, and it includes a disallowed host as a control so a
+listener that never fires fails loudly instead of passing everything. Run it against production as
+well as dev - production is the only place GA is live.
+
+If you add a new external script, font, frame or API endpoint, update the CSP on every affected
+page and add it to `tests/csp.mjs` if a request to it has to succeed.
 
 ### Referrer Policy
 All pages include `<meta name="referrer" content="strict-origin-when-cross-origin" />` to prevent leaking full URLs to third-party sites via the `Referer` header.

@@ -213,6 +213,40 @@ purpose, identically on production - flagging them would be noise that trains
 you to ignore the output. Checking that against prod is what separated the one
 real regression from the two false alarms.
 
+## csp.mjs - analytics can actually transmit
+
+```sh
+node csp.mjs
+node csp.mjs --base https://dailyjamm.com
+```
+
+Exists because Google Analytics was blocked by our own CSP for an unknown
+stretch and nothing anywhere said so. `connect-src` allowed
+`www.google-analytics.com`, which was right for Universal Analytics; current
+gtag posts to `analytics.google.com`, `stats.g.doubleclick.net` and the
+regional `*.google-analytics.com` hosts instead.
+
+Two things hid it, and both are worth remembering:
+
+- `script-src` allows googletagmanager.com, so **gtag.js loads perfectly**. The
+  tag is present, nothing throws, GA looks installed - and simply cannot send.
+- `gtag('config')` is hostname-gated to dailyjamm.com, so GA never fires on dev
+  or tst. The console violation could only ever appear in **production**.
+
+That gate is why this test probes the policy rather than waiting for a beacon:
+it fires a `fetch` at each endpoint from page context and watches for a
+`securitypolicyviolation` event. A CSP refusal raises that event; a network or
+CORS failure does not - which is what separates *our policy blocked it* from
+*Google said no*. Only the first is a bug here.
+
+The negative control carries its weight. A listener that never fires proves
+nothing, so a host that is definitely not in `connect-src` must come back
+blocked; if it does not, the test fails loudly and says the passes above it are
+meaningless.
+
+Run it against production too - that is the only environment where GA is live,
+and before the fix it reported 102 failures there against 0 on dev.
+
 ## play.mjs - the original single-game script
 
 ```sh
