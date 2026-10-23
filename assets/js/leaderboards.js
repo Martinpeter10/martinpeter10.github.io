@@ -282,95 +282,112 @@ window.DJBoards = (function () {
       body.appendChild(h);
     }
 
-    // Offer the leading players on any card that has no "my stats" to show.
-    // Signed out and signed-in-but-unplayed are different sentences but the
-    // same affordance: somebody is on this board and you might want to look.
-    function addSeeTop() {
-      if (!g.players) return;
-      var btn = make('button', 'lb-see-top', 'See the top players');
-      btn.type = 'button';
-      btn.addEventListener('click', function () {
-        toggleBoard(g, 'played', playedLabelFor(period), body, btn);
-      });
-      body.appendChild(btn);
-    }
-
     if (!signedIn) {
       // No "my stats" to show. Lead with who is ahead instead.
       body.appendChild(make('p', 'lb-msg',
         g.players ? 'Sign in to see how you compare.' : 'Nobody has played ' + periodWord() + ' yet.'));
-      addSeeTop();
+      if (g.players) {
+        var btn = make('button', 'lb-see-top', 'See the top players');
+        btn.type = 'button';
+        btn.addEventListener('click', function () {
+          toggleBoard(g, 'played', playedLabelFor(period), body, btn);
+        });
+        body.appendChild(btn);
+      }
       card.appendChild(body);
       return card;
     }
 
-    if (!g.my_played) {
-      // This used to stop at the sentence, so a signed-in player who had not
-      // played a game got a dead end - strictly LESS than the signed-out card
-      // directly above, which has always offered the board. Not having played
-      // is a reason to have no rank, not a reason to be shown nobody else's.
-      body.appendChild(make('p', 'lb-msg',
-        g.players
-          ? (period === 'lifetime' ? 'You have not played this one yet.'
-                                   : 'You have not played this one ' + periodWord() + '.')
-          : 'Nobody has played ' + periodWord() + ' yet.'));
-      addSeeTop();
+    // A game you have not played yet still has every one of its boards, so the
+    // card renders its FULL set of rows either way. Yours read "-" with an
+    // empty rank and each one still opens its board - the row set is a
+    // property of the game, not of your history.
+    //
+    // It used to return early on a single sentence instead, which made a
+    // signed-in player's card strictly less useful than a stranger's. Showing
+    // one "See the top players" button in its place was no better: it answered
+    // for one stat and hid the rest.
+    var mine = !!g.my_played;
+
+    if (!mine && !g.players) {
+      // Genuinely nothing to show on either side.
+      body.appendChild(make('p', 'lb-msg', 'Nobody has played ' + periodWord() + ' yet.'));
       card.appendChild(body);
       return card;
+    }
+
+    if (!mine) {
+      body.appendChild(make('p', 'lb-msg',
+        (period === 'lifetime' ? 'You have not played this one yet.'
+                               : 'You have not played this one ' + periodWord() + '.')
+        + ' Open any row to see who is ahead.'));
     }
 
     addHeader();
 
-    var playedLabel = playedLabelFor(period);
-    body.appendChild(statRow(playedLabel, num(g.my_played), g.rank_played, g.players, 'played', g));
+    // num/avg/signed already render a missing value as "-", and statRow omits
+    // the rank pill unless a rank is given, so an unplayed row needs no
+    // special casing beyond withholding the rank.
+    function srow(label, value, rank, players, metric) {
+      return statRow(label, value, mine ? rank : null, mine ? players : null, metric, g);
+    }
+
+    // With history, a row appears only if the figure exists. Without it, every
+    // row the GAME supports appears, because the board behind it exists
+    // regardless of whether this player has a number in it.
+    function has(v) { return mine ? v != null : true; }
+
+    body.appendChild(srow(playedLabelFor(period), num(g.my_played),
+      g.rank_played, g.players, 'played'));
 
     if (period === 'daily') {
       // A single day is one result. No average, no "best" of anything.
-      if (g.my_best != null) {
+      if (has(g.my_best)) {
         var dv = isChipGame(g.game) ? signed(g.my_best) : num(g.my_best);
-        body.appendChild(statRow(g.score_label || 'Score', dv, g.rank_best, g.players, 'best', g));
+        body.appendChild(srow(g.score_label || 'Score', dv, g.rank_best, g.players, 'best'));
       }
     } else {
       // The AVERAGE is the comparison that keeps working. It is ranked only
       // once a player has min_games results - one lucky first day would
       // otherwise outrank a long honest record forever.
-      if (g.my_avg != null) {
+      if (has(g.my_avg)) {
         var avgVal = isChipGame(g.game) ? signed(Math.round(g.my_avg)) : avg(g.my_avg);
-        body.appendChild(statRow(AVG_LABEL[g.game] || 'Average',
-          avgVal, g.rank_avg, g.avg_players, 'avg', g));
+        body.appendChild(srow(AVG_LABEL[g.game] || 'Average',
+          avgVal, g.rank_avg, g.avg_players, 'avg'));
       }
 
       // The best stays as a personal milestone. It is only RANKED for games
       // where it does not saturate - an unbounded chip day, or a Yachtdle
       // score. Elsewhere the rank column is deliberately blank.
-      if (g.my_best != null) {
+      if (has(g.my_best)) {
         var bestVal = isChipGame(g.game) ? signed(g.my_best) : num(g.my_best);
-        body.appendChild(statRow(BEST_LABEL[g.game] || 'Best',
+        body.appendChild(srow(BEST_LABEL[g.game] || 'Best',
           bestVal, g.best_ranked ? g.rank_best : null,
           g.best_ranked ? g.players : null,
-          g.best_ranked ? 'best' : null, g));
+          g.best_ranked ? 'best' : null));
       }
     }
 
     if (g.notable_label) {
-      body.appendChild(statRow(g.notable_label, num(g.my_notable), g.rank_notable, g.players, 'notable', g));
+      body.appendChild(srow(g.notable_label, num(g.my_notable),
+        g.rank_notable, g.players, 'notable'));
     }
 
     // Streaks and point-in-time extras are lifetime properties - there is no
     // "streak this week" or "chip stack this week". Their values and ranks come
     // from get_my_lifetime(), which is why they are absent on the other periods.
     if (period === 'lifetime') {
-      if (g.my_best_streak != null) {
+      if (has(g.my_best_streak)) {
         // Personal status, not a global stat. No rank, so no chevron either -
         // offering a board for something the row does not rank is a dead end.
-        body.appendChild(statRow('Current streak', num(g.my_cur_streak), null, null, null, g));
-        body.appendChild(statRow('Best streak', num(g.my_best_streak),
-          g.rank_streak, g.players, 'best_streak', g));
+        body.appendChild(srow('Current streak', num(g.my_cur_streak), null, null, null));
+        body.appendChild(srow('Best streak', num(g.my_best_streak),
+          g.rank_streak, g.players, 'best_streak'));
       }
-      if (g.extra_label && g.my_extra != null) {
+      if (g.extra_label && has(g.my_extra)) {
         var ex = LIFETIME_EXTRA[g.game];
-        body.appendChild(statRow(g.extra_label, num(g.my_extra),
-          g.rank_extra, g.players, ex ? 'extras:' + ex[0] : null, g));
+        body.appendChild(srow(g.extra_label, num(g.my_extra),
+          g.rank_extra, g.players, ex ? 'extras:' + ex[0] : null));
       }
     }
 

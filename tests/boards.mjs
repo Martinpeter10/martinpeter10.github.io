@@ -30,8 +30,10 @@ const bad = (m) => fails.push(m);
 
 // Three cards, one per state we care about.
 const ROWS = [
-  // Never played, but 7 other people have -> MUST offer the board.
+  // Never played, but 7 other people have -> MUST show the whole row set.
+  // Carries a notable label so that row is exercised too.
   { game: 'chainlink', label: 'Chain Link', score_label: 'Score',
+    notable_label: 'Perfect games', best_ranked: true,
     players: 7, my_played: 0 },
   // Played, with a rank -> ordinary stat rows.
   { game: 'themedle', label: 'Themedle', score_label: 'Guesses',
@@ -78,11 +80,16 @@ async function openPage(browser, { signedIn }) {
 
 function readCards(page) {
   return page.$$eval('.lb-card', (cards) => cards.map((c) => {
-    const btn = c.querySelector('.lb-see-top');
+    const btn  = c.querySelector('.lb-see-top');
+    const rows = [...c.querySelectorAll('.lb-stat:not(.lb-stat-head)')];
     return {
       text:     c.textContent.replace(/\s+/g, ' ').trim(),
       msg:      (c.querySelector('.lb-msg') || {}).textContent || '',
-      rows:     c.querySelectorAll('.lb-stat:not(.lb-stat-head)').length,
+      rows:     rows.length,
+      labels:   rows.map((r) => (r.querySelector('.lb-stat-label') || {}).textContent || ''),
+      vals:     rows.map((r) => ((r.querySelector('.lb-stat-val') || {}).textContent || '').trim()),
+      ranks:    rows.filter((r) => ((r.querySelector('.lb-stat-rank') || {}).textContent || '').trim()).length,
+      chevrons: rows.filter((r) => r.querySelector('.lb-stat-see')).length,
       hasBtn:   !!btn,
       // An element can carry hidden and still render if author CSS sets
       // display - that shipped once. Measure the box, never the property.
@@ -101,33 +108,51 @@ const browser = await launch();
   if (!unplayed || !played || !nobody) {
     bad(`signed in: expected 3 cards, got ${(await readCards(page)).length}`);
   } else {
-    // THE REGRESSION.
-    if (unplayed.btnShown) ok();
-    else bad('signed in, never played, 7 others have: no visible See-top button '
-             + `- dead end reading "${unplayed.msg.trim()}"`);
+    // THE REGRESSION. An unplayed card must carry the game's whole row set,
+    // not a sentence and not one button standing in for all of them. Named
+    // explicitly rather than counted, so the assertion cannot pass by
+    // coincidence when the set changes shape.
+    const WANT = ['Days played', 'Average', 'Best', 'Perfect games',
+                  'Current streak', 'Best streak'];
+    const missing = WANT.filter((w) => !unplayed.labels.some((l) => l.trim() === w));
+    if (!missing.length) ok();
+    else bad(`signed in, never played: missing stat rows [${missing.join(', ')}] `
+             + `- card showed [${unplayed.labels.join(', ')}]`);
 
-    if (/not played/i.test(unplayed.msg)) ok();
-    else bad(`signed in, never played: expected a "not played" message, got "${unplayed.msg.trim()}"`);
+    // Your own column reads "-" rather than a wrong number or a blank.
+    if (unplayed.vals.length && unplayed.vals.every((v) => v === '-')) ok();
+    else bad(`signed in, never played: "You" column should be all "-", got `
+             + JSON.stringify(unplayed.vals));
 
-    // The button must actually open a board, not just exist.
-    if (unplayed.hasBtn) {
-      await page.click('.lb-card:nth-of-type(1) .lb-see-top');
-      await page.waitForTimeout(500);
-      const names = await page.$$eval('.lb-card:nth-of-type(1)', (cs) =>
-        cs[0].textContent);
-      if (/Alice/.test(names)) ok();
-      else bad('signed in, never played: button clicked but no board rows appeared');
+    // No rank pills, because there is no rank to claim.
+    if (unplayed.ranks === 0) ok();
+    else bad(`signed in, never played: ${unplayed.ranks} rank pills shown`);
+
+    // Every row's board must actually open - that is the whole point. Guarded
+    // so a card with no chevrons reports the failure instead of throwing a
+    // timeout and taking the rest of the run with it.
+    if (unplayed.chevrons > 0) {
+      ok();
+      await page.click('.lb-card:nth-of-type(1) .lb-stat-see');
+      await page.waitForTimeout(600);
+      const opened = await page.$eval('.lb-card:nth-of-type(1)', (c) => c.textContent);
+      if (/Alice/.test(opened)) ok();
+      else bad('signed in, never played: opening a row showed no board rows');
+    } else {
+      bad('signed in, never played: no row offers its board (nothing to open)');
     }
 
-    // A played card keeps its stat rows and does NOT grow a redundant button.
+    // The replaced design must not come back.
+    if (!unplayed.hasBtn) ok();
+    else bad('signed in, never played: a single "See the top players" button is '
+             + 'back - it answers for one stat and hides the rest');
+
     if (played.rows > 0) ok();
     else bad('signed in, played: no stat rows rendered');
-    if (!played.hasBtn) ok();
-    else bad('signed in, played: See-top button added to a card that already ranks');
 
-    // Nothing behind it -> no button.
-    if (!nobody.hasBtn) ok();
-    else bad('nobody has played this game anywhere, yet a See-top button is offered');
+    // Nothing behind it -> a sentence, no rows, nothing to open.
+    if (nobody.rows === 0 && !nobody.hasBtn) ok();
+    else bad('nobody has played this game anywhere, yet the card offers boards');
   }
   await page.close();
 }
