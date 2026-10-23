@@ -91,6 +91,14 @@ async function authPage(browser) {
   const navs = [];
   page.on('framenavigated', (f) => { if (f === page.mainFrame()) navs.push(f.url()); });
 
+  // The vendored bundle defines window.supabase and loads AFTER any init
+  // script, so it would overwrite the fake client and leave the auth callback
+  // unwired - which looks exactly like "the code does not reload". Serve the
+  // stub in its place instead.
+  await page.route('**/assets/js/vendor/supabase.js*', (r) => r.fulfill({
+    status: 200, contentType: 'application/javascript', body: 'void 0;',
+  }));
+
   await page.addInitScript(() => {
     let cb = null;
     window.__fireAuth = (event, session) => cb && cb(event, session);
@@ -115,21 +123,27 @@ async function authPage(browser) {
   return { page, navs };
 }
 
+// Each transition gets a FRESH page. Firing several events down one page
+// leaves module state from the earlier ones - an INITIAL_SESSION followed by a
+// SIGNED_IN is a different code path from a plain sign-in, and reusing the page
+// made a passing fix look broken.
 {
-  const { page, navs } = await authPage(browser);
-
-  // Events that must NOT navigate. INITIAL_SESSION fires on every load.
+  // Events that must NOT navigate. INITIAL_SESSION fires on every ordinary
+  // load and TOKEN_REFRESHED fires on a timer.
   for (const ev of ['INITIAL_SESSION', 'TOKEN_REFRESHED']) {
-    navs.length = 0;
+    const { page, navs } = await authPage(browser);
     await page.evaluate((e) => window.__fireAuth(e, { user: { id: 'u1' } }), ev);
-    await page.waitForTimeout(900);
+    await page.waitForTimeout(1200);
     if (navs.length === 0) ok();
     else bad(`${ev} navigated the page - it fires on an ordinary load or on a `
              + 'timer and would interrupt a player mid-game');
+    await page.close();
   }
+}
 
-  // A real sign-in must navigate, and must drop any fragment.
-  navs.length = 0;
+{
+  // The ordinary case: signed out, then signs in.
+  const { page, navs } = await authPage(browser);
   await page.evaluate(() => window.__fireAuth('SIGNED_IN', { user: { id: 'u1' } }));
   await page.waitForTimeout(1800);
   if (navs.length > 0) ok();
@@ -137,7 +151,22 @@ async function authPage(browser) {
   if (navs.every((u) => !u.includes('#'))) ok();
   else bad(`navigated to a URL still carrying a fragment (${navs.join(', ')}) - `
            + 'the OAuth hash would be re-parsed and loop');
+  await page.close();
+}
 
+{
+  // Account SWITCH. A session and profile already exist, so the "nothing new
+  // to do" short-circuit used to swallow this and leave the previous player's
+  // figures on screen - the shared-computer leak, arriving by a different door.
+  const { page, navs } = await authPage(browser);
+  await page.evaluate(() => window.__fireAuth('INITIAL_SESSION', { user: { id: 'u1' } }));
+  await page.waitForTimeout(1200);
+  navs.length = 0;
+  await page.evaluate(() => window.__fireAuth('SIGNED_IN', { user: { id: 'u2' } }));
+  await page.waitForTimeout(1800);
+  if (navs.length > 0) ok();
+  else bad('a SIGNED_IN for a different account did not repaint - the previous '
+           + "player's stats stay on screen");
   await page.close();
 }
 

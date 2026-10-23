@@ -1001,7 +1001,23 @@ window.DJAccount = (function () {
       if (!s) return;
 
       var hadNone = !session;
+      var prevUser = session && session.user && session.user.id;
+      var newUser  = s.user && s.user.id;
       session = s;
+
+      // A SIGNED_IN for a DIFFERENT account has to repaint even though there
+      // was already a session and a profile, which the short-circuit below
+      // would otherwise skip. Switching accounts - or one person signing in
+      // after another on a shared computer - would leave the previous
+      // player's figures on screen, the same leak clearLocal exists to stop.
+      if (event === 'SIGNED_IN' && prevUser && newUser && prevUser !== newUser) {
+        profile = null;
+        cache(null);
+        if (window.DJStore && DJStore.clearLocal) DJStore.clearLocal();
+        reloadForAuth();
+        return;
+      }
+
       if (!hadNone && profile) return;   // nothing new to do
 
       loadProfile().then(function (p) {
