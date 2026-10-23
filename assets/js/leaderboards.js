@@ -282,21 +282,11 @@ window.DJBoards = (function () {
       body.appendChild(h);
     }
 
-    if (!signedIn) {
-      // No "my stats" to show. Lead with who is ahead instead.
-      body.appendChild(make('p', 'lb-msg',
-        g.players ? 'Sign in to see how you compare.' : 'Nobody has played ' + periodWord() + ' yet.'));
-      if (g.players) {
-        var btn = make('button', 'lb-see-top', 'See the top players');
-        btn.type = 'button';
-        btn.addEventListener('click', function () {
-          toggleBoard(g, 'played', playedLabelFor(period), body, btn);
-        });
-        body.appendChild(btn);
-      }
-      card.appendChild(body);
-      return card;
-    }
+    // No signed-out branch here on purpose: load() returns before any card is
+    // built when there is no session, so cards only ever exist for a signed-in
+    // player. A "sign in to compare" variant used to live here and is gone
+    // rather than left unreachable, which would imply standings are rendered
+    // for visitors when they are not.
 
     // A game you have not played yet still has every one of its boards, so the
     // card renders its FULL set of rows either way. Yours read "-" with an
@@ -410,6 +400,23 @@ window.DJBoards = (function () {
   function load() {
     var grid = $('lb-grid');
     if (!grid) return;
+
+    // Signed out the page is the sign-in bar and nothing else. No cards, no
+    // boards, and NO RPC - the request is not made at all rather than made
+    // and discarded, so there is no window in which other players' standings
+    // reach a browser that should not have them.
+    //
+    // The server half matters as much: the board functions had anon EXECUTE
+    // precisely so this page could work signed out, so leaving that in place
+    // would make this a cosmetic gate, one curl away. Migration 0015 revokes
+    // it. Same reasoning as get_game_global and the Everyone tab.
+    if (!signedIn) {
+      grid.textContent = '';
+      setFurnitureHidden(true);
+      return;
+    }
+    setFurnitureHidden(false);
+
     grid.textContent = '';
     grid.appendChild(make('p', 'lb-msg', 'Loading...'));
 
@@ -435,6 +442,23 @@ window.DJBoards = (function () {
       grid.textContent = '';
       grid.appendChild(make('p', 'lb-msg', 'Could not load your stats. Try again shortly.'));
     });
+  }
+
+  /**
+   * The period filter and the ranking footnote only describe figures the page
+   * is showing. Signed out there are none, so a filter that changes nothing
+   * and a paragraph explaining how averages are ranked are both noise around
+   * the one thing that card is for.
+   */
+  function setFurnitureHidden(hide) {
+    var filter = $('lb-filter');
+    if (filter) filter.hidden = hide;
+    var foot = document.querySelector('.lb-foot');
+    if (foot) foot.hidden = hide;
+    // paintTotals owns this when signed in, but it never runs signed out, so
+    // hide it here rather than relying on the markup's initial state - the
+    // page is also repainted on a period change without a reload.
+    if (hide) { var mine = $('lb-mine'); if (mine) mine.hidden = true; }
   }
 
   function signInPrompt() {
