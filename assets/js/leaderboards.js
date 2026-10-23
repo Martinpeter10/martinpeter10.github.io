@@ -118,6 +118,14 @@ window.DJBoards = (function () {
     return 'all time';
   }
 
+  // "Days played" is wrong under the Daily filter, where the figure is one
+  // day. Shared so the stat row and the board heading cannot drift apart -
+  // they were set independently and the board said "Days played" on a card
+  // whose own row said "Played today".
+  function playedLabelFor(p) {
+    return p === 'daily' ? 'Played today' : 'Days played';
+  }
+
   // ── Period filter ────────────────────────────────────────────────────────
 
   function readPeriod() {
@@ -274,31 +282,46 @@ window.DJBoards = (function () {
       body.appendChild(h);
     }
 
+    // Offer the leading players on any card that has no "my stats" to show.
+    // Signed out and signed-in-but-unplayed are different sentences but the
+    // same affordance: somebody is on this board and you might want to look.
+    function addSeeTop() {
+      if (!g.players) return;
+      var btn = make('button', 'lb-see-top', 'See the top players');
+      btn.type = 'button';
+      btn.addEventListener('click', function () {
+        toggleBoard(g, 'played', playedLabelFor(period), body, btn);
+      });
+      body.appendChild(btn);
+    }
+
     if (!signedIn) {
       // No "my stats" to show. Lead with who is ahead instead.
       body.appendChild(make('p', 'lb-msg',
         g.players ? 'Sign in to see how you compare.' : 'Nobody has played ' + periodWord() + ' yet.'));
-      if (g.players) {
-        var btn = make('button', 'lb-see-top', 'See the top players');
-        btn.type = 'button';
-        btn.addEventListener('click', function () { toggleBoard(g, 'played', 'Days played', body, btn); });
-        body.appendChild(btn);
-      }
+      addSeeTop();
       card.appendChild(body);
       return card;
     }
 
     if (!g.my_played) {
+      // This used to stop at the sentence, so a signed-in player who had not
+      // played a game got a dead end - strictly LESS than the signed-out card
+      // directly above, which has always offered the board. Not having played
+      // is a reason to have no rank, not a reason to be shown nobody else's.
       body.appendChild(make('p', 'lb-msg',
-        period === 'lifetime' ? 'You have not played this one yet.'
-                              : 'You have not played this one ' + periodWord() + '.'));
+        g.players
+          ? (period === 'lifetime' ? 'You have not played this one yet.'
+                                   : 'You have not played this one ' + periodWord() + '.')
+          : 'Nobody has played ' + periodWord() + ' yet.'));
+      addSeeTop();
       card.appendChild(body);
       return card;
     }
 
     addHeader();
 
-    var playedLabel = period === 'daily' ? 'Played today' : 'Days played';
+    var playedLabel = playedLabelFor(period);
     body.appendChild(statRow(playedLabel, num(g.my_played), g.rank_played, g.players, 'played', g));
 
     if (period === 'daily') {
