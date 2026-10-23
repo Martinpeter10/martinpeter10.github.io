@@ -167,21 +167,62 @@ const browser = await launch();
   await page.close();
 }
 
-// ── signed out (the behaviour that was already right) ─────────────────────
+// ── signed out: the sign-in bar and NOTHING else ──────────────────────────
+// Other players' standings are not a visitor's to see. The strong assertion
+// is that the RPC is never issued: a page that fetches the boards and then
+// declines to draw them has still handed them to the browser, where devtools
+// reads them in one line.
 {
-  const page = await openPage(browser, { signedIn: false });
-  const [unplayed, played, nobody] = await readCards(page);
+  const page = await browser.newPage();
+  const rpcCalls = [];
 
-  if (unplayed.btnShown) ok();
-  else bad('signed out: card with 7 players offers no See-top button');
-  if (played.btnShown) ok();
-  else bad('signed out: card with 9 players offers no See-top button');
-  if (!nobody.hasBtn) ok();
-  else bad('signed out: button offered for a game nobody has played');
+  await page.route('**/assets/js/account.js*', (r) => r.fulfill({
+    status: 200, contentType: 'application/javascript', body: '/* stubbed */',
+  }));
+  await page.exposeFunction('__rpcSeen', (name) => { rpcCalls.push(name); });
+  await page.addInitScript(({ rows, board }) => {
+    window.DJAccount = {
+      isReady:      () => false,
+      username:     () => null,
+      whenResolved: (cb) => cb(),
+      open: () => {}, close: () => {},
+      rpc:   (name) => { window.__rpcSeen(name); return Promise.resolve({ data: rows }); },
+      board: (g)    => { window.__rpcSeen('board:' + g); return Promise.resolve(board); },
+    };
+  }, { rows: ROWS, board: BOARD });
 
-  const txt = await page.$eval('.lb-card', (c) => c.textContent);
-  if (/sign in/i.test(txt)) ok();
-  else bad('signed out: no "sign in to compare" pitch on the card');
+  await page.goto(URL_, { waitUntil: 'load' });
+  await page.waitForTimeout(1500);
+
+  const cards = await page.$$('.lb-card');
+  if (cards.length === 0) ok();
+  else bad(`signed out: ${cards.length} game cards rendered - standings should not be shown at all`);
+
+  if (rpcCalls.length === 0) ok();
+  else bad(`signed out: RPC issued anyway [${rpcCalls.join(', ')}] - the data `
+           + 'reaches the browser even if it is not drawn');
+
+  // Nobody else's name may appear anywhere on the page.
+  const body = await page.$eval('body', (b) => b.textContent);
+  const leaked = ['Alice', 'Bob'].filter((n) => body.includes(n));
+  if (!leaked.length) ok();
+  else bad(`signed out: other players named on the page: ${leaked.join(', ')}`);
+
+  // The one thing that SHOULD be there.
+  const cta = await page.$('#lb-signedout');
+  const ctaShown = cta && await cta.evaluate((e) => e.getBoundingClientRect().height > 0);
+  if (ctaShown) ok();
+  else bad('signed out: the sign-in bar is not visible');
+
+  // Furniture that describes figures nobody is being shown.
+  for (const [sel, name] of [['#lb-filter', 'period filter'],
+                             ['.lb-foot', 'ranking footnote'],
+                             ['#lb-mine', 'your-stats section']]) {
+    const el = await page.$(sel);
+    const shown = el && await el.evaluate((e) => e.getBoundingClientRect().height > 0);
+    if (!shown) ok();
+    else bad(`signed out: ${name} still visible with nothing to describe`);
+  }
 
   await page.close();
 }
