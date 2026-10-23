@@ -476,6 +476,17 @@ window.DJBoards = (function () {
     period = readPeriod();
     buildFilter();
 
+    // The session takes up to 1200ms to settle and the page is deliberately
+    // bare until it does - filter, footnote and sign-in bar all start hidden,
+    // because showing any of them first is how the old "block of text that
+    // appears then disappears" happened. One neutral line holds the space so
+    // the wait does not read as a broken page.
+    var grid = $('lb-grid');
+    if (grid) {
+      grid.textContent = '';
+      grid.appendChild(make('p', 'lb-msg', 'Loading...'));
+    }
+
     // account.js settles the session asynchronously; wait for it rather than
     // painting a signed-out page to someone who is signed in.
     function go() {
