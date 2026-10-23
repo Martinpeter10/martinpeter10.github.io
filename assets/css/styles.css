@@ -2787,9 +2787,6 @@ input[type=range].slider::-moz-range-thumb {
 @media (prefers-reduced-motion:reduce){.lb-stat-see{transition:none}}
 
 /* The signed-out prompt keeps words - it is a call to action, not a row control. */
-.lb-see-top{background:transparent;border:1px solid rgba(255,255,255,.16);color:#9fb8c8;border-radius:999px;padding:.3rem .8rem;font-family:inherit;font-size:.74rem;font-weight:700;cursor:pointer;align-self:flex-start;margin-top:.3rem}
-.lb-see-top:hover{color:#fff;border-color:rgba(255,255,255,.34)}
-.lb-see-top:focus-visible{outline:2px solid #45b7d1;outline-offset:2px}
 
 .lb-inline-board{background:rgba(0,0,0,.22);border-radius:10px;padding:.5rem .7rem;margin:.1rem 0 .4rem}
 .lb-msg{color:#7b7b96;font-size:.82rem;margin:.3rem 0}

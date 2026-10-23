@@ -668,6 +668,11 @@ window.DJAccount = (function () {
         render();
         // Anything played before signing in is waiting in the queue.
         flushQueue();
+        // A first claim completes the sign-in, so repaint the page the way a
+        // SIGNED_IN with an existing name already does. A RENAME does not:
+        // the player is sitting in their profile and the only thing that
+        // changed is a label render() has already updated.
+        if (action === 'claim') reloadForAuth();
       } else {
         // The server distinguishes taken, not-allowed, and a rename cooldown.
         setMsg((res && res.message) || 'Could not save that name.', 'bad');
@@ -677,6 +682,41 @@ window.DJAccount = (function () {
       setMsg('Something went wrong. Try again.', 'bad');
       setBusy(true);
     });
+  }
+
+  /**
+   * Repaint the whole page after the session changes.
+   *
+   * Every page reads the session ONCE at boot and paints from it - the games
+   * through DJStore.ready(), the leaderboards through DJAccount.whenResolved().
+   * Nothing re-runs when the session changes later, so before this the header
+   * button was the only thing that updated: sign out on the leaderboards page
+   * and other players' standings stayed on screen until you navigated, and
+   * sign in and your own figures never appeared without a manual refresh.
+   *
+   * A reload rather than a repaint-everything API, because the boot path is
+   * already the thing that knows how to paint each page correctly, and ten
+   * games would otherwise each need a teardown routine that exists for this
+   * one case.
+   *
+   * ONLY on a real transition - never on INITIAL_SESSION or TOKEN_REFRESHED,
+   * which fire on an ordinary load and on a timer, and would reload the page
+   * under a player mid-game.
+   */
+  function reloadForAuth() {
+    try {
+      // replace(), to the same URL WITHOUT its fragment, rather than reload():
+      //
+      //  - the fragment is where the OAuth round trip returns the session.
+      //    supabase-js strips it after parsing, but a plain reload that found
+      //    it still there would parse it again, fire SIGNED_IN again, and
+      //    reload again - a loop on the one path that matters most. Dropping
+      //    the hash makes that impossible rather than relying on the library
+      //    having tidied up first.
+      //  - replace leaves no history entry, so Back does not walk the player
+      //    through the states either side of signing in.
+      location.replace(location.pathname + location.search);
+    } catch (e) { /* nothing sensible to fall back to */ }
   }
 
   function doSignOut() {
@@ -707,6 +747,9 @@ window.DJAccount = (function () {
         if (window.DJStore && DJStore.clearLocal) DJStore.clearLocal();
         paintButton();
         render();
+        // After clearLocal, so the reloaded page reads the restored
+        // signed-out state rather than the account's.
+        reloadForAuth();
       });
   }
 
@@ -946,12 +989,35 @@ window.DJAccount = (function () {
         if (window.DJStore && DJStore.clearLocal) DJStore.clearLocal();
         paintButton();
         if (built) render();
+        // Also fires when the sign-out happened in ANOTHER TAB, which
+        // doSignOut's own reload cannot cover. Leaving this tab painted would
+        // keep that account's stats and standings on screen after they signed
+        // out - the shared-computer case clearLocal exists for. A second
+        // reload from doSignOut in this tab is harmless; the first navigation
+        // wins.
+        reloadForAuth();
         return;
       }
       if (!s) return;
 
       var hadNone = !session;
+      var prevUser = session && session.user && session.user.id;
+      var newUser  = s.user && s.user.id;
       session = s;
+
+      // A SIGNED_IN for a DIFFERENT account has to repaint even though there
+      // was already a session and a profile, which the short-circuit below
+      // would otherwise skip. Switching accounts - or one person signing in
+      // after another on a shared computer - would leave the previous
+      // player's figures on screen, the same leak clearLocal exists to stop.
+      if (event === 'SIGNED_IN' && prevUser && newUser && prevUser !== newUser) {
+        profile = null;
+        cache(null);
+        if (window.DJStore && DJStore.clearLocal) DJStore.clearLocal();
+        reloadForAuth();
+        return;
+      }
+
       if (!hadNone && profile) return;   // nothing new to do
 
       loadProfile().then(function (p) {
@@ -962,7 +1028,17 @@ window.DJAccount = (function () {
         flushQueue();
         // Back from Google with no name yet: finish the job rather than
         // dropping them on the page with nothing to show for the round trip.
-        if (!p && event === 'SIGNED_IN') open();
+        if (!p && event === 'SIGNED_IN') { open(); return; }
+
+        // A real sign-in, with a usable account: repaint the page so the
+        // player's own figures appear without a manual refresh. Guarded to
+        // SIGNED_IN alone - INITIAL_SESSION fires on every ordinary load and
+        // TOKEN_REFRESHED fires on a timer, and reloading on either would
+        // pull the page out from under someone mid-game.
+        //
+        // Not when the username modal is still open: submitName reloads once
+        // the name is actually claimed.
+        if (event === 'SIGNED_IN') reloadForAuth();
       });
     });
 
