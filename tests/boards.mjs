@@ -112,17 +112,27 @@ const browser = await launch();
     // not a sentence and not one button standing in for all of them. Named
     // explicitly rather than counted, so the assertion cannot pass by
     // coincidence when the set changes shape.
-    const WANT = ['Days played', 'Average', 'Best', 'Perfect games',
+    // Chain Link's own labels, from AVG_LABEL/BEST_LABEL - not the generic
+    // fallbacks. Asserting the per-game wording is deliberate: it is what
+    // proves the unplayed card goes through the same labelling as a played
+    // one rather than a simplified copy of it.
+    const WANT = ['Days played', 'Average score', 'Best score', 'Perfect games',
                   'Current streak', 'Best streak'];
     const missing = WANT.filter((w) => !unplayed.labels.some((l) => l.trim() === w));
     if (!missing.length) ok();
     else bad(`signed in, never played: missing stat rows [${missing.join(', ')}] `
              + `- card showed [${unplayed.labels.join(', ')}]`);
 
-    // Your own column reads "-" rather than a wrong number or a blank.
-    if (unplayed.vals.length && unplayed.vals.every((v) => v === '-')) ok();
-    else bad(`signed in, never played: "You" column should be all "-", got `
-             + JSON.stringify(unplayed.vals));
+    // Days played reads "0", everything else "-", and the difference is the
+    // point: you really have played zero days, which is a true figure, but
+    // you have no average or best at all. A dash there would be a lie and a
+    // zero in the others would read as a terrible score rather than no score.
+    const [first, ...rest] = unplayed.vals;
+    if (first === '0') ok();
+    else bad(`signed in, never played: days played should read "0", got "${first}"`);
+    if (rest.length && rest.every((v) => v === '-')) ok();
+    else bad('signed in, never played: stats with no value should read "-", got '
+             + JSON.stringify(rest));
 
     // No rank pills, because there is no rank to claim.
     if (unplayed.ranks === 0) ok();
