@@ -425,10 +425,10 @@ const RLGame = (function () {
    * when the player pressed Spin, never a fresh one.
    */
   function settleSpin(pocket, betTotal) {
-    isSpinning = false;
-    const clearBtn = $('rl-clear-bets');
-    if (clearBtn) clearBtn.disabled = false;
-
+    // isSpinning deliberately stays true here. The table is not cleared until
+    // afterSpin's delay elapses, and unlocking now let a fast tap stack chips
+    // onto the bets just paid and re-enable Spin - whose spin then had its
+    // bets wiped mid-air by that pending cleanup. afterSpin unlocks it.
     const net = evaluateBets(pocket);
     chips += betTotal + net;
     if (chips < 0) chips = 0;
@@ -475,6 +475,9 @@ const RLGame = (function () {
         updateBoardBets();
         updateBetDisplay();
         $('rl-spin-result').classList.add('hidden');
+        isSpinning = false;
+        const clearBtn = $('rl-clear-bets');
+        if (clearBtn) clearBtn.disabled = false;
         updateSpinIndicator();
         updateSpinBtn();
       }, delay);
@@ -489,6 +492,10 @@ const RLGame = (function () {
    * outcome is still open. The result banner is shown immediately instead.
    */
   function resumeSpin(live) {
+    // Lock the table exactly as doSpin does; afterSpin unlocks it.
+    isSpinning = true;
+    $('rl-spin-btn').disabled = true;
+    $('rl-clear-bets').disabled = true;
     activeBets = live.bets || {};
     updateBoardBets();
     updateBetDisplay();
