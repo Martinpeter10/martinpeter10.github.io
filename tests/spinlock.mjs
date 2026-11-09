@@ -1,4 +1,4 @@
-// Roulettedle: the table stays locked from Spin until it has been cleared.
+// Roulettedle: the betting area is locked from Spin until the ball lands.
 //
 //   node spinlock.mjs
 //   node spinlock.mjs --base http://localhost:8080 --headed
@@ -7,6 +7,9 @@
 // table is only cleared ~2.2s later. Tapping numbers in that gap stacked chips
 // onto the bets just paid AND re-enabled Spin; a spin started there then had its
 // bets wiped mid-air by the pending cleanup.
+//
+// Now: the table is cleared at the moment the ball lands, then unlocked, so a
+// tap during the result banner starts a fresh bet that nothing later wipes.
 //
 // Signed out on purpose - localStorage is the whole mechanism under test.
 
@@ -56,23 +59,27 @@ try {
   await page.click('[data-bet="num-5"]', { force: true });
   check('no bet while the wheel turns', await bet() === placed, `${placed} -> ${await bet()}`);
 
-  // Wait for the ball to land: the result banner appears.
-  await page.waitForSelector('#rl-spin-result:not(.hidden)', { timeout: 10000 });
-  await page.click('[data-bet="num-5"]', { force: true });
-  await page.click('[data-bet="num-8"]', { force: true });
-  check('no bet while the result is showing', await bet() === placed, `${placed} -> ${await bet()}`);
-  check('Spin stays disabled while the result is showing',
-    await page.isDisabled('#rl-spin-btn'));
-  check('Clear stays disabled while the result is showing',
-    await page.isDisabled('#rl-clear-bets'));
+  check('betting area is visibly locked while the wheel turns',
+    await page.evaluate(() => document.getElementById('rl-bet-area').classList.contains('rl-locked')));
+  check('Clear is disabled while the wheel turns', await page.isDisabled('#rl-clear-bets'));
 
-  // Once the table clears, betting works again.
+  // The ball lands: the result banner appears, the table is cleared and unlocked.
+  await page.waitForSelector('#rl-spin-result:not(.hidden)', { timeout: 10000 });
+  await page.waitForTimeout(100);
+  check('table is cleared as the ball lands', await bet() === '0', await bet());
+  check('betting area unlocks as the ball lands',
+    await page.evaluate(() => !document.getElementById('rl-bet-area').classList.contains('rl-locked')));
+
+  // A bet placed while the result is still showing starts fresh...
+  await page.click('[data-bet="num-5"]');
+  const fresh = await bet();
+  check('a bet placed during the result starts a fresh table', fresh === placed, `${fresh} (expected ${placed})`);
+  check('Spin re-enables once a new bet is placed', !(await page.isDisabled('#rl-spin-btn')));
+
+  // ...and survives the banner tidying itself away.
   await page.waitForSelector('#rl-spin-result.hidden', { state: 'attached', timeout: 10000 });
   await page.waitForTimeout(200);
-  check('table is cleared', await bet() === '0', await bet());
-  await page.click('[data-bet="num-5"]');
-  check('betting reopens after the table clears', await bet() !== '0', await bet());
-  check('Spin re-enables once a new bet is placed', !(await page.isDisabled('#rl-spin-btn')));
+  check('that bet survives the result banner closing', await bet() === fresh, `${fresh} -> ${await bet()}`);
   check('no uncaught errors', errors.length === 0, errors.slice(0, 2).join(' | '));
   await ctx.close();
 } finally { await browser.close(); }
