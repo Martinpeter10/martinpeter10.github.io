@@ -118,6 +118,14 @@ window.DJBoards = (function () {
     return 'all time';
   }
 
+  // "Days played" is wrong under the Daily filter, where the figure is one
+  // day. Shared so the stat row and the board heading cannot drift apart -
+  // they were set independently and the board said "Days played" on a card
+  // whose own row said "Played today".
+  function playedLabelFor(p) {
+    return p === 'daily' ? 'Played today' : 'Days played';
+  }
+
   // ── Period filter ────────────────────────────────────────────────────────
 
   function readPeriod() {
@@ -274,80 +282,102 @@ window.DJBoards = (function () {
       body.appendChild(h);
     }
 
-    if (!signedIn) {
-      // No "my stats" to show. Lead with who is ahead instead.
-      body.appendChild(make('p', 'lb-msg',
-        g.players ? 'Sign in to see how you compare.' : 'Nobody has played ' + periodWord() + ' yet.'));
-      if (g.players) {
-        var btn = make('button', 'lb-see-top', 'See the top players');
-        btn.type = 'button';
-        btn.addEventListener('click', function () { toggleBoard(g, 'played', 'Days played', body, btn); });
-        body.appendChild(btn);
-      }
+    // No signed-out branch here on purpose: load() returns before any card is
+    // built when there is no session, so cards only ever exist for a signed-in
+    // player. A "sign in to compare" variant used to live here and is gone
+    // rather than left unreachable, which would imply standings are rendered
+    // for visitors when they are not.
+
+    // A game you have not played yet still has every one of its boards, so the
+    // card renders its FULL set of rows either way. Yours read "-" with an
+    // empty rank and each one still opens its board - the row set is a
+    // property of the game, not of your history.
+    //
+    // It used to return early on a single sentence instead, which made a
+    // signed-in player's card strictly less useful than a stranger's. Showing
+    // one "See the top players" button in its place was no better: it answered
+    // for one stat and hid the rest.
+    var mine = !!g.my_played;
+
+    if (!mine && !g.players) {
+      // Genuinely nothing to show on either side.
+      body.appendChild(make('p', 'lb-msg', 'Nobody has played ' + periodWord() + ' yet.'));
       card.appendChild(body);
       return card;
     }
 
-    if (!g.my_played) {
+    if (!mine) {
       body.appendChild(make('p', 'lb-msg',
-        period === 'lifetime' ? 'You have not played this one yet.'
-                              : 'You have not played this one ' + periodWord() + '.'));
-      card.appendChild(body);
-      return card;
+        (period === 'lifetime' ? 'You have not played this one yet.'
+                               : 'You have not played this one ' + periodWord() + '.')
+        + ' Open any row to see who is ahead.'));
     }
 
     addHeader();
 
-    var playedLabel = period === 'daily' ? 'Played today' : 'Days played';
-    body.appendChild(statRow(playedLabel, num(g.my_played), g.rank_played, g.players, 'played', g));
+    // num/avg/signed already render a missing value as "-", and statRow omits
+    // the rank pill unless a rank is given, so an unplayed row needs no
+    // special casing beyond withholding the rank.
+    function srow(label, value, rank, players, metric) {
+      return statRow(label, value, mine ? rank : null, mine ? players : null, metric, g);
+    }
+
+    // With history, a row appears only if the figure exists. Without it, every
+    // row the GAME supports appears, because the board behind it exists
+    // regardless of whether this player has a number in it.
+    function has(v) { return mine ? v != null : true; }
+
+    body.appendChild(srow(playedLabelFor(period), num(g.my_played),
+      g.rank_played, g.players, 'played'));
 
     if (period === 'daily') {
       // A single day is one result. No average, no "best" of anything.
-      if (g.my_best != null) {
+      if (has(g.my_best)) {
         var dv = isChipGame(g.game) ? signed(g.my_best) : num(g.my_best);
-        body.appendChild(statRow(g.score_label || 'Score', dv, g.rank_best, g.players, 'best', g));
+        body.appendChild(srow(g.score_label || 'Score', dv, g.rank_best, g.players, 'best'));
       }
     } else {
       // The AVERAGE is the comparison that keeps working. It is ranked only
       // once a player has min_games results - one lucky first day would
       // otherwise outrank a long honest record forever.
-      if (g.my_avg != null) {
+      if (has(g.my_avg)) {
         var avgVal = isChipGame(g.game) ? signed(Math.round(g.my_avg)) : avg(g.my_avg);
-        body.appendChild(statRow(AVG_LABEL[g.game] || 'Average',
-          avgVal, g.rank_avg, g.avg_players, 'avg', g));
+        body.appendChild(srow(AVG_LABEL[g.game] || 'Average',
+          avgVal, g.rank_avg, g.avg_players, 'avg'));
       }
 
       // The best stays as a personal milestone. It is only RANKED for games
       // where it does not saturate - an unbounded chip day, or a Yachtdle
       // score. Elsewhere the rank column is deliberately blank.
-      if (g.my_best != null) {
+      if (has(g.my_best)) {
         var bestVal = isChipGame(g.game) ? signed(g.my_best) : num(g.my_best);
-        body.appendChild(statRow(BEST_LABEL[g.game] || 'Best',
+        body.appendChild(srow(BEST_LABEL[g.game] || 'Best',
           bestVal, g.best_ranked ? g.rank_best : null,
           g.best_ranked ? g.players : null,
-          g.best_ranked ? 'best' : null, g));
+          g.best_ranked ? 'best' : null));
       }
     }
 
     if (g.notable_label) {
-      body.appendChild(statRow(g.notable_label, num(g.my_notable), g.rank_notable, g.players, 'notable', g));
+      body.appendChild(srow(g.notable_label, num(g.my_notable),
+        g.rank_notable, g.players, 'notable'));
     }
 
     // Streaks and point-in-time extras are lifetime properties - there is no
     // "streak this week" or "chip stack this week". Their values and ranks come
     // from get_my_lifetime(), which is why they are absent on the other periods.
     if (period === 'lifetime') {
-      if (g.my_best_streak != null) {
+      if (has(g.my_best_streak)) {
         // Personal status, not a global stat. No rank, so no chevron either -
         // offering a board for something the row does not rank is a dead end.
-        body.appendChild(statRow('Current streak', num(g.my_cur_streak), null, null, null, g));
-        body.appendChild(statRow('Best streak', num(g.my_best_streak),
-          g.rank_streak, g.players, 'best_streak', g));
+        body.appendChild(srow('Current streak', num(g.my_cur_streak), null, null, null));
+        body.appendChild(srow('Best streak', num(g.my_best_streak),
+          g.rank_streak, g.players, 'best_streak'));
       }
-      if (g.extra_label && g.my_extra != null) {
+      if (g.extra_label && has(g.my_extra)) {
         var ex = LIFETIME_EXTRA[g.game];
-        body.appendChild(statRow(g.extra_label, num(g.my_extra),
-          g.rank_extra, g.players, ex ? 'extras:' + ex[0] : null, g));
+        body.appendChild(srow(g.extra_label, num(g.my_extra),
+          g.rank_extra, g.players, ex ? 'extras:' + ex[0] : null));
       }
     }
 
@@ -370,6 +400,23 @@ window.DJBoards = (function () {
   function load() {
     var grid = $('lb-grid');
     if (!grid) return;
+
+    // Signed out the page is the sign-in bar and nothing else. No cards, no
+    // boards, and NO RPC - the request is not made at all rather than made
+    // and discarded, so there is no window in which other players' standings
+    // reach a browser that should not have them.
+    //
+    // The server half matters as much: the board functions had anon EXECUTE
+    // precisely so this page could work signed out, so leaving that in place
+    // would make this a cosmetic gate, one curl away. Migration 0015 revokes
+    // it. Same reasoning as get_game_global and the Everyone tab.
+    if (!signedIn) {
+      grid.textContent = '';
+      setFurnitureHidden(true);
+      return;
+    }
+    setFurnitureHidden(false);
+
     grid.textContent = '';
     grid.appendChild(make('p', 'lb-msg', 'Loading...'));
 
@@ -397,6 +444,23 @@ window.DJBoards = (function () {
     });
   }
 
+  /**
+   * The period filter and the ranking footnote only describe figures the page
+   * is showing. Signed out there are none, so a filter that changes nothing
+   * and a paragraph explaining how averages are ranked are both noise around
+   * the one thing that card is for.
+   */
+  function setFurnitureHidden(hide) {
+    var filter = $('lb-filter');
+    if (filter) filter.hidden = hide;
+    var foot = document.querySelector('.lb-foot');
+    if (foot) foot.hidden = hide;
+    // paintTotals owns this when signed in, but it never runs signed out, so
+    // hide it here rather than relying on the markup's initial state - the
+    // page is also repainted on a period change without a reload.
+    if (hide) { var mine = $('lb-mine'); if (mine) mine.hidden = true; }
+  }
+
   function signInPrompt() {
     var el = $('lb-signedout');
     if (!el) return;
@@ -411,6 +475,17 @@ window.DJBoards = (function () {
   function boot() {
     period = readPeriod();
     buildFilter();
+
+    // The session takes up to 1200ms to settle and the page is deliberately
+    // bare until it does - filter, footnote and sign-in bar all start hidden,
+    // because showing any of them first is how the old "block of text that
+    // appears then disappears" happened. One neutral line holds the space so
+    // the wait does not read as a broken page.
+    var grid = $('lb-grid');
+    if (grid) {
+      grid.textContent = '';
+      grid.appendChild(make('p', 'lb-msg', 'Loading...'));
+    }
 
     // account.js settles the session asynchronously; wait for it rather than
     // painting a signed-out page to someone who is signed in.

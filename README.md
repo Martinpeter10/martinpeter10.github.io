@@ -193,6 +193,17 @@ Press `Ctrl+C` in the terminal to stop the server.
 
 Full release notes are also available at [dailyjamm.com/releases](https://dailyjamm.com/releases/).
 
+### v3.5.1 - 2026-11-09
+
+**Leaderboard improvements and a Roulettedle fix**
+
+- **Leaderboards are now for signed-in players.** Sign in to see the boards and how you compare. Your own stats in each game work exactly as before, with or without an account.
+- **Every game shows its full set of boards**, even ones you have not played yet. Your rows read "-" until you play, and you can still open any board to see who is ahead.
+- **The leaderboards page updates itself when you sign in or out** - no more refreshing by hand to see your numbers appear.
+- Fixed a block of text that briefly flashed on the leaderboards page before it finished loading.
+- **Roulettedle:** fixed a bug where tapping numbers quickly could place a bet before the wheel stopped. The betting board is now locked while the wheel spins and opens again as soon as the ball lands.
+- Privacy Policy updated: usernames and scores are now shown only to other signed-in players.
+
 ### v3.5.0 - 2026-10-17
 
 **Accounts, leaderboards, and progress that follows you**
