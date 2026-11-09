@@ -12,9 +12,9 @@ window.DJNotify = (function () {
   'use strict';
 
   var RELEASE = {
-    version: '3.5.0',
-    title: 'Accounts and Leaderboards',
-    summary: 'Sign in to save your scores, climb the daily leaderboards, and pick up where you left off on any device.'
+    version: '3.5.1',
+    title: 'Leaderboard improvements and a Roulettedle fix',
+    summary: 'Leaderboards are now for signed-in players and show every game in full, and Roulettedle no longer lets a bet slip in while the wheel is spinning.'
   };
 
   var SEEN_KEY = 'dj_seen_release';
