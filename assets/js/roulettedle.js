@@ -38,6 +38,7 @@ const RLGame = (function () {
   // A spin whose outcome is decided but not yet settled. Persisted, so a
   // reload resumes it instead of handing the stake back - see doSpin().
   let liveSpin      = null;       // { bets, pocket, betTotal } | null
+  let resultTimer   = null;       // hides the previous spin's banner and ball
 
   /* ── DOM helper ── */
   const $ = (id) => document.getElementById(id);
@@ -270,6 +271,23 @@ const RLGame = (function () {
     });
   }
 
+  /**
+   * Lock or unlock the whole betting area: board, chip sizes, Clear and Spin.
+   * Locked from the moment Spin is pressed until the ball lands. `inert`
+   * blocks taps AND keyboard, so nothing in it can be reached mid-spin; the
+   * isSpinning guards in placeBet/clearBets/doSpin stay as a second line.
+   */
+  function setTableLocked(on) {
+    isSpinning = on;
+    const area = $('rl-bet-area');
+    if (area) {
+      area.classList.toggle('rl-locked', on);
+      area.inert = on;
+    }
+    $('rl-clear-bets').disabled = on;
+    updateSpinBtn();
+  }
+
   function updateSpinBtn() {
     const btn = $('rl-spin-btn');
     if (btn) btn.disabled = totalBetAmount() === 0 || isSpinning;
@@ -381,9 +399,9 @@ const RLGame = (function () {
       }
     }
 
-    isSpinning = true;
-    $('rl-spin-btn').disabled = true;
-    $('rl-clear-bets').disabled = true;
+    // The previous spin's banner may still be up; it must not hide this one's ball.
+    clearTimeout(resultTimer);
+    setTableLocked(true);
     $('rl-spin-result').classList.add('hidden');
 
     // Deduct bet total upfront
@@ -425,10 +443,6 @@ const RLGame = (function () {
    * when the player pressed Spin, never a fresh one.
    */
   function settleSpin(pocket, betTotal) {
-    // isSpinning deliberately stays true here. The table is not cleared until
-    // afterSpin's delay elapses, and unlocking now let a fast tap stack chips
-    // onto the bets just paid and re-enable Spin - whose spin then had its
-    // bets wiped mid-air by that pending cleanup. afterSpin unlocks it.
     const net = evaluateBets(pocket);
     chips += betTotal + net;
     if (chips < 0) chips = 0;
@@ -449,6 +463,19 @@ const RLGame = (function () {
     saveToday();
 
     showSpinResult(net, pocket);
+
+    // The ball has landed and the bets are paid: clear the table NOW, then
+    // unlock. Clearing first is what makes unlocking here safe - a tap during
+    // the result banner starts a fresh bet instead of stacking onto the bets
+    // just paid, and nothing pending can wipe it later.
+    activeBets = {};
+    updateBoardBets();
+    updateBetDisplay();
+    // Game over (out of spins or chips) stays locked; the end screen takes over.
+    if (chips > 0 && spinNum < SPINS_PER_DAY) {
+      updateSpinIndicator();
+      setTableLocked(false);
+    }
   }
 
   /** Clear the table and move to whatever comes next. */
@@ -468,18 +495,13 @@ const RLGame = (function () {
         showFinalResults();
       }, delay);
     } else {
-      setTimeout(() => {
+      // Only tidies the previous result away. The table was already cleared and
+      // unlocked in settleSpin, so this must not touch bets the player has
+      // started placing; doSpin cancels it if they spin before it fires.
+      resultTimer = setTimeout(() => {
         const ballEl = document.getElementById('rl-ball');
         if (ballEl) ballEl.setAttribute('visibility', 'hidden');
-        activeBets = {};
-        updateBoardBets();
-        updateBetDisplay();
         $('rl-spin-result').classList.add('hidden');
-        isSpinning = false;
-        const clearBtn = $('rl-clear-bets');
-        if (clearBtn) clearBtn.disabled = false;
-        updateSpinIndicator();
-        updateSpinBtn();
       }, delay);
     }
   }
@@ -492,10 +514,8 @@ const RLGame = (function () {
    * outcome is still open. The result banner is shown immediately instead.
    */
   function resumeSpin(live) {
-    // Lock the table exactly as doSpin does; afterSpin unlocks it.
-    isSpinning = true;
-    $('rl-spin-btn').disabled = true;
-    $('rl-clear-bets').disabled = true;
+    // Lock the table exactly as doSpin does; settleSpin unlocks it.
+    setTableLocked(true);
     activeBets = live.bets || {};
     updateBoardBets();
     updateBetDisplay();

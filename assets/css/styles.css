@@ -1334,6 +1334,15 @@ input[type=range].slider::-moz-range-thumb {
   flex-shrink: 0;
 }
 
+/* Whole betting area while the wheel is spinning (set by setTableLocked) */
+.rl-bet-area.rl-locked {
+  opacity: .45;
+  filter: grayscale(.4);
+  pointer-events: none;
+  transition: opacity .2s, filter .2s;
+}
+.rl-bet-area { transition: opacity .2s, filter .2s; }
+
 /* Denomination row */
 .rl-denom-row {
   display: flex;
