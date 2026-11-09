@@ -10,7 +10,9 @@
 // 2. THE PAGE REPAINTS ITSELF ON AN AUTH CHANGE. Every page reads the session
 //    once at boot, so nothing re-ran when it changed later: signing out left
 //    other players' standings on screen, and signing in showed no figures
-//    until a manual refresh. account.js now navigates on a real transition.
+//    until a manual refresh. account.js now navigates on a real transition -
+//    meaning the signed-in identity differs from the one the page was painted
+//    for. The event name alone is not enough; see THE RELOAD LOOP below.
 //
 // The navigation assertions check the URL has no fragment and that the event
 // guard holds: a reload on INITIAL_SESSION or TOKEN_REFRESHED would fire on
@@ -86,7 +88,7 @@ const browser = await launch();
 // ── 2. an auth change repaints the page ───────────────────────────────────
 // account.js is the real module here. Its client is replaced so the auth
 // callback can be fired by hand; everything downstream of that is real code.
-async function authPage(browser) {
+async function authPage(browser, startUser = null) {
   const page = await browser.newPage();
   const navs = [];
   page.on('framenavigated', (f) => { if (f === page.mainFrame()) navs.push(f.url()); });
@@ -99,13 +101,17 @@ async function authPage(browser) {
     status: 200, contentType: 'application/javascript', body: 'void 0;',
   }));
 
-  await page.addInitScript(() => {
+  await page.addInitScript((startUser) => {
     let cb = null;
     window.__fireAuth = (event, session) => cb && cb(event, session);
     const fakeClient = {
       auth: {
         onAuthStateChange: (fn) => { cb = fn; return { data: { subscription: { unsubscribe() {} } } }; },
-        getSession: () => Promise.resolve({ data: { session: null } }),
+        // startUser = a session already stored when the page loads, which is
+        // how every signed-in visit begins. Always returning null here is why
+        // the reload loop below went unnoticed.
+        getSession: () => Promise.resolve({ data: { session:
+          startUser ? { user: { id: startUser } } : null } }),
         signOut: () => Promise.resolve({}),
         signInWithOAuth: () => Promise.resolve({}),
       },
@@ -115,7 +121,7 @@ async function authPage(browser) {
       rpc: () => Promise.resolve({ data: [] }),
     };
     window.supabase = { createClient: () => fakeClient };
-  });
+  }, startUser);
 
   await page.goto(BASE + '/leaderboards/', { waitUntil: 'load' });
   await page.waitForTimeout(1600);
@@ -155,13 +161,38 @@ async function authPage(browser) {
 }
 
 {
+  // THE RELOAD LOOP. supabase-js emits SIGNED_IN from _recoverAndRefresh() on
+  // every load that finds a stored session, and again whenever the tab becomes
+  // visible. Reloading on that reloaded the page, which emitted SIGNED_IN
+  // again - every signed-in page refreshed itself about twice a second. A
+  // SIGNED_IN for the user the page was already painted for must do nothing.
+  const { page, navs } = await authPage(browser, 'u1');
+  await page.evaluate(() => window.__fireAuth('INITIAL_SESSION', { user: { id: 'u1' } }));
+  await page.evaluate(() => window.__fireAuth('SIGNED_IN', { user: { id: 'u1' } }));
+  await page.waitForTimeout(1800);
+  if (navs.length === 0) ok();
+  else bad(`SIGNED_IN for the already-signed-in user navigated (${navs.length}x) - `
+           + 'supabase-js fires this on every load, so the page reloads forever');
+  await page.close();
+}
+
+{
+  // Same for SIGNED_OUT on a page that was already painted signed out:
+  // supabase-js emits it on load when it discards a stale stored session.
+  const { page, navs } = await authPage(browser);
+  await page.evaluate(() => window.__fireAuth('SIGNED_OUT', null));
+  await page.waitForTimeout(1800);
+  if (navs.length === 0) ok();
+  else bad('SIGNED_OUT on an already signed-out page navigated - a stale stored '
+           + 'session triggers this on load');
+  await page.close();
+}
+
+{
   // Account SWITCH. A session and profile already exist, so the "nothing new
   // to do" short-circuit used to swallow this and leave the previous player's
   // figures on screen - the shared-computer leak, arriving by a different door.
-  const { page, navs } = await authPage(browser);
-  await page.evaluate(() => window.__fireAuth('INITIAL_SESSION', { user: { id: 'u1' } }));
-  await page.waitForTimeout(1200);
-  navs.length = 0;
+  const { page, navs } = await authPage(browser, 'u1');
   await page.evaluate(() => window.__fireAuth('SIGNED_IN', { user: { id: 'u2' } }));
   await page.waitForTimeout(1800);
   if (navs.length > 0) ok();
@@ -171,7 +202,8 @@ async function authPage(browser) {
 }
 
 {
-  const { page, navs } = await authPage(browser);
+  // Painted signed in, then signed out (here or in another tab).
+  const { page, navs } = await authPage(browser, 'u1');
   await page.evaluate(() => window.__fireAuth('SIGNED_OUT', null));
   await page.waitForTimeout(1800);
   if (navs.length > 0) ok();
