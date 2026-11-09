@@ -61,6 +61,10 @@ window.DJAccount = (function () {
   var built = false;
   var resolvedFns = [];      // callbacks waiting on the session question
   var resolved = false;
+  // Who the page was PAINTED for: currentUser() at the moment the first
+  // paint was released. reloadForAuth compares against this, because
+  // supabase-js's own events cannot tell a real sign-in from a page load.
+  var paintedUser = null;
   var checkTimer = null;
   var lastChecked = '';
   var renaming = false;
@@ -704,6 +708,17 @@ window.DJAccount = (function () {
    * under a player mid-game.
    */
   function reloadForAuth() {
+    // Reload ONLY when the signed-in identity differs from the one this page
+    // was painted for. The event name is not enough: supabase-js emits
+    // SIGNED_IN from _recoverAndRefresh() on EVERY load that finds a stored
+    // session, and again every time the tab becomes visible. Reloading on the
+    // event alone reloaded the page, which fired SIGNED_IN, which reloaded it -
+    // a loop every signed-in visitor hit on every page. Likewise SIGNED_OUT
+    // fires on load when a stale stored session is discarded.
+    //
+    // Before the first paint there is nothing to repaint: the boot path will
+    // paint for whoever is signed in by then.
+    if (!resolved || currentUser() === paintedUser) return;
     try {
       // replace(), to the same URL WITHOUT its fragment, rather than reload():
       //
@@ -940,9 +955,17 @@ window.DJAccount = (function () {
     resolvedFns.push(fn);
   }
 
+  // Signed in, for every page, means a session AND a claimed name - the same
+  // test as isReady(). A session with no name yet paints as signed out, so
+  // claiming the name is a real transition and does repaint.
+  function currentUser() {
+    return (session && profile && session.user && session.user.id) || null;
+  }
+
   function markResolved() {
     if (resolved) return;
     resolved = true;
+    paintedUser = currentUser();
     var fns = resolvedFns; resolvedFns = [];
     fns.forEach(function (fn) {
       try { fn(); } catch (e) {
